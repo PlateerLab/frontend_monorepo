@@ -1,0 +1,11 @@
+{
+  "name": "@xgen/feature-support-ServiceRequestResults",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@xgen/types": "workspace:*",
+    "react": "^19.0.0"
+  }
+}
