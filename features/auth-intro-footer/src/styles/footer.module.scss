@@ -1,0 +1,101 @@
+@use "./variables" as *;
+
+.footer {
+    background: linear-gradient(135deg, #1f2937, #111827);
+    color: $white;
+    position: relative;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 50%, rgba(124, 58, 237, 0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+}
+
+.footerContent {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 5rem 2rem 3rem;
+    position: relative;
+    z-index: 1;
+
+    @media (min-width: 640px) { padding: 5rem 3rem 3rem; }
+    @media (min-width: 1024px) { padding: 6rem 4rem 3rem; }
+    @media (min-width: 1440px) { padding: 8rem 5rem 4rem; }
+}
+
+.footerTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.footerBrand {
+    h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, $white, #e2e8f0);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0 0 0.5rem 0;
+    }
+
+    p {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin: 0;
+    }
+}
+
+.footerSocial {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: $white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        svg { width: 1.25rem; height: 1.25rem; }
+    }
+}
+
+.footerBottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 2rem;
+    text-align: center;
+
+    p {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0;
+    }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "@xgen/feature-auth-Introduction",
+  "version": "0.0.0",
+  "private": true,
+  "main": "src/index.tsx",
+  "types": "src/index.tsx",
+  "dependencies": {
+    "@xgen/types": "workspace:*",
+    "@xgen/i18n": "workspace:*",
+    "@xgen/icons": "workspace:*",
+    "react": "^19.0.0",
+    "next": "^15.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "typescript": "^5"
+  }
+}

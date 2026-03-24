@@ -1,0 +1,97 @@
+{
+    "common": {
+        "cancel": "Cancel",
+        "login": "Login",
+        "logout": "Logout",
+        "getStarted": "Get Started",
+        "loading": "Starting app...",
+        "welcome": "Welcome, {username}",
+        "mypage": "Go to My Page"
+    },
+    "header": {
+        "title": "GEN AI Platform"
+    },
+    "hero": {
+        "label": "Hybrid AI Platform",
+        "title": "Driving AX Innovation",
+        "titleHighlight": "Hybrid AI Platform for Enterprises",
+        "titleWith": "with XGEN",
+        "description": "GEN AI Platform is the all-in-one AI platform where you can train models, design intelligent workflows with drag & drop, and serve them as APIs — effortlessly.",
+        "stat1Value": "5+",
+        "stat1Label": "AI Node Types",
+        "stat2Value": "Real-time",
+        "stat2Label": "Chat Interface",
+        "stat3Value": "Unlimited",
+        "stat3Label": "Workflow Creation",
+        "cta": "Be More Productive with XGEN"
+    },
+    "mockup": {
+        "title": "XGEN Canvas",
+        "input": "Input",
+        "aiProcess": "AI Process",
+        "output": "Output"
+    },
+    "features": {
+        "title": "Why XGEN?",
+        "subtitle": "Innovative features that set a new standard for AI workflow development",
+        "visualCanvas": {
+            "title": "Visual Canvas Editor",
+            "description": "Compose complex AI workflows visually with intuitive drag and drop, and preview them in real-time.",
+            "feature1": "5+ AI Node Types",
+            "feature2": "Real-time Preview",
+            "feature3": "Auto Validation"
+        },
+        "realtimeChat": {
+            "title": "Real-time AI Chat",
+            "description": "Have natural conversations with your completed workflows and see AI responses in real-time.",
+            "feature1": "Real-time Response",
+            "feature2": "Chat History",
+            "feature3": "Multi-workflow Selection"
+        },
+        "smartManagement": {
+            "title": "Smart Management Center",
+            "description": "Provides an integrated management environment for workflow performance monitoring, execution log analysis, and team collaboration.",
+            "feature1": "Performance Dashboard",
+            "feature2": "Execution Log Analysis",
+            "feature3": "Team Collaboration Tools"
+        },
+        "highPerformance": {
+            "title": "High-Performance Engine",
+            "description": "Optimized execution engine processes even large-scale workflows quickly and reliably.",
+            "feature1": "Parallel Processing",
+            "feature2": "Auto Scaling",
+            "feature3": "Error Recovery System"
+        },
+        "security": {
+            "title": "Enterprise Security",
+            "description": "Enterprise-grade security and data protection features ensure a safe AI workflow environment.",
+            "feature1": "Data Encryption",
+            "feature2": "Access Control",
+            "feature3": "Audit Logs"
+        },
+        "openEcosystem": {
+            "title": "Open Ecosystem",
+            "description": "Easily integrate various AI models and services with an extensible plugin system.",
+            "feature1": "API Integration",
+            "feature2": "Plugin Support",
+            "feature3": "Community Marketplace"
+        }
+    },
+    "cta": {
+        "label": "Ready to Transform Your AI Workflow?",
+        "title": "Get Started Now",
+        "description": "Create and run your first AI workflow in minutes",
+        "startFree": "Start for Free",
+        "exploreManagement": "Explore Management Center",
+        "note": "Let's Start"
+    },
+    "footer": {
+        "brand": "XGEN",
+        "tagline": "Next Generation AI Workflow",
+        "copyright": "© 2025 Plateer AI-LAB. All rights reserved."
+    },
+    "toast": {
+        "logoutSuccess": "Successfully logged out.",
+        "logoutError": "An error occurred during logout."
+    }
+}
