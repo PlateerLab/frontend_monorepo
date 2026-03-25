@@ -4,6 +4,8 @@ import React from 'react';
 import styles from '../styles/dashboard.module.scss';
 import type { TopWorkflowItem } from '../types';
 import { useTranslation } from '@xgen/i18n';
+import { Button } from '@xgen/ui';
+import { FiChevronRight } from '@xgen/icons';
 
 interface TopWorkflowsSectionProps {
   workflows: TopWorkflowItem[];
@@ -23,10 +25,14 @@ export const TopWorkflowsSection: React.FC<TopWorkflowsSectionProps> = ({
           {t('dashboard.topWorkflows')}
         </h3>
         {onViewAll && (
-          <button onClick={onViewAll} className={styles.viewAllLink}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onViewAll}
+            rightIcon={<FiChevronRight />}
+          >
             {t('common.viewAll')}
-            <ChevronRightIcon />
-          </button>
+          </Button>
         )}
       </div>
 
@@ -54,11 +60,5 @@ export const TopWorkflowsSection: React.FC<TopWorkflowsSectionProps> = ({
     </section>
   );
 };
-
-const ChevronRightIcon: React.FC = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
 
 export default TopWorkflowsSection;
