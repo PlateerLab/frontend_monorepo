@@ -37,4 +37,5 @@ export {
   FiUpload,
   FiRefreshCw,
   FiExternalLink,
+  FiHelpCircle,
 } from 'react-icons/fi';

@@ -1,358 +1,522 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import type { RouteComponentProps, MainFeatureModule } from '@xgen/types';
-import { ContentArea, SearchInput, EmptyState } from '@xgen/ui';
+import type { RouteComponentProps, MainFeatureModule, WorkflowOption } from '@xgen/types';
+import { ContentArea, SearchInput, EmptyState, FilterTabs } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import { createApiClient } from '@xgen/api-client';
 
 import styles from './styles/chat-new.module.scss';
-import type { WorkflowOption, WorkflowCategory } from './types';
+import type { ChatNewPageProps, WorkflowDetailFromAPI, WorkflowFilter, WorkflowOwnerFilter } from './types';
+
+// ─────────────────────────────────────────────────────────────
+// Constants
+// ─────────────────────────────────────────────────────────────
+
+const STORAGE_KEY_CURRENT_CHAT = 'xgen_current_chat';
+const STORAGE_KEY_FAVORITES = 'xgen_workflow_favorites';
 
 // ─────────────────────────────────────────────────────────────
 // Icons
 // ─────────────────────────────────────────────────────────────
 
-const WorkflowIcon: React.FC = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 3V21M3 12H21M7 17L17 7M7 7L17 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+const WorkflowIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+    <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+    <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+    <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+    <path d="M10 6.5H14M17.5 10V14M10 17.5H14M6.5 10V14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
   </svg>
 );
 
-const StarIcon: React.FC<{ filled?: boolean }> = ({ filled }) => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill={filled ? 'currentColor' : 'none'} xmlns="http://www.w3.org/2000/svg">
+const StarIcon: React.FC<{ filled?: boolean; className?: string }> = ({ filled, className }) => (
+  <svg className={className} width="16" height="16" viewBox="0 0 16 16" fill={filled ? 'currentColor' : 'none'} xmlns="http://www.w3.org/2000/svg">
     <path d="M8 1L10.163 5.279L15 5.919L11.5 9.321L12.326 14L8 11.779L3.674 14L4.5 9.321L1 5.919L5.837 5.279L8 1Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
-const ClockIcon: React.FC = () => (
+const PlayIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg className={className} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 3L13 8L4 13V3Z" fill="currentColor"/>
+  </svg>
+);
+
+const UserIcon: React.FC = () => (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M7 3.5V7L9.333 8.167M12.833 7C12.833 10.222 10.222 12.833 7 12.833C3.778 12.833 1.167 10.222 1.167 7C1.167 3.778 3.778 1.167 7 1.167C10.222 1.167 12.833 3.778 12.833 7Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M11.667 12.25V11.083C11.667 10.4645 11.4214 9.87141 10.9838 9.43382C10.5462 8.99624 9.95311 8.75 9.33467 8.75H4.66801C4.04956 8.75 3.45647 8.99624 3.01889 9.43382C2.58131 9.87141 2.33301 10.4645 2.33301 11.083V12.25M9.33301 4.08333C9.33301 5.37196 8.28831 6.41667 6.99967 6.41667C5.71101 6.41667 4.66634 5.37196 4.66634 4.08333C4.66634 2.79467 5.71101 1.75 6.99967 1.75C8.28831 1.75 9.33301 2.79467 9.33301 4.08333Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
-const FireIcon: React.FC = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10 1.667C10 1.667 11.667 4.167 11.667 6.667C11.667 8.333 10.833 9.167 10 9.167C9.167 9.167 8.333 8.333 8.333 6.667C8.333 5 10 3.333 10 1.667ZM6.667 5.833C6.667 5.833 7.5 6.667 7.5 7.5C7.5 8.333 7.083 8.75 6.667 8.75C6.25 8.75 5.833 8.333 5.833 7.5C5.833 6.667 6.667 5.833 6.667 5.833ZM13.333 10C13.333 10 15 12.5 15 14.167C15 15.833 13.333 18.333 10 18.333C6.667 18.333 5 15.833 5 14.167C5 12.5 6.667 10 6.667 10C6.667 10 8.333 11.667 10 11.667C11.667 11.667 13.333 10 13.333 10Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const ChartIcon: React.FC = () => (
+const UsersIcon: React.FC = () => (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M11.667 11.667H2.333V2.333M4.667 8.167V9.333M7 6.417V9.333M9.333 4.667V9.333" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M10 12.25V11.083C10 10.4645 9.7544 9.87141 9.31682 9.43382C8.87924 8.99624 8.28616 8.75 7.66772 8.75H3C2.38156 8.75 1.78847 8.99624 1.35089 9.43382C0.91331 9.87141 0.667 10.4645 0.667 11.083V12.25M13.333 12.25V11.083C13.3326 10.5731 13.1571 10.0785 12.8345 9.68123C12.5119 9.28398 12.0613 9.00785 11.558 8.90083M9.225 1.81749C9.73005 1.92336 10.1825 2.19952 10.5065 2.59769C10.8305 2.99586 11.0067 3.4919 11.0067 4.00332C11.0067 4.51475 10.8305 5.01079 10.5065 5.40896C10.1825 5.80713 9.73005 6.08329 9.225 6.18916M7.667 4C7.667 5.28866 6.6223 6.33333 5.33364 6.33333C4.04498 6.33333 3.00031 5.28866 3.00031 4C3.00031 2.71134 4.04498 1.66667 5.33364 1.66667C6.6223 1.66667 7.667 2.71134 7.667 4Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
-const SearchResultIcon: React.FC = () => (
-  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M21 38C30.3888 38 38 30.3888 38 21C38 11.6112 30.3888 4 21 4C11.6112 4 4 11.6112 4 21C4 30.3888 11.6112 38 21 38Z" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M44 44L33 33" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+const NodesIcon: React.FC = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="3" cy="3" r="1.5" stroke="currentColor" strokeWidth="1.2"/>
+    <circle cx="11" cy="3" r="1.5" stroke="currentColor" strokeWidth="1.2"/>
+    <circle cx="7" cy="11" r="1.5" stroke="currentColor" strokeWidth="1.2"/>
+    <path d="M4.2 3.9L6.1 9.5M9.8 3.9L7.9 9.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+  </svg>
+);
+
+const ArrowRightIcon: React.FC = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3.333 8H12.667M12.667 8L8 3.333M12.667 8L8 12.667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const RefreshIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg className={className} width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M1.5 3V7.5H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M16.5 15V10.5H12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M14.715 6.75C14.31 5.633 13.589 4.659 12.64 3.946C11.692 3.233 10.559 2.811 9.376 2.731C8.193 2.652 7.013 2.919 5.976 3.5C4.94 4.081 4.093 4.95 3.538 6M3.285 11.25C3.69 12.367 4.411 13.341 5.36 14.054C6.308 14.767 7.442 15.189 8.624 15.269C9.807 15.348 10.987 15.081 12.024 14.5C13.06 13.919 13.907 13.05 14.462 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
 // ─────────────────────────────────────────────────────────────
-// Mock Data
+// Utilities
 // ─────────────────────────────────────────────────────────────
 
-const MOCK_WORKFLOWS: WorkflowOption[] = [
-  {
-    workflowId: 'wf-001',
-    name: '이커머스 법률 상담',
-    description: '전자상거래 관련 법률 문의에 대해 AI 기반으로 전문적인 답변을 제공합니다.',
-    category: '법무',
-    usageCount: 245,
-    isFavorite: true,
-    lastUsedAt: '2025-01-28T10:30:00Z',
-    tags: ['법률', '전자상거래', 'AI'],
-  },
-  {
-    workflowId: 'wf-002',
-    name: '고객지원 자동응답',
-    description: '고객 문의에 대한 자동 응답 시스템으로 24시간 지원이 가능합니다.',
-    category: 'CS',
-    usageCount: 512,
-    isFavorite: true,
-    lastUsedAt: '2025-01-27T09:00:00Z',
-    tags: ['고객지원', '자동화'],
-  },
-  {
-    workflowId: 'wf-003',
-    name: 'HR 문서 검색',
-    description: '인사 관련 문서를 빠르게 검색하고 필요한 정보를 추출합니다.',
-    category: 'HR',
-    usageCount: 89,
-    isFavorite: false,
-    lastUsedAt: '2025-01-26T15:00:00Z',
-    tags: ['HR', '문서검색'],
-  },
-  {
-    workflowId: 'wf-004',
-    name: '마케팅 콘텐츠 생성',
-    description: 'SNS 게시물, 블로그 글, 광고 카피 등 다양한 마케팅 콘텐츠를 생성합니다.',
-    category: '마케팅',
-    usageCount: 178,
-    isFavorite: false,
-    lastUsedAt: '2025-01-25T14:00:00Z',
-    tags: ['마케팅', '콘텐츠', 'AI'],
-  },
-  {
-    workflowId: 'wf-005',
-    name: '기술 문서 번역',
-    description: '기술 문서를 다국어로 번역하며 전문 용어를 정확하게 처리합니다.',
-    category: '개발',
-    usageCount: 156,
-    isFavorite: false,
-    lastUsedAt: '2025-01-24T11:00:00Z',
-    tags: ['번역', '기술문서'],
-  },
-  {
-    workflowId: 'wf-006',
-    name: '데이터 분석 리포트',
-    description: '데이터를 분석하고 인사이트가 담긴 리포트를 자동으로 생성합니다.',
-    category: '데이터',
-    usageCount: 234,
-    isFavorite: false,
-    lastUsedAt: '2025-01-23T16:30:00Z',
-    tags: ['데이터', '분석', '리포트'],
-  },
-];
+/** interaction_id 생성 */
+const generateInteractionId = (prefix = 'chat'): string => {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8);
+  return `${prefix}_${timestamp}_${random}`;
+};
 
-const MOCK_CATEGORIES: WorkflowCategory[] = [
-  { id: 'all', name: '전체', count: 6 },
-  { id: 'legal', name: '법무', count: 1 },
-  { id: 'cs', name: 'CS', count: 1 },
-  { id: 'hr', name: 'HR', count: 1 },
-  { id: 'marketing', name: '마케팅', count: 1 },
-  { id: 'dev', name: '개발', count: 1 },
-  { id: 'data', name: '데이터', count: 1 },
-];
+/** 현재 채팅 데이터 저장 */
+const saveCurrentChatData = (data: {
+  workflowId: string;
+  workflowName: string;
+  interactionId: string;
+  userId?: number;
+}): boolean => {
+  try {
+    const chatData = {
+      workflowId: data.workflowId,
+      workflowName: data.workflowName,
+      interactionId: data.interactionId,
+      userId: data.userId,
+      startedAt: new Date().toISOString(),
+    };
+    localStorage.setItem(STORAGE_KEY_CURRENT_CHAT, JSON.stringify(chatData));
+    return true;
+  } catch (error) {
+    console.error('Failed to save current chat data:', error);
+    return false;
+  }
+};
+
+/** 즐겨찾기 목록 가져오기 */
+const getFavorites = (): string[] => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY_FAVORITES);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+/** 즐겨찾기 토글 */
+const toggleFavorite = (workflowId: string): string[] => {
+  const favorites = getFavorites();
+  const index = favorites.indexOf(workflowId);
+  if (index > -1) {
+    favorites.splice(index, 1);
+  } else {
+    favorites.push(workflowId);
+  }
+  localStorage.setItem(STORAGE_KEY_FAVORITES, JSON.stringify(favorites));
+  return favorites;
+};
 
 // ─────────────────────────────────────────────────────────────
-// Chat New Page
+// Workflow Card Component
 // ─────────────────────────────────────────────────────────────
 
-interface ChatNewPageProps extends RouteComponentProps {
-  onNavigate?: (sectionId: string) => void;
-  onSelectWorkflow?: (workflow: WorkflowOption) => void;
+interface WorkflowCardProps {
+  workflow: WorkflowOption;
+  isFavorite: boolean;
+  onSelect: () => void;
+  onToggleFavorite: () => void;
 }
 
-const ChatNewPage: React.FC<ChatNewPageProps> = ({ onNavigate, onSelectWorkflow }) => {
+const WorkflowCard: React.FC<WorkflowCardProps> = ({
+  workflow,
+  isFavorite,
+  onSelect,
+  onToggleFavorite,
+}) => {
   const { t } = useTranslation();
+  const isActive = workflow.status === 'active';
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleFavorite();
+  };
+
+  return (
+    <article
+      className={`${styles.workflowCard} ${!isActive ? styles.draft : ''}`}
+      onClick={isActive ? onSelect : undefined}
+      role="button"
+      tabIndex={isActive ? 0 : -1}
+      aria-label={workflow.name}
+    >
+      <div className={styles.cardHeader}>
+        <div className={styles.cardIcon}>
+          <WorkflowIcon />
+        </div>
+        <button
+          className={`${styles.favoriteButton} ${isFavorite ? styles.active : ''}`}
+          onClick={handleFavoriteClick}
+          aria-label={isFavorite ? t('chatNew.removeFavorite') : t('chatNew.addFavorite')}
+        >
+          <StarIcon filled={isFavorite} />
+        </button>
+      </div>
+
+      <div className={styles.cardBody}>
+        <h3 className={styles.cardTitle}>{workflow.name}</h3>
+        {workflow.description && (
+          <p className={styles.cardDescription}>{workflow.description}</p>
+        )}
+      </div>
+
+      <div className={styles.cardFooter}>
+        <div className={styles.cardMeta}>
+          {workflow.isShared ? (
+            <span className={styles.metaItem} title={t('chatNew.shared')}>
+              <UsersIcon />
+              {workflow.username || t('chatNew.shared')}
+            </span>
+          ) : (
+            <span className={styles.metaItem} title={t('chatNew.personal')}>
+              <UserIcon />
+              {t('chatNew.personal')}
+            </span>
+          )}
+          {workflow.nodeCount !== undefined && (
+            <span className={styles.metaItem}>
+              <NodesIcon />
+              {workflow.nodeCount}
+            </span>
+          )}
+        </div>
+
+        <span className={`${styles.statusBadge} ${styles[workflow.status]}`}>
+          {t(`chatNew.status.${workflow.status}`)}
+        </span>
+      </div>
+
+      {isActive && (
+        <div className={styles.cardOverlay}>
+          <button className={styles.startButton}>
+            <PlayIcon />
+            <span>{t('chatNew.startChat')}</span>
+            <ArrowRightIcon />
+          </button>
+        </div>
+      )}
+    </article>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────
+// Chat New Page Component
+// ─────────────────────────────────────────────────────────────
+
+const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
+  onNavigate,
+  onSelectWorkflow,
+}) => {
+  const { t } = useTranslation();
+  const api = createApiClient();
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [workflows, setWorkflows] = useState<WorkflowOption[]>([]);
-  const [categories, setCategories] = useState<WorkflowCategory[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [statusFilter, setStatusFilter] = useState<WorkflowFilter>('active');
+  const [ownerFilter, setOwnerFilter] = useState<WorkflowOwnerFilter>('all');
+
+  // ─────────────────────────────────────────────────────────────
+  // API 호출
+  // ─────────────────────────────────────────────────────────────
 
   const loadWorkflows = useCallback(async () => {
     setLoading(true);
-    try {
-      // TODO: API 연동
-      // const api = createApiClient();
-      // const response = await api.get<WorkflowOption[]>('/api/workflows');
-      // setWorkflows(response.data);
+    setError(null);
 
-      await new Promise(resolve => setTimeout(resolve, 400));
-      setWorkflows(MOCK_WORKFLOWS);
-      setCategories(MOCK_CATEGORIES);
-    } catch (error) {
-      console.error('Failed to load workflows:', error);
+    try {
+      const result = await api.get<WorkflowDetailFromAPI[]>('/api/workflow/detail/list');
+      const workflowList = result?.data || [];
+
+      // API 응답을 WorkflowOption 형태로 변환
+      const transformed: WorkflowOption[] = workflowList
+        .filter((detail) => detail.is_accepted !== false)
+        .map((detail) => {
+          // 상태 결정
+          let status: 'active' | 'draft' | 'archived' = 'active';
+          if (!detail.has_startnode || !detail.has_endnode || detail.node_count < 3) {
+            status = 'draft';
+          }
+
+          return {
+            id: detail.workflow_id,
+            name: detail.workflow_name.replace('.json', '') || detail.workflow_id,
+            description: detail.metadata?.description as string | undefined,
+            status,
+            nodeCount: detail.node_count,
+            isShared: detail.is_shared,
+            userId: detail.user_id,
+            username: detail.username || detail.full_name,
+            lastModified: detail.updated_at,
+          };
+        });
+
+      setWorkflows(transformed);
+      setFavorites(getFavorites());
+    } catch (err) {
+      console.error('Failed to load workflows:', err);
+      setError(t('chatNew.error.loadFailed'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [api, t]);
 
   useEffect(() => {
     loadWorkflows();
   }, [loadWorkflows]);
 
-  // 즐겨찾기 워크플로우
-  const favoriteWorkflows = useMemo(() =>
-    workflows.filter(w => w.isFavorite).slice(0, 4),
-    [workflows]
-  );
+  // ─────────────────────────────────────────────────────────────
+  // 필터링
+  // ─────────────────────────────────────────────────────────────
 
-  // 최근 사용 워크플로우
-  const recentWorkflows = useMemo(() =>
-    workflows
-      .filter(w => w.lastUsedAt)
-      .sort((a, b) => new Date(b.lastUsedAt!).getTime() - new Date(a.lastUsedAt!).getTime())
-      .slice(0, 4),
-    [workflows]
-  );
-
-  // 필터링된 워크플로우
   const filteredWorkflows = useMemo(() => {
-    return workflows.filter(workflow => {
+    return workflows.filter((workflow) => {
       // 검색 필터
       if (search) {
         const searchLower = search.toLowerCase();
         const matchName = workflow.name.toLowerCase().includes(searchLower);
         const matchDesc = workflow.description?.toLowerCase().includes(searchLower);
-        const matchTags = workflow.tags?.some(tag => tag.toLowerCase().includes(searchLower));
-        if (!matchName && !matchDesc && !matchTags) return false;
+        if (!matchName && !matchDesc) return false;
       }
 
-      // 카테고리 필터
-      if (selectedCategory !== 'all') {
-        if (workflow.category?.toLowerCase() !== selectedCategory.toLowerCase()) return false;
+      // 상태 필터
+      if (statusFilter !== 'all' && workflow.status !== statusFilter) {
+        return false;
+      }
+
+      // 소유자 필터
+      if (ownerFilter === 'personal' && workflow.isShared) {
+        return false;
+      }
+      if (ownerFilter === 'shared' && !workflow.isShared) {
+        return false;
       }
 
       return true;
     });
-  }, [workflows, search, selectedCategory]);
+  }, [workflows, search, statusFilter, ownerFilter]);
 
-  const handleWorkflowSelect = (workflow: WorkflowOption) => {
-    onSelectWorkflow?.(workflow);
+  // 즐겨찾기 워크플로우
+  const favoriteWorkflows = useMemo(() => {
+    return filteredWorkflows.filter((w) => favorites.includes(w.id));
+  }, [filteredWorkflows, favorites]);
+
+  // 일반 워크플로우 (즐겨찾기 제외)
+  const regularWorkflows = useMemo(() => {
+    return filteredWorkflows.filter((w) => !favorites.includes(w.id));
+  }, [filteredWorkflows, favorites]);
+
+  // 카운트 계산
+  const counts = {
+    all: workflows.length,
+    active: workflows.filter((w) => w.status === 'active').length,
+    draft: workflows.filter((w) => w.status === 'draft').length,
+  };
+
+  const statusTabs = [
+    { key: 'all', label: t('chatNew.filter.all'), count: counts.all },
+    { key: 'active', label: t('chatNew.filter.active'), count: counts.active },
+    { key: 'draft', label: t('chatNew.filter.draft'), count: counts.draft },
+  ];
+
+  const ownerTabs = [
+    { key: 'all', label: t('chatNew.owner.all') },
+    { key: 'personal', label: t('chatNew.owner.personal') },
+    { key: 'shared', label: t('chatNew.owner.shared') },
+  ];
+
+  // ─────────────────────────────────────────────────────────────
+  // Event Handlers
+  // ─────────────────────────────────────────────────────────────
+
+  const handleSelectWorkflow = (workflow: WorkflowOption) => {
+    if (workflow.status !== 'active') {
+      alert(t('chatNew.error.draftWorkflow'));
+      return;
+    }
+
+    // 새 interaction_id 생성
+    const interactionId = generateInteractionId();
+
+    // 현재 채팅 데이터 저장
+    const saved = saveCurrentChatData({
+      workflowId: workflow.id,
+      workflowName: workflow.name,
+      interactionId,
+      userId: workflow.userId,
+    });
+
+    if (!saved) {
+      alert(t('chatNew.error.saveFailed'));
+      return;
+    }
+
+    // 콜백 호출
+    onSelectWorkflow?.({
+      workflowId: workflow.id,
+      workflowName: workflow.name,
+      userId: workflow.userId,
+    });
+
+    // 현재 채팅 페이지로 이동
     onNavigate?.('current-chat');
   };
 
-  const handleToggleFavorite = async (workflow: WorkflowOption, e: React.MouseEvent) => {
-    e.stopPropagation();
-    // TODO: API 연동
-    setWorkflows(prev => prev.map(w =>
-      w.workflowId === workflow.workflowId
-        ? { ...w, isFavorite: !w.isFavorite }
-        : w
-    ));
+  const handleToggleFavorite = (workflowId: string) => {
+    const newFavorites = toggleFavorite(workflowId);
+    setFavorites(newFavorites);
   };
 
-  const formatLastUsed = (dateString?: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return t('chatNew.today');
-    if (diffDays === 1) return t('chatNew.yesterday');
-    return t('chatNew.daysAgo', { days: diffDays });
-  };
+  // ─────────────────────────────────────────────────────────────
+  // Render
+  // ─────────────────────────────────────────────────────────────
 
   return (
-    <ContentArea title={t('chatNew.title')}>
+    <ContentArea
+      title={t('chatNew.title')}
+      headerActions={
+        <button
+          onClick={loadWorkflows}
+          className={`${styles.refreshButton} ${loading ? styles.loading : ''}`}
+          disabled={loading}
+          aria-label={t('common.refresh')}
+        >
+          <RefreshIcon />
+        </button>
+      }
+    >
       <div className={styles.container}>
         {/* Header */}
         <div className={styles.header}>
-          <h1 className={styles.title}>{t('chatNew.header.title')}</h1>
-          <p className={styles.subtitle}>{t('chatNew.header.subtitle')}</p>
+          <div className={styles.headerText}>
+            <h1 className={styles.title}>{t('chatNew.header.title')}</h1>
+            <p className={styles.subtitle}>{t('chatNew.header.subtitle')}</p>
+          </div>
         </div>
 
-        {/* Quick Start (Favorites) */}
-        {!loading && favoriteWorkflows.length > 0 && (
-          <section className={styles.quickStartSection}>
-            <h2 className={styles.sectionTitle}>
-              <FireIcon />
-              {t('chatNew.sections.favorites')}
-            </h2>
-            <div className={styles.quickStartGrid}>
-              {favoriteWorkflows.map(workflow => (
+        {/* Filters */}
+        <div className={styles.filters}>
+          <div className={styles.filterRow}>
+            <FilterTabs
+              tabs={statusTabs}
+              activeKey={statusFilter}
+              onChange={(key) => setStatusFilter(key as WorkflowFilter)}
+              variant="pills"
+            />
+            <div className={styles.ownerFilters}>
+              {ownerTabs.map((tab) => (
                 <button
-                  key={workflow.workflowId}
-                  className={styles.quickStartCard}
-                  onClick={() => handleWorkflowSelect(workflow)}
+                  key={tab.key}
+                  className={`${styles.ownerButton} ${ownerFilter === tab.key ? styles.active : ''}`}
+                  onClick={() => setOwnerFilter(tab.key as WorkflowOwnerFilter)}
                 >
-                  <div className={styles.quickStartIcon}>
-                    <WorkflowIcon />
-                  </div>
-                  <div className={styles.quickStartText}>
-                    <p className={styles.quickStartName}>{workflow.name}</p>
-                    <p className={styles.quickStartMeta}>{workflow.category}</p>
-                  </div>
+                  {tab.key === 'personal' && <UserIcon />}
+                  {tab.key === 'shared' && <UsersIcon />}
+                  {tab.label}
                 </button>
               ))}
             </div>
-          </section>
-        )}
-
-        {/* Search & Category Filter */}
-        <div className={styles.searchWrapper}>
+          </div>
           <SearchInput
             value={search}
             onChange={setSearch}
             placeholder={t('chatNew.searchPlaceholder')}
             size="md"
-            className={styles.searchInput}
           />
         </div>
 
-        <div className={styles.categoryFilter}>
-          {categories.map(category => (
-            <button
-              key={category.id}
-              className={`${styles.categoryChip} ${selectedCategory === category.id ? styles.active : ''}`}
-              onClick={() => setSelectedCategory(category.id)}
-            >
-              {category.name}
-              <span className={styles.categoryCount}>{category.count}</span>
-            </button>
-          ))}
-        </div>
+        {/* Error State */}
+        {error && (
+          <div className={styles.errorBanner}>
+            <span>{error}</span>
+            <button onClick={loadWorkflows}>{t('common.retry')}</button>
+          </div>
+        )}
 
-        {/* Workflow Grid */}
+        {/* Content */}
         {loading ? (
-          <div className={styles.loading}>
+          <div className={styles.loadingState}>
             <div className={styles.spinner} />
+            <p>{t('common.loading')}</p>
           </div>
         ) : filteredWorkflows.length === 0 ? (
           <EmptyState
-            icon={<SearchResultIcon />}
+            icon={<WorkflowIcon />}
             title={t('chatNew.empty.title')}
             description={t('chatNew.empty.description')}
           />
         ) : (
-          <div className={styles.workflowGrid}>
-            {filteredWorkflows.map(workflow => (
-              <div
-                key={workflow.workflowId}
-                className={`${styles.workflowCard} ${workflow.isFavorite ? styles.favorite : ''}`}
-                onClick={() => handleWorkflowSelect(workflow)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && handleWorkflowSelect(workflow)}
-              >
-                <div className={styles.cardHeader}>
-                  <div className={styles.cardIcon}>
-                    {workflow.iconUrl ? (
-                      <img src={workflow.iconUrl} alt="" />
-                    ) : (
-                      <WorkflowIcon />
-                    )}
-                  </div>
-                  <div className={styles.cardInfo}>
-                    <h3 className={styles.cardName}>{workflow.name}</h3>
-                    <p className={styles.cardCategory}>{workflow.category}</p>
-                  </div>
-                  <button
-                    className={`${styles.favoriteButton} ${workflow.isFavorite ? styles.active : ''}`}
-                    onClick={(e) => handleToggleFavorite(workflow, e)}
-                    aria-label={workflow.isFavorite ? t('chatNew.removeFavorite') : t('chatNew.addFavorite')}
-                  >
-                    <StarIcon filled={workflow.isFavorite} />
-                  </button>
+          <div className={styles.content}>
+            {/* Favorites Section */}
+            {favoriteWorkflows.length > 0 && (
+              <section className={styles.section}>
+                <h2 className={styles.sectionTitle}>
+                  <StarIcon filled />
+                  {t('chatNew.sections.favorites')}
+                  <span className={styles.sectionCount}>{favoriteWorkflows.length}</span>
+                </h2>
+                <div className={styles.workflowGrid}>
+                  {favoriteWorkflows.map((workflow) => (
+                    <WorkflowCard
+                      key={workflow.id}
+                      workflow={workflow}
+                      isFavorite={true}
+                      onSelect={() => handleSelectWorkflow(workflow)}
+                      onToggleFavorite={() => handleToggleFavorite(workflow.id)}
+                    />
+                  ))}
                 </div>
-                <p className={styles.cardDescription}>{workflow.description}</p>
-                <div className={styles.cardMeta}>
-                  <span className={styles.cardMetaItem}>
-                    <ChartIcon />
-                    {t('chatNew.usageCount', { count: workflow.usageCount })}
-                  </span>
-                  {workflow.lastUsedAt && (
-                    <span className={styles.cardMetaItem}>
-                      <ClockIcon />
-                      {formatLastUsed(workflow.lastUsedAt)}
-                    </span>
-                  )}
-                </div>
-                {workflow.tags && workflow.tags.length > 0 && (
-                  <div className={styles.cardTags}>
-                    {workflow.tags.slice(0, 3).map(tag => (
-                      <span key={tag} className={styles.tag}>#{tag}</span>
-                    ))}
-                  </div>
-                )}
+              </section>
+            )}
+
+            {/* All Workflows Section */}
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>
+                <WorkflowIcon />
+                {t('chatNew.sections.all')}
+                <span className={styles.sectionCount}>{regularWorkflows.length}</span>
+              </h2>
+              <div className={styles.workflowGrid}>
+                {regularWorkflows.map((workflow) => (
+                  <WorkflowCard
+                    key={workflow.id}
+                    workflow={workflow}
+                    isFavorite={false}
+                    onSelect={() => handleSelectWorkflow(workflow)}
+                    onToggleFavorite={() => handleToggleFavorite(workflow.id)}
+                  />
+                ))}
               </div>
-            ))}
+            </section>
           </div>
         )}
       </div>
@@ -382,5 +546,4 @@ export const mainChatNewFeature: MainFeatureModule = {
 };
 
 export default mainChatNewFeature;
-
-export type { WorkflowOption, WorkflowCategory } from './types';
+export type { WorkflowOption } from '@xgen/types';

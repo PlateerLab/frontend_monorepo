@@ -7,6 +7,9 @@ $color-gray-900: #212529;
 $color-primary: #305eeb;
 $color-white: #ffffff;
 
+$sidebar-width: 250px;
+$sidebar-collapsed-width: 72px;
+
 .container {
   display: flex;
   min-height: 100vh;
@@ -17,6 +20,12 @@ $color-white: #ffffff;
   flex: 1;
   min-width: 0;
   overflow-y: auto;
+  margin-left: $sidebar-width;
+  transition: margin-left 0.25s ease-out;
+
+  &.sidebarCollapsed {
+    margin-left: $sidebar-collapsed-width;
+  }
 }
 
 // ─────────────────────────────────────────────────────────────

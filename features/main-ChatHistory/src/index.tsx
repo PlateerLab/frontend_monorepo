@@ -1,13 +1,20 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import type { RouteComponentProps, MainFeatureModule } from '@xgen/types';
+import type { RouteComponentProps, MainFeatureModule, ChatHistoryItem, ChatHistoryFilter } from '@xgen/types';
 import { ContentArea, FilterTabs, SearchInput, EmptyState } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import { createApiClient } from '@xgen/api-client';
 
 import styles from './styles/chat-history.module.scss';
-import type { ChatHistoryItem, ChatHistoryFilter } from './types';
+import type { ChatHistoryPageProps, ExecutionMeta, WorkflowDetail } from './types';
+
+// ─────────────────────────────────────────────────────────────
+// Constants
+// ─────────────────────────────────────────────────────────────
+
+const STORAGE_KEY_CURRENT_CHAT = 'xgen_current_chat';
+const SHA1_PATTERN = /^[a-f0-9]{40}$/i;
 
 // ─────────────────────────────────────────────────────────────
 // Icons
@@ -39,106 +46,131 @@ const TrashIcon: React.FC = () => (
   </svg>
 );
 
-const HistoryIcon: React.FC = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M8 4.66667V8L10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M2.66667 8C2.66667 5.05448 5.05448 2.66667 8 2.66667C10.9455 2.66667 13.3333 5.05448 13.3333 8C13.3333 10.9455 10.9455 13.3333 8 13.3333C5.05448 13.3333 2.66667 10.9455 2.66667 8Z" stroke="currentColor" strokeWidth="1.5"/>
-  </svg>
-);
-
 // ─────────────────────────────────────────────────────────────
-// Mock Data
+// Utilities
 // ─────────────────────────────────────────────────────────────
 
-const MOCK_CHATS: ChatHistoryItem[] = [
-  {
-    id: '1',
-    interactionId: 'int-001',
-    workflowId: 'wf-001',
-    workflowName: '이커머스 법률 상담',
-    interactionCount: 15,
-    createdAt: '2025-01-28T10:30:00Z',
-    updatedAt: '2025-01-28T14:25:00Z',
-    isWorkflowDeleted: false,
-  },
-  {
-    id: '2',
-    interactionId: 'int-002',
-    workflowId: 'wf-002',
-    workflowName: '고객지원 자동응답',
-    interactionCount: 8,
-    createdAt: '2025-01-27T09:00:00Z',
-    updatedAt: '2025-01-27T11:30:00Z',
-    isWorkflowDeleted: false,
-  },
-  {
-    id: '3',
-    interactionId: 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0',
-    workflowId: 'wf-003',
-    workflowName: 'HR 문서 검색',
-    interactionCount: 3,
-    createdAt: '2025-01-26T15:00:00Z',
-    updatedAt: '2025-01-26T15:45:00Z',
-    isWorkflowDeleted: false,
-  },
-  {
-    id: '4',
-    interactionId: 'int-004',
-    workflowId: 'wf-deleted',
-    workflowName: '삭제된 워크플로우',
-    interactionCount: 5,
-    createdAt: '2025-01-25T08:00:00Z',
-    updatedAt: '2025-01-25T09:00:00Z',
-    isWorkflowDeleted: true,
-  },
-];
+/** Deploy 채팅 여부 확인 (SHA1 해시 패턴) */
+const isDeployChat = (interactionId: string): boolean => {
+  return SHA1_PATTERN.test(interactionId);
+};
+
+/** 현재 채팅 데이터 저장 */
+const saveCurrentChatData = (data: {
+  workflowId: string;
+  workflowName: string;
+  interactionId: string;
+  userId?: number;
+  startedAt?: string;
+}): boolean => {
+  try {
+    const chatData = {
+      workflowId: data.workflowId,
+      workflowName: data.workflowName,
+      interactionId: data.interactionId,
+      userId: data.userId,
+      startedAt: data.startedAt || new Date().toISOString(),
+    };
+    localStorage.setItem(STORAGE_KEY_CURRENT_CHAT, JSON.stringify(chatData));
+    return true;
+  } catch (error) {
+    console.error('Failed to save current chat data:', error);
+    return false;
+  }
+};
 
 // ─────────────────────────────────────────────────────────────
-// Chat History Page
+// Chat History Page Component
 // ─────────────────────────────────────────────────────────────
 
-interface ChatHistoryPageProps extends RouteComponentProps {
-  onNavigate?: (sectionId: string) => void;
-  onSelectChat?: (chat: ChatHistoryItem) => void;
-}
-
-const ChatHistoryPage: React.FC<ChatHistoryPageProps> = ({ onNavigate, onSelectChat }) => {
+const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
+  onNavigate,
+  onSelectChat,
+}) => {
   const { t } = useTranslation();
+  const api = createApiClient();
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [chats, setChats] = useState<ChatHistoryItem[]>([]);
   const [filter, setFilter] = useState<ChatHistoryFilter>('active');
   const [search, setSearch] = useState('');
 
-  // SHA1 해시 패턴 체크 (deploy 채팅 확인)
-  const isDeployChat = (interactionId: string): boolean => {
-    const sha1Pattern = /^[a-f0-9]{40}$/i;
-    return sha1Pattern.test(interactionId);
-  };
+  // ─────────────────────────────────────────────────────────────
+  // API 호출
+  // ─────────────────────────────────────────────────────────────
 
-  const loadChats = useCallback(async () => {
+  const loadChatHistory = useCallback(async () => {
     setLoading(true);
-    try {
-      // TODO: API 연동
-      // const api = createApiClient();
-      // const response = await api.get<ChatHistoryItem[]>('/api/chat/history');
-      // setChats(response.data);
+    setError(null);
 
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setChats(MOCK_CHATS);
-    } catch (error) {
-      console.error('Failed to load chat history:', error);
+    try {
+      // 채팅 기록과 워크플로우 목록을 병렬로 가져오기
+      const [interactionsResult, workflowsResult] = await Promise.all([
+        api.get<{ execution_meta_list: ExecutionMeta[] }>('/api/interaction/list', {
+          params: { limit: 1000 },
+        }),
+        api.get<WorkflowDetail[]>('/api/workflow/detail/list'),
+      ]);
+
+      const chatList = interactionsResult?.data?.execution_meta_list || [];
+      const workflows = workflowsResult?.data || [];
+
+      // 각 채팅 기록에 대해 해당 워크플로우가 존재하는지 확인
+      const enrichedChatList: ChatHistoryItem[] = chatList.map((chat: ExecutionMeta) => {
+        // default_mode인 경우는 항상 사용 가능
+        if (chat.workflow_name === 'default_mode') {
+          return {
+            id: chat.id,
+            interactionId: chat.interaction_id,
+            workflowId: chat.workflow_id,
+            workflowName: chat.workflow_name,
+            interactionCount: chat.interaction_count,
+            metadata: chat.metadata,
+            createdAt: chat.created_at,
+            updatedAt: chat.updated_at,
+            isWorkflowDeleted: false,
+            userId: undefined,
+          };
+        }
+
+        // 해당 워크플로우 찾기
+        const matchingWorkflow = workflows.find(
+          (workflow: WorkflowDetail) => workflow.workflow_id === chat.workflow_id
+        );
+
+        return {
+          id: chat.id,
+          interactionId: chat.interaction_id,
+          workflowId: chat.workflow_id,
+          workflowName: chat.workflow_name,
+          interactionCount: chat.interaction_count,
+          metadata: chat.metadata,
+          createdAt: chat.created_at,
+          updatedAt: chat.updated_at,
+          isWorkflowDeleted: !matchingWorkflow,
+          userId: matchingWorkflow?.user_id,
+        };
+      });
+
+      setChats(enrichedChatList);
+    } catch (err) {
+      console.error('Failed to load chat history:', err);
+      setError(t('chatHistory.error.loadFailed'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [api, t]);
 
   useEffect(() => {
-    loadChats();
-  }, [loadChats]);
+    loadChatHistory();
+  }, [loadChatHistory]);
 
-  // 필터링된 채팅 목록
-  const filteredChats = chats.filter(chat => {
+  // ─────────────────────────────────────────────────────────────
+  // 필터링
+  // ─────────────────────────────────────────────────────────────
+
+  const filteredChats = chats.filter((chat) => {
     // 검색 필터
     if (search && !chat.workflowName.toLowerCase().includes(search.toLowerCase())) {
       return false;
@@ -159,54 +191,129 @@ const ChatHistoryPage: React.FC<ChatHistoryPageProps> = ({ onNavigate, onSelectC
     }
   });
 
-  // 필터 탭 설정
-  const filterTabs = [
-    { key: 'active', label: t('chatHistory.filter.active'), count: chats.filter(c => !c.isWorkflowDeleted && !isDeployChat(c.interactionId)).length },
-    { key: 'deploy', label: t('chatHistory.filter.deploy'), count: chats.filter(c => isDeployChat(c.interactionId)).length },
-    { key: 'deleted', label: t('chatHistory.filter.deleted'), count: chats.filter(c => c.isWorkflowDeleted).length },
-    { key: 'all', label: t('chatHistory.filter.all'), count: chats.length },
-  ];
-
-  const handleChatClick = (chat: ChatHistoryItem) => {
-    onSelectChat?.(chat);
-    onNavigate?.('current-chat');
+  // 카운트 계산
+  const counts = {
+    all: chats.length,
+    active: chats.filter((c) => !c.isWorkflowDeleted && !isDeployChat(c.interactionId)).length,
+    deleted: chats.filter((c) => c.isWorkflowDeleted).length,
+    deploy: chats.filter((c) => isDeployChat(c.interactionId)).length,
   };
 
-  const handleContinueChat = (chat: ChatHistoryItem) => {
-    onSelectChat?.(chat);
+  const filterTabs = [
+    { key: 'active', label: t('chatHistory.filter.active'), count: counts.active },
+    { key: 'deploy', label: t('chatHistory.filter.deploy'), count: counts.deploy },
+    { key: 'deleted', label: t('chatHistory.filter.deleted'), count: counts.deleted },
+    { key: 'all', label: t('chatHistory.filter.all'), count: counts.all },
+  ];
+
+  // ─────────────────────────────────────────────────────────────
+  // Event Handlers
+  // ─────────────────────────────────────────────────────────────
+
+  const handleContinueChat = async (chat: ChatHistoryItem) => {
+    // 삭제된 워크플로우는 계속 불가
+    if (chat.isWorkflowDeleted) {
+      alert(t('chatHistory.error.workflowDeleted'));
+      return;
+    }
+
+    // 현재 채팅 데이터 저장
+    const saved = saveCurrentChatData({
+      workflowId: chat.workflowId,
+      workflowName: chat.workflowName,
+      interactionId: chat.interactionId,
+      userId: chat.userId,
+      startedAt: chat.createdAt,
+    });
+
+    if (!saved) {
+      alert(t('chatHistory.error.saveFailed'));
+      return;
+    }
+
+    // 콜백 호출
+    onSelectChat?.({
+      workflowId: chat.workflowId,
+      workflowName: chat.workflowName,
+      interactionId: chat.interactionId,
+      userId: chat.userId,
+    });
+
+    // 현재 채팅 페이지로 이동
     onNavigate?.('current-chat');
   };
 
   const handleDeleteChat = async (chat: ChatHistoryItem) => {
-    // TODO: API 연동
-    console.log('Delete chat:', chat.id);
+    const confirmed = window.confirm(
+      t('chatHistory.deleteConfirm', { name: chat.workflowName })
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await api.delete('/api/workflow/io-logs', {
+        params: {
+          workflow_name: chat.workflowName,
+          workflow_id: chat.workflowId,
+          interaction_id: chat.interactionId,
+        },
+      });
+
+      // 목록에서 제거
+      setChats((prev) => prev.filter((c) => c.id !== chat.id));
+    } catch (err) {
+      console.error('Failed to delete chat:', err);
+      alert(t('chatHistory.error.deleteFailed'));
+    }
   };
+
+  // ─────────────────────────────────────────────────────────────
+  // Date Formatting
+  // ─────────────────────────────────────────────────────────────
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      return date.toLocaleTimeString('ko-KR', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } else if (diffDays === 1) {
+      return t('chatHistory.yesterday');
+    } else if (diffDays < 7) {
+      return t('chatHistory.daysAgo', { days: diffDays });
+    } else {
+      return date.toLocaleDateString('ko-KR', {
+        month: 'short',
+        day: 'numeric',
+      });
+    }
   };
+
+  // ─────────────────────────────────────────────────────────────
+  // Render
+  // ─────────────────────────────────────────────────────────────
 
   return (
     <ContentArea
       title={t('chatHistory.title')}
       headerActions={
         <button
-          onClick={loadChats}
+          onClick={loadChatHistory}
           className={`${styles.refreshButton} ${loading ? styles.loading : ''}`}
           disabled={loading}
+          aria-label={t('common.refresh')}
         >
           <RefreshIcon />
         </button>
       }
     >
       <div className={styles.container}>
-        {/* Filters */}
+        {/* Header: Filters & Search */}
         <div className={styles.header}>
           <FilterTabs
             tabs={filterTabs}
@@ -222,10 +329,19 @@ const ChatHistoryPage: React.FC<ChatHistoryPageProps> = ({ onNavigate, onSelectC
           />
         </div>
 
+        {/* Error State */}
+        {error && (
+          <div className={styles.errorBanner}>
+            <span>{error}</span>
+            <button onClick={loadChatHistory}>{t('common.retry')}</button>
+          </div>
+        )}
+
         {/* Content */}
         {loading ? (
-          <div className={styles.loading}>
+          <div className={styles.loadingState}>
             <div className={styles.spinner} />
+            <p>{t('common.loading')}</p>
           </div>
         ) : filteredChats.length === 0 ? (
           <EmptyState
@@ -240,55 +356,55 @@ const ChatHistoryPage: React.FC<ChatHistoryPageProps> = ({ onNavigate, onSelectC
         ) : (
           <div className={styles.chatList}>
             {filteredChats.map((chat) => (
-              <div
+              <article
                 key={chat.id}
                 className={`${styles.chatItem} ${chat.isWorkflowDeleted ? styles.deleted : ''}`}
-                onClick={() => handleChatClick(chat)}
               >
                 <div className={styles.chatIcon}>
                   <MessageIcon />
                 </div>
+
                 <div className={styles.chatContent}>
-                  <h4 className={styles.chatTitle}>{chat.workflowName}</h4>
+                  <h3 className={styles.chatTitle}>{chat.workflowName}</h3>
                   <div className={styles.chatMeta}>
-                    <span>{t('chatHistory.interactions', { count: chat.interactionCount })}</span>
-                    <span>•</span>
-                    <span>{formatDate(chat.updatedAt)}</span>
+                    <span className={styles.metaItem}>
+                      {t('chatHistory.interactions', { count: chat.interactionCount })}
+                    </span>
+                    <span className={styles.metaSeparator}>•</span>
+                    <span className={styles.metaItem}>{formatDate(chat.updatedAt)}</span>
+
                     {chat.isWorkflowDeleted && (
-                      <span className={`${styles.badge} ${styles.deleted}`}>
+                      <span className={`${styles.badge} ${styles.badgeDeleted}`}>
                         {t('chatHistory.deleted')}
                       </span>
                     )}
                     {isDeployChat(chat.interactionId) && (
-                      <span className={`${styles.badge} ${styles.deploy}`}>
+                      <span className={`${styles.badge} ${styles.badgeDeploy}`}>
                         {t('chatHistory.deploy')}
                       </span>
                     )}
                   </div>
                 </div>
+
                 <div className={styles.chatActions}>
                   <button
-                    className={styles.actionButton}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleContinueChat(chat);
-                    }}
+                    className={`${styles.actionButton} ${styles.primary}`}
+                    onClick={() => handleContinueChat(chat)}
+                    disabled={chat.isWorkflowDeleted}
                     title={t('chatHistory.continue')}
                   >
                     <PlayIcon />
+                    <span>{t('chatHistory.continue')}</span>
                   </button>
                   <button
                     className={`${styles.actionButton} ${styles.danger}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteChat(chat);
-                    }}
+                    onClick={() => handleDeleteChat(chat)}
                     title={t('chatHistory.delete')}
                   >
                     <TrashIcon />
                   </button>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
         )}
@@ -319,5 +435,4 @@ export const mainChatHistoryFeature: MainFeatureModule = {
 };
 
 export default mainChatHistoryFeature;
-
-export type { ChatHistoryItem, ChatHistoryFilter } from './types';
+export type { ChatHistoryItem, ChatHistoryFilter } from '@xgen/types';

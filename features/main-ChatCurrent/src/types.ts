@@ -1,109 +1,140 @@
 /**
- * @xgen/main-chat-current 타입 정의
+ * @xgen/main-ChatCurrent 타입 정의
+ *
+ * 현재 진행 중인 채팅 인터페이스를 위한 타입 정의
  */
 
-/**
- * 채팅 메시지 발신자 타입
- */
-export type MessageSender = 'user' | 'assistant' | 'system';
+// Re-export shared types from @xgen/types
+export type {
+  ChatMessage,
+  ChatMessageSender,
+  ChatMessageStatus,
+  ChatAttachment,
+  ChatWorkflow,
+  ChatSession,
+  CurrentChatData,
+  ChatInputState,
+  ChatUIState,
+  ChatExecutionState,
+  SuggestedQuestion,
+  StreamMessageChunk,
+  SendMessageRequest,
+} from '@xgen/types';
+
+// ─────────────────────────────────────────────────────────────
+// Local Types
+// ─────────────────────────────────────────────────────────────
 
 /**
- * 메시지 상태
+ * SSE 이벤트 타입
  */
-export type MessageStatus = 'sending' | 'sent' | 'error' | 'streaming';
+export type SSEEventType = 'message' | 'log' | 'node_status' | 'tool' | 'error' | 'end';
 
 /**
- * 첨부 파일 타입
+ * SSE 이벤트 데이터
  */
-export interface MessageAttachment {
-  id: string;
+export interface SSEEventData {
+  type: 'data' | 'summary' | 'error';
+  content?: string;
+  data?: {
+    outputs?: string[];
+    io_id?: number;
+    [key: string]: unknown;
+  };
+  error?: string;
+}
+
+/**
+ * 노드 상태 이벤트
+ */
+export interface NodeStatusEvent {
+  node_id: string;
+  status: 'running' | 'completed' | 'error';
+  message?: string;
+}
+
+/**
+ * 툴 이벤트
+ */
+export interface ToolEvent {
+  type: 'tool_call' | 'tool_result' | 'tool_error';
+  tool_name: string;
+  input?: unknown;
+  output?: unknown;
+  error?: string;
+}
+
+/**
+ * 워크플로우 실행 요청
+ */
+export interface WorkflowExecutionRequest {
+  workflow_id: string;
+  workflow_name?: string;
+  input_data: string;
+  interaction_id: string;
+  user_id?: number;
+  selected_collections?: string[];
+  selected_files?: FileInfo[];
+  additional_params?: Record<string, unknown>;
+}
+
+/**
+ * 파일 정보
+ */
+export interface FileInfo {
   name: string;
-  type: string;
   size: number;
+  type: string;
   url?: string;
-  previewUrl?: string;
+  chunks?: number;
 }
 
 /**
- * 채팅 메시지
+ * 채팅 페이지 Props
  */
-export interface ChatMessage {
-  /** 메시지 ID */
-  id: string;
-
-  /** 발신자 */
-  sender: MessageSender;
-
-  /** 메시지 내용 */
-  content: string;
-
-  /** HTML 포맷팅된 내용 (마크다운 렌더링용) */
-  htmlContent?: string;
-
-  /** 첨부파일 */
-  attachments?: MessageAttachment[];
-
-  /** 생성 시간 */
-  createdAt: string;
-
-  /** 상태 */
-  status: MessageStatus;
-
-  /** 에러 메시지 */
-  errorMessage?: string;
-
-  /** 메타데이터 */
-  metadata?: {
-    tokens?: number;
-    model?: string;
-    processingTime?: number;
-    sources?: string[];
-  };
+export interface ChatCurrentPageProps {
+  onNavigate?: (sectionId: string) => void;
+  onChatEnd?: () => void;
 }
 
 /**
- * 채팅 세션
+ * 메시지 아이템 Props
  */
-export interface ChatSession {
-  /** 세션 ID */
-  id: string;
+export interface MessageItemProps {
+  message: import('@xgen/types').ChatMessage;
+  onRetry?: () => void;
+  onViewSource?: (source: unknown) => void;
+}
 
-  /** 상호작용 ID */
+/**
+ * 로컬 스토리지에 저장된 현재 채팅 데이터
+ */
+export interface StoredChatData {
+  workflowId: string;
+  workflowName: string;
   interactionId: string;
-
-  /** 워크플로우 정보 */
-  workflow: {
-    id: string;
-    name: string;
-    description?: string;
-  };
-
-  /** 메시지 목록 */
-  messages: ChatMessage[];
-
-  /** 생성 시간 */
-  createdAt: string;
-
-  /** 마지막 업데이트 시간 */
-  updatedAt: string;
-
-  /** 스트리밍 중인지 여부 */
-  isStreaming?: boolean;
+  userId?: number;
+  startedAt: string;
 }
 
 /**
- * 입력 상태
+ * IOLog 응답
  */
-export interface InputState {
-  content: string;
-  attachments: File[];
-  isComposing: boolean;
+export interface IOLog {
+  io_id: number;
+  interaction_id: string;
+  workflow_id: string;
+  input_data: string;
+  output_data: string;
+  created_at: string;
+  user_id?: number;
+  metadata?: Record<string, unknown>;
 }
 
 /**
- * 추천 질문
+ * IOLogs 목록 응답
  */
-export interface SuggestedQuestion {
-  id: string;
-  text: string;
+export interface IOLogsResponse {
+  logs: IOLog[];
+  total_count: number;
 }

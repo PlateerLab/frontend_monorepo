@@ -1,55 +1,46 @@
-/**
- * @xgen/main-chat-new 타입 정의
- */
+// Chat New Types
+// API에서 받아오는 워크플로우 데이터와 컴포넌트 타입 정의
 
-/**
- * 워크플로우 항목 (채팅 시작용)
- */
-export interface WorkflowOption {
-  /** 워크플로우 ID */
-  workflowId: string;
+export type { WorkflowOption, WorkflowDetailResponse } from '@xgen/types';
 
-  /** 워크플로우 이름 */
-  name: string;
+// ─────────────────────────────────────────────────────────────
+// API Response Types
+// ─────────────────────────────────────────────────────────────
 
-  /** 워크플로우 설명 */
-  description?: string;
-
-  /** 카테고리 */
-  category?: string;
-
-  /** 사용 횟수 */
-  usageCount?: number;
-
-  /** 즐겨찾기 여부 */
-  isFavorite?: boolean;
-
-  /** 최근 사용일 */
-  lastUsedAt?: string;
-
-  /** 버전 정보 */
-  version?: string;
-
-  /** 태그 */
-  tags?: string[];
-
-  /** 아이콘 URL */
-  iconUrl?: string;
+export interface WorkflowDetailFromAPI {
+  id: number;
+  workflow_name: string;
+  workflow_id: string;
+  username: string;
+  user_id: number;
+  full_name?: string;
+  node_count: number;
+  edge_count: number;
+  updated_at: string;
+  created_at: string;
+  has_startnode: boolean;
+  has_endnode: boolean;
+  is_completed: boolean;
+  is_shared: boolean;
+  share_group: string | null;
+  share_permissions: string;
+  metadata?: Record<string, unknown>;
+  error?: string;
+  is_accepted?: boolean;
 }
 
-/**
- * 워크플로우 카테고리
- */
-export interface WorkflowCategory {
-  id: string;
-  name: string;
-  count: number;
-}
+// ─────────────────────────────────────────────────────────────
+// Component Types
+// ─────────────────────────────────────────────────────────────
 
-/**
- * 초기 메시지 설정
- */
-export interface InitialMessageConfig {
-  content: string;
-  attachments?: File[];
+export type WorkflowFilter = 'all' | 'active' | 'draft';
+export type WorkflowOwnerFilter = 'all' | 'personal' | 'shared';
+
+export interface ChatNewPageProps {
+  onNavigate?: (sectionId: string) => void;
+  onSelectWorkflow?: (workflow: {
+    workflowId: string;
+    workflowName: string;
+    userId?: number;
+  }) => void;
 }

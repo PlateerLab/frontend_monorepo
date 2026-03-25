@@ -176,15 +176,24 @@ $shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
 .chatMeta {
   display: flex;
   align-items: center;
-  gap: $spacing-md;
+  gap: $spacing-sm;
   margin-top: $spacing-xs;
   font-size: $font-size-sm;
+  color: $color-text-secondary;
+  flex-wrap: wrap;
+}
+
+.metaItem {
+  color: $color-text-secondary;
+}
+
+.metaSeparator {
   color: $color-text-muted;
 }
 
 .chatActions {
   display: flex;
-  gap: $spacing-xs;
+  gap: $spacing-sm;
   opacity: 0;
   transition: opacity 0.2s ease;
 
@@ -197,7 +206,9 @@ $shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-sm;
+  min-width: 32px;
   height: 32px;
   background: transparent;
   border: 1px solid $color-border;
@@ -205,13 +216,34 @@ $shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   color: $color-text-secondary;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-size: $font-size-sm;
 
   &:hover {
     background-color: $color-bg-secondary;
     color: $color-text-primary;
   }
 
-  &.danger:hover {
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.primary {
+    background-color: $color-primary;
+    border-color: $color-primary;
+    color: $color-white;
+    padding: $spacing-xs $spacing-md;
+
+    &:hover:not(:disabled) {
+      background-color: darken($color-primary, 8%);
+    }
+
+    span {
+      font-weight: $font-weight-medium;
+    }
+  }
+
+  &.danger:hover:not(:disabled) {
     background-color: rgba($color-error, 0.1);
     border-color: $color-error;
     color: $color-error;
@@ -220,6 +252,7 @@ $shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   svg {
     width: 16px;
     height: 16px;
+    flex-shrink: 0;
   }
 }
 
@@ -303,13 +336,76 @@ $shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
     color: $color-success;
   }
 
-  &.deleted {
+  &.deleted,
+  &.badgeDeleted {
     background-color: rgba($color-error, 0.1);
     color: $color-error;
   }
 
-  &.deploy {
+  &.deploy,
+  &.badgeDeploy {
     background-color: rgba($color-primary, 0.1);
     color: $color-primary;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Error Banner
+// ─────────────────────────────────────────────────────────────
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $spacing-lg;
+  background-color: rgba($color-error, 0.1);
+  border: 1px solid rgba($color-error, 0.2);
+  border-radius: $radius-md;
+  color: $color-error;
+
+  span {
+    font-size: $font-size-sm;
+  }
+
+  button {
+    background: none;
+    border: none;
+    color: $color-error;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Loading State
+// ─────────────────────────────────────────────────────────────
+
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-3xl;
+  gap: $spacing-md;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid $color-border;
+    border-top-color: $color-primary;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  p {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin: 0;
   }
 }

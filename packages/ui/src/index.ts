@@ -44,3 +44,22 @@ export type { ToggleProps } from './inputs/toggle';
 // Navigation Components
 export { DropdownMenu } from './navigation/dropdown-menu';
 export type { DropdownMenuProps, DropdownMenuItem } from './navigation/dropdown-menu';
+
+// Sidebar Components - 범용 사이드바 (admin, main, mypage, support 등)
+export { Sidebar, SidebarSection, SidebarPopover } from './navigation/sidebar';
+export type {
+  SidebarProps,
+  SidebarSectionProps,
+  SidebarPopoverProps,
+  PopoverItem,
+  SidebarConfig,
+  SidebarSectionType,
+  SidebarMenuItem,
+  SidebarSectionId,
+  SidebarSupportItem,
+  SidebarUserProfile,
+  SidebarLogo,
+  SidebarHeader,
+  SidebarSupport,
+  SidebarVariant,
+} from './navigation/sidebar';

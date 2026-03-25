@@ -9,8 +9,11 @@ export interface RouteComponentProps {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Sidebar Types
+// Sidebar Types — 범용 사이드바 컴포넌트 인터페이스
+// admin, main, mypage, support 등 모든 페이지에서 공통으로 사용
 // ─────────────────────────────────────────────────────────────
+
+/** 사이드바 섹션 ID 타입 */
 export type SidebarSectionId =
   | 'workspace'
   | 'chat'
@@ -18,8 +21,127 @@ export type SidebarSectionId =
   | 'model'
   | 'ml-model'
   | 'data'
-  | 'support';
+  | 'support'
+  | 'admin'
+  | 'mypage'
+  | string; // 확장 가능
 
+/** 사이드바 메뉴 아이템 */
+export interface SidebarMenuItem {
+  /** 고유 ID */
+  id: string;
+  /** i18n 타이틀 키 */
+  titleKey: string;
+  /** i18n 설명 키 */
+  descriptionKey?: string;
+  /** 아이콘 컴포넌트 */
+  icon?: ComponentType<{ className?: string }>;
+  /** 배지 (숫자 또는 텍스트) */
+  badge?: string | number;
+  /** 링크 URL (onNavigate 대신 직접 이동할 때) */
+  href?: string;
+  /** 비활성화 여부 */
+  disabled?: boolean;
+}
+
+/** 사이드바 섹션 (아코디언) */
+export interface SidebarSection {
+  /** 섹션 고유 ID */
+  id: SidebarSectionId;
+  /** i18n 섹션 타이틀 키 */
+  titleKey: string;
+  /** 섹션 아이콘 컴포넌트 */
+  icon?: ComponentType<{ className?: string }>;
+  /** 섹션 내 메뉴 아이템들 */
+  items: SidebarMenuItem[];
+  /** 기본 확장 여부 */
+  defaultExpanded?: boolean;
+}
+
+/** 사이드바 지원 섹션 아이템 */
+export interface SidebarSupportItem {
+  /** 고유 ID */
+  id: string;
+  /** i18n 타이틀 키 */
+  titleKey: string;
+  /** 링크 URL */
+  href?: string;
+}
+
+/** 사용자 프로필 정보 */
+export interface SidebarUserProfile {
+  /** 사용자 이름 */
+  name: string;
+  /** 역할/직급 */
+  role?: string;
+  /** 아바타 URL 또는 문자 */
+  avatar?: string;
+}
+
+/** 사이드바 로고 설정 */
+export interface SidebarLogo {
+  /** 확장 상태 로고 텍스트 */
+  expanded: string;
+  /** 축소 상태 로고 텍스트 */
+  collapsed: string;
+}
+
+/** 사이드바 헤더 설정 */
+export interface SidebarHeader {
+  /** 모드 라벨 (예: "User Mode", "Admin Mode") */
+  modeLabelKey?: string;
+  /** 관리자 버튼 표시 여부 */
+  showAdminButton?: boolean;
+  /** 관리자 버튼 클릭 핸들러 */
+  onAdminClick?: () => void;
+}
+
+/** 사이드바 지원 섹션 설정 */
+export interface SidebarSupport {
+  /** i18n 섹션 타이틀 키 */
+  titleKey: string;
+  /** 지원 메뉴 아이템들 */
+  items: SidebarSupportItem[];
+}
+
+/** 사이드바 테마/변형 */
+export type SidebarVariant = 'main' | 'admin' | 'support' | 'mypage';
+
+/**
+ * 사이드바 전체 설정
+ * @xgen/ui의 Sidebar 컴포넌트에 전달
+ */
+export interface SidebarConfig {
+  /** 로고 설정 */
+  logo?: SidebarLogo;
+  /** 헤더 설정 */
+  header?: SidebarHeader;
+  /** 섹션 목록 (메인 메뉴) */
+  sections: SidebarSection[];
+  /** 지원 섹션 */
+  support?: SidebarSupport;
+  /** 사용자 프로필 */
+  user?: SidebarUserProfile;
+  /** 로그아웃 핸들러 */
+  onLogout?: () => void;
+  /** 메뉴 클릭 핸들러 */
+  onNavigate: (itemId: string, href?: string) => void;
+  /** 로고 클릭 핸들러 */
+  onLogoClick?: () => void;
+  /** 축소 상태 */
+  collapsed?: boolean;
+  /** 축소 토글 핸들러 */
+  onToggle?: () => void;
+  /** 현재 활성 메뉴 ID */
+  activeItemId?: string;
+  /** 사이드바 테마/변형 */
+  variant?: SidebarVariant;
+  /** 추가 CSS 클래스 */
+  className?: string;
+}
+
+// 하위 호환을 위한 기존 타입 (deprecated, 향후 제거 예정)
+/** @deprecated SidebarMenuItem 사용 권장 */
 export interface SidebarItem {
   id: string;
   titleKey: string;
@@ -219,11 +341,201 @@ export interface ModelItem extends BaseEntity {
   createdBy: string;
 }
 
+// ─────────────────────────────────────────────────────────────
+// Chat Types
+// 채팅 관련 인터페이스
+// ─────────────────────────────────────────────────────────────
+
+/** 채팅 메시지 발신자 타입 */
+export type ChatMessageSender = 'user' | 'assistant' | 'system';
+
+/** 채팅 메시지 상태 */
+export type ChatMessageStatus = 'pending' | 'sent' | 'error' | 'streaming';
+
+/** 파일 첨부 정보 */
+export interface ChatAttachment {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  url?: string;
+}
+
+/** 채팅 메시지 */
+export interface ChatMessage {
+  id: string;
+  sender: ChatMessageSender;
+  content: string;
+  createdAt: string;
+  status: ChatMessageStatus;
+  attachments?: ChatAttachment[];
+  metadata?: {
+    tokens?: number;
+    processingTime?: number;
+    toolCalls?: Array<{
+      name: string;
+      status: 'running' | 'completed' | 'failed';
+    }>;
+    sources?: Array<{
+      id: string;
+      title: string;
+      page?: number;
+    }>;
+  };
+  errorMessage?: string;
+}
+
+/** 워크플로우 정보 (채팅에서 사용) */
+export interface ChatWorkflow {
+  id: string;
+  name: string;
+  description?: string;
+  nodeCount?: number;
+  status: 'active' | 'draft' | 'archived';
+  isShared?: boolean;
+  userId?: number;
+  username?: string;
+  lastModified?: string;
+}
+
+/** 워크플로우 선택 옵션 */
+export interface WorkflowOption extends ChatWorkflow {
+  category?: string;
+  usageCount?: number;
+  isFavorite?: boolean;
+  lastUsedAt?: string;
+  tags?: string[];
+}
+
+/** 채팅 기록 항목 */
+export interface ChatHistoryItem {
+  id: string;
+  interactionId: string;
+  workflowId: string;
+  workflowName: string;
+  interactionCount: number;
+  createdAt: string;
+  updatedAt: string;
+  isWorkflowDeleted?: boolean;
+  userId?: number;
+  metadata?: Record<string, unknown>;
+}
+
+/** 채팅 기록 필터 */
+export type ChatHistoryFilter = 'all' | 'active' | 'deleted' | 'deploy';
+
+/** 채팅 세션 */
 export interface ChatSession extends BaseEntity {
-  title: string;
+  interactionId: string;
+  workflow: ChatWorkflow;
+  messages: ChatMessage[];
+  title?: string;
   lastMessage?: string;
   messageCount: number;
-  workflowId?: string;
+  startedAt?: string;
+}
+
+/** 현재 채팅 데이터 (로컬 스토리지 저장용) */
+export interface CurrentChatData {
+  workflowId: string;
+  workflowName: string;
+  interactionId: string;
+  userId?: number;
+  startedAt: string;
+}
+
+/** 입력 상태 */
+export interface ChatInputState {
+  content: string;
+  attachments: ChatAttachment[];
+  isComposing: boolean;
+}
+
+/** 추천 질문 */
+export interface SuggestedQuestion {
+  id: string;
+  text: string;
+  category?: string;
+}
+
+/** 채팅 UI 상태 */
+export interface ChatUIState {
+  showAttachmentMenu: boolean;
+  showSettingsModal: boolean;
+  isLoading: boolean;
+}
+
+/** 채팅 실행 상태 */
+export interface ChatExecutionState {
+  isPaused: boolean;
+  currentToolName: string | null;
+  toolCallCount: number;
+  isStreaming: boolean;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Chat API Types (요청/응답)
+// ─────────────────────────────────────────────────────────────
+
+/** Interaction 목록 API 응답 */
+export interface ListInteractionsResponse {
+  execution_meta_list: Array<{
+    id: string;
+    interaction_id: string;
+    workflow_id: string;
+    workflow_name: string;
+    interaction_count: number;
+    metadata: Record<string, unknown>;
+    created_at: string;
+    updated_at: string;
+  }>;
+}
+
+/** 워크플로우 상세 API 응답 */
+export interface WorkflowDetailResponse {
+  id: number;
+  workflow_name: string;
+  workflow_id: string;
+  username: string;
+  user_id: number;
+  full_name?: string;
+  node_count: number;
+  edge_count: number;
+  updated_at: string;
+  created_at: string;
+  has_startnode: boolean;
+  has_endnode: boolean;
+  is_completed: boolean;
+  is_shared: boolean;
+  share_group: string | null;
+  share_permissions: string;
+  metadata: Record<string, unknown>;
+  error?: string;
+}
+
+/** 메시지 전송 요청 */
+export interface SendMessageRequest {
+  workflow_id: string;
+  workflow_name: string;
+  interaction_id: string;
+  message: string;
+  user_id?: number;
+  attachments?: ChatAttachment[];
+  metadata?: Record<string, unknown>;
+}
+
+/** 메시지 전송 응답 (스트리밍용) */
+export interface StreamMessageChunk {
+  type: 'token' | 'tool_call' | 'source' | 'error' | 'done';
+  content?: string;
+  toolName?: string;
+  toolStatus?: 'running' | 'completed' | 'failed';
+  source?: {
+    id: string;
+    title: string;
+    page?: number;
+  };
+  error?: string;
 }
 
 // ─────────────────────────────────────────────────────────────

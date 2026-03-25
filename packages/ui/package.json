@@ -9,6 +9,10 @@
     "./styles": "./src/styles/_variables.scss"
   },
   "dependencies": {
+    "@xgen/i18n": "workspace:*",
+    "@xgen/icons": "workspace:*",
+    "@xgen/types": "workspace:*",
+    "framer-motion": "^11.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

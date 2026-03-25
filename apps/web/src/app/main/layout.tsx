@@ -1,11 +1,15 @@
-import MainPage from './page';
+'use client';
+
+import { AuthProvider } from '@xgen/auth-provider';
 
 export default function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <AuthProvider>
+      {children}
+    </AuthProvider>
+  );
 }
-
-export { MainPage };

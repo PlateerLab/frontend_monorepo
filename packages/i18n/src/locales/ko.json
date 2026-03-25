@@ -1,97 +1,575 @@
 {
-    "common": {
-        "cancel": "취소",
-        "login": "Login",
-        "logout": "로그아웃",
-        "getStarted": "Get Started",
-        "loading": "앱을 시작하는 중...",
-        "welcome": "환영합니다, {username}님",
-        "mypage": "마이페이지로 이동"
+  "common": {
+    "cancel": "취소",
+    "login": "로그인",
+    "logout": "로그아웃",
+    "getStarted": "시작하기",
+    "loading": "앱을 시작하는 중...",
+    "loadingGeneric": "로딩 중...",
+    "welcome": "환영합니다, {username}님",
+    "mypage": "마이페이지로 이동",
+    "viewAll": "전체 보기",
+    "refresh": "새로 고침",
+    "retry": "다시 시도",
+    "error": "오류가 발생했습니다"
+  },
+  "header": {
+    "title": "GEN AI Platform"
+  },
+  "hero": {
+    "label": "Hybrid AI Platform",
+    "title": "기업의 AX 혁신을 돕는",
+    "titleHighlight": "하이브리드 AI Platform",
+    "titleWith": "with XGEN",
+    "description": "GEN AI Platform은 모델 학습, 드래그 앤 드롭으로 지능형 워크플로우 설계, API 서빙을 손쉽게 할 수 있는 올인원 AI 플랫폼입니다.",
+    "stat1Value": "5+",
+    "stat1Label": "AI 노드 타입",
+    "stat2Value": "실시간",
+    "stat2Label": "채팅 인터페이스",
+    "stat3Value": "무제한",
+    "stat3Label": "워크플로우 생성",
+    "cta": "XGEN과 함께 더 생산적으로"
+  },
+  "mockup": {
+    "title": "XGEN Canvas",
+    "input": "입력",
+    "aiProcess": "AI 프로세스",
+    "output": "출력"
+  },
+  "features": {
+    "title": "왜 XGEN인가요?",
+    "subtitle": "AI 워크플로우 구축의 새로운 표준을 제시하는 혁신적인 기능들",
+    "visualCanvas": {
+      "title": "비주얼 캔버스 에디터",
+      "description": "직관적인 드래그 앤 드롭으로 복잡한 AI 워크플로우를 시각적으로 구성하고 실시간으로 미리보기할 수 있습니다.",
+      "feature1": "5+ AI 노드 타입",
+      "feature2": "실시간 미리보기",
+      "feature3": "자동 유효성 검사"
     },
-    "header": {
-        "title": "GEN AI Platform"
+    "realtimeChat": {
+      "title": "실시간 AI 채팅",
+      "description": "완성된 워크플로우와 자연스럽게 대화하며 AI의 응답을 실시간으로 확인할 수 있습니다.",
+      "feature1": "실시간 응답",
+      "feature2": "대화 기록 저장",
+      "feature3": "다중 워크플로우 선택"
     },
+    "smartManagement": {
+      "title": "스마트 관리센터",
+      "description": "워크플로우 성능 모니터링, 실행 로그 분석, 그리고 팀 협업을 위한 통합 관리 환경을 제공합니다.",
+      "feature1": "성능 대시보드",
+      "feature2": "실행 로그 분석",
+      "feature3": "팀 협업 도구"
+    },
+    "highPerformance": {
+      "title": "고성능 실행 엔진",
+      "description": "최적화된 실행 엔진으로 대규모 워크플로우도 빠르고 안정적으로 처리합니다.",
+      "feature1": "병렬 처리 지원",
+      "feature2": "자동 스케일링",
+      "feature3": "에러 복구 시스템"
+    },
+    "security": {
+      "title": "엔터프라이즈 보안",
+      "description": "기업급 보안과 데이터 보호 기능으로 안전한 AI 워크플로우 환경을 보장합니다.",
+      "feature1": "데이터 암호화",
+      "feature2": "접근 권한 제어",
+      "feature3": "감사 로그"
+    },
+    "openEcosystem": {
+      "title": "개방형 생태계",
+      "description": "다양한 AI 모델과 서비스를 쉽게 연동하고 확장 가능한 플러그인 시스템을 제공합니다.",
+      "feature1": "API 통합",
+      "feature2": "플러그인 지원",
+      "feature3": "커뮤니티 마켓플레이스"
+    }
+  },
+  "cta": {
+    "label": "AI 워크플로우를 혁신할 준비가 되셨나요?",
+    "title": "지금 바로 시작해보세요",
+    "description": "몇 분 안에 첫 번째 AI 워크플로우를 만들고 실행해보세요",
+    "startFree": "무료로 시작하기",
+    "exploreManagement": "관리센터 둘러보기",
+    "note": "시작하기"
+  },
+  "footer": {
+    "brand": "XGEN",
+    "tagline": "차세대 AI 워크플로우",
+    "copyright": "© 2025 Plateer AI-LAB. All rights reserved."
+  },
+  "toast": {
+    "logoutSuccess": "로그아웃되었습니다.",
+    "logoutError": "로그아웃 처리 중 오류가 발생했습니다."
+  },
+  "sidebar": {
+    "userMode": "User mode",
+    "openSidebar": "사이드바 열기",
+    "closeSidebar": "사이드바 닫기",
+    "chat": {
+      "title": "채팅",
+      "intro": { "title": "채팅 소개" },
+      "history": { "title": "채팅 기록" },
+      "new": { "title": "새 채팅" },
+      "current": { "title": "현재 채팅" }
+    },
+    "workflow": {
+      "title": "워크플로우",
+      "intro": { "title": "워크플로우 소개" },
+      "canvas": { "title": "캔버스" },
+      "workflows": { "title": "워크플로우 목록" },
+      "documents": { "title": "문서" },
+      "tools": { "title": "도구 저장소" },
+      "prompts": { "title": "프롬프트 저장소" },
+      "profile": { "title": "프로필" }
+    },
+    "model": {
+      "title": "모델",
+      "intro": { "title": "모델 소개" },
+      "train": { "title": "모델 학습" },
+      "eval": { "title": "모델 평가" },
+      "storage": { "title": "모델 저장소" },
+      "metrics": { "title": "모델 메트릭스" }
+    },
+    "ml": {
+      "title": "ML",
+      "intro": { "title": "ML 소개" },
+      "train": { "title": "ML 학습" },
+      "hub": { "title": "ML 허브" }
+    },
+    "data": {
+      "title": "데이터",
+      "intro": { "title": "데이터 소개" },
+      "station": { "title": "데이터 스테이션" },
+      "storage": { "title": "데이터 저장소" }
+    },
+    "support": {
+      "title": "지원",
+      "request": { "title": "서비스 요청" },
+      "faq": { "title": "FAQ" }
+    },
+    "workspace": {
+      "title": "워크스페이스",
+      "mainDashboard": { "title": "대시보드", "description": "메인 대시보드" }
+    }
+  },
+  "dashboard": {
+    "welcome": "환영합니다",
+    "welcomeSubtitle": "오늘도 생산적인 하루 되세요",
+    "workplaceOverview": "워크플로우 현황",
+    "latestUpdates": "최근 업데이트",
+    "noUpdates": "최근 업데이트가 없습니다",
+    "topWorkflows": "인기 워크플로우",
+    "noWorkflows": "워크플로우가 없습니다",
+    "recentErrors": "최근 오류",
+    "noErrors": "오류가 없습니다",
+    "lastUpdated": "마지막 업데이트",
+    "errors": {
+      "workflow": "워크플로우",
+      "time": "시간",
+      "message": "메시지"
+    }
+  },
+  "chatIntro": {
+    "heroTitle": "AI와 대화하세요",
+    "heroDescription": "자연어로 질문하고 즉각적인 답변을 받으세요",
+    "startNewChat": "새 채팅 시작",
+    "viewHistory": "기록 보기",
+    "features": {
+      "naturalLanguage": {
+        "title": "자연어 처리",
+        "description": "일상적인 언어로 AI와 자연스럽게 대화하세요"
+      },
+      "contextSearch": {
+        "title": "컨텍스트 검색",
+        "description": "대화 맥락을 이해하고 관련 정보를 검색합니다"
+      },
+      "toolIntegration": {
+        "title": "도구 통합",
+        "description": "다양한 도구와 연동하여 작업을 수행합니다"
+      }
+    },
+    "quickStart": {
+      "title": "빠른 시작",
+      "step1": { "title": "워크플로우 선택", "description": "사용할 AI 워크플로우를 선택하세요" },
+      "step2": { "title": "질문하기", "description": "자연어로 질문을 입력하세요" },
+      "step3": { "title": "답변 받기", "description": "AI가 생성한 답변을 확인하세요" }
+    },
+    "additionalFeatures": {
+      "title": "추가 기능",
+      "history": { "title": "대화 기록", "description": "이전 대화를 언제든 확인하세요" },
+      "multimodal": { "title": "멀티모달", "description": "텍스트, 이미지, 파일을 함께 사용하세요" },
+      "workflow": { "title": "워크플로우 연동", "description": "채팅에서 바로 워크플로우를 실행하세요" }
+    }
+  },
+  "chatHistory": {
+    "title": "채팅 기록",
+    "searchPlaceholder": "채팅 검색...",
+    "filter": { "all": "전체", "active": "활성", "deleted": "삭제됨", "deploy": "배포" },
+    "interactions": "대화",
+    "continue": "계속하기",
+    "delete": "삭제",
+    "deleted": "삭제됨",
+    "deploy": "배포",
+    "yesterday": "어제",
+    "empty": {
+      "title": "채팅 기록이 없습니다",
+      "description": "새로운 대화를 시작해보세요",
+      "action": "새 채팅 시작"
+    },
+    "error": {
+      "loadFailed": "채팅 기록을 불러오지 못했습니다",
+      "workflowDeleted": "삭제된 워크플로우입니다",
+      "saveFailed": "저장에 실패했습니다",
+      "deleteFailed": "삭제에 실패했습니다"
+    }
+  },
+  "chatNew": {
+    "title": "새 채팅",
+    "header": { "title": "워크플로우 선택", "subtitle": "대화를 시작할 워크플로우를 선택하세요" },
+    "searchPlaceholder": "워크플로우 검색...",
+    "sections": { "favorites": "즐겨찾기", "all": "전체 워크플로우" },
+    "filter": { "all": "전체", "active": "활성", "draft": "초안" },
+    "owner": { "all": "전체", "personal": "개인", "shared": "공유" },
+    "status": { "active": "활성", "draft": "초안", "archived": "보관됨" },
+    "addFavorite": "즐겨찾기 추가",
+    "removeFavorite": "즐겨찾기 제거",
+    "startChat": "채팅 시작",
+    "personal": "개인",
+    "shared": "공유",
+    "usageCount": "사용 횟수",
+    "today": "오늘",
+    "yesterday": "어제",
+    "daysAgo": "일 전",
+    "empty": { "title": "워크플로우가 없습니다", "description": "먼저 워크플로우를 생성하세요" },
+    "error": {
+      "loadFailed": "워크플로우를 불러오지 못했습니다",
+      "draftWorkflow": "초안 상태의 워크플로우는 사용할 수 없습니다",
+      "saveFailed": "저장에 실패했습니다"
+    }
+  },
+  "chat": {
+    "inputPlaceholder": "메시지를 입력하세요...",
+    "send": "전송",
+    "sendError": "메시지 전송 실패",
+    "retry": "재시도",
+    "attach": "파일 첨부",
+    "settings": "설정",
+    "viewHistory": "기록 보기",
+    "interactionCount": "대화 수",
+    "currentChat": "현재 채팅",
+    "newChat": "새 채팅",
+    "startNewChat": "새 채팅 시작",
+    "stop": "중지",
+    "cancelled": "취소됨",
+    "sessionStarted": "{{workflowName}} 워크플로우가 시작되었습니다",
+    "error": {
+      "noSession": "진행 중인 채팅이 없습니다",
+      "executionFailed": "실행 중 오류가 발생했습니다"
+    }
+  },
+  "workflowIntro": {
+    "title": "워크플로우",
     "hero": {
-        "label": "Hybrid AI Platform",
-        "title": "기업의 AX 혁신을 돕는",
-        "titleHighlight": "하이브리드 AI Platform",
-        "titleWith": "with XGEN",
-        "description": "GEN AI Platform is the all-in-one AI platform where you can train models, design intelligent workflows with drag & drop, and serve them as APIs — effortlessly.",
-        "stat1Value": "5+",
-        "stat1Label": "AI 노드 타입",
-        "stat2Value": "실시간",
-        "stat2Label": "채팅 인터페이스",
-        "stat3Value": "무제한",
-        "stat3Label": "워크플로우 생성",
-        "cta": "Be More Productive with XGEN"
-    },
-    "mockup": {
-        "title": "XGEN Canvas",
-        "input": "Input",
-        "aiProcess": "AI Process",
-        "output": "Output"
+      "title": "AI 워크플로우 빌더",
+      "description": "드래그 앤 드롭으로 강력한 AI 파이프라인을 구축하세요",
+      "primaryAction": "캔버스로 이동",
+      "secondaryAction": "워크플로우 탐색"
     },
     "features": {
-        "title": "왜 XGEN인가요?",
-        "subtitle": "AI 워크플로우 구축의 새로운 표준을 제시하는 혁신적인 기능들",
-        "visualCanvas": {
-            "title": "비주얼 캔버스 에디터",
-            "description": "직관적인 드래그 앤 드롭으로 복잡한 AI 워크플로우를 시각적으로 구성하고 실시간으로 미리보기할 수 있습니다.",
-            "feature1": "5+ AI 노드 타입",
-            "feature2": "실시간 미리보기",
-            "feature3": "자동 유효성 검사"
-        },
-        "realtimeChat": {
-            "title": "실시간 AI 채팅",
-            "description": "완성된 워크플로우와 자연스럽게 대화하며 AI의 응답을 실시간으로 확인할 수 있습니다.",
-            "feature1": "실시간 응답",
-            "feature2": "대화 기록 저장",
-            "feature3": "다중 워크플로우 선택"
-        },
-        "smartManagement": {
-            "title": "스마트 관리센터",
-            "description": "워크플로우 성능 모니터링, 실행 로그 분석, 그리고 팀 협업을 위한 통합 관리 환경을 제공합니다.",
-            "feature1": "성능 대시보드",
-            "feature2": "실행 로그 분석",
-            "feature3": "팀 협업 도구"
-        },
-        "highPerformance": {
-            "title": "고성능 실행 엔진",
-            "description": "최적화된 실행 엔진으로 대규모 워크플로우도 빠르고 안정적으로 처리합니다.",
-            "feature1": "병렬 처리 지원",
-            "feature2": "자동 스케일링",
-            "feature3": "에러 복구 시스템"
-        },
-        "security": {
-            "title": "엔터프라이즈 보안",
-            "description": "기업급 보안과 데이터 보호 기능으로 안전한 AI 워크플로우 환경을 보장합니다.",
-            "feature1": "데이터 암호화",
-            "feature2": "접근 권한 제어",
-            "feature3": "감사 로그"
-        },
-        "openEcosystem": {
-            "title": "개방형 생태계",
-            "description": "다양한 AI 모델과 서비스를 쉽게 연동하고 확장 가능한 플러그인 시스템을 제공합니다.",
-            "feature1": "API 통합",
-            "feature2": "플러그인 지원",
-            "feature3": "커뮤니티 마켓플레이스"
-        }
+      "title": "주요 기능",
+      "canvas": { "title": "비주얼 캔버스", "description": "직관적인 드래그 앤 드롭 인터페이스" },
+      "nodes": { "title": "다양한 노드", "description": "AI, 데이터, 로직 노드 제공" },
+      "ai": { "title": "AI 통합", "description": "다양한 AI 모델과 쉽게 연동" },
+      "deploy": { "title": "원클릭 배포", "description": "API로 즉시 배포 가능" }
     },
-    "cta": {
-        "label": "Ready to Transform Your AI Workflow?",
-        "title": "지금 바로 시작해보세요",
-        "description": "몇 분 안에 첫 번째 AI 워크플로우를 만들고 실행해보세요",
-        "startFree": "무료로 시작하기",
-        "exploreManagement": "관리센터 둘러보기",
-        "note": "Let's Start"
+    "quickActions": { "title": "빠른 실행" },
+    "actions": {
+      "createCanvas": "캔버스 생성",
+      "viewTools": "도구 보기",
+      "manageDocuments": "문서 관리",
+      "editPrompts": "프롬프트 편집"
     },
-    "footer": {
-        "brand": "XGEN",
-        "tagline": "Next Generation AI Workflow",
-        "copyright": "© 2025 Plateer AI-LAB. All rights reserved."
-    },
-    "toast": {
-        "logoutSuccess": "로그아웃되었습니다.",
-        "logoutError": "로그아웃 처리 중 오류가 발생했습니다."
+    "stats": {
+      "workflows": "워크플로우",
+      "nodeTypes": "노드 타입",
+      "executions": "실행",
+      "uptime": "가동률"
     }
+  },
+  "workflows": {
+    "title": "워크플로우",
+    "searchPlaceholder": "워크플로우 검색...",
+    "createNew": "새 워크플로우",
+    "filter": { "all": "전체", "published": "배포됨", "draft": "초안", "archived": "보관됨" },
+    "viewList": "목록 보기",
+    "viewGrid": "그리드 보기",
+    "edit": "편집",
+    "delete": "삭제",
+    "nodeCount": "노드 수",
+    "empty": {
+      "title": "워크플로우가 없습니다",
+      "description": "새 워크플로우를 만들어보세요",
+      "action": "워크플로우 생성"
+    }
+  },
+  "canvasIntro": {
+    "title": "캔버스",
+    "hero": {
+      "title": "AI 캔버스 에디터",
+      "description": "시각적으로 AI 워크플로우를 설계하세요",
+      "createBlank": "빈 캔버스로 시작",
+      "browseWorkflows": "워크플로우 탐색"
+    },
+    "templates": {
+      "title": "템플릿",
+      "recommended": "추천",
+      "popular": "인기",
+      "advanced": "고급",
+      "blank": { "title": "빈 캔버스", "description": "처음부터 시작하기" },
+      "chatbot": { "title": "챗봇", "description": "대화형 AI 봇 만들기" },
+      "rag": { "title": "RAG 파이프라인", "description": "검색 증강 생성" },
+      "agent": { "title": "AI 에이전트", "description": "자율 AI 에이전트" }
+    }
+  },
+  "documents": {
+    "title": "문서",
+    "searchPlaceholder": "문서 검색...",
+    "upload": "업로드",
+    "empty": { "title": "문서가 없습니다", "description": "문서를 업로드하세요" }
+  },
+  "toolStorage": {
+    "title": "도구 저장소",
+    "searchPlaceholder": "도구 검색...",
+    "createNew": "새 도구",
+    "filter": { "all": "전체" },
+    "empty": { "title": "도구가 없습니다", "description": "새 도구를 만들어보세요" }
+  },
+  "promptStorage": {
+    "title": "프롬프트 저장소",
+    "searchPlaceholder": "프롬프트 검색...",
+    "createNew": "새 프롬프트",
+    "filter": { "all": "전체" },
+    "empty": { "title": "프롬프트가 없습니다", "description": "새 프롬프트를 만들어보세요" }
+  },
+  "profile": {
+    "title": "프로필",
+    "editProfile": "프로필 편집",
+    "name": "이름",
+    "email": "이메일",
+    "accountSettings": "계정 설정",
+    "changePassword": "비밀번호 변경",
+    "notifications": "알림 설정",
+    "emailNotifications": "이메일 알림",
+    "emailNotificationsDesc": "중요한 업데이트를 이메일로 받습니다",
+    "workflowAlerts": "워크플로우 알림",
+    "workflowAlertsDesc": "워크플로우 오류 발생 시 알림을 받습니다",
+    "security": "보안",
+    "twoFactor": "2단계 인증",
+    "twoFactorDesc": "계정 보안을 강화합니다",
+    "sessionTimeout": "세션 타임아웃",
+    "sessionTimeoutDesc": "비활성 시 자동 로그아웃 시간",
+    "dangerZone": "위험 영역",
+    "logout": "로그아웃"
+  },
+  "modelIntro": {
+    "title": "모델",
+    "hero": {
+      "title": "모델 허브",
+      "subtitle": "AI 모델을 학습, 평가, 관리하세요",
+      "startTraining": "학습 시작",
+      "browseModels": "모델 탐색"
+    },
+    "capabilities": "주요 기능",
+    "features": {
+      "train": { "title": "모델 학습", "description": "커스텀 모델을 학습시키세요" },
+      "eval": { "title": "모델 평가", "description": "모델 성능을 평가하세요" },
+      "storage": { "title": "모델 저장소", "description": "모델을 저장하고 관리하세요" },
+      "metrics": { "title": "모델 메트릭스", "description": "실시간 성능 모니터링" }
+    },
+    "stats": {
+      "trainedModels": "학습된 모델",
+      "pretrainedModels": "사전 학습 모델",
+      "accuracy": "평균 정확도",
+      "monitoring": "실시간 모니터링"
+    }
+  },
+  "modelTrain": {
+    "title": "모델 학습",
+    "searchPlaceholder": "학습 작업 검색...",
+    "newTraining": "새 학습",
+    "tabs": { "all": "전체", "running": "진행중", "completed": "완료", "failed": "실패" },
+    "status": {
+      "pending": "대기중",
+      "running": "진행중",
+      "completed": "완료",
+      "failed": "실패",
+      "cancelled": "취소됨"
+    },
+    "start": "시작",
+    "stop": "중지",
+    "retry": "재시도",
+    "viewResults": "결과 보기",
+    "createdAt": "생성일",
+    "empty": { "title": "학습 작업이 없습니다", "description": "새 학습을 시작하세요" }
+  },
+  "modelEval": {
+    "title": "모델 평가",
+    "searchPlaceholder": "평가 검색...",
+    "newEvaluation": "새 평가",
+    "tabs": { "all": "전체", "running": "진행중", "completed": "완료" },
+    "status": { "running": "진행중", "completed": "완료", "failed": "실패" },
+    "compareModels": "모델 비교",
+    "exportReport": "리포트 내보내기",
+    "confusionMatrix": "혼동 행렬",
+    "evaluationInProgress": "평가 진행중...",
+    "empty": { "title": "평가가 없습니다", "description": "새 평가를 시작하세요" }
+  },
+  "modelStorage": {
+    "title": "모델 저장소",
+    "searchPlaceholder": "모델 검색...",
+    "uploadModel": "모델 업로드",
+    "tabs": { "all": "전체", "active": "활성", "draft": "초안", "archived": "보관됨" },
+    "accuracy": "정확도",
+    "size": "크기",
+    "updated": "업데이트",
+    "downloads": "다운로드",
+    "deploy": "배포",
+    "empty": { "title": "모델이 없습니다", "description": "모델을 업로드하세요" }
+  },
+  "modelMetrics": {
+    "title": "모델 메트릭스",
+    "totalRequests": "총 요청",
+    "avgLatency": "평균 지연시간",
+    "errorRate": "오류율",
+    "healthyModels": "정상 모델",
+    "throughput": "처리량",
+    "latency": "지연시간",
+    "requests": "요청",
+    "resourceUsage": "리소스 사용량",
+    "viewDetails": "상세 보기"
+  },
+  "mlIntro": {
+    "title": "ML",
+    "hero": {
+      "title": "머신러닝 플랫폼",
+      "subtitle": "ML 모델을 쉽게 학습하고 배포하세요",
+      "startTraining": "학습 시작",
+      "exploreModels": "모델 탐색"
+    },
+    "capabilities": "주요 기능",
+    "features": {
+      "train": { "title": "ML 학습", "description": "다양한 알고리즘으로 모델 학습" },
+      "inference": { "title": "추론", "description": "실시간 예측 수행" },
+      "hub": { "title": "모델 허브", "description": "사전 학습 모델 활용" }
+    },
+    "stats": {
+      "algorithms": "알고리즘",
+      "faster": "더 빠른",
+      "uptime": "가동률",
+      "scaling": "자동 스케일링"
+    },
+    "workflow": {
+      "title": "ML 워크플로우",
+      "prepare": "데이터 준비",
+      "train": "모델 학습",
+      "evaluate": "평가",
+      "deploy": "배포"
+    }
+  },
+  "mlTrain": {
+    "title": "ML 학습",
+    "searchPlaceholder": "실험 검색...",
+    "newExperiment": "새 실험",
+    "tabs": { "all": "전체", "running": "진행중", "completed": "완료", "queued": "대기중" },
+    "empty": { "title": "실험이 없습니다", "description": "새 실험을 시작하세요" }
+  },
+  "mlHub": {
+    "title": "ML 허브",
+    "searchPlaceholder": "모델 검색...",
+    "publishModel": "모델 등록",
+    "tabs": { "all": "전체", "nlp": "NLP", "vision": "비전", "classification": "분류", "regression": "회귀" },
+    "use": "사용",
+    "viewDetails": "상세 보기",
+    "empty": { "title": "모델이 없습니다", "description": "모델을 등록하세요" }
+  },
+  "dataIntro": {
+    "title": "데이터",
+    "hero": {
+      "title": "데이터 플랫폼",
+      "subtitle": "데이터를 통합하고 관리하세요",
+      "manageStorage": "저장소 관리",
+      "exploreData": "데이터 탐색"
+    },
+    "capabilities": "주요 기능",
+    "features": {
+      "station": { "title": "데이터 스테이션", "description": "다양한 소스에서 데이터 수집" },
+      "storage": { "title": "데이터 저장소", "description": "데이터셋 저장 및 관리" },
+      "pipeline": { "title": "데이터 파이프라인", "description": "자동화된 데이터 처리" }
+    },
+    "stats": {
+      "connectors": "커넥터",
+      "storage": "저장 용량",
+      "rowsPerSec": "초당 처리량",
+      "reliability": "안정성"
+    },
+    "supportedSources": "지원 소스"
+  },
+  "dataStation": {
+    "title": "데이터 스테이션",
+    "searchPlaceholder": "데이터 소스 검색...",
+    "addSource": "소스 추가",
+    "tabs": { "all": "전체", "database": "데이터베이스", "api": "API", "file": "파일", "stream": "스트림" },
+    "tables": "테이블",
+    "rows": "행",
+    "size": "크기",
+    "lastSync": "마지막 동기화",
+    "explore": "탐색",
+    "schema": "스키마",
+    "empty": { "title": "데이터 소스가 없습니다", "description": "데이터 소스를 추가하세요" }
+  },
+  "dataStorage": {
+    "title": "데이터 저장소",
+    "searchPlaceholder": "데이터셋 검색...",
+    "uploadDataset": "데이터셋 업로드",
+    "exportAll": "전체 내보내기",
+    "tabs": { "all": "전체", "tabular": "테이블", "text": "텍스트", "image": "이미지", "audio": "오디오" },
+    "summary": {
+      "datasets": "데이터셋",
+      "totalRows": "총 행",
+      "totalSize": "총 크기",
+      "ready": "준비됨"
+    },
+    "rows": "행",
+    "columns": "열",
+    "size": "크기",
+    "format": "형식",
+    "preview": "미리보기",
+    "download": "다운로드",
+    "empty": { "title": "데이터셋이 없습니다", "description": "데이터셋을 업로드하세요" }
+  },
+  "serviceRequest": {
+    "title": "서비스 요청",
+    "searchPlaceholder": "요청 검색...",
+    "newRequest": "새 요청",
+    "tabs": { "all": "전체", "open": "열림", "inProgress": "진행중", "resolved": "해결됨" },
+    "summary": { "open": "열림", "inProgress": "진행중", "resolved": "해결됨", "urgent": "긴급" },
+    "by": "요청자",
+    "view": "보기",
+    "time": {
+      "justNow": "방금",
+      "hoursAgo": "시간 전",
+      "daysAgo": "일 전"
+    },
+    "empty": { "title": "요청이 없습니다", "description": "새 요청을 생성하세요" }
+  },
+  "faq": {
+    "title": "FAQ",
+    "subtitle": "자주 묻는 질문",
+    "searchPlaceholder": "질문 검색...",
+    "tabs": { "all": "전체", "gettingStarted": "시작하기", "models": "모델", "data": "데이터", "api": "API" },
+    "wasHelpful": "도움이 되었나요?",
+    "contact": {
+      "title": "더 궁금한 점이 있으신가요?",
+      "description": "고객 지원팀에 문의하세요",
+      "link": "문의하기"
+    }
+  }
 }
