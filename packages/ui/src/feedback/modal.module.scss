@@ -1,0 +1,130 @@
+@use '../styles/variables' as *;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $bg-overlay;
+  z-index: $z-modal;
+  padding: $spacing-4;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.modal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: calc(100vh - #{$spacing-8});
+  background-color: $bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-xl;
+  animation: slideIn 0.2s ease-out;
+  overflow: hidden;
+
+  &.sm {
+    max-width: $modal-size-sm;
+  }
+
+  &.md {
+    max-width: $modal-size-md;
+  }
+
+  &.lg {
+    max-width: $modal-size-lg;
+  }
+
+  &.xl {
+    max-width: $modal-size-xl;
+  }
+
+  &.full {
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-4 $spacing-6;
+  border-bottom: 1px solid $border-color;
+  flex-shrink: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  line-height: $line-height-tight;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0;
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: $gray-500;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: background-color $transition-fast, color $transition-fast;
+
+  &:hover {
+    background-color: $gray-100;
+    color: $gray-700;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+}
+
+.body {
+  flex: 1;
+  padding: $spacing-6;
+  overflow-y: auto;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $spacing-3;
+  padding: $spacing-4 $spacing-6;
+  border-top: 1px solid $border-color;
+  flex-shrink: 0;
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

@@ -14,6 +14,15 @@ importers:
 
   apps/web:
     dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@xgen/feature-auth-Introduction':
         specifier: workspace:*
         version: link:../../features/auth-Introduction
@@ -32,12 +41,87 @@ importers:
       '@xgen/feature-auth-intro-hero':
         specifier: workspace:*
         version: link:../../features/auth-intro-hero
+      '@xgen/feature-main-ChatHistory':
+        specifier: workspace:*
+        version: link:../../features/main-ChatHistory
+      '@xgen/feature-main-ChatIntro':
+        specifier: workspace:*
+        version: link:../../features/main-ChatIntro
+      '@xgen/feature-main-Dashboard':
+        specifier: workspace:*
+        version: link:../../features/main-Dashboard
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
       '@xgen/icons':
         specifier: workspace:*
         version: link:../../packages/icons
+      '@xgen/main-DataIntro':
+        specifier: workspace:*
+        version: link:../../features/main-DataIntro
+      '@xgen/main-DataStation':
+        specifier: workspace:*
+        version: link:../../features/main-DataStation
+      '@xgen/main-DataStorage':
+        specifier: workspace:*
+        version: link:../../features/main-DataStorage
+      '@xgen/main-FAQ':
+        specifier: workspace:*
+        version: link:../../features/main-FAQ
+      '@xgen/main-MlModelHub':
+        specifier: workspace:*
+        version: link:../../features/main-MlModelHub
+      '@xgen/main-MlModelIntro':
+        specifier: workspace:*
+        version: link:../../features/main-MlModelIntro
+      '@xgen/main-MlTrain':
+        specifier: workspace:*
+        version: link:../../features/main-MlTrain
+      '@xgen/main-ModelEval':
+        specifier: workspace:*
+        version: link:../../features/main-ModelEval
+      '@xgen/main-ModelIntro':
+        specifier: workspace:*
+        version: link:../../features/main-ModelIntro
+      '@xgen/main-ModelMetrics':
+        specifier: workspace:*
+        version: link:../../features/main-ModelMetrics
+      '@xgen/main-ModelStorage':
+        specifier: workspace:*
+        version: link:../../features/main-ModelStorage
+      '@xgen/main-ModelTrain':
+        specifier: workspace:*
+        version: link:../../features/main-ModelTrain
+      '@xgen/main-ServiceRequest':
+        specifier: workspace:*
+        version: link:../../features/main-ServiceRequest
+      '@xgen/main-auth-profile':
+        specifier: workspace:*
+        version: link:../../features/main-AuthProfile
+      '@xgen/main-canvas-intro':
+        specifier: workspace:*
+        version: link:../../features/main-CanvasIntro
+      '@xgen/main-chat-current':
+        specifier: workspace:*
+        version: link:../../features/main-ChatCurrent
+      '@xgen/main-chat-new':
+        specifier: workspace:*
+        version: link:../../features/main-ChatNew
+      '@xgen/main-documents':
+        specifier: workspace:*
+        version: link:../../features/main-Documents
+      '@xgen/main-prompt-storage':
+        specifier: workspace:*
+        version: link:../../features/main-PromptStorage
+      '@xgen/main-tool-storage':
+        specifier: workspace:*
+        version: link:../../features/main-ToolStorage
+      '@xgen/main-workflow-intro':
+        specifier: workspace:*
+        version: link:../../features/main-WorkflowIntro
+      '@xgen/main-workflows':
+        specifier: workspace:*
+        version: link:../../features/main-Workflows
       '@xgen/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -202,6 +286,603 @@ importers:
         specifier: ^5
         version: 5.9.3
 
+  features/main-AuthProfile:
+    dependencies:
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.0.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.0.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  features/main-CanvasIntro:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.0.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.0.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  features/main-ChatCurrent:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.0.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.0.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  features/main-ChatHistory:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+
+  features/main-ChatIntro:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+
+  features/main-ChatNew:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.0.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.0.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  features/main-Dashboard:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+
+  features/main-DataIntro:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
+  features/main-DataStation:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
+  features/main-DataStorage:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
+  features/main-Documents:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.0.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.0.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  features/main-FAQ:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
+  features/main-MlModelHub:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
+  features/main-MlModelIntro:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
+  features/main-MlTrain:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
+  features/main-ModelEval:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
+  features/main-ModelIntro:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
+  features/main-ModelMetrics:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
+  features/main-ModelStorage:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
+  features/main-ModelTrain:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
+  features/main-PromptStorage:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.0.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.0.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  features/main-ServiceRequest:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
+  features/main-ToolStorage:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.0.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.0.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  features/main-WorkflowIntro:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.0.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.0.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  features/main-Workflows:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^18.0.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.0.0
+        version: 18.3.28
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  packages/api-client:
+    dependencies:
+      '@xgen/config':
+        specifier: workspace:*
+        version: link:../config
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../types
+      react:
+        specifier: ^18.0.0 || ^19.0.0
+        version: 18.3.1
+
+  packages/auth-provider:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../api-client
+      '@xgen/config':
+        specifier: workspace:*
+        version: link:../config
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../types
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+
+  packages/config: {}
+
   packages/i18n:
     dependencies:
       react:
@@ -221,6 +902,13 @@ importers:
       react:
         specifier: ^19.0.0
         version: 19.2.4
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.4(react@19.2.4)
+    devDependencies:
+      sass:
+        specifier: ^1.77.0
+        version: 1.98.0
 
 packages:
 
@@ -474,10 +1162,16 @@ packages:
   '@types/node@20.19.37':
     resolution: {integrity: sha512-8kzdPJ3FsNsVIurqBs7oodNnCEVbni9yUEkaHbgptDACOPW04jimGagZ51E6+lXUwJjgnBw+hyko/lkFWCldqw==}
 
+  '@types/prop-types@15.7.15':
+    resolution: {integrity: sha512-F6bEyamV9jKGAFBEmlQnesRPGOQqS2+Uwi0Em15xenOxHaf2hv6L8YCVn3rPdPJOiJfPiCnLIRyvwVaqMY3MIw==}
+
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
     peerDependencies:
       '@types/react': ^19.2.0
+
+  '@types/react@18.3.28':
+    resolution: {integrity: sha512-z9VXpC7MWrhfWipitjNdgCauoMLRdIILQsAEV+ZesIzBq/oUlxk0m3ApZuMFCXdnS4U7KrI+l3WRUEGQ8K1QKw==}
 
   '@types/react@19.2.14':
     resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
@@ -531,6 +1225,13 @@ packages:
     resolution: {integrity: sha512-xelSayHH36ZgE7ZWhli7pW34hNbNl8Ojv5KVmkJD4hBdD3th8Tfk9vYasLM+mXWOZhFkgZfxhLSnrwRr4elSSg==}
     engines: {node: '>=0.10.0'}
 
+  js-tokens@4.0.0:
+    resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
+
+  loose-envify@1.4.0:
+    resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
+    hasBin: true
+
   nanoid@3.3.11:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
@@ -581,6 +1282,10 @@ packages:
     resolution: {integrity: sha512-RH93p5ki6LfOiIt0UtDyNg/cee+HLVR6cHHtW3wALfo+eOHTp8RnU2kRkI6E+H19zMIs03DyxUG/GfZMOGvmiA==}
     peerDependencies:
       react: '*'
+
+  react@18.3.1:
+    resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}
+    engines: {node: '>=0.10.0'}
 
   react@19.2.4:
     resolution: {integrity: sha512-9nfp2hYpCwOjAN+8TZFGhtWEwgvWHXqESH8qT89AT/lWklpLON22Lc8pEtnpsZz7VmawabSU0gCjnj8aC0euHQ==}
@@ -821,9 +1526,16 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/prop-types@15.7.15': {}
+
   '@types/react-dom@19.2.3(@types/react@19.2.14)':
     dependencies:
       '@types/react': 19.2.14
+
+  '@types/react@18.3.28':
+    dependencies:
+      '@types/prop-types': 15.7.15
+      csstype: 3.2.3
 
   '@types/react@19.2.14':
     dependencies:
@@ -879,6 +1591,12 @@ snapshots:
       is-extglob: 2.1.1
     optional: true
 
+  js-tokens@4.0.0: {}
+
+  loose-envify@1.4.0:
+    dependencies:
+      js-tokens: 4.0.0
+
   nanoid@3.3.11: {}
 
   next@15.1.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.98.0):
@@ -929,6 +1647,10 @@ snapshots:
   react-icons@5.6.0(react@19.2.4):
     dependencies:
       react: 19.2.4
+
+  react@18.3.1:
+    dependencies:
+      loose-envify: 1.4.0
 
   react@19.2.4: {}
 

@@ -1,0 +1,119 @@
+@use '../styles/variables' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.required {
+  color: $color-error;
+}
+
+.description {
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  margin: 0;
+  line-height: $line-height-relaxed;
+}
+
+.fieldWrapper {
+  // 기본 input 스타일
+  input,
+  textarea,
+  select {
+    width: 100%;
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-size-base;
+    color: $color-text-primary;
+    background-color: $color-bg-secondary;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &::placeholder {
+      color: $color-text-muted;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 2px rgba($color-primary, 0.1);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2.5 4.5L6 8L9.5 4.5' stroke='%23666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right $spacing-md center;
+    padding-right: calc($spacing-md * 2 + 12px);
+  }
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-size: $font-size-sm;
+  color: $color-error;
+  margin: 0;
+
+  &::before {
+    content: '';
+    width: 14px;
+    height: 14px;
+    background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='7' cy='7' r='6' stroke='%23ef4444' stroke-width='1.5'/%3E%3Cpath d='M7 4V7.5' stroke='%23ef4444' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='7' cy='9.5' r='0.75' fill='%23ef4444'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    flex-shrink: 0;
+  }
+}
+
+.hint {
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  margin: 0;
+}
+
+// Error state
+.hasError {
+  .fieldWrapper {
+    input,
+    textarea,
+    select {
+      border-color: $color-error;
+
+      &:focus {
+        box-shadow: 0 0 0 2px rgba($color-error, 0.1);
+      }
+    }
+  }
+}
+
+// Disabled state
+.disabled {
+  opacity: 0.6;
+
+  .label {
+    cursor: not-allowed;
+  }
+}

@@ -1,0 +1,110 @@
+@use '../styles/variables' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-12 $spacing-6;
+  text-align: center;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-4;
+  color: $gray-400;
+}
+
+.title {
+  margin: 0 0 $spacing-2;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  line-height: $line-height-tight;
+}
+
+.description {
+  margin: 0 0 $spacing-6;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  line-height: $line-height-base;
+  max-width: 400px;
+}
+
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-3 $spacing-5;
+  border: none;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: background-color $transition-fast, transform $transition-fast;
+
+  &.primary {
+    background: $primary-gradient;
+    color: white;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  &.secondary {
+    background-color: $gray-100;
+    color: $text-primary;
+
+    &:hover {
+      background-color: $gray-200;
+    }
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+}
+
+.actionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+  justify-content: center;
+  margin-top: $spacing-6;
+  max-width: 500px;
+}
+
+.suggestionChip {
+  padding: $spacing-2 $spacing-4;
+  background-color: $gray-100;
+  border: 1px solid $border-color;
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  color: $text-primary;
+  cursor: pointer;
+  transition: background-color $transition-fast, border-color $transition-fast;
+
+  &:hover {
+    background-color: $gray-200;
+    border-color: $border-color-hover;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+}

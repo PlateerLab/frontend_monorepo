@@ -1,0 +1,262 @@
+// Design tokens
+$color-gray-50: #f8f9fa;
+$color-gray-100: #f1f3f5;
+$color-gray-200: #e9ecef;
+$color-gray-400: #ced4da;
+$color-gray-500: #7a7f89;
+$color-gray-600: #495057;
+$color-gray-700: #40444d;
+$color-gray-900: #212529;
+$color-primary: #305eeb;
+$color-secondary: #783ced;
+$color-white: #ffffff;
+
+// Text colors
+$color-text-primary: #1d1f23;
+$color-text-secondary: #7a7f89;
+$color-text-muted: #adb5bd;
+$color-surface: #ffffff;
+$color-border: #e9ecef;
+
+// Spacing tokens
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 48px;
+$spacing-3xl: 64px;
+
+// Typography tokens
+$font-size-sm: 0.875rem;
+$font-size-md: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.5rem;
+$font-size-2xl: 2rem;
+$font-size-base: 1rem;
+$font-size-3xl: 2.25rem;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$line-height-relaxed: 1.75;
+
+// Border radius tokens
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$border-radius-xl: 16px;
+$border-radius-lg: 12px;
+$border-radius-md: 8px;
+
+// Shadow tokens
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+// Transition tokens
+$transition-fast: 150ms ease;
+$transition-normal: 200ms ease;
+$transition-slow: 300ms ease;
+
+// ─────────────────────────────────────────────────────────────
+// Intro Page Common Styles
+// ─────────────────────────────────────────────────────────────
+
+.container {
+  padding: $spacing-xl;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Hero Section
+// ─────────────────────────────────────────────────────────────
+
+.hero {
+  text-align: center;
+  padding: $spacing-3xl 0;
+  margin-bottom: $spacing-3xl;
+  background: linear-gradient(135deg, rgba($color-primary, 0.05) 0%, rgba($color-secondary, 0.05) 100%);
+  border-radius: $border-radius-xl;
+}
+
+.heroIcon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto $spacing-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+  border-radius: $border-radius-xl;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 40px;
+    height: 40px;
+    color: white;
+  }
+}
+
+.heroTitle {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-md;
+}
+
+.heroDescription {
+  font-size: $font-size-lg;
+  color: $color-text-secondary;
+  margin: 0 0 $spacing-xl;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: $line-height-relaxed;
+}
+
+.heroActions {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-md;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Features Grid
+// ─────────────────────────────────────────────────────────────
+
+.featuresSection {
+  margin-bottom: $spacing-3xl;
+}
+
+.sectionTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-xl;
+  text-align: center;
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: $spacing-lg;
+}
+
+.featureCard {
+  padding: $spacing-xl;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  text-align: center;
+  transition: all $transition-fast ease;
+
+  &:hover {
+    border-color: $color-primary;
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+}
+
+.featureIcon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto $spacing-md;
+  background: rgba($color-primary, 0.1);
+  border-radius: $border-radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 28px;
+    height: 28px;
+    color: $color-primary;
+  }
+}
+
+.featureTitle {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-sm;
+}
+
+.featureDescription {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin: 0;
+  line-height: $line-height-relaxed;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Stats Section
+// ─────────────────────────────────────────────────────────────
+
+.statsSection {
+  margin-bottom: $spacing-3xl;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $spacing-lg;
+}
+
+.statCard {
+  padding: $spacing-lg;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  text-align: center;
+}
+
+.statValue {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  margin: 0 0 $spacing-xs;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin: 0;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Quick Actions
+// ─────────────────────────────────────────────────────────────
+
+.quickActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-3xl;
+}
+
+.quickAction {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  cursor: pointer;
+  transition: all $transition-fast ease;
+  color: $color-text-secondary;
+
+  &:hover {
+    border-color: $color-primary;
+    color: $color-primary;
+    background: rgba($color-primary, 0.05);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}

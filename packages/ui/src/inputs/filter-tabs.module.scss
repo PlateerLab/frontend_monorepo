@@ -1,0 +1,144 @@
+@use '../styles/variables' as *;
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.fullWidth {
+  width: 100%;
+
+  .tab {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label {
+  font-weight: $font-weight-medium;
+}
+
+.count {
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+// Size variants
+.sm {
+  .tab {
+    padding: $spacing-xs $spacing-sm;
+    font-size: $font-size-sm;
+  }
+}
+
+.md {
+  .tab {
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-size-base;
+  }
+}
+
+.lg {
+  .tab {
+    padding: $spacing-md $spacing-lg;
+    font-size: $font-size-lg;
+  }
+}
+
+// Variant: default
+.default {
+  background-color: $color-bg-secondary;
+  border-radius: $radius-md;
+  padding: $spacing-xs;
+
+  .tab {
+    border-radius: $radius-sm;
+    color: $color-text-secondary;
+
+    &:hover:not(:disabled) {
+      background-color: rgba($color-text-primary, 0.05);
+    }
+
+    &.active {
+      background-color: $color-bg-primary;
+      color: $color-text-primary;
+      box-shadow: $shadow-sm;
+    }
+  }
+}
+
+// Variant: pills
+.pills {
+  .tab {
+    border-radius: $radius-full;
+    color: $color-text-secondary;
+    background-color: transparent;
+
+    &:hover:not(:disabled) {
+      background-color: rgba($color-primary, 0.1);
+      color: $color-primary;
+    }
+
+    &.active {
+      background-color: $color-primary;
+      color: #ffffff;
+    }
+  }
+
+  .count {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 0 $spacing-xs;
+    border-radius: $radius-full;
+    font-size: 0.75em;
+  }
+
+  .tab:not(.active) .count {
+    background-color: rgba($color-text-primary, 0.1);
+  }
+}
+
+// Variant: underline
+.underline {
+  border-bottom: 1px solid $color-border;
+  gap: 0;
+
+  .tab {
+    border-radius: 0;
+    color: $color-text-secondary;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+
+    &:hover:not(:disabled) {
+      color: $color-text-primary;
+      border-bottom-color: $color-border;
+    }
+
+    &.active {
+      color: $color-primary;
+      border-bottom-color: $color-primary;
+    }
+  }
+}
