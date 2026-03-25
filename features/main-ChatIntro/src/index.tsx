@@ -4,6 +4,7 @@ import React from 'react';
 import type { RouteComponentProps, MainFeatureModule } from '@xgen/types';
 import { ContentArea } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
+import './locales';
 import styles from './styles/chat-intro.module.scss';
 
 // ─────────────────────────────────────────────────────────────

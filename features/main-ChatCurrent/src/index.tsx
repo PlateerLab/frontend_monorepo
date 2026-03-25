@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import type { RouteComponentProps, MainFeatureModule, ChatMessage, ChatMessageSender, CurrentChatData } from '@xgen/types';
 import { ContentArea } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
+import './locales';
 import { createApiClient } from '@xgen/api-client';
 
 import styles from './styles/chat-current.module.scss';

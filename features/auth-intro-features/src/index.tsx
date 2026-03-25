@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { useTranslation } from '@xgen/i18n';
+import './locales';
 import {
   FiGrid,
   FiMessageCircle,

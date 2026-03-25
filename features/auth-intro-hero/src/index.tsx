@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslation } from '@xgen/i18n';
+import './locales';
 import { FiPlay, FiLayers, FiCpu, FiZap } from '@xgen/icons';
 import type { IntroductionSectionPlugin } from '@xgen/types';
 import styles from './styles/hero.module.scss';

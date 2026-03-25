@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useTranslation } from '@xgen/i18n';
+import './locales';
 import { FiPlay, FiTrendingUp } from '@xgen/icons';
 import type { IntroductionSectionPlugin } from '@xgen/types';
 import styles from './styles/cta.module.scss';

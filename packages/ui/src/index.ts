@@ -25,6 +25,20 @@ export type { CardProps, CardMetadata, CardAction, CardBadge } from './data-disp
 export { CardGrid } from './data-display/card-grid';
 export type { CardGridProps, CardGridColumns, CardGridGap } from './data-display/card-grid';
 
+// Resource Card - 워크플로우, 프롬프트, 컬렉션 등 범용 리소스 카드
+export { ResourceCard } from './data-display/resource-card';
+export type {
+  ResourceCardProps,
+  CardBadge as ResourceCardBadge,
+  CardMetaItem,
+  CardActionButton,
+  CardDropdownItem,
+  CardThumbnail,
+} from './data-display/resource-card';
+
+export { ResourceCardGrid } from './data-display/resource-card-grid';
+export type { ResourceCardGridProps } from './data-display/resource-card-grid';
+
 // Input Components
 export { Button } from './inputs/button';
 export type { ButtonProps, ButtonVariant, ButtonSize } from './inputs/button';

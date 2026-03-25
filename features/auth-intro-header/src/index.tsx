@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@xgen/i18n';
+import './locales';
 import { FiArrowRight, FiLogOut } from '@xgen/icons';
 import type { IntroductionSectionPlugin, IntroductionHeaderProps } from '@xgen/types';
 import styles from './styles/header.module.scss';

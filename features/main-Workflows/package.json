@@ -13,8 +13,11 @@
     "@xgen/types": "workspace:*",
     "@xgen/ui": "workspace:*",
     "@xgen/i18n": "workspace:*",
+    "@xgen/icons": "workspace:*",
+    "@xgen/auth-provider": "workspace:*",
     "@xgen/api-client": "workspace:*",
-    "react": "^18.0.0"
+    "react": "^18.0.0",
+    "next": "^16.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",

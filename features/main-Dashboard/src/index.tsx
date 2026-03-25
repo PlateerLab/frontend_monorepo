@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import type { RouteComponentProps, MainFeatureModule } from '@xgen/types';
 import { ContentArea } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
+import './locales';
 import { useAuth } from '@xgen/auth-provider';
 import { createApiClient } from '@xgen/api-client';
 

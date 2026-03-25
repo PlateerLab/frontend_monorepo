@@ -1,381 +1,510 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import type { RouteComponentProps, MainFeatureModule } from '@xgen/types';
-import { ContentArea, SearchInput, FilterTabs, Button, EmptyState } from '@xgen/ui';
+import { useRouter } from 'next/navigation';
+import type { RouteComponentProps, MainFeatureModule, WorkflowDetail, CardBadge } from '@xgen/types';
+import { ContentArea, FilterTabs, Button, EmptyState, ResourceCard, ResourceCardGrid } from '@xgen/ui';
+import { FiFolder, FiPlay, FiEdit2, FiCopy, FiTrash2, FiSettings, FiFileText, FiServer, FiGitBranch, FiMoreVertical, FiUser, FiClock, FiCheckSquare, FiRefreshCw, FiPlus } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
-import { createApiClient } from '@xgen/api-client';
-
+import './locales';
+import { useAuth } from '@xgen/auth-provider';
+import { listWorkflowsDetail, deleteWorkflow, duplicateWorkflow, getWorkflowIOLogs } from './api';
+import { WorkflowStore } from './components/WorkflowStore';
+import { WorkflowScheduler } from './components/WorkflowScheduler';
+import { WorkflowTester } from './components/WorkflowTester';
 import styles from './styles/workflows.module.scss';
-import type { WorkflowItem, WorkflowFilter } from './types';
+import type { WorkflowStatusFilter, WorkflowOwnerFilter, WorkflowTab, WorkflowFilter, WorkflowItem } from './types';
 
 // ─────────────────────────────────────────────────────────────
-// Icons
+// Constants & Helpers
 // ─────────────────────────────────────────────────────────────
 
-const WorkflowIcon: React.FC = () => (
-  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M24 6V42M6 24H42M14 34L34 14M14 14L34 34" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
-  </svg>
-);
+const STATUS_BADGE_MAP: Record<string, { text: string; variant: CardBadge['variant'] }> = {
+  active: { text: 'LIVE', variant: 'success' },
+  draft: { text: 'DRAFT', variant: 'warning' },
+  archived: { text: 'ARCHIVED', variant: 'secondary' },
+  unactive: { text: 'DISABLED', variant: 'error' },
+};
 
-const GridIcon: React.FC = () => (
-  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-    <rect x="11" y="2" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-    <rect x="2" y="11" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-    <rect x="11" y="11" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-  </svg>
-);
+const DEPLOY_BADGE_MAP: Record<string, { text: string; variant: CardBadge['variant'] }> = {
+  deployed: { text: 'DEPLOYED', variant: 'purple' },
+  pending: { text: 'PENDING', variant: 'warning' },
+  not_deployed: { text: 'CLOSE', variant: 'error' },
+};
 
-const ListIcon: React.FC = () => (
-  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M6 4.5H15M6 9H15M6 13.5H15M3 4.5H3.0075M3 9H3.0075M3 13.5H3.0075" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const PlusIcon: React.FC = () => (
-  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M9 3.75V14.25M3.75 9H14.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-  </svg>
-);
-
-const NodeIcon: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="7" cy="7" r="2" stroke="currentColor" strokeWidth="1.2"/>
-    <circle cx="3" cy="3" r="1" stroke="currentColor" strokeWidth="1"/>
-    <circle cx="11" cy="3" r="1" stroke="currentColor" strokeWidth="1"/>
-    <circle cx="3" cy="11" r="1" stroke="currentColor" strokeWidth="1"/>
-    <circle cx="11" cy="11" r="1" stroke="currentColor" strokeWidth="1"/>
-    <path d="M4 4L5.5 5.5M10 4L8.5 5.5M4 10L5.5 8.5M10 10L8.5 8.5" stroke="currentColor" strokeWidth="1"/>
-  </svg>
-);
-
-const PlayIcon: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M4.083 2.917L10.5 7L4.083 11.083V2.917Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const ClockIcon: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M7 3.5V7L9.333 8.167M12.833 7C12.833 10.222 10.222 12.833 7 12.833C3.778 12.833 1.167 10.222 1.167 7C1.167 3.778 3.778 1.167 7 1.167C10.222 1.167 12.833 3.778 12.833 7Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const EditIcon: React.FC = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M11.333 2L14 4.667L5.333 13.333H2.667V10.667L11.333 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const TrashIcon: React.FC = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M2 4H14M12.667 4V13.333C12.667 14 12 14.667 11.333 14.667H4.667C4 14.667 3.333 14 3.333 13.333V4M5.333 4V2.667C5.333 2 6 1.333 6.667 1.333H9.333C10 1.333 10.667 2 10.667 2.667V4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const MoreIcon: React.FC = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="8" cy="8" r="1" fill="currentColor"/>
-    <circle cx="8" cy="4" r="1" fill="currentColor"/>
-    <circle cx="8" cy="12" r="1" fill="currentColor"/>
-  </svg>
-);
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).replace(/\. /g, '. ');
+}
 
 // ─────────────────────────────────────────────────────────────
-// Mock Data
+// WorkflowStorage Component
 // ─────────────────────────────────────────────────────────────
 
-const MOCK_WORKFLOWS: WorkflowItem[] = [
-  {
-    id: 'wf-001',
-    name: '이커머스 법률 상담',
-    description: '전자상거래 관련 법률 문의에 대해 AI 기반으로 전문적인 답변을 제공하는 워크플로우입니다.',
-    status: 'published',
-    category: '법무',
-    version: '1.2.0',
-    nodeCount: 12,
-    tags: ['법률', '전자상거래', 'AI'],
-    executionCount: 245,
-    lastExecutedAt: '2025-01-28T10:30:00Z',
-    createdAt: '2025-01-15T09:00:00Z',
-    updatedAt: '2025-01-27T14:00:00Z',
-    createdBy: 'user-001',
-  },
-  {
-    id: 'wf-002',
-    name: '고객지원 자동응답',
-    description: '고객 문의에 대한 자동 응답 시스템으로 24시간 지원이 가능한 챗봇 워크플로우입니다.',
-    status: 'published',
-    category: 'CS',
-    version: '2.0.0',
-    nodeCount: 18,
-    tags: ['고객지원', '자동화', '챗봇'],
-    executionCount: 512,
-    lastExecutedAt: '2025-01-28T09:00:00Z',
-    createdAt: '2025-01-10T10:00:00Z',
-    updatedAt: '2025-01-26T16:00:00Z',
-    createdBy: 'user-002',
-  },
-  {
-    id: 'wf-003',
-    name: 'HR 문서 검색 (Draft)',
-    description: '인사 관련 문서를 빠르게 검색하고 필요한 정보를 추출하는 RAG 기반 워크플로우입니다.',
-    status: 'draft',
-    category: 'HR',
-    version: '0.5.0',
-    nodeCount: 8,
-    tags: ['HR', 'RAG', '문서검색'],
-    executionCount: 0,
-    createdAt: '2025-01-25T11:00:00Z',
-    updatedAt: '2025-01-28T08:00:00Z',
-    createdBy: 'user-001',
-  },
-  {
-    id: 'wf-004',
-    name: '레거시 마케팅 봇',
-    description: '더 이상 사용되지 않는 마케팅 콘텐츠 생성 워크플로우입니다.',
-    status: 'archived',
-    category: '마케팅',
-    version: '1.0.0',
-    nodeCount: 6,
-    tags: ['마케팅'],
-    executionCount: 89,
-    lastExecutedAt: '2025-01-10T12:00:00Z',
-    createdAt: '2024-12-01T09:00:00Z',
-    updatedAt: '2025-01-20T10:00:00Z',
-    createdBy: 'user-003',
-  },
-];
+interface WorkflowStorageProps extends RouteComponentProps {
+  onNavigate?: (sectionId: string) => void;
+  activeTab?: WorkflowTab;
+  onTabChange?: (tab: WorkflowTab) => void;
+}
+
+const WorkflowStorage: React.FC<WorkflowStorageProps> = ({
+  onNavigate,
+  activeTab = 'storage',
+  onTabChange,
+}) => {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const { user, isInitialized } = useAuth();
+
+  // State
+  const [workflows, setWorkflows] = useState<WorkflowDetail[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<WorkflowStatusFilter>('all');
+  const [ownerFilter, setOwnerFilter] = useState<WorkflowOwnerFilter>('all');
+  const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [deployStatus, setDeployStatus] = useState<Record<string, string>>({});
+
+  // Load workflows
+  const fetchWorkflows = useCallback(async () => {
+    if (!isInitialized) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await listWorkflowsDetail();
+      setWorkflows(data);
+
+      // Set deploy status
+      const statusMap: Record<string, string> = {};
+      data.forEach((w) => {
+        if (w.userId === user?.id) {
+          if (w.inquireDeploy) {
+            statusMap[w.name] = 'pending';
+          } else if (w.isDeployed) {
+            statusMap[w.name] = 'deployed';
+          } else {
+            statusMap[w.name] = 'not_deployed';
+          }
+        }
+      });
+      setDeployStatus(statusMap);
+    } catch (err) {
+      console.error('Failed to fetch workflows:', err);
+      setError(t('workflows.error.loadFailed'));
+    } finally {
+      setLoading(false);
+    }
+  }, [isInitialized, user?.id, t]);
+
+  useEffect(() => {
+    fetchWorkflows();
+  }, [fetchWorkflows]);
+
+  // Check if user owns workflow
+  const isOwner = useCallback(
+    (userId?: number): boolean => {
+      if (!isInitialized || !user) return false;
+      if (userId === undefined || userId === null) return false;
+      return Number(user.id) === Number(userId);
+    },
+    [isInitialized, user]
+  );
+
+  // Filter workflows
+  const filteredWorkflows = useMemo(() => {
+    return workflows.filter((w) => {
+      // Status filter
+      if (statusFilter === 'all') {
+        // "all" excludes unactive
+        if (w.status === 'unactive') return false;
+      } else if (w.status !== statusFilter) {
+        return false;
+      }
+
+      // Owner filter
+      if (ownerFilter === 'personal' && w.isShared) return false;
+      if (ownerFilter === 'shared' && !w.isShared) return false;
+
+      return true;
+    });
+  }, [workflows, statusFilter, ownerFilter]);
+
+  // Handlers
+  const handleExecute = useCallback(
+    (workflow: WorkflowDetail) => {
+      router.push(
+        `/main?view=new-chat&workflowName=${encodeURIComponent(workflow.name)}&workflowId=${encodeURIComponent(workflow.id)}&user_id=${workflow.userId}`
+      );
+    },
+    [router]
+  );
+
+  const handleEdit = useCallback(
+    (workflow: WorkflowDetail) => {
+      localStorage.setItem(
+        'canvas-previous-page',
+        JSON.stringify({ path: '/main?view=workflows', timestamp: Date.now() })
+      );
+      router.push(`/canvas?load=${encodeURIComponent(workflow.id)}&user_id=${workflow.userId}`);
+    },
+    [router]
+  );
+
+  const handleDuplicate = useCallback(
+    async (workflow: WorkflowDetail) => {
+      if (!workflow.userId) return;
+      try {
+        await duplicateWorkflow(workflow.id, workflow.userId);
+        await fetchWorkflows();
+      } catch (err) {
+        console.error('Failed to duplicate workflow:', err);
+      }
+    },
+    [fetchWorkflows]
+  );
+
+  const handleDelete = useCallback(
+    async (workflow: WorkflowDetail) => {
+      if (!confirm(t('workflows.confirm.delete', { name: workflow.name }))) return;
+      try {
+        await deleteWorkflow(workflow.id);
+        await fetchWorkflows();
+      } catch (err) {
+        console.error('Failed to delete workflow:', err);
+      }
+    },
+    [fetchWorkflows, t]
+  );
+
+  const handleToggleMultiSelect = useCallback(() => {
+    setIsMultiSelectMode((prev) => {
+      if (prev) setSelectedIds([]);
+      return !prev;
+    });
+  }, []);
+
+  const handleBulkDelete = useCallback(async () => {
+    if (selectedIds.length === 0) return;
+
+    const toDelete = workflows.filter(
+      (w) => selectedIds.includes(w.id) && isOwner(w.userId)
+    );
+
+    if (toDelete.length === 0) {
+      alert(t('workflows.error.noDeletePermission'));
+      return;
+    }
+
+    if (!confirm(t('workflows.confirm.bulkDelete', { count: toDelete.length }))) return;
+
+    try {
+      for (const w of toDelete) {
+        await deleteWorkflow(w.id);
+      }
+      setSelectedIds([]);
+      setIsMultiSelectMode(false);
+      await fetchWorkflows();
+    } catch (err) {
+      console.error('Failed to bulk delete:', err);
+    }
+  }, [selectedIds, workflows, isOwner, fetchWorkflows, t]);
+
+  const handleCreateNew = useCallback(() => {
+    onNavigate?.('canvas-intro');
+  }, [onNavigate]);
+
+  // Tab filters
+  const tabTabs = [
+    { key: 'storage', label: t('workflows.tabs.storage') },
+    { key: 'store', label: t('workflows.tabs.store') },
+    { key: 'scheduler', label: t('workflows.tabs.scheduler') },
+    { key: 'tester', label: t('workflows.tabs.tester') },
+  ];
+
+  const statusTabs = [
+    { key: 'all', label: t('workflows.filter.all') },
+    { key: 'active', label: t('workflows.filter.active') },
+    { key: 'archived', label: t('workflows.filter.archived') },
+    { key: 'unactive', label: t('workflows.filter.unactive') },
+  ];
+
+  const ownerTabs = [
+    { key: 'all', label: t('workflows.filter.all') },
+    { key: 'personal', label: t('workflows.filter.personal') },
+    { key: 'shared', label: t('workflows.filter.shared') },
+  ];
+
+  // Build card items
+  const cardItems = useMemo(() => {
+    return filteredWorkflows.map((workflow) => {
+      const badges: CardBadge[] = [];
+
+      // Status badge
+      const statusBadge = STATUS_BADGE_MAP[workflow.status];
+      if (statusBadge) {
+        badges.push(statusBadge);
+      }
+
+      // Owner badge
+      badges.push({
+        text: workflow.isShared ? 'SHARED' : 'MY',
+        variant: workflow.isShared ? 'primary' : 'secondary',
+      });
+
+      // Deploy badge (only for owner)
+      if (isOwner(workflow.userId)) {
+        const deployKey = deployStatus[workflow.name] || 'not_deployed';
+        const deployBadge = DEPLOY_BADGE_MAP[deployKey];
+        if (deployBadge) {
+          badges.push(deployBadge);
+        }
+      }
+
+      // Primary actions
+      const primaryActions = workflow.status !== 'unactive' ? [
+        {
+          id: 'execute',
+          icon: <FiPlay />,
+          label: t('workflows.actions.execute'),
+          onClick: () => handleExecute(workflow),
+        },
+        {
+          id: 'edit',
+          icon: <FiEdit2 />,
+          label: t('workflows.actions.edit'),
+          onClick: () => handleEdit(workflow),
+          disabled: !isOwner(workflow.userId) && workflow.sharePermissions !== 'read_write',
+          disabledMessage: t('workflows.messages.readOnly'),
+        },
+        {
+          id: 'copy',
+          icon: <FiCopy />,
+          label: t('workflows.actions.copy'),
+          onClick: () => handleDuplicate(workflow),
+        },
+      ] : [];
+
+      // Dropdown actions
+      const dropdownActions = isOwner(workflow.userId)
+        ? [
+            { id: 'logs', icon: <FiFileText />, label: t('workflows.actions.logs'), onClick: () => {} },
+            { id: 'settings', icon: <FiSettings />, label: t('workflows.actions.settings'), onClick: () => {} },
+            { id: 'deploy-info', icon: <FiServer />, label: t('workflows.actions.deployInfo'), onClick: () => {} },
+            { id: 'deploy-settings', icon: <FiSettings />, label: t('workflows.actions.deploySettings'), onClick: () => {} },
+            { id: 'versions', icon: <FiGitBranch />, label: t('workflows.actions.versions'), onClick: () => {} },
+            { id: 'delete', icon: <FiTrash2 />, label: t('workflows.actions.delete'), onClick: () => handleDelete(workflow), danger: true, dividerBefore: true },
+          ]
+        : [
+            { id: 'logs', icon: <FiFileText />, label: t('workflows.actions.logs'), onClick: () => {} },
+            { id: 'versions', icon: <FiGitBranch />, label: t('workflows.actions.versions'), onClick: () => {} },
+          ];
+
+      return {
+        id: workflow.id,
+        data: workflow,
+        title: workflow.name,
+        description: workflow.description,
+        errorMessage: workflow.error,
+        thumbnail: {
+          icon: <FiFolder />,
+          backgroundColor: 'rgba(48, 94, 235, 0.1)',
+          iconColor: '#305eeb',
+        },
+        badges,
+        metadata: [
+          { icon: <FiUser />, value: workflow.author },
+          ...(workflow.lastModified
+            ? [{ icon: <FiClock />, value: formatDate(workflow.lastModified) }]
+            : []),
+          { value: `${workflow.nodeCount} nodes` },
+          ...(workflow.shareGroup
+            ? [{ value: `${t('workflows.card.organization')}: ${workflow.shareGroup}` }]
+            : []),
+        ],
+        primaryActions,
+        dropdownActions,
+        inactive: workflow.status === 'unactive',
+        inactiveMessage: t('workflows.messages.unactive'),
+        onClick: () => {},
+      };
+    });
+  }, [
+    filteredWorkflows,
+    isOwner,
+    deployStatus,
+    handleExecute,
+    handleEdit,
+    handleDuplicate,
+    handleDelete,
+    t,
+  ]);
+
+  // Render other tabs
+  if (activeTab === 'store') {
+    return (
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <FilterTabs
+            tabs={tabTabs}
+            activeKey={activeTab}
+            onChange={(key) => onTabChange?.(key as WorkflowTab)}
+          />
+        </div>
+        <WorkflowStore onStorageRefresh={fetchWorkflows} />
+      </div>
+    );
+  }
+
+  if (activeTab === 'scheduler') {
+    return (
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <FilterTabs
+            tabs={tabTabs}
+            activeKey={activeTab}
+            onChange={(key) => onTabChange?.(key as WorkflowTab)}
+          />
+        </div>
+        <WorkflowScheduler />
+      </div>
+    );
+  }
+
+  if (activeTab === 'tester') {
+    return (
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <FilterTabs
+            tabs={tabTabs}
+            activeKey={activeTab}
+            onChange={(key) => onTabChange?.(key as WorkflowTab)}
+          />
+        </div>
+        <WorkflowTester />
+      </div>
+    );
+  }
+
+  // Storage tab (default)
+  return (
+    <div className={styles.container}>
+      {/* Header */}
+      <div className={styles.header}>
+        <div className={styles.headerLeft}>
+          <FilterTabs
+            tabs={tabTabs}
+            activeKey={activeTab}
+            onChange={(key) => onTabChange?.(key as WorkflowTab)}
+          />
+        </div>
+
+        <div className={styles.headerRight}>
+          <FilterTabs
+            tabs={statusTabs}
+            activeKey={statusFilter}
+            onChange={(key) => setStatusFilter(key as WorkflowStatusFilter)}
+          />
+          <FilterTabs
+            tabs={ownerTabs}
+            activeKey={ownerFilter}
+            onChange={(key) => setOwnerFilter(key as WorkflowOwnerFilter)}
+          />
+
+          <Button
+            variant={isMultiSelectMode ? 'primary' : 'outline'}
+            size="sm"
+            onClick={handleToggleMultiSelect}
+            title={isMultiSelectMode ? t('workflows.buttons.multiSelectDisable') : t('workflows.buttons.multiSelectEnable')}
+          >
+            <FiCheckSquare />
+          </Button>
+
+          {isMultiSelectMode && selectedIds.length > 0 && (
+            <Button variant="danger" size="sm" onClick={handleBulkDelete}>
+              <FiTrash2 />
+              {t('workflows.buttons.deleteSelected')}
+            </Button>
+          )}
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fetchWorkflows}
+            disabled={loading}
+          >
+            <FiRefreshCw className={loading ? styles.spinning : ''} />
+          </Button>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className={styles.content}>
+        {!isInitialized ? (
+          <div className={styles.loadingState}>
+            <p>{t('workflows.messages.loadingAuth')}</p>
+          </div>
+        ) : error ? (
+          <EmptyState
+            icon={<FiFolder />}
+            title={t('workflows.error.title')}
+            description={error}
+            action={{
+              label: t('workflows.buttons.retry'),
+              onClick: fetchWorkflows,
+            }}
+          />
+        ) : (
+          <ResourceCardGrid
+            items={cardItems}
+            loading={loading}
+            showEmptyState
+            emptyStateProps={{
+              icon: <FiFolder />,
+              title: t('workflows.empty.title'),
+              description: t('workflows.empty.description'),
+              action: {
+                label: t('workflows.empty.action'),
+                onClick: handleCreateNew,
+              },
+            }}
+            multiSelectMode={isMultiSelectMode}
+            selectedIds={selectedIds}
+            onSelectionChange={setSelectedIds}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
 
 // ─────────────────────────────────────────────────────────────
-// Workflows Page
+// WorkflowsPage Wrapper
 // ─────────────────────────────────────────────────────────────
 
 interface WorkflowsPageProps extends RouteComponentProps {
   onNavigate?: (sectionId: string) => void;
-  onSelectWorkflow?: (workflow: WorkflowItem) => void;
 }
 
-const WorkflowsPage: React.FC<WorkflowsPageProps> = ({ onNavigate, onSelectWorkflow }) => {
+const WorkflowsPage: React.FC<WorkflowsPageProps> = ({ onNavigate }) => {
   const { t } = useTranslation();
-
-  const [loading, setLoading] = useState(true);
-  const [workflows, setWorkflows] = useState<WorkflowItem[]>([]);
-  const [filter, setFilter] = useState<WorkflowFilter>('all');
-  const [search, setSearch] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
-  const loadWorkflows = useCallback(async () => {
-    setLoading(true);
-    try {
-      // TODO: API 연동
-      await new Promise(resolve => setTimeout(resolve, 400));
-      setWorkflows(MOCK_WORKFLOWS);
-    } catch (error) {
-      console.error('Failed to load workflows:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadWorkflows();
-  }, [loadWorkflows]);
-
-  // 필터링된 워크플로우
-  const filteredWorkflows = useMemo(() => {
-    return workflows.filter(workflow => {
-      // 검색 필터
-      if (search) {
-        const searchLower = search.toLowerCase();
-        const matchName = workflow.name.toLowerCase().includes(searchLower);
-        const matchDesc = workflow.description?.toLowerCase().includes(searchLower);
-        const matchTags = workflow.tags?.some(tag => tag.toLowerCase().includes(searchLower));
-        if (!matchName && !matchDesc && !matchTags) return false;
-      }
-
-      // 상태 필터
-      if (filter !== 'all' && workflow.status !== filter) return false;
-
-      return true;
-    });
-  }, [workflows, search, filter]);
-
-  // 필터 탭
-  const filterTabs = [
-    { key: 'all', label: t('workflows.filter.all'), count: workflows.length },
-    { key: 'published', label: t('workflows.filter.published'), count: workflows.filter(w => w.status === 'published').length },
-    { key: 'draft', label: t('workflows.filter.draft'), count: workflows.filter(w => w.status === 'draft').length },
-    { key: 'archived', label: t('workflows.filter.archived'), count: workflows.filter(w => w.status === 'archived').length },
-  ];
-
-  const handleWorkflowClick = (workflow: WorkflowItem) => {
-    onSelectWorkflow?.(workflow);
-  };
-
-  const handleCreateNew = () => {
-    onNavigate?.('canvas-intro');
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
-  };
+  const [activeTab, setActiveTab] = useState<WorkflowTab>('storage');
 
   return (
     <ContentArea
       title={t('workflows.title')}
-      headerActions={
-        <Button onClick={handleCreateNew}>
-          <PlusIcon />
-          {t('workflows.createNew')}
-        </Button>
-      }
+      description={t('workflows.description')}
     >
-      <div className={styles.container}>
-        {/* Header */}
-        <div className={styles.header}>
-          <div className={styles.headerLeft}>
-            <FilterTabs
-              tabs={filterTabs}
-              activeKey={filter}
-              onChange={(key) => setFilter(key as WorkflowFilter)}
-            />
-            <SearchInput
-              value={search}
-              onChange={setSearch}
-              placeholder={t('workflows.searchPlaceholder')}
-              size="sm"
-            />
-          </div>
-          <div className={styles.headerRight}>
-            <div className={styles.viewToggle}>
-              <button
-                className={`${styles.viewButton} ${viewMode === 'grid' ? styles.active : ''}`}
-                onClick={() => setViewMode('grid')}
-                title={t('workflows.viewGrid')}
-              >
-                <GridIcon />
-              </button>
-              <button
-                className={`${styles.viewButton} ${viewMode === 'list' ? styles.active : ''}`}
-                onClick={() => setViewMode('list')}
-                title={t('workflows.viewList')}
-              >
-                <ListIcon />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Content */}
-        {loading ? (
-          <div className={styles.loading}>
-            <div className={styles.spinner} />
-          </div>
-        ) : filteredWorkflows.length === 0 ? (
-          <EmptyState
-            icon={<WorkflowIcon />}
-            title={t('workflows.empty.title')}
-            description={t('workflows.empty.description')}
-            action={{
-              label: t('workflows.empty.action'),
-              onClick: handleCreateNew,
-            }}
-          />
-        ) : viewMode === 'grid' ? (
-          <div className={styles.grid}>
-            {filteredWorkflows.map(workflow => (
-              <div
-                key={workflow.id}
-                className={styles.card}
-                onClick={() => handleWorkflowClick(workflow)}
-              >
-                <div className={styles.cardThumbnail}>
-                  {workflow.thumbnailUrl ? (
-                    <img src={workflow.thumbnailUrl} alt="" />
-                  ) : (
-                    <WorkflowIcon />
-                  )}
-                </div>
-                <div className={styles.cardContent}>
-                  <div className={styles.cardHeader}>
-                    <h3 className={styles.cardTitle}>{workflow.name}</h3>
-                    <span className={`${styles.statusBadge} ${styles[workflow.status]}`}>
-                      {t(`workflows.status.${workflow.status}`)}
-                    </span>
-                  </div>
-                  <p className={styles.cardDescription}>{workflow.description}</p>
-                  <div className={styles.cardMeta}>
-                    <span className={styles.cardMetaItem}>
-                      <NodeIcon />
-                      {t('workflows.nodeCount', { count: workflow.nodeCount })}
-                    </span>
-                    <span className={styles.cardMetaItem}>
-                      <PlayIcon />
-                      {workflow.executionCount}
-                    </span>
-                    <span className={styles.cardMetaItem}>
-                      <ClockIcon />
-                      {formatDate(workflow.updatedAt)}
-                    </span>
-                  </div>
-                  {workflow.tags && workflow.tags.length > 0 && (
-                    <div className={styles.cardTags}>
-                      {workflow.tags.slice(0, 3).map(tag => (
-                        <span key={tag} className={styles.tag}>#{tag}</span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className={styles.list}>
-            {filteredWorkflows.map(workflow => (
-              <div
-                key={workflow.id}
-                className={styles.listItem}
-                onClick={() => handleWorkflowClick(workflow)}
-              >
-                <div className={styles.listIcon}>
-                  <WorkflowIcon />
-                </div>
-                <div className={styles.listContent}>
-                  <h3 className={styles.listTitle}>{workflow.name}</h3>
-                  <p className={styles.listDescription}>{workflow.description}</p>
-                </div>
-                <span className={`${styles.statusBadge} ${styles[workflow.status]}`}>
-                  {t(`workflows.status.${workflow.status}`)}
-                </span>
-                <div className={styles.listMeta}>
-                  <span>{workflow.nodeCount} nodes</span>
-                  <span>{formatDate(workflow.updatedAt)}</span>
-                </div>
-                <div className={styles.listActions}>
-                  <button
-                    className={styles.actionButton}
-                    onClick={(e) => { e.stopPropagation(); }}
-                    title={t('workflows.edit')}
-                  >
-                    <EditIcon />
-                  </button>
-                  <button
-                    className={`${styles.actionButton} ${styles.danger}`}
-                    onClick={(e) => { e.stopPropagation(); }}
-                    title={t('workflows.delete')}
-                  >
-                    <TrashIcon />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <WorkflowStorage
+        onNavigate={onNavigate}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
     </ContentArea>
   );
 };
@@ -396,11 +525,13 @@ export const mainWorkflowsFeature: MainFeatureModule = {
     },
   ],
   routes: {
-    'workflows': WorkflowsPage,
+    workflows: WorkflowsPage,
   },
-  requiresAuth: true,
 };
 
 export default mainWorkflowsFeature;
 
-export type { WorkflowItem, WorkflowFilter, WorkflowStatus } from './types';
+// Re-export for convenience
+export { WorkflowStorage, WorkflowsPage };
+export * from './types';
+export * from './api';

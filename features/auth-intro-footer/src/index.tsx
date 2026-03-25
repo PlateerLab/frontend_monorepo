@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslation } from '@xgen/i18n';
+import './locales';
 import type { IntroductionSectionPlugin } from '@xgen/types';
 import styles from './styles/footer.module.scss';
 

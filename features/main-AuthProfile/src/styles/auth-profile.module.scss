@@ -1,0 +1,229 @@
+// Design tokens
+$color-gray-50: #f8f9fa;
+$color-gray-100: #f1f3f5;
+$color-gray-200: #e9ecef;
+$color-gray-400: #ced4da;
+$color-gray-500: #7a7f89;
+$color-gray-600: #495057;
+$color-gray-700: #40444d;
+$color-gray-900: #212529;
+$color-primary: #305eeb;
+$color-secondary: #783ced;
+$color-success: #2eb146;
+$color-warning: #f59f00;
+$color-error: #e03131;
+$color-white: #ffffff;
+$color-background-alt: #f1f3f5;
+
+// Text colors
+$color-text-primary: #1d1f23;
+$color-text-secondary: #7a7f89;
+$color-text-tertiary: #adb5bd;
+$color-surface: #ffffff;
+$color-border: #e9ecef;
+
+// Spacing
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 48px;
+
+// Typography
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-md: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.5rem;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$line-height-relaxed: 1.75;
+
+// Border radius
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+
+// Shadows
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+// Transitions
+$transition-fast: 150ms ease;
+$transition-normal: 200ms ease;
+
+// ─────────────────────────────────────────────────────────────
+// Auth Profile Page Styles
+// ─────────────────────────────────────────────────────────────
+
+.container {
+  padding: $spacing-xl;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Header
+// ─────────────────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-xl;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex: 1;
+  min-width: 300px;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Content Area
+// ─────────────────────────────────────────────────────────────
+
+.content {
+  min-height: 400px;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: $color-text-secondary;
+  font-size: $font-size-md;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: $color-error;
+  font-size: $font-size-md;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Modal Styles
+// ─────────────────────────────────────────────────────────────
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: $color-white;
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  min-width: 400px;
+  max-width: 500px;
+  box-shadow: $shadow-md;
+
+  h3 {
+    margin: 0 0 $spacing-lg;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+  }
+}
+
+.formGroup {
+  margin-bottom: $spacing-md;
+
+  label {
+    display: block;
+    margin-bottom: $spacing-sm;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-text-primary;
+  }
+
+  select,
+  input {
+    width: 100%;
+    padding: $spacing-sm $spacing-md;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    font-size: $font-size-base;
+    transition: border-color $transition-fast;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+    }
+  }
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-sm;
+  margin-top: $spacing-lg;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Tag Filter
+// ─────────────────────────────────────────────────────────────
+
+.tagFilter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: $spacing-xs $spacing-md;
+  background: $color-gray-100;
+  border: 1px solid $color-border;
+  border-radius: 999px;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: $color-gray-200;
+  }
+}
+
+.tagActive {
+  background: $color-primary;
+  border-color: $color-primary;
+  color: $color-white;
+
+  &:hover {
+    background: $color-primary;
+  }
+}

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import type { RouteComponentProps, MainFeatureModule, ChatHistoryItem, ChatHistoryFilter } from '@xgen/types';
 import { ContentArea, FilterTabs, SearchInput, EmptyState } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
+import './locales';
 import { createApiClient } from '@xgen/api-client';
 
 import styles from './styles/chat-history.module.scss';

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import type { RouteComponentProps, MainFeatureModule } from '@xgen/types';
 import { ContentArea, SearchInput, FilterTabs } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
+import './locales';
 
 // ─────────────────────────────────────────────────────────────
 // Types

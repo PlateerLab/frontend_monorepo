@@ -1,4 +1,5 @@
-import type { ComponentType } from 'react';
+import type { ComponentType, ReactNode } from 'react';
+import type React from 'react';
 
 // ─────────────────────────────────────────────────────────────
 // Route Component Props
@@ -246,6 +247,348 @@ export interface StorageListPlugin {
   createModalRenderer?: ComponentType<{ onClose: () => void; onSuccess: () => void }>;
   /** 상세 모달 컴포넌트 */
   detailModalRenderer?: ComponentType<{ item: unknown; onClose: () => void }>;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Card Types — 범용 카드 컴포넌트 인터페이스
+// 워크플로우, 프롬프트, 컬렉션, 스케줄 등 다양한 목록에서 사용
+// ─────────────────────────────────────────────────────────────
+
+/** 배지 변형 타입 */
+export type CardBadgeVariant =
+  | 'success'    // 활성/라이브
+  | 'warning'    // 대기중/초안
+  | 'error'      // 에러/비활성
+  | 'info'       // 정보
+  | 'primary'    // 기본/공유
+  | 'secondary'  // 보조/개인
+  | 'purple'     // 배포됨
+  | 'default';   // 기본
+
+/** 카드 배지 */
+export interface CardBadge {
+  /** 배지 텍스트 (i18n 키 또는 문자열) */
+  text: string;
+  /** 배지 변형 */
+  variant: CardBadgeVariant;
+  /** 툴팁 텍스트 */
+  tooltip?: string;
+}
+
+/** 카드 메타데이터 아이템 */
+export interface CardMetaItem {
+  /** 아이콘 (React 노드 또는 아이콘 컴포넌트) */
+  icon?: React.ReactNode;
+  /** 라벨 (선택적) */
+  label?: string;
+  /** 값 */
+  value: string | number;
+  /** 툴팁 */
+  tooltip?: string;
+}
+
+/** 카드 액션 버튼 */
+export interface CardActionButton {
+  /** 고유 ID */
+  id: string;
+  /** 아이콘 */
+  icon: React.ReactNode;
+  /** 라벨/툴팁 */
+  label: string;
+  /** 클릭 핸들러 */
+  onClick: () => void;
+  /** 비활성화 여부 */
+  disabled?: boolean;
+  /** 비활성화 시 표시할 메시지 */
+  disabledMessage?: string;
+}
+
+/** 드롭다운 메뉴 아이템 */
+export interface CardDropdownItem {
+  /** 고유 ID */
+  id: string;
+  /** 라벨 */
+  label: string;
+  /** 아이콘 */
+  icon?: React.ReactNode;
+  /** 클릭 핸들러 */
+  onClick: () => void;
+  /** 위험 액션 여부 (삭제 등) */
+  danger?: boolean;
+  /** 비활성화 여부 */
+  disabled?: boolean;
+  /** 구분선 표시 (이 아이템 위에) */
+  dividerBefore?: boolean;
+}
+
+/** 카드 썸네일/아이콘 설정 */
+export interface CardThumbnail {
+  /** 아이콘 컴포넌트 또는 노드 */
+  icon?: React.ReactNode;
+  /** 이미지 URL */
+  imageUrl?: string;
+  /** 배경색 (hex 또는 CSS 색상) */
+  backgroundColor?: string;
+  /** 아이콘 색상 */
+  iconColor?: string;
+}
+
+/** 카드 공통 Props */
+export interface ResourceCardProps<T = unknown> {
+  /** 카드 고유 ID */
+  id: string;
+  /** 원본 데이터 (제네릭) */
+  data: T;
+  /** 카드 제목 */
+  title: string;
+  /** 카드 설명 (선택적) */
+  description?: string;
+  /** 에러 메시지 (선택적) */
+  errorMessage?: string;
+  /** 썸네일/아이콘 설정 */
+  thumbnail?: CardThumbnail;
+  /** 상태 배지 목록 */
+  badges?: CardBadge[];
+  /** 메타데이터 목록 */
+  metadata?: CardMetaItem[];
+  /** 기본 액션 버튼들 (좌측) */
+  primaryActions?: CardActionButton[];
+  /** 드롭다운 메뉴 아이템들 (더보기 버튼) */
+  dropdownActions?: CardDropdownItem[];
+  /** 선택 가능 여부 */
+  selectable?: boolean;
+  /** 선택됨 여부 */
+  selected?: boolean;
+  /** 카드 클릭 핸들러 */
+  onClick?: (data: T) => void;
+  /** 카드 더블클릭 핸들러 */
+  onDoubleClick?: (data: T) => void;
+  /** 선택 변경 핸들러 */
+  onSelect?: (id: string, selected: boolean) => void;
+  /** 비활성 상태 (unactive) */
+  inactive?: boolean;
+  /** 비활성 상태 메시지 */
+  inactiveMessage?: string;
+  /** 추가 CSS 클래스 */
+  className?: string;
+}
+
+/** 카드 그리드 Props */
+export interface ResourceCardGridProps<T = unknown> {
+  /** 카드 목록 */
+  items: Array<ResourceCardProps<T>>;
+  /** 로딩 상태 */
+  loading?: boolean;
+  /** 빈 상태 표시 여부 */
+  showEmptyState?: boolean;
+  /** 빈 상태 Props */
+  emptyStateProps?: {
+    icon?: React.ReactNode;
+    title: string;
+    description?: string;
+    action?: {
+      label: string;
+      onClick: () => void;
+    };
+  };
+  /** 다중 선택 모드 */
+  multiSelectMode?: boolean;
+  /** 선택된 ID 목록 */
+  selectedIds?: string[];
+  /** 선택 변경 핸들러 */
+  onSelectionChange?: (ids: string[]) => void;
+  /** 그리드 열 수 (기본: auto) */
+  columns?: 1 | 2 | 3 | 4 | 'auto';
+  /** 추가 CSS 클래스 */
+  className?: string;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Workflow Management Types — 워크플로우 관리 타입
+// Storage, Store, Scheduler, Tester 공통
+// ─────────────────────────────────────────────────────────────
+
+/** 워크플로우 상태 */
+export type WorkflowStatus = 'active' | 'draft' | 'archived' | 'unactive';
+
+/** 배포 상태 */
+export type DeployStatus = 'deployed' | 'not_deployed' | 'pending' | 'error' | null;
+
+/** 공유 권한 */
+export type SharePermission = 'read_only' | 'read_write';
+
+/** 워크플로우 필터 */
+export type WorkflowStatusFilter = 'all' | 'active' | 'archived' | 'unactive';
+export type WorkflowOwnerFilter = 'all' | 'personal' | 'shared';
+
+/** 워크플로우 탭 */
+export type WorkflowTab = 'storage' | 'store' | 'scheduler' | 'tester';
+
+/** 워크플로우 상세 정보 */
+export interface WorkflowDetail {
+  /** DB ID */
+  keyValue: number;
+  /** 워크플로우 UUID */
+  id: string;
+  /** 워크플로우 이름 */
+  name: string;
+  /** 설명 */
+  description?: string;
+  /** 작성자 이름 */
+  author: string;
+  /** 작성자 사용자 ID */
+  userId?: number;
+  /** 노드 수 */
+  nodeCount: number;
+  /** 상태 */
+  status: WorkflowStatus;
+  /** 마지막 수정일 */
+  lastModified?: string;
+  /** 생성일 */
+  createdAt?: string;
+  /** 파일명 */
+  filename?: string;
+  /** 에러 메시지 */
+  error?: string;
+  /** 공유 여부 */
+  isShared?: boolean;
+  /** 공유 그룹 */
+  shareGroup?: string | null;
+  /** 공유 권한 */
+  sharePermissions?: SharePermission;
+  /** 배포 요청 여부 */
+  inquireDeploy?: boolean;
+  /** 승인 여부 */
+  isAccepted?: boolean;
+  /** 배포 여부 */
+  isDeployed?: boolean;
+}
+
+/** 워크플로우 스토어 아이템 (템플릿) */
+export interface WorkflowStoreItem {
+  /** DB ID */
+  id: number;
+  /** 워크플로우 UUID */
+  workflowId: string;
+  /** 업로드 이름 */
+  uploadName: string;
+  /** 워크플로우 이름 */
+  workflowName: string;
+  /** 설명 */
+  description?: string;
+  /** 작성자 이름 */
+  username?: string;
+  /** 작성자 ID */
+  userId: number;
+  /** 노드 수 */
+  nodeCount: number;
+  /** 엣지 수 */
+  edgeCount: number;
+  /** 템플릿 여부 */
+  isTemplate: boolean;
+  /** 완료 여부 */
+  isCompleted: boolean;
+  /** 버전 */
+  currentVersion: number;
+  latestVersion: number;
+  /** 태그 */
+  tags?: string[];
+  /** 생성/수정일 */
+  createdAt: string;
+  updatedAt: string;
+  /** 메타데이터 */
+  metadata?: Record<string, unknown>;
+  /** 시작/종료 노드 여부 */
+  hasStartNode: boolean;
+  hasEndNode: boolean;
+  /** 평점 */
+  ratingCount?: number;
+  ratingSum?: number;
+}
+
+/** 스케줄 상태 */
+export type ScheduleStatus = 'active' | 'paused' | 'completed' | 'failed';
+
+/** 스케줄 주기 타입 */
+export type ScheduleFrequency = 'once' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'cron';
+
+/** 워크플로우 스케줄 */
+export interface WorkflowSchedule {
+  /** 스케줄 ID */
+  id: number;
+  /** 워크플로우 ID */
+  workflowId: string;
+  /** 워크플로우 이름 */
+  workflowName: string;
+  /** 스케줄 이름 */
+  name: string;
+  /** 설명 */
+  description?: string;
+  /** 스케줄 상태 */
+  status: ScheduleStatus;
+  /** 주기 타입 */
+  frequency: ScheduleFrequency;
+  /** Cron 표현식 (frequency가 cron일 때) */
+  cronExpression?: string;
+  /** 다음 실행 시간 */
+  nextRunAt?: string;
+  /** 마지막 실행 시간 */
+  lastRunAt?: string;
+  /** 마지막 실행 결과 */
+  lastRunStatus?: 'success' | 'failed';
+  /** 총 실행 횟수 */
+  runCount: number;
+  /** 생성/수정일 */
+  createdAt: string;
+  updatedAt: string;
+  /** 작성자 */
+  userId?: number;
+  username?: string;
+}
+
+/** 테스터 실행 상태 */
+export type TesterRunStatus = 'idle' | 'running' | 'success' | 'failed';
+
+/** 워크플로우 테스트 케이스 */
+export interface WorkflowTestCase {
+  /** 테스트 케이스 ID */
+  id: string;
+  /** 테스트 이름 */
+  name: string;
+  /** 입력값 */
+  input: Record<string, unknown>;
+  /** 예상 출력 (선택적) */
+  expectedOutput?: Record<string, unknown>;
+  /** 실제 출력 */
+  actualOutput?: Record<string, unknown>;
+  /** 실행 상태 */
+  status: TesterRunStatus;
+  /** 실행 시간 (ms) */
+  executionTime?: number;
+  /** 에러 메시지 */
+  error?: string;
+  /** 실행일시 */
+  executedAt?: string;
+}
+
+/** 워크플로우 테스터 세션 */
+export interface WorkflowTesterSession {
+  /** 세션 ID */
+  id: string;
+  /** 워크플로우 ID */
+  workflowId: string;
+  /** 워크플로우 이름 */
+  workflowName: string;
+  /** 테스트 케이스 목록 */
+  testCases: WorkflowTestCase[];
+  /** 전체 상태 */
+  status: TesterRunStatus;
+  /** 성공 개수 */
+  passedCount: number;
+  /** 실패 개수 */
+  failedCount: number;
+  /** 생성일 */
+  createdAt: string;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -537,6 +880,88 @@ export interface StreamMessageChunk {
   };
   error?: string;
 }
+
+// ─────────────────────────────────────────────────────────────
+// Auth Profile Types (API 인증 정보 관리)
+// ─────────────────────────────────────────────────────────────
+
+/** 인증 프로필 인증 타입 */
+export type AuthProfileType = 'bearer' | 'api_key' | 'oauth2' | 'basic' | 'custom';
+
+/** 인증 프로필 상태 */
+export type AuthProfileStatus = 'active' | 'inactive';
+
+/** 인증 프로필 테스트 결과 */
+export interface AuthProfileTestResult {
+  success: boolean;
+  message?: string;
+  responseTime?: number;
+  statusCode?: number;
+  error?: string;
+}
+
+/** 인증 프로필 (Storage) */
+export interface AuthProfile {
+  /** 서비스 ID (고유 식별자) */
+  serviceId: string;
+  /** 프로필 이름 */
+  name: string;
+  /** 설명 */
+  description?: string;
+  /** 인증 타입 */
+  authType: AuthProfileType;
+  /** 상태 */
+  status: AuthProfileStatus;
+  /** 인증 payload (토큰, API Key 등) */
+  payload?: string;
+  /** 사용자 ID */
+  userId?: number;
+  /** 사용자 이름 */
+  username?: string;
+  /** 생성일 */
+  createdAt: string;
+  /** 수정일 */
+  updatedAt: string;
+  /** 마지막 테스트 일시 */
+  lastTestedAt?: string;
+  /** 마지막 테스트 결과 */
+  lastTestResult?: AuthProfileTestResult;
+  /** 메타데이터 */
+  metadata?: Record<string, unknown>;
+}
+
+/** 인증 프로필 스토어 아이템 */
+export interface AuthProfileStoreItem {
+  /** 템플릿 ID */
+  templateId: string;
+  /** 서비스 ID */
+  serviceId: string;
+  /** 프로필 이름 */
+  name: string;
+  /** 설명 */
+  description?: string;
+  /** 인증 타입 */
+  authType: AuthProfileType;
+  /** 태그 */
+  tags: string[];
+  /** 사용자 ID */
+  userId?: number;
+  /** 사용자 이름 */
+  username?: string;
+  /** 생성일 */
+  createdAt: string;
+  /** 메타데이터 */
+  metadata?: Record<string, unknown>;
+}
+
+/** Auth Profile 탭 */
+export type AuthProfileTab = 'storage' | 'store';
+
+/** Auth Profile 필터 */
+export type AuthProfileFilter = 'all' | 'active' | 'inactive';
+
+/** Auth Profile 스토어 필터 */
+export type AuthProfileStoreFilter = 'all' | 'my';
 
 // ─────────────────────────────────────────────────────────────
 // Feature Registry

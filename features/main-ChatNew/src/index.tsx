@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { RouteComponentProps, MainFeatureModule, WorkflowOption } from '@xgen/types';
 import { ContentArea, SearchInput, EmptyState, FilterTabs } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
+import './locales';
 import { createApiClient } from '@xgen/api-client';
 
 import styles from './styles/chat-new.module.scss';

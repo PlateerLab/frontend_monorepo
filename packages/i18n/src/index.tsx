@@ -1,113 +1,166 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 
-// 지원 언어 타입
-export type Locale = 'ko' | 'en';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  type ReactNode,
+} from 'react';
 
-// 번역 데이터 타입 (중첩 구조 및 배열 지원)
-type NestedTranslation = string | string[] | { [key: string]: NestedTranslation };
-type TranslationData = Record<string, NestedTranslation>;
+// Types
+export type { Locale, TranslationData, TranslationBundle, LanguageContextType } from './types';
+import type { Locale, LanguageContextType } from './types';
 
-// 언어 컨텍스트 타입
-interface LanguageContextType {
-    locale: Locale;
-    setLocale: (locale: Locale) => void;
-    t: (key: string, vars?: Record<string, unknown>) => string;
-    isHydrated: boolean;
-}
+// Registry
+export {
+  registerTranslations,
+  registerTranslationBundle,
+  getTranslation,
+  getAllTranslations,
+  isNamespaceRegistered,
+  getRegisteredNamespaces,
+  addTranslationListener,
+  clearTranslations,
+} from './registry';
+import {
+  getTranslation,
+  registerTranslationBundle,
+  addTranslationListener,
+} from './registry';
 
-// 번역 파일 import
-import koTranslations from './locales/ko.json';
-import enTranslations from './locales/en.json';
+// Common translations
+import { commonKo } from './locales/common-ko';
+import { commonEn } from './locales/common-en';
 
-const translations: Record<Locale, TranslationData> = {
-    ko: koTranslations as TranslationData,
-    en: enTranslations as TranslationData,
-};
+// ─────────────────────────────────────────────────────────────
+// 초기화: 공통 번역 등록
+// ─────────────────────────────────────────────────────────────
 
-// 컨텍스트 생성
+// 공통 번역 자동 등록
+registerTranslationBundle('common', { ko: commonKo.common, en: commonEn.common });
+registerTranslationBundle('toast', { ko: commonKo.toast, en: commonEn.toast });
+registerTranslationBundle('sidebar', { ko: commonKo.sidebar, en: commonEn.sidebar });
+registerTranslationBundle('header', { ko: commonKo.header, en: commonEn.header });
+
+// ─────────────────────────────────────────────────────────────
+// Context & Provider
+// ─────────────────────────────────────────────────────────────
+
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-// localStorage 키
 const LOCALE_STORAGE_KEY = 'xgen-locale';
-
-// SSR과 클라이언트 초기 렌더가 동일하도록 항상 기본 locale('en')로 시작
 const DEFAULT_LOCALE: Locale = 'en';
 
-// Provider 컴포넌트
 interface LanguageProviderProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-    const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
-    const [isHydrated, setIsHydrated] = useState(false);
+  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [, forceUpdate] = useState(0);
 
-    // hydration 이후 localStorage에서 저장된 locale 복원
-    useEffect(() => {
-        const savedLocale = window.localStorage.getItem(LOCALE_STORAGE_KEY) as Locale | null;
-        if (savedLocale === 'ko' || savedLocale === 'en') {
-            setLocaleState(savedLocale);
-        }
-        setIsHydrated(true);
-    }, []);
-
-    // 언어 변경 함수
-    const setLocale = useCallback((newLocale: Locale) => {
-        setLocaleState(newLocale);
-        localStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
-    }, []);
-
-    // 번역 함수
-    const t = useCallback((key: string, vars?: Record<string, unknown>): string => {
-        const keys = key.split('.');
-        let value: unknown = translations[locale];
-
-        for (const k of keys) {
-            if (value && typeof value === 'object' && k in value) {
-                value = (value as Record<string, unknown>)[k];
-            } else {
-                return key;
-            }
-        }
-
-        if (typeof value !== 'string') return key;
-
-        // 변수 보간: {{varName}} → vars[varName]
-        if (vars) {
-            return value.replace(/\{\{(\w+)\}\}/g, (_, varName) =>
-                varName in vars ? String(vars[varName]) : `{{${varName}}}`
-            );
-        }
-
-        return value;
-    }, [locale]);
-
-    const contextValue = useMemo(() => ({
-        locale,
-        setLocale,
-        t,
-        isHydrated
-    }), [locale, setLocale, t, isHydrated]);
-
-    return (
-        <LanguageContext.Provider value={contextValue}>
-            {children}
-        </LanguageContext.Provider>
-    );
-};
-
-// useTranslation 훅
-export const useTranslation = () => {
-    const context = useContext(LanguageContext);
-    if (!context) {
-        throw new Error('useTranslation must be used within a LanguageProvider');
+  // hydration 이후 localStorage에서 저장된 locale 복원
+  useEffect(() => {
+    const savedLocale = window.localStorage.getItem(LOCALE_STORAGE_KEY) as Locale | null;
+    if (savedLocale === 'ko' || savedLocale === 'en') {
+      setLocaleState(savedLocale);
     }
-    return context;
+    setIsHydrated(true);
+  }, []);
+
+  // 번역 변경 리스너 - 새 번역이 등록되면 리렌더링
+  useEffect(() => {
+    const unsubscribe = addTranslationListener(() => {
+      forceUpdate((n) => n + 1);
+    });
+    return unsubscribe;
+  }, []);
+
+  // 언어 변경 함수
+  const setLocale = useCallback((newLocale: Locale) => {
+    setLocaleState(newLocale);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
+    }
+  }, []);
+
+  // 번역 함수
+  const t = useCallback(
+    (key: string, vars?: Record<string, unknown>): string => {
+      return getTranslation(locale, key, vars);
+    },
+    [locale]
+  );
+
+  const contextValue = useMemo(
+    () => ({
+      locale,
+      setLocale,
+      t,
+      isHydrated,
+    }),
+    [locale, setLocale, t, isHydrated]
+  );
+
+  return (
+    <LanguageContext.Provider value={contextValue}>
+      {children}
+    </LanguageContext.Provider>
+  );
 };
 
-// useLocale 훅 (간단한 locale 접근용)
-export const useLocale = () => {
-    const { locale, setLocale } = useTranslation();
-    return { locale, setLocale };
+// ─────────────────────────────────────────────────────────────
+// Hooks
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * 번역 훅
+ * @returns { t, locale, setLocale, isHydrated }
+ */
+export const useTranslation = (): LanguageContextType => {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useTranslation must be used within a LanguageProvider');
+  }
+  return context;
 };
+
+/**
+ * 간단한 locale 접근용 훅
+ */
+export const useLocale = (): { locale: Locale; setLocale: (locale: Locale) => void } => {
+  const { locale, setLocale } = useTranslation();
+  return { locale, setLocale };
+};
+
+// ─────────────────────────────────────────────────────────────
+// Feature 번역 등록 헬퍼
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Feature의 번역을 등록하는 헬퍼 함수
+ * 각 feature에서 초기화 시 호출
+ *
+ * @example
+ * ```ts
+ * // features/main-AuthProfile/src/locales/index.ts
+ * import { registerFeatureTranslations } from '@xgen/i18n';
+ * import { ko } from './ko';
+ * import { en } from './en';
+ *
+ * registerFeatureTranslations('authProfile', { ko, en });
+ * ```
+ */
+export function registerFeatureTranslations(
+  namespace: string,
+  bundle: { ko: Record<string, unknown>; en: Record<string, unknown> }
+): void {
+  registerTranslationBundle(namespace, {
+    ko: bundle.ko as Record<string, unknown>,
+    en: bundle.en as Record<string, unknown>,
+  });
+}

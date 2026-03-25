@@ -1,0 +1,493 @@
+// =============================================================================
+// Workflow Tester Styles
+// =============================================================================
+
+// Variables
+$color-primary: #305eeb;
+$color-secondary: #783ced;
+$color-success: #2eb146;
+$color-warning: #f59f00;
+$color-error: #e03131;
+$color-text-primary: #1d1f23;
+$color-text-secondary: #7a7f89;
+$color-text-tertiary: #adb5bd;
+$color-border: #e9ecef;
+$color-bg-alt: #f1f3f5;
+$color-surface: #ffffff;
+
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+
+$transition-fast: 150ms ease;
+
+// Container
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: $spacing-lg;
+}
+
+// Header
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+// Filter tabs
+.filterTabs {
+  display: flex;
+  gap: $spacing-xs;
+  padding: $spacing-xs;
+  background: $color-bg-alt;
+  border-radius: $radius-md;
+}
+
+.filterTab {
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  color: $color-text-secondary;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: $radius-sm;
+  transition: all $transition-fast;
+
+  &:hover {
+    color: $color-text-primary;
+  }
+
+  &.active {
+    background: $color-surface;
+    color: $color-primary;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Content
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+// Loading state
+.loadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: $color-text-secondary;
+  font-size: 14px;
+}
+
+// Spinning animation
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Empty State
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-xl * 2;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba($color-primary, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-lg;
+
+  svg {
+    width: 32px;
+    height: 32px;
+    color: $color-primary;
+  }
+}
+
+.emptyTitle {
+  margin: 0 0 $spacing-sm;
+  font-size: 18px;
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+.emptyDescription {
+  margin: 0 0 $spacing-xl;
+  font-size: 14px;
+  color: $color-text-secondary;
+  max-width: 400px;
+}
+
+.emptySteps {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+  max-width: 400px;
+  width: 100%;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  text-align: left;
+}
+
+.stepNumber {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: $color-primary;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+
+  h4 {
+    margin: 0 0 $spacing-xs;
+    font-size: 14px;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: $color-text-secondary;
+  }
+}
+
+// Session List
+.sessionList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.sessionCard {
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $color-primary;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.sessionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.sessionInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.sessionWorkflow {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+.sessionStatus {
+  padding: 2px 8px;
+  border-radius: $radius-sm;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  &.pending {
+    background: rgba($color-warning, 0.1);
+    color: $color-warning;
+  }
+
+  &.running {
+    background: rgba($color-primary, 0.1);
+    color: $color-primary;
+  }
+
+  &.completed {
+    background: rgba($color-success, 0.1);
+    color: $color-success;
+  }
+
+  &.error {
+    background: rgba($color-error, 0.1);
+    color: $color-error;
+  }
+
+  &.cancelled {
+    background: rgba($color-text-tertiary, 0.2);
+    color: $color-text-secondary;
+  }
+}
+
+.sessionDate {
+  font-size: 12px;
+  color: $color-text-tertiary;
+}
+
+.sessionProgress {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.progressBar {
+  flex: 1;
+  height: 8px;
+  background: $color-bg-alt;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: $color-primary;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  font-size: 13px;
+  font-weight: 500;
+  color: $color-text-secondary;
+  min-width: 80px;
+  text-align: right;
+}
+
+.sessionStats {
+  display: flex;
+  gap: $spacing-lg;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-size: 13px;
+  color: $color-text-secondary;
+}
+
+.statIconSuccess {
+  color: $color-success;
+}
+
+.statIconError {
+  color: $color-error;
+}
+
+// Modal
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: $color-surface;
+  border-radius: $radius-lg;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg;
+  border-bottom: 1px solid $color-border;
+
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+}
+
+.closeButton {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  color: $color-text-tertiary;
+  cursor: pointer;
+  border-radius: $radius-sm;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: $color-bg-alt;
+    color: $color-text-primary;
+  }
+}
+
+.modalContent {
+  flex: 1;
+  padding: $spacing-lg;
+  overflow-y: auto;
+}
+
+.uploadArea {
+  border: 2px dashed $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  text-align: center;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $color-primary;
+    background: rgba($color-primary, 0.02);
+  }
+
+  p {
+    margin: $spacing-md 0 $spacing-sm;
+    font-size: 15px;
+    font-weight: 500;
+    color: $color-text-primary;
+  }
+}
+
+.uploadIcon {
+  width: 48px;
+  height: 48px;
+  color: $color-primary;
+}
+
+.uploadHint {
+  font-size: 13px;
+  color: $color-text-tertiary;
+}
+
+.workflowSelect {
+  margin-top: $spacing-lg;
+
+  label {
+    display: block;
+    margin-bottom: $spacing-sm;
+    font-size: 14px;
+    font-weight: 500;
+    color: $color-text-primary;
+  }
+
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    font-size: 14px;
+    color: $color-text-primary;
+    background: $color-surface;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+    }
+
+    &:disabled {
+      background: $color-bg-alt;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.modalFooter {
+  display: flex;
+  gap: $spacing-sm;
+  justify-content: flex-end;
+  padding: $spacing-lg;
+  border-top: 1px solid $color-border;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .headerLeft,
+  .headerRight {
+    justify-content: center;
+  }
+
+  .filterTabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .emptySteps {
+    max-width: none;
+  }
+}

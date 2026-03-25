@@ -416,3 +416,26 @@ $transition-normal: 200ms ease;
     transform: rotate(360deg);
   }
 }
+
+// ─────────────────────────────────────────────────────────────
+// Additional Utility Classes
+// ─────────────────────────────────────────────────────────────
+
+.loadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
