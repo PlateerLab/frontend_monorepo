@@ -60,8 +60,8 @@ const WorkflowsPage: React.FC<WorkflowsPageProps> = ({ onNavigate }) => {
 // ─────────────────────────────────────────────────────────────
 
 export const mainWorkflowsFeature: MainFeatureModule = {
-  id: 'main-Workflows',
-  name: 'Workflows',
+  id: 'main-workflow-management-orchestrator',
+  name: 'Workflow Management',
   sidebarSection: 'workflow',
   sidebarItems: [
     {

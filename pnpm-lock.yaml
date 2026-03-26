@@ -122,21 +122,21 @@ importers:
       '@xgen/main-workflow-intro':
         specifier: workspace:*
         version: link:../../features/main-WorkflowIntro
-      '@xgen/main-workflow-management':
+      '@xgen/main-workflow-management-orchestrator':
         specifier: workspace:*
-        version: link:../../features/main-workflow-management
-      '@xgen/main-workflow-scheduler':
+        version: link:../../features/main-workflow-management-orchestrator
+      '@xgen/main-workflow-management-scheduler':
         specifier: workspace:*
-        version: link:../../features/main-workflow-scheduler
-      '@xgen/main-workflow-storage':
+        version: link:../../features/main-workflow-management-scheduler
+      '@xgen/main-workflow-management-storage':
         specifier: workspace:*
-        version: link:../../features/main-workflow-storage
-      '@xgen/main-workflow-store':
+        version: link:../../features/main-workflow-management-storage
+      '@xgen/main-workflow-management-store':
         specifier: workspace:*
-        version: link:../../features/main-workflow-store
-      '@xgen/main-workflow-tester':
+        version: link:../../features/main-workflow-management-store
+      '@xgen/main-workflow-management-tester':
         specifier: workspace:*
-        version: link:../../features/main-workflow-tester
+        version: link:../../features/main-workflow-management-tester
       '@xgen/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -881,7 +881,7 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
-  features/main-workflow-management:
+  features/main-Workflows:
     dependencies:
       '@xgen/i18n':
         specifier: workspace:*
@@ -909,20 +909,11 @@ importers:
         specifier: ^5
         version: 5.9.3
 
-  features/main-workflow-scheduler:
+  features/main-workflow-management-orchestrator:
     dependencies:
-      '@xgen/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@xgen/auth-provider':
-        specifier: workspace:*
-        version: link:../../packages/auth-provider
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
       '@xgen/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -946,7 +937,7 @@ importers:
         specifier: ^5
         version: 5.9.3
 
-  features/main-workflow-storage:
+  features/main-workflow-management-scheduler:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -983,7 +974,7 @@ importers:
         specifier: ^5
         version: 5.9.3
 
-  features/main-workflow-store:
+  features/main-workflow-management-storage:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -1020,7 +1011,44 @@ importers:
         specifier: ^5
         version: 5.9.3
 
-  features/main-workflow-tester:
+  features/main-workflow-management-store:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      next:
+        specifier: ^15.1.0
+        version: 15.1.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.98.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      sass:
+        specifier: ^1.89.2
+        version: 1.98.0
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/main-workflow-management-tester:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*

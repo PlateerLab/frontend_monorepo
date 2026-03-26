@@ -1,5 +1,5 @@
 {
-  "name": "@xgen/main-workflow-management",
+  "name": "@xgen/main-workflow-management-orchestrator",
   "version": "0.2.0",
   "private": true,
   "main": "src/index.tsx",

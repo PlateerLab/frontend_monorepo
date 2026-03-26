@@ -1,5 +1,5 @@
 {
-  "name": "@xgen/main-workflow-tester",
+  "name": "@xgen/main-workflow-management-storage",
   "version": "0.0.0",
   "private": true,
   "main": "src/index.tsx",

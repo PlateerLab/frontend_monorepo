@@ -184,7 +184,7 @@ export async function initializeFeatures(): Promise<void> {
     // Workflow Section
     import('@xgen/main-workflow-intro'),
     import('@xgen/main-canvas-intro'),
-    import('@xgen/main-workflow-management'),
+    import('@xgen/main-workflow-management-orchestrator'),
     import('@xgen/main-documents'),
     import('@xgen/main-tool-storage'),
     import('@xgen/main-prompt-storage'),
@@ -223,10 +223,10 @@ export async function initializeFeatures(): Promise<void> {
     wfSchedulerMod,
     wfTesterMod,
   ] = await Promise.all([
-    import('@xgen/main-workflow-storage'),
-    import('@xgen/main-workflow-store'),
-    import('@xgen/main-workflow-scheduler'),
-    import('@xgen/main-workflow-tester'),
+    import('@xgen/main-workflow-management-storage'),
+    import('@xgen/main-workflow-management-store'),
+    import('@xgen/main-workflow-management-scheduler'),
+    import('@xgen/main-workflow-management-tester'),
   ]);
 
   CoreRegistry.registerWorkflowTabPlugin(wfStorageMod.workflowStoragePlugin);

@@ -1,5 +1,5 @@
 {
-  "name": "@xgen/main-workflow-store",
+  "name": "@xgen/main-workflow-management-scheduler",
   "version": "0.0.0",
   "private": true,
   "main": "src/index.tsx",
