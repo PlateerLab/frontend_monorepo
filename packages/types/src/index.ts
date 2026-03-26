@@ -970,6 +970,28 @@ export type AuthProfileFilter = 'all' | 'active' | 'inactive';
 export type AuthProfileStoreFilter = 'all' | 'my';
 
 // ─────────────────────────────────────────────────────────────
+// Workflow Tab Plugin
+// 워크플로우 페이지에 탭으로 끼워지는 플러그인 인터페이스
+// ─────────────────────────────────────────────────────────────
+export interface WorkflowTabPlugin {
+  /** 플러그인 고유 ID (탭 key로도 사용) */
+  id: string;
+  /** 플러그인 이름 */
+  name: string;
+  /** 탭 라벨 i18n 키 */
+  tabLabelKey: string;
+  /** 탭 순서 (작을수록 앞) */
+  order: number;
+  /** 탭 컨텐츠 컴포넌트 */
+  component: ComponentType<WorkflowTabPluginProps>;
+}
+
+export interface WorkflowTabPluginProps {
+  /** 다른 섹션으로 이동 */
+  onNavigate?: (sectionId: string) => void;
+}
+
+// ─────────────────────────────────────────────────────────────
 // Feature Registry
 // ─────────────────────────────────────────────────────────────
 class FeatureRegistryClass {
@@ -978,6 +1000,7 @@ class FeatureRegistryClass {
   private introductionPlugins: Map<string, IntroductionSectionPlugin> = new Map();
   private dashboardPlugins: Map<string, DashboardPlugin> = new Map();
   private storageListPlugins: Map<string, StorageListPlugin> = new Map();
+  private workflowTabPlugins: Map<string, WorkflowTabPlugin> = new Map();
 
   // ── FeatureModule (기존 호환) ──
   register(feature: FeatureModule): void {
@@ -1042,6 +1065,16 @@ class FeatureRegistryClass {
 
   getStorageListPlugins(): StorageListPlugin[] {
     return Array.from(this.storageListPlugins.values());
+  }
+
+  // ── WorkflowTabPlugin ──
+  registerWorkflowTabPlugin(plugin: WorkflowTabPlugin): void {
+    this.workflowTabPlugins.set(plugin.id, plugin);
+  }
+
+  getWorkflowTabPlugins(): WorkflowTabPlugin[] {
+    return Array.from(this.workflowTabPlugins.values())
+      .sort((a, b) => a.order - b.order);
   }
 }
 

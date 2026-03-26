@@ -1,35 +1,22 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import type { WorkflowTesterSession, TesterRunStatus, CardBadge } from '@xgen/types';
+import type { CardBadge, WorkflowTabPlugin, WorkflowTabPluginProps } from '@xgen/types';
 import { Button, EmptyState } from '@xgen/ui';
-import { FiPlay, FiRefreshCw, FiPlus, FiClock, FiCheckCircle, FiAlertCircle, FiUpload, FiDownload, FiFile, FiFolder } from '@xgen/icons';
+import { FiPlay, FiRefreshCw, FiPlus, FiClock, FiCheckCircle, FiAlertCircle, FiUpload } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
-import styles from '../styles/workflow-tester.module.scss';
+import { listBatchHistory, cancelBatch, deleteBatch } from './api';
+import type { BatchSession } from './api';
+import styles from './styles/workflow-tester.module.scss';
 
 // ─────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────
 
-interface BatchSession {
-  batchId: string;
-  workflowId: string;
-  workflowName: string;
-  status: TesterRunStatus;
-  totalCount: number;
-  completedCount: number;
-  successCount: number;
-  errorCount: number;
-  progress: number;
-  startedAt?: string;
-  completedAt?: string;
-  createdAt: string;
-}
-
 type TesterFilterStatus = 'all' | 'running' | 'completed' | 'error';
 
-interface WorkflowTesterProps {
+export interface WorkflowTesterProps extends WorkflowTabPluginProps {
   className?: string;
 }
 
@@ -37,12 +24,11 @@ interface WorkflowTesterProps {
 // Helpers
 // ─────────────────────────────────────────────────────────────
 
-const STATUS_BADGE_MAP: Record<TesterRunStatus, { text: string; variant: CardBadge['variant'] }> = {
-  pending: { text: 'PENDING', variant: 'warning' },
+const STATUS_BADGE_MAP: Record<string, { text: string; variant: CardBadge['variant'] }> = {
+  idle: { text: 'IDLE', variant: 'secondary' },
   running: { text: 'RUNNING', variant: 'primary' },
-  completed: { text: 'COMPLETED', variant: 'success' },
-  cancelled: { text: 'CANCELLED', variant: 'secondary' },
-  error: { text: 'ERROR', variant: 'error' },
+  success: { text: 'SUCCESS', variant: 'success' },
+  failed: { text: 'FAILED', variant: 'error' },
 };
 
 function formatDate(dateString?: string): string {
@@ -76,19 +62,18 @@ export const WorkflowTester: React.FC<WorkflowTesterProps> = ({ className }) => 
   const [filterStatus, setFilterStatus] = useState<TesterFilterStatus>('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  // Mock data for demonstration
+  // Load batch history
   const fetchSessions = useCallback(async () => {
     if (!isInitialized) return;
 
     try {
       setLoading(true);
       setError(null);
-      // TODO: Replace with actual API call
-      // const data = await listBatchHistory();
-      setSessions([]);
+      const data = await listBatchHistory();
+      setSessions(data);
     } catch (err) {
       console.error('Failed to fetch batch sessions:', err);
-      setError(t('workflowTester.error.loadFailed'));
+      setError(t('workflows.tester.error.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -101,19 +86,46 @@ export const WorkflowTester: React.FC<WorkflowTesterProps> = ({ className }) => 
   // Filter sessions
   const filteredSessions = useMemo(() => {
     if (filterStatus === 'all') return sessions;
-    return sessions.filter((s) => s.status === filterStatus);
+    if (filterStatus === 'running') return sessions.filter((s) => s.status === 'running');
+    if (filterStatus === 'completed') return sessions.filter((s) => s.status === 'success');
+    if (filterStatus === 'error') return sessions.filter((s) => s.status === 'failed');
+    return sessions;
   }, [sessions, filterStatus]);
 
   const handleCreateClick = useCallback(() => {
     setIsCreateModalOpen(true);
   }, []);
 
+  const handleCancelBatch = useCallback(
+    async (batchId: string) => {
+      try {
+        await cancelBatch(batchId);
+        await fetchSessions();
+      } catch (err) {
+        console.error('Failed to cancel batch:', err);
+      }
+    },
+    [fetchSessions]
+  );
+
+  const handleDeleteBatch = useCallback(
+    async (batchId: string) => {
+      try {
+        await deleteBatch(batchId);
+        await fetchSessions();
+      } catch (err) {
+        console.error('Failed to delete batch:', err);
+      }
+    },
+    [fetchSessions]
+  );
+
   // Filter tabs
   const filterTabs = [
-    { key: 'all', label: t('workflowTester.filter.all') },
-    { key: 'running', label: t('workflowTester.filter.running') },
-    { key: 'completed', label: t('workflowTester.filter.completed') },
-    { key: 'error', label: t('workflowTester.filter.error') },
+    { key: 'all', label: t('workflows.tester.filter.all') },
+    { key: 'running', label: t('workflows.tester.filter.running') },
+    { key: 'completed', label: t('workflows.tester.filter.completed') },
+    { key: 'error', label: t('workflows.tester.filter.error') },
   ];
 
   return (
@@ -139,10 +151,10 @@ export const WorkflowTester: React.FC<WorkflowTesterProps> = ({ className }) => 
             variant="primary"
             size="sm"
             onClick={handleCreateClick}
-            title={t('workflowTester.newTest')}
+            title={t('workflows.tester.newTest')}
           >
             <FiPlus />
-            {t('workflowTester.newTest')}
+            {t('workflows.tester.newTest')}
           </Button>
 
           <Button
@@ -150,7 +162,7 @@ export const WorkflowTester: React.FC<WorkflowTesterProps> = ({ className }) => 
             size="sm"
             onClick={fetchSessions}
             disabled={loading}
-            title={t('workflowTester.refresh')}
+            title={t('workflows.tester.refresh')}
           >
             <FiRefreshCw className={loading ? styles.spinning : ''} />
           </Button>
@@ -161,15 +173,15 @@ export const WorkflowTester: React.FC<WorkflowTesterProps> = ({ className }) => 
       <div className={styles.content}>
         {!isInitialized ? (
           <div className={styles.loadingState}>
-            <p>{t('workflowTester.loading')}</p>
+            <p>{t('workflows.tester.loading')}</p>
           </div>
         ) : error ? (
           <EmptyState
             icon={<FiAlertCircle />}
-            title={t('workflowTester.error.title')}
+            title={t('workflows.tester.error.title')}
             description={error}
             action={{
-              label: t('workflowTester.buttons.retry'),
+              label: t('workflows.tester.buttons.retry'),
               onClick: fetchSessions,
             }}
           />
@@ -178,36 +190,36 @@ export const WorkflowTester: React.FC<WorkflowTesterProps> = ({ className }) => 
             <div className={styles.emptyIcon}>
               <FiPlay />
             </div>
-            <h3 className={styles.emptyTitle}>{t('workflowTester.empty.title')}</h3>
-            <p className={styles.emptyDescription}>{t('workflowTester.empty.description')}</p>
+            <h3 className={styles.emptyTitle}>{t('workflows.tester.empty.title')}</h3>
+            <p className={styles.emptyDescription}>{t('workflows.tester.empty.description')}</p>
 
             <div className={styles.emptySteps}>
               <div className={styles.step}>
                 <div className={styles.stepNumber}>1</div>
                 <div className={styles.stepContent}>
-                  <h4>{t('workflowTester.steps.selectWorkflow')}</h4>
-                  <p>{t('workflowTester.steps.selectWorkflowDesc')}</p>
+                  <h4>{t('workflows.tester.steps.selectWorkflow')}</h4>
+                  <p>{t('workflows.tester.steps.selectWorkflowDesc')}</p>
                 </div>
               </div>
               <div className={styles.step}>
                 <div className={styles.stepNumber}>2</div>
                 <div className={styles.stepContent}>
-                  <h4>{t('workflowTester.steps.uploadFile')}</h4>
-                  <p>{t('workflowTester.steps.uploadFileDesc')}</p>
+                  <h4>{t('workflows.tester.steps.uploadFile')}</h4>
+                  <p>{t('workflows.tester.steps.uploadFileDesc')}</p>
                 </div>
               </div>
               <div className={styles.step}>
                 <div className={styles.stepNumber}>3</div>
                 <div className={styles.stepContent}>
-                  <h4>{t('workflowTester.steps.runTest')}</h4>
-                  <p>{t('workflowTester.steps.runTestDesc')}</p>
+                  <h4>{t('workflows.tester.steps.runTest')}</h4>
+                  <p>{t('workflows.tester.steps.runTestDesc')}</p>
                 </div>
               </div>
             </div>
 
             <Button variant="primary" onClick={handleCreateClick}>
               <FiPlus />
-              {t('workflowTester.empty.action')}
+              {t('workflows.tester.empty.action')}
             </Button>
           </div>
         ) : (
@@ -245,6 +257,16 @@ export const WorkflowTester: React.FC<WorkflowTesterProps> = ({ className }) => 
                     <FiAlertCircle className={styles.statIconError} />
                     <span>{session.errorCount}</span>
                   </div>
+                  {session.status === 'running' && (
+                    <Button variant="outline" size="sm" onClick={() => handleCancelBatch(session.batchId)}>
+                      {t('workflows.tester.actions.cancel')}
+                    </Button>
+                  )}
+                  {(session.status === 'success' || session.status === 'failed') && (
+                    <Button variant="outline" size="sm" onClick={() => handleDeleteBatch(session.batchId)}>
+                      {t('workflows.tester.actions.delete')}
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}
@@ -252,12 +274,12 @@ export const WorkflowTester: React.FC<WorkflowTesterProps> = ({ className }) => 
         )}
       </div>
 
-      {/* TODO: Create Test Modal */}
+      {/* Create Test Modal */}
       {isCreateModalOpen && (
         <div className={styles.modalOverlay} onClick={() => setIsCreateModalOpen(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h3>{t('workflowTester.create.title')}</h3>
+              <h3>{t('workflows.tester.create.title')}</h3>
               <button className={styles.closeButton} onClick={() => setIsCreateModalOpen(false)}>
                 ×
               </button>
@@ -266,14 +288,14 @@ export const WorkflowTester: React.FC<WorkflowTesterProps> = ({ className }) => 
             <div className={styles.modalContent}>
               <div className={styles.uploadArea}>
                 <FiUpload className={styles.uploadIcon} />
-                <p>{t('workflowTester.create.uploadPrompt')}</p>
-                <span className={styles.uploadHint}>{t('workflowTester.create.uploadHint')}</span>
+                <p>{t('workflows.tester.create.uploadPrompt')}</p>
+                <span className={styles.uploadHint}>{t('workflows.tester.create.uploadHint')}</span>
               </div>
 
               <div className={styles.workflowSelect}>
-                <label>{t('workflowTester.create.selectWorkflow')}</label>
+                <label>{t('workflows.tester.create.selectWorkflow')}</label>
                 <select disabled>
-                  <option value="">{t('workflowTester.create.selectPlaceholder')}</option>
+                  <option value="">{t('workflows.tester.create.selectPlaceholder')}</option>
                 </select>
               </div>
             </div>
@@ -284,7 +306,7 @@ export const WorkflowTester: React.FC<WorkflowTesterProps> = ({ className }) => 
               </Button>
               <Button variant="primary" disabled>
                 <FiPlay />
-                {t('workflowTester.create.start')}
+                {t('workflows.tester.create.start')}
               </Button>
             </div>
           </div>
@@ -295,3 +317,11 @@ export const WorkflowTester: React.FC<WorkflowTesterProps> = ({ className }) => 
 };
 
 export default WorkflowTester;
+
+export const workflowTesterPlugin: WorkflowTabPlugin = {
+  id: 'tester',
+  name: 'Workflow Tester',
+  tabLabelKey: 'workflows.tabs.tester',
+  order: 4,
+  component: WorkflowTester,
+};

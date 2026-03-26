@@ -1,6 +1,6 @@
 {
-  "name": "@xgen/main-workflows",
-  "version": "0.2.0",
+  "name": "@xgen/main-workflow-tester",
+  "version": "0.0.0",
   "private": true,
   "main": "src/index.tsx",
   "types": "src/index.tsx",
@@ -8,6 +8,9 @@
     "@xgen/types": "workspace:*",
     "@xgen/ui": "workspace:*",
     "@xgen/i18n": "workspace:*",
+    "@xgen/icons": "workspace:*",
+    "@xgen/auth-provider": "workspace:*",
+    "@xgen/api-client": "workspace:*",
     "next": "^15.1.0",
     "react": "^19.0.0"
   },

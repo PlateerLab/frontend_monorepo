@@ -66,7 +66,7 @@ export const commonEn: TranslationData = {
       current: { title: 'Current Chat' },
     },
     workflow: {
-      title: 'Workflow',
+      title: 'Workflow Management',
       intro: { title: 'Workflow Introduction' },
       canvas: { title: 'Canvas' },
       workflows: { title: 'Workflows' },

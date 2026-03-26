@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import type { WorkflowStoreItem, CardBadge } from '@xgen/types';
+import type { WorkflowStoreItem, CardBadge, WorkflowTabPlugin, WorkflowTabPluginProps } from '@xgen/types';
 import { Button, ResourceCardGrid, EmptyState } from '@xgen/ui';
 import { FiFolder, FiDownload, FiSearch, FiRefreshCw, FiUpload, FiStar, FiUser, FiCalendar, FiBox } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
-import { listWorkflowStore, downloadWorkflowTemplate, uploadWorkflowToStore } from '../api';
-import styles from '../styles/workflow-store.module.scss';
+import { listWorkflowStore, downloadWorkflowTemplate } from './api';
+import styles from './styles/workflow-store.module.scss';
 
 // ─────────────────────────────────────────────────────────────
 // Types
@@ -15,7 +15,7 @@ import styles from '../styles/workflow-store.module.scss';
 
 type StoreFilterMode = 'all' | 'my' | 'template' | 'shared';
 
-interface WorkflowStoreProps {
+export interface WorkflowStoreProps extends WorkflowTabPluginProps {
   onStorageRefresh?: () => void | Promise<void>;
 }
 
@@ -63,7 +63,7 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh }
       setWorkflows(data);
     } catch (err) {
       console.error('Failed to fetch workflow store:', err);
-      setError(t('workflowStore.error.loadFailed'));
+      setError(t('workflows.store.error.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -76,22 +76,20 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh }
   // Filter workflows
   const filteredWorkflows = useMemo(() => {
     return workflows.filter((workflow) => {
-      // Search filter
       const matchesSearch =
         !searchTerm ||
-        workflow.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        workflow.workflowName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         workflow.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         workflow.tags?.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
 
-      // Mode filter
       let matchesFilter = true;
       if (filterMode === 'my') {
-        matchesFilter = !!(user && workflow.userId === user.id);
+        matchesFilter = !!(user && Number(workflow.userId) === Number(user.id));
       } else if (filterMode === 'template') {
         matchesFilter = workflow.isTemplate === true;
       } else if (filterMode === 'shared') {
         matchesFilter =
-          workflow.isTemplate === false && (!user || workflow.userId !== user.id);
+          workflow.isTemplate === false && (!user || Number(workflow.userId) !== Number(user.id));
       }
 
       return matchesSearch && matchesFilter;
@@ -107,7 +105,6 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh }
           workflow.userId,
           workflow.currentVersion
         );
-        // Trigger storage refresh if provided
         if (onStorageRefresh) {
           await onStorageRefresh();
         }
@@ -134,15 +131,15 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh }
         badges.push({ text: 'TEMPLATE', variant: 'purple' });
       }
 
-      if (user && workflow.userId === user.id) {
-        badges.push({ text: 'MY', variant: 'primary' });
+      if (user && Number(workflow.userId) === Number(user.id)) {
+        badges.push({ text: t('workflows.badges.my'), variant: 'primary' });
       }
 
       return {
         id: workflow.id.toString(),
         data: workflow,
-        title: workflow.name,
-        description: workflow.description || t('workflowStore.card.noDescription'),
+        title: workflow.workflowName,
+        description: workflow.description || t('workflows.store.card.noDescription'),
         thumbnail: {
           icon: <FiBox />,
           backgroundColor: 'rgba(120, 60, 237, 0.1)',
@@ -152,14 +149,14 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh }
         metadata: [
           { icon: <FiUser />, value: workflow.username || 'Unknown' },
           { icon: <FiCalendar />, value: formatDate(workflow.createdAt) },
-          { icon: <FiStar />, value: avgRating > 0 ? `${avgRating.toFixed(1)} (${workflow.ratingCount})` : t('workflowStore.card.noRating') },
-          { value: `${workflow.nodeCount} nodes` },
+          { icon: <FiStar />, value: avgRating > 0 ? `${avgRating.toFixed(1)} (${workflow.ratingCount})` : t('workflows.store.card.noRating') },
+          { value: t('workflows.card.nodes', { count: workflow.nodeCount }) },
         ],
         primaryActions: [
           {
             id: 'download',
             icon: <FiDownload />,
-            label: t('workflowStore.actions.download'),
+            label: t('workflows.store.actions.download'),
             onClick: () => handleDownload(workflow),
           },
         ],
@@ -171,10 +168,10 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh }
 
   // Filter tabs
   const filterTabs = [
-    { key: 'all', label: t('workflowStore.filter.all') },
-    { key: 'my', label: t('workflowStore.filter.my') },
-    { key: 'template', label: t('workflowStore.filter.template') },
-    { key: 'shared', label: t('workflowStore.filter.shared') },
+    { key: 'all', label: t('workflows.store.filter.all') },
+    { key: 'my', label: t('workflows.store.filter.my') },
+    { key: 'template', label: t('workflows.store.filter.template') },
+    { key: 'shared', label: t('workflows.store.filter.shared') },
   ];
 
   return (
@@ -186,7 +183,7 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh }
             <FiSearch className={styles.searchIcon} />
             <input
               type="text"
-              placeholder={t('workflowStore.search.placeholder')}
+              placeholder={t('workflows.store.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={styles.searchInput}
@@ -211,7 +208,7 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh }
             variant="outline"
             size="sm"
             onClick={handleUploadClick}
-            title={t('workflowStore.upload')}
+            title={t('workflows.store.upload')}
           >
             <FiUpload />
           </Button>
@@ -221,7 +218,7 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh }
             size="sm"
             onClick={fetchWorkflows}
             disabled={loading}
-            title={t('workflowStore.refresh')}
+            title={t('workflows.store.refresh')}
           >
             <FiRefreshCw className={loading ? styles.spinning : ''} />
           </Button>
@@ -232,15 +229,15 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh }
       <div className={styles.content}>
         {!isInitialized ? (
           <div className={styles.loadingState}>
-            <p>{t('workflowStore.loading')}</p>
+            <p>{t('workflows.store.loading')}</p>
           </div>
         ) : error ? (
           <EmptyState
             icon={<FiFolder />}
-            title={t('workflowStore.error.title')}
+            title={t('workflows.store.error.title')}
             description={error}
             action={{
-              label: t('workflowStore.buttons.retry'),
+              label: t('workflows.store.buttons.retry'),
               onClick: fetchWorkflows,
             }}
           />
@@ -251,12 +248,12 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh }
             showEmptyState
             emptyStateProps={{
               icon: <FiFolder />,
-              title: t('workflowStore.empty.title'),
+              title: t('workflows.store.empty.title'),
               description: searchTerm
-                ? t('workflowStore.empty.searchDescription', { term: searchTerm })
-                : t('workflowStore.empty.description'),
+                ? t('workflows.store.empty.searchDescription', { term: searchTerm })
+                : t('workflows.store.empty.description'),
               action: {
-                label: t('workflowStore.empty.action'),
+                label: t('workflows.store.empty.action'),
                 onClick: handleUploadClick,
               },
             }}
@@ -268,8 +265,8 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh }
       {isUploadModalOpen && (
         <div className={styles.modalOverlay} onClick={() => setIsUploadModalOpen(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h3>{t('workflowStore.upload.title')}</h3>
-            <p>{t('workflowStore.upload.description')}</p>
+            <h3>{t('workflows.store.uploadModal.title')}</h3>
+            <p>{t('workflows.store.uploadModal.description')}</p>
             <Button variant="primary" onClick={() => setIsUploadModalOpen(false)}>
               {t('common.close')}
             </Button>
@@ -281,3 +278,11 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh }
 };
 
 export default WorkflowStore;
+
+export const workflowStorePlugin: WorkflowTabPlugin = {
+  id: 'store',
+  name: 'Workflow Store',
+  tabLabelKey: 'workflows.tabs.store',
+  order: 2,
+  component: WorkflowStore,
+};

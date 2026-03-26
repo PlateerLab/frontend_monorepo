@@ -6,6 +6,7 @@
  */
 
 import type { MainFeatureModule, SidebarItem } from '@xgen/types';
+import { FeatureRegistry as CoreRegistry } from '@xgen/types';
 
 // ─────────────────────────────────────────────────────────────
 // Types
@@ -183,7 +184,7 @@ export async function initializeFeatures(): Promise<void> {
     // Workflow Section
     import('@xgen/main-workflow-intro'),
     import('@xgen/main-canvas-intro'),
-    import('@xgen/main-workflows'),
+    import('@xgen/main-workflow-management'),
     import('@xgen/main-documents'),
     import('@xgen/main-tool-storage'),
     import('@xgen/main-prompt-storage'),
@@ -214,6 +215,24 @@ export async function initializeFeatures(): Promise<void> {
   // Register all features
   const features = featureModules.map(mod => mod.default || Object.values(mod)[0]);
   featureRegistry.registerAll(features as MainFeatureModule[]);
+
+  // Register Workflow Tab Plugins (순서 = 탭 순서)
+  const [
+    wfStorageMod,
+    wfStoreMod,
+    wfSchedulerMod,
+    wfTesterMod,
+  ] = await Promise.all([
+    import('@xgen/main-workflow-storage'),
+    import('@xgen/main-workflow-store'),
+    import('@xgen/main-workflow-scheduler'),
+    import('@xgen/main-workflow-tester'),
+  ]);
+
+  CoreRegistry.registerWorkflowTabPlugin(wfStorageMod.workflowStoragePlugin);
+  CoreRegistry.registerWorkflowTabPlugin(wfStoreMod.workflowStorePlugin);
+  CoreRegistry.registerWorkflowTabPlugin(wfSchedulerMod.workflowSchedulerPlugin);
+  CoreRegistry.registerWorkflowTabPlugin(wfTesterMod.workflowTesterPlugin);
 }
 
 export default featureRegistry;

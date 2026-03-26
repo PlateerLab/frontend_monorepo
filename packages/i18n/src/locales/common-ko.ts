@@ -66,7 +66,7 @@ export const commonKo: TranslationData = {
       current: { title: '현재 채팅' },
     },
     workflow: {
-      title: '워크플로우',
+      title: 'Workflow Management',
       intro: { title: '워크플로우 소개' },
       canvas: { title: '캔버스' },
       workflows: { title: '워크플로우 목록' },

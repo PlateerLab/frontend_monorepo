@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import type { WorkflowSchedule, ScheduleStatus, CardBadge } from '@xgen/types';
+import type { WorkflowSchedule, ScheduleStatus, CardBadge, WorkflowTabPlugin, WorkflowTabPluginProps } from '@xgen/types';
 import { Button, ResourceCardGrid, EmptyState } from '@xgen/ui';
 import { FiFolder, FiPlay, FiPause, FiTrash2, FiRefreshCw, FiPlus, FiClock, FiCalendar, FiCheckSquare, FiAlertCircle } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
-import { listWorkflowSchedules, createWorkflowSchedule, deleteWorkflowSchedule, toggleWorkflowSchedule } from '../api';
-import styles from '../styles/workflow-scheduler.module.scss';
+import { listWorkflowSchedules, deleteWorkflowSchedule, toggleWorkflowSchedule } from './api';
+import styles from './styles/workflow-scheduler.module.scss';
 
 // ─────────────────────────────────────────────────────────────
 // Types
@@ -15,7 +15,7 @@ import styles from '../styles/workflow-scheduler.module.scss';
 
 type ScheduleFilterStatus = 'all' | 'active' | 'paused' | 'completed' | 'failed';
 
-interface WorkflowSchedulerProps {
+export interface WorkflowSchedulerProps extends WorkflowTabPluginProps {
   className?: string;
 }
 
@@ -24,12 +24,10 @@ interface WorkflowSchedulerProps {
 // ─────────────────────────────────────────────────────────────
 
 const STATUS_BADGE_MAP: Record<ScheduleStatus, { text: string; variant: CardBadge['variant'] }> = {
-  pending: { text: 'PENDING', variant: 'warning' },
   active: { text: 'ACTIVE', variant: 'success' },
   paused: { text: 'PAUSED', variant: 'secondary' },
   completed: { text: 'COMPLETED', variant: 'info' },
   failed: { text: 'FAILED', variant: 'error' },
-  cancelled: { text: 'CANCELLED', variant: 'secondary' },
 };
 
 function formatDate(dateString?: string): string {
@@ -41,18 +39,6 @@ function formatDate(dateString?: string): string {
     hour: '2-digit',
     minute: '2-digit',
   });
-}
-
-function formatScheduleType(type: string): string {
-  const typeMap: Record<string, string> = {
-    daily: '매일',
-    weekly: '매주',
-    monthly: '매월',
-    cron: 'Cron',
-    interval: '간격',
-    once: '한번',
-  };
-  return typeMap[type] || type;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -81,7 +67,7 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
       setSchedules(data);
     } catch (err) {
       console.error('Failed to fetch schedules:', err);
-      setError(t('workflowScheduler.error.loadFailed'));
+      setError(t('workflows.scheduler.error.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -102,7 +88,7 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
     async (schedule: WorkflowSchedule) => {
       try {
         const newEnabled = schedule.status !== 'active';
-        await toggleWorkflowSchedule(schedule.sessionId, newEnabled);
+        await toggleWorkflowSchedule(schedule.id, newEnabled);
         await fetchSchedules();
       } catch (err) {
         console.error('Failed to toggle schedule:', err);
@@ -113,10 +99,10 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
 
   const handleDelete = useCallback(
     async (schedule: WorkflowSchedule) => {
-      if (!confirm(t('workflowScheduler.confirm.delete', { name: schedule.name }))) return;
+      if (!confirm(t('workflows.scheduler.confirm.delete', { name: schedule.name }))) return;
 
       try {
-        await deleteWorkflowSchedule(schedule.sessionId);
+        await deleteWorkflowSchedule(schedule.id);
         await fetchSchedules();
       } catch (err) {
         console.error('Failed to delete schedule:', err);
@@ -135,9 +121,9 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
       const statusBadge = STATUS_BADGE_MAP[schedule.status];
       const badges: CardBadge[] = statusBadge ? [statusBadge] : [];
 
-      // Schedule type badge
+      const frequencyKey = `workflows.scheduler.frequency.${schedule.frequency}`;
       badges.push({
-        text: formatScheduleType(schedule.scheduleType),
+        text: t(frequencyKey) !== frequencyKey ? t(frequencyKey) : schedule.frequency,
         variant: 'secondary',
       });
 
@@ -146,10 +132,10 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
       const canToggle = isActive || isPaused;
 
       return {
-        id: schedule.sessionId,
+        id: schedule.id.toString(),
         data: schedule,
         title: schedule.name,
-        description: schedule.description || t('workflowScheduler.card.noDescription'),
+        description: schedule.description || t('workflows.scheduler.card.noDescription'),
         thumbnail: {
           icon: <FiClock />,
           backgroundColor: isActive ? 'rgba(46, 177, 70, 0.1)' : 'rgba(120, 60, 237, 0.1)',
@@ -158,12 +144,12 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
         badges,
         metadata: [
           { icon: <FiFolder />, value: schedule.workflowName },
-          { icon: <FiCheckSquare />, value: `${schedule.successfulExecutions}/${schedule.totalExecutions}` },
-          ...(schedule.nextExecutionAt
-            ? [{ icon: <FiCalendar />, value: formatDate(schedule.nextExecutionAt) }]
+          { icon: <FiCheckSquare />, value: `${t('workflows.scheduler.fields.runCount')}: ${schedule.runCount}` },
+          ...(schedule.nextRunAt
+            ? [{ icon: <FiCalendar />, value: formatDate(schedule.nextRunAt) }]
             : []),
-          ...(schedule.lastExecutionAt
-            ? [{ icon: <FiClock />, value: formatDate(schedule.lastExecutionAt) }]
+          ...(schedule.lastRunAt
+            ? [{ icon: <FiClock />, value: formatDate(schedule.lastRunAt) }]
             : []),
         ],
         primaryActions: canToggle
@@ -171,7 +157,7 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
               {
                 id: 'toggle',
                 icon: isActive ? <FiPause /> : <FiPlay />,
-                label: isActive ? t('workflowScheduler.actions.pause') : t('workflowScheduler.actions.resume'),
+                label: isActive ? t('workflows.scheduler.actions.pause') : t('workflows.scheduler.actions.resume'),
                 onClick: () => handleToggle(schedule),
               },
             ]
@@ -180,7 +166,7 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
           {
             id: 'delete',
             icon: <FiTrash2 />,
-            label: t('workflowScheduler.actions.delete'),
+            label: t('workflows.scheduler.actions.delete'),
             onClick: () => handleDelete(schedule),
             danger: true,
           },
@@ -192,11 +178,11 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
 
   // Filter tabs
   const filterTabs = [
-    { key: 'all', label: t('workflowScheduler.filter.all') },
-    { key: 'active', label: t('workflowScheduler.filter.active') },
-    { key: 'paused', label: t('workflowScheduler.filter.paused') },
-    { key: 'completed', label: t('workflowScheduler.filter.completed') },
-    { key: 'failed', label: t('workflowScheduler.filter.failed') },
+    { key: 'all', label: t('workflows.scheduler.filter.all') },
+    { key: 'active', label: t('workflows.scheduler.filter.active') },
+    { key: 'paused', label: t('workflows.scheduler.filter.paused') },
+    { key: 'completed', label: t('workflows.scheduler.filter.completed') },
+    { key: 'failed', label: t('workflows.scheduler.filter.failed') },
   ];
 
   return (
@@ -222,10 +208,10 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
             variant="primary"
             size="sm"
             onClick={handleCreateClick}
-            title={t('workflowScheduler.create')}
+            title={t('workflows.scheduler.create')}
           >
             <FiPlus />
-            {t('workflowScheduler.create')}
+            {t('workflows.scheduler.create')}
           </Button>
 
           <Button
@@ -233,7 +219,7 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
             size="sm"
             onClick={fetchSchedules}
             disabled={loading}
-            title={t('workflowScheduler.refresh')}
+            title={t('workflows.scheduler.refresh')}
           >
             <FiRefreshCw className={loading ? styles.spinning : ''} />
           </Button>
@@ -244,15 +230,15 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
       <div className={styles.content}>
         {!isInitialized ? (
           <div className={styles.loadingState}>
-            <p>{t('workflowScheduler.loading')}</p>
+            <p>{t('workflows.scheduler.loading')}</p>
           </div>
         ) : error ? (
           <EmptyState
             icon={<FiAlertCircle />}
-            title={t('workflowScheduler.error.title')}
+            title={t('workflows.scheduler.error.title')}
             description={error}
             action={{
-              label: t('workflowScheduler.buttons.retry'),
+              label: t('workflows.scheduler.buttons.retry'),
               onClick: fetchSchedules,
             }}
           />
@@ -263,10 +249,10 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
             showEmptyState
             emptyStateProps={{
               icon: <FiClock />,
-              title: t('workflowScheduler.empty.title'),
-              description: t('workflowScheduler.empty.description'),
+              title: t('workflows.scheduler.empty.title'),
+              description: t('workflows.scheduler.empty.description'),
               action: {
-                label: t('workflowScheduler.empty.action'),
+                label: t('workflows.scheduler.empty.action'),
                 onClick: handleCreateClick,
               },
             }}
@@ -278,8 +264,8 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
       {isCreateModalOpen && (
         <div className={styles.modalOverlay} onClick={() => setIsCreateModalOpen(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h3>{t('workflowScheduler.create.title')}</h3>
-            <p>{t('workflowScheduler.create.description')}</p>
+            <h3>{t('workflows.scheduler.createModal.title')}</h3>
+            <p>{t('workflows.scheduler.createModal.description')}</p>
             <Button variant="primary" onClick={() => setIsCreateModalOpen(false)}>
               {t('common.close')}
             </Button>
@@ -291,3 +277,11 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
 };
 
 export default WorkflowScheduler;
+
+export const workflowSchedulerPlugin: WorkflowTabPlugin = {
+  id: 'scheduler',
+  name: 'Workflow Scheduler',
+  tabLabelKey: 'workflows.tabs.scheduler',
+  order: 3,
+  component: WorkflowScheduler,
+};
