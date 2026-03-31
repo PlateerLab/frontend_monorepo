@@ -27,23 +27,6 @@ export const routeMappings: Record<string, string> = {
   'prompt-storage': 'prompt-storage',
   'auth-profile': 'auth-profile',
 
-  // Model Section
-  'model-intro': 'model-intro',
-  'model-train': 'model-train',
-  'model-eval': 'model-eval',
-  'model-storage': 'model-storage',
-  'model-metrics': 'model-metrics',
-
-  // ML Section
-  'ml-intro': 'ml-intro',
-  'ml-train': 'ml-train',
-  'ml-hub': 'ml-hub',
-
-  // Data Section
-  'data-intro': 'data-intro',
-  'data-station': 'data-station',
-  'data-storage': 'data-storage',
-
   // Support Section
   'service-request': 'service-request',
   'faq': 'faq',

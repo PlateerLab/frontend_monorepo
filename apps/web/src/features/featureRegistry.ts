@@ -39,9 +39,6 @@ class FeatureRegistry {
     'dashboard',
     'chat',
     'workflow',
-    'model',
-    'ml',
-    'data',
     'support',
     'settings',
   ];
@@ -189,23 +186,6 @@ export async function initializeFeatures(): Promise<void> {
     import('@xgen/main-tool-storage'),
     import('@xgen/main-prompt-storage'),
     import('@xgen/main-auth-profile'),
-
-    // Model Section
-    import('@xgen/main-ModelIntro'),
-    import('@xgen/main-ModelTrain'),
-    import('@xgen/main-ModelEval'),
-    import('@xgen/main-ModelStorage'),
-    import('@xgen/main-ModelMetrics'),
-
-    // ML Section
-    import('@xgen/main-MlModelIntro'),
-    import('@xgen/main-MlTrain'),
-    import('@xgen/main-MlModelHub'),
-
-    // Data Section
-    import('@xgen/main-DataIntro'),
-    import('@xgen/main-DataStation'),
-    import('@xgen/main-DataStorage'),
 
     // Support Section
     import('@xgen/main-ServiceRequest'),
