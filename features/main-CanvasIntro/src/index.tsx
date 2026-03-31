@@ -214,11 +214,11 @@ const CanvasIntroPage: React.FC<CanvasIntroPageProps> = ({ onNavigate, onCreateC
   ];
 
   const handleSelectTemplate = (templateId: string) => {
-    // Navigate to canvas editor; pass template via onCreateCanvas or fallback to onNavigate
+    // Navigate to canvas editor; pass template via onCreateCanvas or fallback to /canvas
     if (onCreateCanvas) {
       onCreateCanvas(templateId);
     } else {
-      onNavigate?.('canvas-editor');
+      window.location.href = '/canvas';
     }
   };
 
@@ -283,6 +283,7 @@ export const mainCanvasIntroFeature: MainFeatureModule = {
       id: 'canvas-intro',
       titleKey: 'sidebar.workflow.canvas.title',
       descriptionKey: 'sidebar.workflow.canvas.description',
+      href: '/canvas',
     },
   ],
   routes: {

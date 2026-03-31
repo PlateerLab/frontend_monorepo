@@ -218,9 +218,7 @@ export async function initializeFeatures(): Promise<void> {
   // Register Canvas Page Plugins
   registerCanvasPlugins();
 
-  // Register Canvas Editor Feature (app-level orchestrator)
-  const { canvasEditorFeature } = await import('../components/CanvasPage');
-  featureRegistry.register(canvasEditorFeature);
+
 }
 
 export default featureRegistry;

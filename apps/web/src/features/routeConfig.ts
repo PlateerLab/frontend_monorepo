@@ -21,7 +21,6 @@ export const routeMappings: Record<string, string> = {
   // Workflow Section
   'workflow-intro': 'workflow-intro',
   'canvas-intro': 'canvas-intro',
-  'canvas-editor': 'canvas-editor',
   'workflows': 'workflows',
   'documents': 'documents',
   'tool-storage': 'tool-storage',
