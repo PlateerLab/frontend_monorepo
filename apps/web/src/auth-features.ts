@@ -1,5 +1,5 @@
 /**
- * Feature Registry
+ * Feature Registry — Root Landing
  *
  * 설계 원칙:
  * - 이 파일은 Feature를 import하고 등록만 한다
@@ -9,27 +9,27 @@
 import { FeatureRegistry } from '@xgen/types';
 
 // Feature Modules
-import authIntroduction from '@xgen/feature-auth-Introduction';
+import rootLanding from '@xgen/feature-root-Landing';
 
-// Introduction Section Plugins
-import authIntroHeaderPlugin from '@xgen/feature-auth-intro-header';
-import authIntroHeroPlugin from '@xgen/feature-auth-intro-hero';
-import authIntroFeaturesPlugin from '@xgen/feature-auth-intro-features';
-import authIntroCtaPlugin from '@xgen/feature-auth-intro-cta';
-import authIntroFooterPlugin from '@xgen/feature-auth-intro-footer';
+// Landing Section Plugins
+import rootLandingHeaderPlugin from '@xgen/feature-root-landing-header';
+import rootLandingHeroPlugin from '@xgen/feature-root-landing-hero';
+import rootLandingFeaturesPlugin from '@xgen/feature-root-landing-features';
+import rootLandingCtaPlugin from '@xgen/feature-root-landing-cta';
+import rootLandingFooterPlugin from '@xgen/feature-root-landing-footer';
 
 // Register Feature Modules
 const features = [
-  authIntroduction,
+  rootLanding,
 ];
 
 features.forEach((f) => FeatureRegistry.register(f));
 
-// Register Introduction Section Plugins (순서 = 렌더링 순서)
-FeatureRegistry.registerIntroductionPlugin(authIntroHeaderPlugin);
-FeatureRegistry.registerIntroductionPlugin(authIntroHeroPlugin);
-FeatureRegistry.registerIntroductionPlugin(authIntroFeaturesPlugin);
-FeatureRegistry.registerIntroductionPlugin(authIntroCtaPlugin);
-FeatureRegistry.registerIntroductionPlugin(authIntroFooterPlugin);
+// Register Landing Section Plugins (순서 = 렌더링 순서)
+FeatureRegistry.registerIntroductionPlugin(rootLandingHeaderPlugin);
+FeatureRegistry.registerIntroductionPlugin(rootLandingHeroPlugin);
+FeatureRegistry.registerIntroductionPlugin(rootLandingFeaturesPlugin);
+FeatureRegistry.registerIntroductionPlugin(rootLandingCtaPlugin);
+FeatureRegistry.registerIntroductionPlugin(rootLandingFooterPlugin);
 
 export { FeatureRegistry };

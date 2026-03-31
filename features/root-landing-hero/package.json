@@ -1,0 +1,14 @@
+{
+  "name": "@xgen/feature-root-landing-hero",
+  "version": "0.0.0",
+  "private": true,
+  "main": "src/index.tsx",
+  "types": "src/index.tsx",
+  "dependencies": {
+    "@xgen/types": "workspace:*",
+    "@xgen/i18n": "workspace:*",
+    "@xgen/icons": "workspace:*",
+    "next": "^16.2.1",
+    "react": "^19.0.0"
+  }
+}

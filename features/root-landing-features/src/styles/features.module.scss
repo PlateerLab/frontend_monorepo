@@ -1,0 +1,184 @@
+@use "./variables" as *;
+
+.featuresSection {
+    width: 90vw;
+    max-width: 1400px;
+    margin: 3rem auto;
+    padding: 5rem 2rem;
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 28px;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.06),
+        0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+
+    @media (min-width: 640px) {
+        width: 88vw;
+        padding: 5rem 3rem;
+    }
+
+    @media (min-width: 1024px) {
+        width: 85vw;
+        margin: 4rem auto;
+        padding: 6rem 4rem;
+    }
+
+    @media (min-width: 1440px) {
+        width: 80vw;
+        padding: 7rem 5rem;
+    }
+}
+
+.featuresHeader {
+    text-align: center;
+    margin-bottom: 3.5rem;
+
+    h2 {
+        font-size: 2.25rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, $gray-900, $primary-blue);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.025em;
+
+        @media (min-width: 640px) { font-size: 2.75rem; }
+    }
+
+    p {
+        font-size: 1.125rem;
+        color: $gray-600;
+        max-width: 560px;
+        margin: 0 auto;
+        line-height: 1.7;
+    }
+}
+
+.featuresGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+
+    @media (min-width: 640px) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+
+    @media (min-width: 1440px) { gap: 2.5rem; }
+}
+
+.featureCard {
+    position: relative;
+    height: 100%;
+
+    .cardBackground {
+        position: absolute;
+        inset: 0;
+        border-radius: 18px;
+        opacity: 0;
+        transition: opacity 0.35s ease;
+
+        &.blue   { background: linear-gradient(135deg, rgba($primary-blue, 0.06), rgba($primary-purple, 0.04)); }
+        &.purple { background: linear-gradient(135deg, rgba($primary-purple, 0.06), rgba($primary-pink, 0.04)); }
+        &.green  { background: linear-gradient(135deg, rgba($primary-green, 0.06), rgba($primary-blue, 0.04)); }
+        &.orange { background: linear-gradient(135deg, rgba($primary-orange, 0.06), rgba(#f59e0b, 0.04)); }
+        &.pink   { background: linear-gradient(135deg, rgba($primary-pink, 0.06), rgba($primary-purple, 0.04)); }
+        &.indigo { background: linear-gradient(135deg, rgba($primary-indigo, 0.06), rgba($primary-blue, 0.04)); }
+    }
+
+    &:hover {
+        .cardBackground { opacity: 1; }
+
+        .cardContent {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+            border-color: $gray-200;
+        }
+    }
+
+    .cardContent {
+        position: relative;
+        background: $white;
+        padding: 2rem 1.75rem;
+        border-radius: 18px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        border: 1px solid $gray-100;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .cardHeader {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.25rem;
+
+        span {
+            width: 2.5rem;
+            height: 2.5rem;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: $gray-50;
+
+            svg { width: 1.5rem; height: 1.5rem; }
+
+            &.blue   { color: $primary-blue; background: rgba($primary-blue, 0.08); }
+            &.purple { color: $primary-purple; background: rgba($primary-purple, 0.08); }
+            &.green  { color: $primary-green; background: rgba($primary-green, 0.08); }
+            &.orange { color: $primary-orange; background: rgba($primary-orange, 0.08); }
+            &.pink   { color: $primary-pink; background: rgba($primary-pink, 0.08); }
+            &.indigo { color: $primary-indigo; background: rgba($primary-indigo, 0.08); }
+        }
+
+        h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: $gray-900;
+            margin: 0 0 0 0.875rem;
+            line-height: 1.3;
+        }
+    }
+
+    .cardDescription {
+        color: $gray-600;
+        margin: 0 0 1.25rem 0;
+        line-height: 1.7;
+        font-size: 0.9375rem;
+        flex-grow: 1;
+    }
+
+    .cardFeatures {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+
+        span {
+            font-size: 0.8125rem;
+            color: $gray-500;
+            display: flex;
+            align-items: center;
+
+            &::before {
+                content: '✓';
+                color: $primary-green;
+                font-weight: 700;
+                margin-right: 0.5rem;
+                font-size: 0.75rem;
+            }
+        }
+    }
+}

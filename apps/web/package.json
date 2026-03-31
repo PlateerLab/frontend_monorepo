@@ -9,12 +9,12 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
-    "@xgen/feature-auth-Introduction": "workspace:*",
-    "@xgen/feature-auth-intro-header": "workspace:*",
-    "@xgen/feature-auth-intro-hero": "workspace:*",
-    "@xgen/feature-auth-intro-features": "workspace:*",
-    "@xgen/feature-auth-intro-cta": "workspace:*",
-    "@xgen/feature-auth-intro-footer": "workspace:*",
+    "@xgen/feature-root-Landing": "workspace:*",
+    "@xgen/feature-root-landing-header": "workspace:*",
+    "@xgen/feature-root-landing-hero": "workspace:*",
+    "@xgen/feature-root-landing-features": "workspace:*",
+    "@xgen/feature-root-landing-cta": "workspace:*",
+    "@xgen/feature-root-landing-footer": "workspace:*",
     "@xgen/feature-auth-LoginForm": "workspace:*",
     "@xgen/feature-main-Dashboard": "workspace:*",
     "@xgen/feature-main-ChatIntro": "workspace:*",

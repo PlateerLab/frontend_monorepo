@@ -23,27 +23,9 @@ importers:
       '@xgen/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@xgen/feature-auth-Introduction':
-        specifier: workspace:*
-        version: link:../../features/auth-Introduction
       '@xgen/feature-auth-LoginForm':
         specifier: workspace:*
         version: link:../../features/auth-LoginForm
-      '@xgen/feature-auth-intro-cta':
-        specifier: workspace:*
-        version: link:../../features/auth-intro-cta
-      '@xgen/feature-auth-intro-features':
-        specifier: workspace:*
-        version: link:../../features/auth-intro-features
-      '@xgen/feature-auth-intro-footer':
-        specifier: workspace:*
-        version: link:../../features/auth-intro-footer
-      '@xgen/feature-auth-intro-header':
-        specifier: workspace:*
-        version: link:../../features/auth-intro-header
-      '@xgen/feature-auth-intro-hero':
-        specifier: workspace:*
-        version: link:../../features/auth-intro-hero
       '@xgen/feature-main-ChatHistory':
         specifier: workspace:*
         version: link:../../features/main-ChatHistory
@@ -53,6 +35,24 @@ importers:
       '@xgen/feature-main-Dashboard':
         specifier: workspace:*
         version: link:../../features/main-Dashboard
+      '@xgen/feature-root-Landing':
+        specifier: workspace:*
+        version: link:../../features/root-Landing
+      '@xgen/feature-root-landing-cta':
+        specifier: workspace:*
+        version: link:../../features/root-landing-cta
+      '@xgen/feature-root-landing-features':
+        specifier: workspace:*
+        version: link:../../features/root-landing-features
+      '@xgen/feature-root-landing-footer':
+        specifier: workspace:*
+        version: link:../../features/root-landing-footer
+      '@xgen/feature-root-landing-header':
+        specifier: workspace:*
+        version: link:../../features/root-landing-header
+      '@xgen/feature-root-landing-hero':
+        specifier: workspace:*
+        version: link:../../features/root-landing-hero
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
@@ -139,31 +139,6 @@ importers:
         specifier: ^5
         version: 5.9.3
 
-  features/auth-Introduction:
-    dependencies:
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      next:
-        specifier: ^15.1.0
-        version: 15.1.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.98.0)
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-    devDependencies:
-      '@types/react':
-        specifier: ^19
-        version: 19.2.14
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-
   features/auth-LoginForm:
     dependencies:
       '@xgen/auth-provider':
@@ -188,113 +163,6 @@ importers:
       '@types/react':
         specifier: ^19
         version: 19.2.14
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-
-  features/auth-intro-cta:
-    dependencies:
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-      react-dom:
-        specifier: ^19.0.0
-        version: 19.2.4(react@19.2.4)
-
-  features/auth-intro-features:
-    dependencies:
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-      react-dom:
-        specifier: ^19.0.0
-        version: 19.2.4(react@19.2.4)
-
-  features/auth-intro-footer:
-    dependencies:
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-      react-dom:
-        specifier: ^19.0.0
-        version: 19.2.4(react@19.2.4)
-
-  features/auth-intro-header:
-    dependencies:
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      next:
-        specifier: ^15.1.0
-        version: 15.1.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.98.0)
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-    devDependencies:
-      '@types/react':
-        specifier: ^19
-        version: 19.2.14
-      sass:
-        specifier: ^1.89.2
-        version: 1.98.0
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-
-  features/auth-intro-hero:
-    dependencies:
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      next:
-        specifier: ^15.1.0
-        version: 15.1.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.98.0)
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-    devDependencies:
-      '@types/react':
-        specifier: ^19
-        version: 19.2.14
-      sass:
-        specifier: ^1.89.2
-        version: 1.98.0
       typescript:
         specifier: ^5
         version: 5.9.3
@@ -781,6 +649,96 @@ importers:
       typescript:
         specifier: ^5
         version: 5.9.3
+
+  features/root-Landing:
+    dependencies:
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+
+  features/root-landing-cta:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      next:
+        specifier: ^16.2.1
+        version: 16.2.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.98.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+
+  features/root-landing-features:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+
+  features/root-landing-footer:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+
+  features/root-landing-header:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      next:
+        specifier: ^16.2.1
+        version: 16.2.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.98.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+
+  features/root-landing-hero:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      next:
+        specifier: ^16.2.1
+        version: 16.2.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.98.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
 
   packages/api-client:
     dependencies:

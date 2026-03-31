@@ -1,20 +1,20 @@
 'use client';
 
-import { IntroductionPage } from '@xgen/feature-auth-Introduction';
-import authIntroHeaderPlugin from '@xgen/feature-auth-intro-header';
-import authIntroHeroPlugin from '@xgen/feature-auth-intro-hero';
-import authIntroFeaturesPlugin from '@xgen/feature-auth-intro-features';
-import authIntroCtaPlugin from '@xgen/feature-auth-intro-cta';
-import authIntroFooterPlugin from '@xgen/feature-auth-intro-footer';
+import { LandingPage } from '@xgen/feature-root-Landing';
+import rootLandingHeaderPlugin from '@xgen/feature-root-landing-header';
+import rootLandingHeroPlugin from '@xgen/feature-root-landing-hero';
+import rootLandingFeaturesPlugin from '@xgen/feature-root-landing-features';
+import rootLandingCtaPlugin from '@xgen/feature-root-landing-cta';
+import rootLandingFooterPlugin from '@xgen/feature-root-landing-footer';
 
 const plugins = [
-  authIntroHeaderPlugin,
-  authIntroHeroPlugin,
-  authIntroFeaturesPlugin,
-  authIntroCtaPlugin,
-  authIntroFooterPlugin,
+  rootLandingHeaderPlugin,
+  rootLandingHeroPlugin,
+  rootLandingFeaturesPlugin,
+  rootLandingCtaPlugin,
+  rootLandingFooterPlugin,
 ];
 
 export default function IntroductionEntry() {
-  return <IntroductionPage plugins={plugins} />;
+  return <LandingPage plugins={plugins} />;
 }
