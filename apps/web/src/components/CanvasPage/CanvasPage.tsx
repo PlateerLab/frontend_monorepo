@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import type { RouteComponentProps, MainFeatureModule, CanvasPagePlugin, CanvasPluginContext } from '@xgen/types';
 import { FeatureRegistry } from '@xgen/types';
 import { useTranslation } from '@xgen/i18n';
+import { useAuth } from '@xgen/auth-provider';
 
 // Canvas packages
 import { Canvas } from '@xgen/canvas-engine';
@@ -17,6 +18,10 @@ import {
     loadWorkflow as apiLoadWorkflow,
     checkWorkflowExistence,
     listWorkflows as apiListWorkflows,
+    listWorkflowsDetail as apiListWorkflowsDetail,
+    renameWorkflow as apiRenameWorkflow,
+    duplicateWorkflow as apiDuplicateWorkflow,
+    deleteWorkflow as apiDeleteWorkflow,
 } from '@xgen/api-client';
 
 // Canvas core UI
@@ -29,12 +34,19 @@ import {
 } from '@xgen/feature-canvas-core';
 import type { CanvasMode, MenuView } from '@xgen/feature-canvas-core';
 
+// Sidebar panels
+import { AddNodePanel } from '@xgen/feature-canvas-sidebar-nodes';
+import { TemplatePanel } from '@xgen/feature-canvas-sidebar-templates';
+import { WorkflowPanel } from '@xgen/feature-canvas-sidebar-workflows';
+import { DeploymentModal } from '@xgen/feature-canvas-deploy';
+
 import styles from './CanvasPage.module.scss';
 
 // ── Types ──────────────────────────────────────────────────────
 
 interface CanvasPageProps extends RouteComponentProps {
     onNavigate?: (sectionId: string) => void;
+    sidebarCollapsed?: boolean;
 }
 
 interface NodeModalState {
@@ -86,9 +98,10 @@ function validateWorkflowName(name: string): string {
 
 // ── Component ──────────────────────────────────────────────────
 
-const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate }) => {
+const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed }) => {
     const { t } = useTranslation();
     const searchParams = useSearchParams();
+    const { user } = useAuth();
 
     // ── Refs ──
     const canvasRef = useRef<CanvasRef>(null);
@@ -113,6 +126,15 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate }) => {
     const [isSaving, setIsSaving] = useState(false);
     const [isCanvasReady, setIsCanvasReady] = useState(false);
     const [loadingCanvas, setLoadingCanvas] = useState(true);
+    const [isCreatingNewWorkflow, setIsCreatingNewWorkflow] = useState(false);
+
+    // ── Auth / ownership state ──
+    const [isOwner, setIsOwner] = useState(true);
+    const [workflowOriginUserId, setWorkflowOriginUserId] = useState<string | null>(null);
+
+    // ── Deploy state ──
+    const [showDeploymentModal, setShowDeploymentModal] = useState(false);
+    const [workflowDetailData, setWorkflowDetailData] = useState<any>(null);
 
     // ── Canvas state tracking ──
     const [currentCanvasState, setCurrentCanvasState] = useState<any>(null);
@@ -214,6 +236,15 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate }) => {
         }
         const workflowIdToLoad = decodeURIComponent(loadParam);
         const userId = searchParams?.get('user_id') ?? undefined;
+
+        // Determine ownership
+        if (userId && user?.user_id != null && String(userId) !== String(user.user_id)) {
+            setIsOwner(false);
+            setWorkflowOriginUserId(userId);
+        } else {
+            setIsOwner(true);
+            setWorkflowOriginUserId(null);
+        }
 
         const loadFromServer = async () => {
             try {
@@ -336,7 +367,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate }) => {
         setIsSaving(true);
         try {
             const canvasState = canvasRef.current.getCanvasState();
-            let name = validateWorkflowName(workflowName);
+            const name = validateWorkflowName(workflowName);
             let currentId = workflowId;
             if (!currentId || currentId === 'None') {
                 currentId = generateWorkflowId();
@@ -345,18 +376,19 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate }) => {
 
             if (!canvasState.nodes || canvasState.nodes.length === 0) {
                 console.warn('Cannot save empty workflow');
+                setIsSaving(false);
                 return;
             }
 
             const content = { ...canvasState, workflow_id: currentId, workflow_name: name };
-            await apiSaveWorkflow(name, content, currentId);
+            await apiSaveWorkflow(name, content, currentId, workflowOriginUserId || undefined);
             setStoredState(STORAGE_KEYS.WORKFLOW_NAME, name);
         } catch (error) {
             console.error('Failed to save workflow:', error);
         } finally {
             setIsSaving(false);
         }
-    }, [isSaving, workflowId, workflowName]);
+    }, [isSaving, workflowId, workflowName, workflowOriginUserId]);
 
     // ── Side panel toggle ──
     const handleSidePanelToggle = useCallback((panelId: string) => {
@@ -364,38 +396,49 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate }) => {
     }, []);
 
     const handleNewWorkflow = useCallback(async () => {
-        const hasCurrentWork = canvasRef.current &&
-            (canvasRef.current.getCanvasState().nodes.length > 0 || canvasRef.current.getCanvasState().edges.length > 0);
+        if (isCreatingNewWorkflow) return;
+        setIsCreatingNewWorkflow(true);
 
-        if (hasCurrentWork && !window.confirm(t('canvas.confirmNewWorkflow', 'Start a new workflow? Unsaved changes may be lost.'))) {
-            return;
-        }
-
-        let newName = 'Workflow';
         try {
-            const existing = await apiListWorkflows();
-            let index = 1;
-            while (existing.includes(newName)) {
-                index += 1;
-                newName = `Workflow ${index}`;
+            const hasCurrentWork = canvasRef.current &&
+                (canvasRef.current.getCanvasState().nodes.length > 0 || canvasRef.current.getCanvasState().edges.length > 0);
+
+            if (hasCurrentWork && !window.confirm(t('canvas.confirmNewWorkflow', 'Start a new workflow? Unsaved changes may be lost.'))) {
+                return;
             }
-        } catch {
-            // Keep default name on API failure
-        }
 
-        const newId = generateWorkflowId();
-        setWorkflowId(newId);
-        setWorkflowName(newName);
-        setStoredState(STORAGE_KEYS.WORKFLOW_ID, newId);
-        setStoredState(STORAGE_KEYS.WORKFLOW_NAME, newName);
-        setStoredState(STORAGE_KEYS.WORKFLOW_STATE, null);
-        isRestorationComplete.current = true;
+            let newName = 'Workflow';
+            try {
+                const existing = await apiListWorkflows();
+                let index = 1;
+                while (existing.includes(newName)) {
+                    index += 1;
+                    newName = `Workflow ${index}`;
+                }
+            } catch {
+                // Keep default name on API failure
+            }
 
-        if (canvasRef.current) {
-            const centeredView = canvasRef.current.getCenteredView();
-            canvasRef.current.loadWorkflow({ nodes: [], edges: [], memos: [], view: centeredView });
+            const newId = generateWorkflowId();
+            setWorkflowId(newId);
+            setWorkflowName(newName);
+            setStoredState(STORAGE_KEYS.WORKFLOW_ID, newId);
+            setStoredState(STORAGE_KEYS.WORKFLOW_NAME, newName);
+            setStoredState(STORAGE_KEYS.WORKFLOW_STATE, null);
+            isRestorationComplete.current = true;
+
+            // Reset ownership
+            setIsOwner(true);
+            setWorkflowOriginUserId(null);
+
+            if (canvasRef.current) {
+                const centeredView = canvasRef.current.getCenteredView();
+                canvasRef.current.loadWorkflow({ nodes: [], edges: [], memos: [], view: centeredView });
+            }
+        } finally {
+            setIsCreatingNewWorkflow(false);
         }
-    }, [t]);
+    }, [t, isCreatingNewWorkflow]);
 
     const handleExport = useCallback(() => {
         if (!canvasRef.current) return;
@@ -420,10 +463,6 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate }) => {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
     }, [workflowId, workflowName]);
-
-    const handleImportClick = useCallback(() => {
-        fileInputRef.current?.click();
-    }, []);
 
     const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -465,6 +504,100 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate }) => {
     const handleEmptyAICreate = useCallback(() => {
         setIsAutoWorkflowOpen(true);
     }, []);
+
+    // ── Header action handlers ──
+    const handleAddNodeClick = useCallback(() => {
+        setDirectPanel((prev) => prev === 'addNodes' ? null : 'addNodes');
+    }, []);
+
+    const handleTemplateStart = useCallback(() => {
+        setDirectPanel((prev) => prev === 'template' ? null : 'template');
+    }, []);
+
+    const handleAutoWorkflowClick = useCallback(() => {
+        setIsAutoWorkflowOpen(true);
+    }, []);
+
+    const handleImportWorkflow = useCallback(() => {
+        setDirectPanel((prev) => prev === 'workflow' ? null : 'workflow');
+    }, []);
+
+    const handleFileInputClick = useCallback(() => {
+        fileInputRef.current?.click();
+    }, []);
+
+    const handleWorkflowNameChange = useCallback((name: string) => {
+        setWorkflowName(name);
+        setStoredState(STORAGE_KEYS.WORKFLOW_NAME, name);
+    }, []);
+
+    const handleDuplicate = useCallback(async () => {
+        if (!canvasRef.current) return;
+        try {
+            const sourceUserId = isOwner
+                ? (user?.user_id != null ? String(user.user_id) : undefined)
+                : (workflowOriginUserId || undefined);
+
+            const checkResult = await checkWorkflowExistence(workflowName);
+            if (checkResult.exists && workflowId !== 'None') {
+                // Workflow exists in DB — duplicate directly
+                const result = await apiDuplicateWorkflow(workflowId, sourceUserId);
+                if (result?.workflow_id) {
+                    const currentUserId = user?.user_id != null ? String(user.user_id) : undefined;
+                    const loadedData = await apiLoadWorkflow(result.workflow_id, currentUserId);
+                    if (loadedData && canvasRef.current) {
+                        const loadName = result.workflow_name || loadedData.workflow_name || `${workflowName} (copy)`;
+                        const loadContent = loadedData.content || loadedData;
+                        canvasRef.current.loadCanvasState(loadContent as any);
+                        setWorkflowName(loadName);
+                        setWorkflowId(result.workflow_id);
+                        setStoredState(STORAGE_KEYS.WORKFLOW_NAME, loadName);
+                        setStoredState(STORAGE_KEYS.WORKFLOW_ID, result.workflow_id);
+                        // Now we own the copy
+                        setIsOwner(true);
+                        setWorkflowOriginUserId(null);
+                    }
+                }
+            } else {
+                // Workflow not saved to DB yet — ask to save first
+                const userConfirmed = window.confirm(
+                    t('canvas.saveBeforeCopy', '워크플로우를 복사하려면 먼저 저장해야 합니다. 저장하시겠습니까?'),
+                );
+                if (!userConfirmed) return;
+
+                // Save first
+                const canvasState = canvasRef.current.getCanvasState();
+                let currentId = workflowId;
+                if (!currentId || currentId === 'None') {
+                    currentId = generateWorkflowId();
+                    setWorkflowId(currentId);
+                }
+                const name = validateWorkflowName(workflowName);
+                const content = { ...canvasState, workflow_id: currentId, workflow_name: name };
+                await apiSaveWorkflow(name, content, currentId, workflowOriginUserId || undefined);
+
+                // Then duplicate
+                const result = await apiDuplicateWorkflow(currentId, sourceUserId);
+                if (result?.workflow_id) {
+                    const currentUserId = user?.user_id != null ? String(user.user_id) : undefined;
+                    const loadedData = await apiLoadWorkflow(result.workflow_id, currentUserId);
+                    if (loadedData && canvasRef.current) {
+                        const loadName = result.workflow_name || loadedData.workflow_name || `${name} (copy)`;
+                        const loadContent = loadedData.content || loadedData;
+                        canvasRef.current.loadCanvasState(loadContent as any);
+                        setWorkflowName(loadName);
+                        setWorkflowId(result.workflow_id);
+                        setStoredState(STORAGE_KEYS.WORKFLOW_NAME, loadName);
+                        setStoredState(STORAGE_KEYS.WORKFLOW_ID, result.workflow_id);
+                        setIsOwner(true);
+                        setWorkflowOriginUserId(null);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Failed to duplicate workflow:', error);
+        }
+    }, [workflowName, workflowId, workflowOriginUserId, isOwner, user, t]);
 
     // ── Node modal handlers ──
     const handleOpenNodeModal = useCallback((nodeId: string, paramId: string, paramName: string, currentValue: string) => {
@@ -613,12 +746,92 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate }) => {
         }
     }, []);
 
+    // ── Wrapped panel components for SideMenu ──
+    const AddNodePanelWrapped = useMemo(() => {
+        const Wrapped: React.FC<{ onBack: () => void }> = ({ onBack }) => (
+            <AddNodePanel
+                onBack={onBack}
+                nodeSpecs={nodeCategories}
+                nodesLoading={nodesLoading}
+                nodesError={nodesError ?? null}
+                onRefreshNodes={refreshNodes}
+                onAddNodeToCenter={handleAddNodeToCenter}
+                onSidebarDragStart={handleSidebarDragStart}
+                onSidebarDragEnd={handleSidebarDragEnd}
+            />
+        );
+        Wrapped.displayName = 'AddNodePanelWrapped';
+        return Wrapped;
+    }, [nodeCategories, nodesLoading, nodesError, refreshNodes, handleAddNodeToCenter, handleSidebarDragStart, handleSidebarDragEnd]);
+
+    const TemplatePanelWrapped = useMemo(() => {
+        const Wrapped: React.FC<{ onBack: () => void }> = ({ onBack }) => (
+            <TemplatePanel
+                onBack={onBack}
+                onLoadWorkflow={handleLoadWorkflow}
+                fetchTemplates={apiListWorkflowsDetail}
+                createNewWorkflowId={generateWorkflowId}
+                hasCurrentWorkflow={() => {
+                    if (!canvasRef.current) return false;
+                    const state = canvasRef.current.getCanvasState();
+                    return (state.nodes?.length ?? 0) > 0;
+                }}
+            />
+        );
+        Wrapped.displayName = 'TemplatePanelWrapped';
+        return Wrapped;
+    }, [handleLoadWorkflow]);
+
+    const WorkflowPanelWrapped = useMemo(() => {
+        const Wrapped: React.FC<{ onBack: () => void }> = ({ onBack }) => (
+            <WorkflowPanel
+                onBack={onBack}
+                onLoad={handleFileInputClick}
+                onExport={handleExport}
+                onLoadWorkflow={handleLoadWorkflow}
+                fetchWorkflowsDetail={apiListWorkflowsDetail}
+                loadWorkflowById={async (wfId: string, userId: number) => {
+                    const result = await apiLoadWorkflow(wfId, userId);
+                    return result.content || result;
+                }}
+                deleteWorkflowById={apiDeleteWorkflow}
+                hasCurrentWorkflow={() => {
+                    if (!canvasRef.current) return false;
+                    const state = canvasRef.current.getCanvasState();
+                    return (state.nodes?.length ?? 0) > 0;
+                }}
+            />
+        );
+        Wrapped.displayName = 'WorkflowPanelWrapped';
+        return Wrapped;
+    }, [handleFileInputClick, handleExport, handleLoadWorkflow]);
+
+    // ── Deploy handler ──
+    const handleDeploy = useCallback(() => {
+        if (!canvasRef.current) return;
+        const canvasState = canvasRef.current.getCanvasState();
+        setWorkflowDetailData(canvasState);
+        setShowDeploymentModal(true);
+    }, []);
+
     // ── Active side panel component ──
     const ActiveSidePanelComponent = useMemo(() => {
         if (!activeSidePanel) return null;
         const panel = sidePanels.find((p) => p.id === activeSidePanel);
         return panel?.component ?? null;
     }, [activeSidePanel, sidePanels]);
+
+    // ── Keyboard shortcuts (Ctrl+S) ──
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                handleSave();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [handleSave]);
 
     // ── Backspace prevention ──
     useEffect(() => {
@@ -663,13 +876,18 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate }) => {
                     {...pluginContext}
                     onSave={handleSave}
                     onNewWorkflow={handleNewWorkflow}
-                    onDeploy={() => {}}
-                    onSidePanelToggle={handleSidePanelToggle}
-                    onToggleAI={() => setIsAutoWorkflowOpen(true)}
-                    sidePanels={sidePanels}
-                    onImportWorkflow={handleImportClick}
+                    onDeploy={handleDeploy}
+                    onDuplicate={handleDuplicate}
+                    onTemplateStart={handleTemplateStart}
+                    onAddNodeClick={handleAddNodeClick}
+                    onAutoWorkflowClick={handleAutoWorkflowClick}
+                    onImportWorkflow={handleImportWorkflow}
+                    onWorkflowNameChange={handleWorkflowNameChange}
+                    isOwner={isOwner}
+                    renameWorkflow={apiRenameWorkflow}
                     checkWorkflowExistence={checkWorkflowExistence}
                     listWorkflows={apiListWorkflows}
+                    sidebarLayout={{ isOpen: !sidebarCollapsed }}
                 />
             )}
 
@@ -741,6 +959,9 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate }) => {
                     <SideMenu
                         menuRef={menuRef}
                         initialView={directPanel}
+                        AddNodePanel={AddNodePanelWrapped}
+                        TemplatePanel={TemplatePanelWrapped}
+                        WorkflowPanel={WorkflowPanelWrapped}
                     />
                 )}
 
@@ -773,12 +994,18 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate }) => {
                     overlay.id === 'auto-workflow-sidebar' ? () => setIsAutoWorkflowOpen(false) :
                     overlay.id === 'history-panel' ? () => setIsHistoryPanelOpen(false) :
                     () => {};
+                const extraProps: Record<string, unknown> = {};
+                if (overlay.id === 'auto-workflow-sidebar') {
+                    extraProps.onLoadWorkflow = handleLoadWorkflow;
+                    extraProps.getCanvasState = () => canvasRef.current?.getCanvasState();
+                }
                 return (
                     <OverlayComponent
                         key={overlay.id}
                         {...pluginContext}
                         isOpen={isOpen}
                         onClose={onClose}
+                        {...extraProps}
                     />
                 );
             })}
@@ -812,6 +1039,14 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate }) => {
                     />
                 );
             })}
+
+            {/* Deploy Modal */}
+            <DeploymentModal
+                isOpen={showDeploymentModal}
+                onClose={() => setShowDeploymentModal(false)}
+                workflow={{ id: workflowId, name: workflowName, user_id: workflowOriginUserId || user?.user_id }}
+                workflowDetail={workflowDetailData}
+            />
 
             <input
                 ref={fileInputRef}

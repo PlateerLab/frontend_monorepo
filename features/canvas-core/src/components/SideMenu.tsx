@@ -67,7 +67,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
     const [view, setView] = useState<MenuView>('main');
 
     React.useEffect(() => {
-        if (initialView && (initialView === 'template' || initialView === 'addNodes')) {
+        if (initialView && (initialView === 'template' || initialView === 'addNodes' || initialView === 'workflow')) {
             setView(initialView);
         }
     }, [initialView]);

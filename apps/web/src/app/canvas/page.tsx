@@ -144,7 +144,7 @@ function CanvasPageContent() {
 
             <main className={`${styles.content} ${sidebarCollapsed ? styles.sidebarCollapsed : ''}`}>
                 <Suspense fallback={<LoadingSpinner />}>
-                    <CanvasPageLazy onNavigate={handleNavigate} />
+                    <CanvasPageLazy onNavigate={handleNavigate} sidebarCollapsed={sidebarCollapsed} />
                 </Suspense>
             </main>
         </div>

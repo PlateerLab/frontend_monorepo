@@ -1057,9 +1057,18 @@ export interface CanvasModalProps extends CanvasPluginContext {
 export interface CanvasHeaderProps extends CanvasPluginContext {
   onSave: () => void;
   onNewWorkflow: () => void;
-  onSidePanelToggle: (panelId: string) => void;
-  onToggleAI: () => void;
-  sidePanels: CanvasSidePanel[];
+  onDeploy: () => void;
+  onAddNodeClick?: () => void;
+  onAutoWorkflowClick?: () => void;
+  onTemplateStart?: () => void;
+  onImportWorkflow?: () => void;
+  onWorkflowNameChange?: (name: string) => void;
+  onDuplicate?: () => void;
+  isOwner?: boolean;
+  sidebarLayout?: { isOpen: boolean };
+  renameWorkflow?: (oldName: string, newName: string, workflowId: string) => Promise<void>;
+  checkWorkflowExistence?: (name: string) => Promise<{ exists: boolean }>;
+  listWorkflows?: () => Promise<any[]>;
 }
 
 /** 캔버스 페이지 플러그인 */

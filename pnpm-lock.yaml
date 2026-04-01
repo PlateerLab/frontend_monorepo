@@ -41,6 +41,9 @@ importers:
       '@xgen/feature-canvas-core':
         specifier: workspace:*
         version: link:../../features/canvas-core
+      '@xgen/feature-canvas-deploy':
+        specifier: workspace:*
+        version: link:../../features/canvas-deploy
       '@xgen/feature-canvas-document-drop':
         specifier: workspace:*
         version: link:../../features/canvas-document-drop
@@ -226,6 +229,30 @@ importers:
       '@xgen/canvas-engine':
         specifier: workspace:*
         version: link:../../packages/canvas-engine
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+
+  features/canvas-deploy:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n

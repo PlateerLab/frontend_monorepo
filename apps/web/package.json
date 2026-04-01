@@ -47,6 +47,7 @@
     "@xgen/feature-canvas-ai-generator": "workspace:*",
     "@xgen/feature-canvas-node-detail": "workspace:*",
     "@xgen/feature-canvas-document-drop": "workspace:*",
+    "@xgen/feature-canvas-deploy": "workspace:*",
     "@xgen/api-client": "workspace:*",
     "@xgen/config": "workspace:*",
     "@xgen/auth-provider": "workspace:*",

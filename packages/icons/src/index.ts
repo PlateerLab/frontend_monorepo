@@ -133,6 +133,12 @@ export {
   LuSettings,
   LuCirclePlus,
   LuCircleHelp,
+  LuSparkles,
+  LuExternalLink,
+  LuCode,
+  LuTerminal,
+  LuShare2,
+  LuLoader,
 } from 'react-icons/lu';
 
 // -----------------------------------------------------------------------------

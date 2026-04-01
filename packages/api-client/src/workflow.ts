@@ -445,3 +445,54 @@ export async function deleteWorkflowIOLogs(
     const response = await client.delete<any>(`/api/workflow/io_logs?${params}`);
     return response.data;
 }
+
+// ─────────────────────────────────────────────────────────────
+// Deploy API
+// ─────────────────────────────────────────────────────────────
+
+export interface DeployStatus {
+    workflow_name: string;
+    workflow_id: string;
+    is_deployed: boolean;
+    deploy_key?: string;
+    deploy_name?: string;
+    deploy_start_msg?: string;
+    deploy_msg_selection?: string[];
+    deploy_img?: string;
+    deploy_style?: {
+        theme?: 'light' | 'dark';
+        primaryColor?: string;
+        botMessageColor?: string;
+        embedWidth?: string;
+        embedHeight?: string;
+        defaultExpanded?: boolean;
+        enableAudio?: boolean;
+        enableFile?: boolean;
+        enableToolList?: boolean;
+        enableAgentList?: boolean;
+        suggestedRepliesAlignment?: 'left' | 'center' | 'right';
+    };
+}
+
+export async function getDeployStatus(workflowId: string, userId: string | number): Promise<DeployStatus> {
+    const client = getClient();
+    const response = await client.post<DeployStatus>(
+        `/api/workflow/deploy/status/${encodeURIComponent(workflowId)}`,
+        { user_id: String(userId) },
+    );
+    return response.data;
+}
+
+export async function generateEmbedJs(params: {
+    workflowId: string;
+    userId: string;
+    apiHost: string;
+    backendApiHost: string;
+    workflowName: string;
+    uriPrefix?: string;
+    embedType?: 'popup' | 'full';
+}): Promise<{ url: string }> {
+    const client = getClient();
+    const response = await client.post<{ url: string }>('/api/workflow/generate-embed', params);
+    return response.data;
+}

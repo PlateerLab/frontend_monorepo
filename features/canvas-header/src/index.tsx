@@ -1,31 +1,11 @@
 import './locales';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { LuCheck, LuX, LuPencil, LuUsers, LuChevronDown } from '@xgen/icons';
+import { LuCheck, LuX, LuPencil, LuUsers, LuChevronDown, LuCirclePlus, LuSparkles } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import styles from './styles/header.module.scss';
-import type { CanvasPagePlugin, CanvasPluginContext } from '@xgen/types';
+import type { CanvasPagePlugin, CanvasHeaderProps } from '@xgen/types';
 
 export type CanvasMode = 'edit' | 'run';
-
-export interface CanvasHeaderProps extends CanvasPluginContext {
-    onSave: () => void;
-    onNewWorkflow: () => void;
-    onDeploy: () => void;
-    onAddNodeClick?: () => void;
-    onAutoWorkflowClick?: () => void;
-    onTemplateStart?: () => void;
-    onImportWorkflow?: () => void;
-    onWorkflowNameChange?: (name: string) => void;
-    onDuplicate?: () => void;
-    isOwner?: boolean;
-    sidebarLayout?: { isOpen: boolean };
-    /** External workflow name rename handler */
-    renameWorkflow?: (oldName: string, newName: string, workflowId: string) => Promise<void>;
-    /** Check if workflow exists */
-    checkWorkflowExistence?: (name: string) => Promise<{ exists: boolean }>;
-    /** List all workflows for duplicate name check */
-    listWorkflows?: () => Promise<any[]>;
-}
 
 const CanvasHeader: React.FC<CanvasHeaderProps> = ({
     workflowName: externalWorkflowName,
@@ -247,7 +227,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                 </button>
                 {onAddNodeClick && (
                     <button type="button" className={styles.menuButton} onClick={onAddNodeClick} title={t('canvas.header.addNode', 'Add Node')}>
-                        +
+                        <LuCirclePlus />
                     </button>
                 )}
                 {onAutoWorkflowClick && (
@@ -257,7 +237,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                         title={t('canvas.header.autoWorkflow', 'Auto Workflow')}
                         type="button"
                     >
-                        ✦
+                        <LuSparkles />
                     </button>
                 )}
             </div>
@@ -269,7 +249,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
 export const canvasHeaderPlugin: CanvasPagePlugin = {
     id: 'canvas-header',
     name: 'Canvas Header',
-    headerComponent: CanvasHeader as any,
+    headerComponent: CanvasHeader,
 };
 
 export { CanvasHeader };

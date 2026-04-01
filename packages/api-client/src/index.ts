@@ -145,6 +145,8 @@ export {
   getWorkflowIOLogs,
   rateWorkflowIOLog,
   deleteWorkflowIOLogs,
+  getDeployStatus,
+  generateEmbedJs,
 } from './workflow';
 export type {
   WorkflowContent,
@@ -153,6 +155,7 @@ export type {
   WorkflowLoadResult,
   WorkflowExistence,
   ExecuteWorkflowOptions,
+  DeployStatus,
 } from './workflow';
 
 // Node API exports
