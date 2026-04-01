@@ -11,7 +11,7 @@ import {
     FiPlay,
     FiSave,
     FiSlash
-} from 'react-icons/fi';
+} from '@xgen/icons';
 import styles from '../styles/NodeContextMenu.module.scss';
 import { useTranslation } from '@xgen/i18n';
 

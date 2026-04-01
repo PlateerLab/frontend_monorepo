@@ -1,9 +1,8 @@
 export const en: Record<string, unknown> = {
   addNode: 'Add Node',
+  selectConnectableNode: 'Select Connectable Node',
   searchNodes: 'Search nodes...',
   noNodesFound: 'No nodes found',
-  predictedNodes: 'Predicted Nodes',
-  noPredictedNodes: 'No predicted nodes',
   node: {
     parameter: 'PARAMETER',
     parameters: 'PARAMETERS',

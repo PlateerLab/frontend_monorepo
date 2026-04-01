@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { FiX, FiPlus, FiMinus } from 'react-icons/fi';
+import { FiX, FiPlus, FiMinus } from '@xgen/icons';
 import styles from '../styles/CanvasMemo.module.scss';
 import type { CanvasMemo as CanvasMemoType, MemoColor } from '@xgen/canvas-types';
 import { MEMO_COLORS, MEMO_DEFAULT_FONT_SIZE, MEMO_MIN_FONT_SIZE, MEMO_MAX_FONT_SIZE } from '@xgen/canvas-types';

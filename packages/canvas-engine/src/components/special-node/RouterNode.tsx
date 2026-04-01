@@ -26,7 +26,6 @@ const RouterNodeComponent: React.FC<RouterNodeProps> = ({
     snappedPortKey,
     isSnapTargetInvalid,
     isPreview,
-    isPredicted,
     ...restProps
 }) => {
     const inputs = node.data?.inputs ?? [];
@@ -38,7 +37,6 @@ const RouterNodeComponent: React.FC<RouterNodeProps> = ({
         <Node
             node={node}
             isPreview={isPreview}
-            isPredicted={isPredicted}
             onPortMouseDown={onPortMouseDown}
             onPortMouseUp={onPortMouseUp}
             registerPortRef={registerPortRef}
@@ -58,7 +56,6 @@ const RouterNodeComponent: React.FC<RouterNodeProps> = ({
                     outputs={outputs}
                     parameters={parameters}
                     isPreview={isPreview}
-                    isPredicted={isPredicted}
                     isCollapsed={isCollapsed}
                     onPortMouseDown={onPortMouseDown}
                     onPortMouseUp={onPortMouseUp}

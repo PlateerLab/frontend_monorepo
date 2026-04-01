@@ -1,5 +1,5 @@
 import React from 'react';
-import { LuFolderOpen, LuDownload } from 'react-icons/lu';
+import { LuFolderOpen, LuDownload } from '@xgen/icons';
 import styles from '../styles/workflow-panel.module.scss';
 
 interface WorkflowPanelActionButtonsProps {

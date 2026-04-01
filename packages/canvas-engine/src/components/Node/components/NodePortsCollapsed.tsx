@@ -13,7 +13,6 @@ export const NodePortsCollapsed: React.FC<NodePortsProps> = ({
     outputs,
     parameters,
     isPreview = false,
-    isPredicted = false,
     onPortMouseDown,
     onPortMouseUp,
     registerPortRef,
@@ -59,7 +58,7 @@ export const NodePortsCollapsed: React.FC<NodePortsProps> = ({
                                 }`}
                                 ref={(el) => registerPortRef(nodeId, input.id, 'input', el)}
                                 onMouseDown={(e) => {
-                                    if (isPreview || isPredicted) return;
+                                    if (isPreview) return;
                                     e.stopPropagation();
                                     onPortMouseDown({
                                         nodeId: nodeId,
@@ -70,7 +69,7 @@ export const NodePortsCollapsed: React.FC<NodePortsProps> = ({
                                     }, e);
                                 }}
                                 onMouseUp={(e) => {
-                                    if (isPreview || isPredicted) return;
+                                    if (isPreview) return;
                                     e.stopPropagation();
                                     onPortMouseUp({
                                         nodeId: nodeId,
@@ -114,7 +113,7 @@ export const NodePortsCollapsed: React.FC<NodePortsProps> = ({
                                 }`}
                                 ref={(el) => registerPortRef(nodeId, output.id, 'output', el)}
                                 onMouseDown={(e) => {
-                                    if (isPreview || isPredicted) return;
+                                    if (isPreview) return;
                                     e.stopPropagation();
                                     onPortMouseDown({
                                         nodeId: nodeId,
@@ -125,7 +124,7 @@ export const NodePortsCollapsed: React.FC<NodePortsProps> = ({
                                     }, e);
                                 }}
                                 onMouseUp={(e) => {
-                                    if (isPreview || isPredicted) return;
+                                    if (isPreview) return;
                                     e.stopPropagation();
                                     onPortMouseUp({
                                         nodeId: nodeId,

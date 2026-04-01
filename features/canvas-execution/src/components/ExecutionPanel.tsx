@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { LuPlay, LuTrash2, LuCircleX, LuChevronUp, LuChevronDown, LuCopy, LuCheck } from 'react-icons/lu';
+import { LuPlay, LuTrash2, LuCircleX, LuChevronUp, LuChevronDown, LuCopy, LuCheck } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import {
     type OutputRendererProps,

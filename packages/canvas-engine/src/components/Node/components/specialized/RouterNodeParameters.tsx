@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
-import { LuTrash2 } from 'react-icons/lu';
+import { LuTrash2 } from '@xgen/icons';
 import styles from '../../../../styles/Node.module.scss';
 import { useTranslation } from '@xgen/i18n';
 import type { Parameter } from '@xgen/canvas-types';

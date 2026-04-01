@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { FiClipboard, FiMaximize2, FiMinimize2, FiGrid, FiEdit3 } from 'react-icons/fi';
+import { FiClipboard, FiMaximize2, FiMinimize2, FiGrid, FiEdit3 } from '@xgen/icons';
 import styles from '../styles/CanvasContextMenu.module.scss';
 
 interface CanvasContextMenuProps {

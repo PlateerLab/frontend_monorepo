@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { LuPlus, LuTrash2 } from 'react-icons/lu';
-import { FiEdit3 } from 'react-icons/fi';
+import { LuPlus, LuTrash2, FiEdit3 } from '@xgen/icons';
 import styles from '../../../styles/Node.module.scss';
 import { filterPortsByDependency } from '../utils/portUtils';
 import { getPortTypeDisplay, getPortClasses, generatePortKey } from '../utils/nodeUtils';
@@ -15,7 +14,6 @@ export interface RouterNodePortsProps {
     outputs: Port[];
     parameters: Parameter[];
     isPreview?: boolean;
-    isPredicted?: boolean;
     isCollapsed?: boolean;
     onPortMouseDown?: (data: PortMouseData, e: React.MouseEvent) => void;
     onPortMouseUp?: (data: PortMouseData, e: React.MouseEvent) => void;
@@ -34,7 +32,6 @@ export const RouterNodePorts: React.FC<RouterNodePortsProps> = ({
     outputs,
     parameters,
     isPreview = false,
-    isPredicted = false,
     isCollapsed = false,
     onPortMouseDown,
     onPortMouseUp,
@@ -105,7 +102,7 @@ export const RouterNodePorts: React.FC<RouterNodePortsProps> = ({
                     data-port-id={portKey}
                     data-port-type={portType}
                     onMouseDown={(e) => {
-                        if (!isPreview && !isPredicted && onPortMouseDown) {
+                        if (!isPreview && onPortMouseDown) {
                             e.stopPropagation();
                             onPortMouseDown({
                                 nodeId,
@@ -117,7 +114,7 @@ export const RouterNodePorts: React.FC<RouterNodePortsProps> = ({
                         }
                     }}
                     onMouseUp={(e) => {
-                        if (!isPreview && !isPredicted && onPortMouseUp) {
+                        if (!isPreview && onPortMouseUp) {
                             e.stopPropagation();
                             onPortMouseUp({
                                 nodeId,

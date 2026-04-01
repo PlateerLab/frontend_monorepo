@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { LuDownload } from 'react-icons/lu';
+import { LuDownload } from '@xgen/icons';
 import styles from '../../../styles/Node.module.scss';
 import { generatePortKey, getConnectedSchemaProvider, getPortTypeDisplay } from '../utils/nodeUtils';
 import { filterPortsByDependency } from '../utils/portUtils';
@@ -14,7 +14,6 @@ export const NodePorts: React.FC<NodePortsProps> = ({
     outputs,
     parameters,
     isPreview = false,
-    isPredicted = false,
     isSelected,
     onPortMouseDown,
     onPortMouseUp,
@@ -82,7 +81,7 @@ export const NodePorts: React.FC<NodePortsProps> = ({
                                     ref={(el) => registerPortRef && registerPortRef(nodeId, portData.id, 'input', el)}
                                     className={portClasses}
                                     data-port-id={portData.id}
-                                    onMouseDown={isPreview || isPredicted ? undefined : (e) => {
+                                    onMouseDown={isPreview ? undefined : (e) => {
                                         e.stopPropagation();
                                         onPortMouseDown({
                                             nodeId: nodeId,
@@ -92,7 +91,7 @@ export const NodePorts: React.FC<NodePortsProps> = ({
                                             type: portData.type
                                         }, e);
                                     }}
-                                    onMouseUp={isPreview || isPredicted ? undefined : (e) => {
+                                    onMouseUp={isPreview ? undefined : (e) => {
                                         e.stopPropagation();
                                         onPortMouseUp({
                                             nodeId: nodeId,
@@ -111,7 +110,7 @@ export const NodePorts: React.FC<NodePortsProps> = ({
                                 <span className={`${styles.portLabel} ${portData.required ? styles.required : ''}`}>
                                     {portData.name}
                                 </span>
-                                {portData.type === 'InputSchema' && !isPreview && !isPredicted && getConnectedSchemaProvider(nodeId, portData.id, currentEdges, currentNodes) && (
+                                {portData.type === 'InputSchema' && !isPreview && getConnectedSchemaProvider(nodeId, portData.id, currentEdges, currentNodes) && (
                                     <button
                                         className={styles.downloadButton}
                                         onClick={(e) => {
@@ -155,7 +154,7 @@ export const NodePorts: React.FC<NodePortsProps> = ({
                                     ref={(el) => registerPortRef && registerPortRef(nodeId, portData.id, 'output', el)}
                                     className={portClasses}
                                     data-port-id={portData.id}
-                                    onMouseDown={isPreview || isPredicted ? undefined : (e) => {
+                                    onMouseDown={isPreview ? undefined : (e) => {
                                         e.stopPropagation();
                                         onPortMouseDown({
                                             nodeId: nodeId,
@@ -165,7 +164,7 @@ export const NodePorts: React.FC<NodePortsProps> = ({
                                             type: portData.type
                                         }, e);
                                     }}
-                                    onMouseUp={isPreview || isPredicted ? undefined : (e) => {
+                                    onMouseUp={isPreview ? undefined : (e) => {
                                         e.stopPropagation();
                                         onPortMouseUp({
                                             nodeId: nodeId,

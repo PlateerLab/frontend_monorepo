@@ -1,5 +1,5 @@
 import React from 'react';
-import { LuRefreshCw } from 'react-icons/lu';
+import { LuRefreshCw } from '@xgen/icons';
 import styles from '../styles/workflow-panel.module.scss';
 
 interface WorkflowListItem {

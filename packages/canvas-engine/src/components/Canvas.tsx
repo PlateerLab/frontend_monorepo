@@ -1,9 +1,10 @@
 'use client';
 
 import React, { forwardRef, useImperativeHandle, useRef, useState, useCallback, useEffect, useMemo } from 'react';
-import type { CanvasNode, CanvasEdge, CanvasMemo, EdgePreview, Position, View, PredictedNode } from '@xgen/canvas-types';
+import type { CanvasNode, CanvasEdge, CanvasMemo, EdgePreview, Position, View, NodeData } from '@xgen/canvas-types';
 import { areTypesCompatible } from '../utils/canvas-utils';
 import type { CanvasProps, CanvasRef } from '../types';
+import { useTranslation } from '@xgen/i18n';
 
 // Hooks
 import { useCanvasView } from '../hooks/useCanvasView';
@@ -12,7 +13,7 @@ import { useNodeManagement } from '../hooks/useNodeManagement';
 import { useEdgeManagement } from '../hooks/useEdgeManagement';
 import { useMemoManagement } from '../hooks/useMemoManagement';
 import { useDragState } from '../hooks/useDragState';
-import { usePredictedNodes } from '../hooks/usePredictedNodes';
+import { useCompatibleNodes } from '../hooks/useCompatibleNodes';
 import { useCanvasEventHandlers } from '../hooks/useCanvasEventHandlers';
 import { usePortHandlers } from '../hooks/usePortHandlers';
 import { useKeyboardHandlers } from '../hooks/useKeyboardHandlers';
@@ -23,9 +24,8 @@ import { useHistoryManagement, createHistoryHelpers } from '../hooks/useHistoryM
 import { CanvasNodes } from './CanvasNodes';
 import { CanvasEdges } from './CanvasEdges';
 import { CanvasMemos } from './CanvasMemos';
-import { CanvasPredictedNodes } from './CanvasPredictedNodes';
 import CanvasContextMenu from './CanvasContextMenu';
-import { CanvasAddNodesPopup } from './CanvasAddNodesPopup';
+import { NodeSelectorPopup } from './NodeSelectorPopup';
 
 import styles from '../styles/Canvas.module.scss';
 import { MIN_SCALE, MAX_SCALE } from '../hooks/useCanvasView';
@@ -68,11 +68,12 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
     const [isSnapTargetValid, setIsSnapTargetValid] = useState(false);
     const [portClickStart, setPortClickStart] = useState<any>(null);
     const [portPositions, setPortPositions] = useState<Record<string, Position>>({});
-    const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
     const [selectedMemoIds, setSelectedMemoIds] = useState<string[]>([]);
     const [nodeSpecs, setNodeSpecs] = useState(availableNodeSpecs);
     const [contextMenuState, setContextMenuState] = useState<{ position: Position; type: string } | null>(null);
     const [addNodePopup, setAddNodePopup] = useState<{ position: Position } | null>(null);
+
+    const { t } = useTranslation();
 
     // ── Port ref registration (tracks DOM elements for position calculation) ──
     const registerPortRef = useCallback((nodeId: string, portId: string, portType: 'input' | 'output', el: HTMLDivElement | null) => {
@@ -145,16 +146,17 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
         startCanvasDrag, startNodeDrag, startEdgeDrag, startSelectionBoxDrag, stopDrag,
     } = useDragState({ historyHelpers, nodes });
 
-    // 8. Predicted nodes
+    // 8. Compatible nodes (for connectable node modal)
     const {
-        predictedNodes, setPredictedNodes,
+        compatibleNodes, setCompatibleNodes,
         isDraggingOutput, isDraggingInput,
         setIsDraggingOutput, setIsDraggingInput,
         setCurrentOutputType, setCurrentInputType,
         sourcePortForConnection, setSourcePortForConnection,
-        generatePredictedNodes, generatePredictedOutputNodes,
-        clearPredictedNodes, isPredictedNodeId,
-    } = usePredictedNodes({
+        findCompatibleInputNodes, findCompatibleOutputNodes,
+        createNodeFromSpec,
+        clearCompatibleNodes,
+    } = useCompatibleNodes({
         availableNodeSpecs: nodeSpecs,
         areTypesCompatible,
     });
@@ -167,19 +169,18 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
 
     // 10. Port handlers
     const { handlePortMouseDown, handlePortMouseUp } = usePortHandlers({
-        edges, nodes, predictedNodes, portPositions,
+        edges, nodes, portPositions,
         isDraggingOutput, isDraggingInput,
         portClickStart,
         edgePreviewRef,
         setPortClickStart, setEdgePreview, setSnappedPortKey, setIsSnapTargetValid,
         setIsDraggingOutput, setIsDraggingInput,
         setCurrentOutputType, setCurrentInputType,
-        setSourcePortForConnection, setPredictedNodes, setEdges,
+        setSourcePortForConnection, setCompatibleNodes, setEdges,
         startEdgeDrag, removeEdge,
         addNode, addEdge,
-        clearPredictedNodes, isDuplicateEdge,
-        generatePredictedNodes, generatePredictedOutputNodes,
-        isNodePredicted: isPredictedNodeId,
+        clearCompatibleNodes, isDuplicateEdge,
+        findCompatibleInputNodes, findCompatibleOutputNodes,
     });
 
     // 11. Canvas event handlers
@@ -188,18 +189,17 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
         handleNodeMouseDown, handleEdgeClick,
     } = useCanvasEventHandlers({
         dragState, view, portPositions,
-        nodes, edges, predictedNodes,
+        nodes, edges,
         isDraggingOutput, isDraggingInput,
         portClickStart, selectedNodeIds, selectedEdgeIds,
         containerRef, edgePreviewRef, snappedPortKeyRef,
         setView, setNodes, setEdgePreview, setSnappedPortKey, setIsSnapTargetValid,
-        setPortClickStart, setPredictedNodes,
+        setPortClickStart, setCompatibleNodes,
         clearSelection, startCanvasDrag, startSelectionBoxDrag,
-        clearPredictedNodes, generatePredictedNodes, generatePredictedOutputNodes,
+        clearCompatibleNodes, findCompatibleInputNodes, findCompatibleOutputNodes,
         stopDrag, selectNode, selectEdge,
         toggleNodeSelection, toggleEdgeSelection, setSelection,
         startNodeDrag, setDragState,
-        isNodePredicted: isPredictedNodeId,
         handlePortMouseUp,
     });
 
@@ -216,11 +216,16 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
         clearSelection, selectNode, setSelection,
         toggleBypass,
         toggleExpanded: (nodeId: string) => {
-            setExpandedNodes(prev => {
-                const next = new Set(prev);
-                if (next.has(nodeId)) next.delete(nodeId);
-                else next.add(nodeId);
-                return next;
+            setNodes(prevNodes => {
+                const idx = prevNodes.findIndex(n => n.id === nodeId);
+                if (idx === -1) return prevNodes;
+                const target = prevNodes[idx];
+                const currentExpanded = target.isExpanded !== undefined ? target.isExpanded : true;
+                return [
+                    ...prevNodes.slice(0, idx),
+                    { ...target, isExpanded: !currentExpanded },
+                    ...prevNodes.slice(idx + 1)
+                ];
             });
         },
         undo: history.undo,
@@ -357,11 +362,16 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
         canUndo: () => history.canUndo,
         canRedo: () => history.canRedo,
         toggleExpanded: (nodeId: string) => {
-            setExpandedNodes(prev => {
-                const next = new Set(prev);
-                if (next.has(nodeId)) next.delete(nodeId);
-                else next.add(nodeId);
-                return next;
+            setNodes(prevNodes => {
+                const idx = prevNodes.findIndex(n => n.id === nodeId);
+                if (idx === -1) return prevNodes;
+                const target = prevNodes[idx];
+                const currentExpanded = target.isExpanded !== undefined ? target.isExpanded : true;
+                return [
+                    ...prevNodes.slice(0, idx),
+                    { ...target, isExpanded: !currentExpanded },
+                    ...prevNodes.slice(idx + 1)
+                ];
             });
         },
         findAutoConnection,
@@ -521,13 +531,25 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
     );
 
     const handleNodeToggleExpand = useCallback((nodeId: string) => {
-        setExpandedNodes(prev => {
-            const next = new Set(prev);
-            if (next.has(nodeId)) next.delete(nodeId);
-            else next.add(nodeId);
-            return next;
+        setNodes(prevNodes => {
+            const targetNodeIndex = prevNodes.findIndex(node => node.id === nodeId);
+            if (targetNodeIndex === -1) return prevNodes;
+
+            const targetNode = prevNodes[targetNodeIndex];
+            const currentExpanded = targetNode.isExpanded !== undefined ? targetNode.isExpanded : true;
+
+            const newNodes = [
+                ...prevNodes.slice(0, targetNodeIndex),
+                {
+                    ...targetNode,
+                    isExpanded: !currentExpanded
+                },
+                ...prevNodes.slice(targetNodeIndex + 1)
+            ];
+
+            return newNodes;
         });
-    }, []);
+    }, [setNodes]);
 
     const handleNodeToggleBypass = useCallback(
         (nodeId: string) => toggleBypass(nodeId),
@@ -619,6 +641,81 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
         setAddNodePopup(null);
     }, []);
 
+    // ── Connectable node popup handlers (edge drop on empty canvas) ──
+    const handleConnectableNodeSelect = useCallback((nodeData: NodeData) => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        // Place new node at viewport center
+        const rect = container.getBoundingClientRect();
+        const centerX = (rect.width / 2 - view.x) / view.scale;
+        const centerY = (rect.height / 2 - view.y) / view.scale;
+        const position = { x: centerX - 120, y: centerY - 60 };
+
+        const newNode = createNodeFromSpec(nodeData, position);
+
+        // Create edge between source port and new node
+        const source = sourcePortForConnection;
+        if (source) {
+            let newEdge: CanvasEdge | null = null;
+
+            if (isDraggingOutput && nodeData.inputs) {
+                const compatibleInput = nodeData.inputs.find(input =>
+                    areTypesCompatible(source.type, input.type)
+                );
+                if (compatibleInput) {
+                    newEdge = {
+                        id: `edge-${source.nodeId}:${source.portId}-${newNode.id}:${compatibleInput.id}-${Date.now()}`,
+                        source: { nodeId: source.nodeId, portId: source.portId, portType: source.portType as 'input' | 'output' },
+                        target: { nodeId: newNode.id, portId: compatibleInput.id, portType: 'input' },
+                    };
+                }
+            } else if (isDraggingInput && nodeData.outputs) {
+                const compatibleOutput = nodeData.outputs.find(output =>
+                    areTypesCompatible(output.type, source.type)
+                );
+                if (compatibleOutput) {
+                    newEdge = {
+                        id: `edge-${newNode.id}:${compatibleOutput.id}-${source.nodeId}:${source.portId}-${Date.now()}`,
+                        source: { nodeId: newNode.id, portId: compatibleOutput.id, portType: 'output' },
+                        target: { nodeId: source.nodeId, portId: source.portId, portType: source.portType as 'input' | 'output' },
+                    };
+                }
+            }
+
+            if (newEdge && historyHelpers?.recordMultiAction) {
+                historyHelpers.recordMultiAction(
+                    `Created node ${newNode.data.nodeName} with edge connection`,
+                    [{ actionType: 'MULTI_ACTION', nodeId: newNode.id, nodeType: newNode.data.nodeName, position: newNode.position }],
+                );
+                addNode(newNode, true);
+                addEdge(newEdge, true);
+            } else if (newEdge) {
+                addNode(newNode);
+                addEdge(newEdge);
+            } else {
+                addNode(newNode);
+            }
+        } else {
+            addNode(newNode);
+        }
+
+        // Clean up
+        setEdgePreview(null);
+        clearCompatibleNodes();
+    }, [
+        view, sourcePortForConnection, isDraggingOutput, isDraggingInput,
+        createNodeFromSpec, addNode, addEdge, setEdgePreview, clearCompatibleNodes,
+        historyHelpers,
+    ]);
+
+    const handleConnectableNodesClose = useCallback(() => {
+        clearCompatibleNodes();
+        setEdgePreview(null);
+        setSnappedPortKey(null);
+        setIsSnapTargetValid(true);
+    }, [clearCompatibleNodes, setEdgePreview, setSnappedPortKey, setIsSnapTargetValid]);
+
     // ── Canvas container class ──
     const containerClassName = [styles.canvasContainer, className].filter(Boolean).join(' ');
 
@@ -685,13 +782,6 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
                     onMemoDelete={deleteMemo}
                 />
 
-                {/* Predicted nodes */}
-                {predictedNodes.length > 0 && (
-                    <CanvasPredictedNodes
-                        predictedNodes={predictedNodes}
-                    />
-                )}
-
                 {/* Selection box */}
                 {dragState.type === 'selection-box' && dragState.selectionBox && (
                     <div
@@ -725,12 +815,21 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
             />
 
             {/* Add nodes popup (on double-click) */}
-            <CanvasAddNodesPopup
+            <NodeSelectorPopup
                 isOpen={addNodePopup !== null}
-                position={addNodePopup?.position ?? { x: 0, y: 0 }}
-                availableNodes={nodeSpecs}
+                title={t('canvas.addNode')}
+                nodes={nodeSpecs}
                 onSelectNode={handleAddNodeFromPopup}
                 onClose={handleCloseAddNodesPopup}
+            />
+
+            {/* Connectable node popup (on edge drop to empty canvas) */}
+            <NodeSelectorPopup
+                isOpen={compatibleNodes.length > 0}
+                title={t('canvas.selectConnectableNode')}
+                nodes={compatibleNodes}
+                onSelectNode={handleConnectableNodeSelect}
+                onClose={handleConnectableNodesClose}
             />
         </div>
     );

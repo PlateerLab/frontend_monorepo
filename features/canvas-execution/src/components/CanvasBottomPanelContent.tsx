@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { LuSend } from 'react-icons/lu';
+import { LuSend } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import {
     hasError,

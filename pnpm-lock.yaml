@@ -238,15 +238,15 @@ importers:
       react:
         specifier: ^19.0.0
         version: 19.2.4
-      react-icons:
-        specifier: ^5.5.0
-        version: 5.6.0(react@19.2.4)
 
   features/canvas-document-drop:
     dependencies:
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
       '@xgen/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -256,9 +256,6 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.4(react@19.2.4)
-      react-icons:
-        specifier: ^5.5.0
-        version: 5.6.0(react@19.2.4)
 
   features/canvas-execution:
     dependencies:
@@ -280,9 +277,6 @@ importers:
       react:
         specifier: ^19.0.0
         version: 19.2.4
-      react-icons:
-        specifier: ^5.4.0
-        version: 5.6.0(react@19.2.4)
 
   features/canvas-header:
     dependencies:
@@ -304,9 +298,6 @@ importers:
       react:
         specifier: ^19.0.0
         version: 19.2.4
-      react-icons:
-        specifier: ^5.4.0
-        version: 5.6.0(react@19.2.4)
 
   features/canvas-history:
     dependencies:
@@ -316,21 +307,24 @@ importers:
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
       '@xgen/types':
         specifier: workspace:*
         version: link:../../packages/types
       react:
         specifier: ^19.0.0
         version: 19.2.4
-      react-icons:
-        specifier: ^5.4.0
-        version: 5.6.0(react@19.2.4)
 
   features/canvas-node-detail:
     dependencies:
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
       '@xgen/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -340,9 +334,6 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.4(react@19.2.4)
-      react-icons:
-        specifier: ^5.5.0
-        version: 5.6.0(react@19.2.4)
 
   features/canvas-sidebar-nodes:
     dependencies:
@@ -373,6 +364,9 @@ importers:
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
       '@xgen/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -382,9 +376,6 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.4(react@19.2.4)
-      react-icons:
-        specifier: ^5.4.0
-        version: 5.6.0(react@19.2.4)
 
   features/canvas-sidebar-workflows:
     dependencies:
@@ -394,15 +385,15 @@ importers:
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
       '@xgen/types':
         specifier: workspace:*
         version: link:../../packages/types
       react:
         specifier: ^19.0.0
         version: 19.2.4
-      react-icons:
-        specifier: ^5.4.0
-        version: 5.6.0(react@19.2.4)
 
   features/main-AuthProfile:
     dependencies:

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, RefObject } from 'react';
-import { LuCirclePlus, LuCircleHelp, LuSettings, LuLayoutGrid, LuLayoutTemplate } from 'react-icons/lu';
+import { LuCirclePlus, LuCircleHelp, LuSettings, LuLayoutGrid, LuLayoutTemplate } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import styles from '../styles/side-menu.module.scss';
 

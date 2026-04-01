@@ -1,6 +1,6 @@
 import './locales';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { LuCheck, LuX, LuPencil, LuUsers, LuChevronDown } from 'react-icons/lu';
+import { LuCheck, LuX, LuPencil, LuUsers, LuChevronDown } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import styles from './styles/header.module.scss';
 import type { CanvasPagePlugin, CanvasPluginContext } from '@xgen/types';

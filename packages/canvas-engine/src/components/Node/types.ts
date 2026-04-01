@@ -29,7 +29,6 @@ export interface NodePortsProps {
     outputs?: Port[];
     parameters?: Parameter[];
     isPreview?: boolean;
-    isPredicted?: boolean;
     isSelected?: boolean;
     onPortMouseDown: (data: PortMouseData, e: React.MouseEvent) => void;
     onPortMouseUp: (data: PortMouseData, e: React.MouseEvent) => void;
@@ -56,7 +55,6 @@ export interface NodeParametersProps {
     nodeDataId: string;
     parameters?: Parameter[];
     isPreview?: boolean;
-    isPredicted?: boolean;
     onParameterChange?: (nodeId: string, paramId: string, value: string | number | boolean, skipHistory?: boolean) => void;
     onParameterNameChange?: (nodeId: string, paramId: string, newName: string) => void;
     onParameterAdd?: (nodeId: string, parameter: Parameter) => void;

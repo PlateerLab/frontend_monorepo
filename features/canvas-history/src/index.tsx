@@ -1,6 +1,6 @@
 import './locales';
 import React from 'react';
-import { FaTrashAlt } from 'react-icons/fa';
+import { FaTrashAlt } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import type { CanvasPagePlugin } from '@xgen/types';
 import styles from './styles/history-panel.module.scss';

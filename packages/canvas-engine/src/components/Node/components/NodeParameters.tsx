@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { LuPlus, LuRefreshCw, LuCopy, LuTrash2 } from 'react-icons/lu';
+import { LuPlus, LuRefreshCw, LuCopy, LuTrash2, FiInfo } from '@xgen/icons';
 import styles from '../../../styles/Node.module.scss';
 import { separateParameters, detectParameterType, createCustomParameter, duplicateParameter, getLocalizedDescription } from '../utils/parameterUtils';
 import { useApiParameters } from '../../../hooks/node/useApiParameters';
@@ -15,7 +15,6 @@ export const NodeParameters: React.FC<NodeParametersProps & {
     nodeDataId,
     parameters,
     isPreview = false,
-    isPredicted = false,
     onParameterChange,
     onParameterNameChange,
     onParameterAdd,
@@ -137,7 +136,7 @@ export const NodeParameters: React.FC<NodeParametersProps & {
                         onMouseEnter={() => setHoveredParam(param.id)}
                         onMouseLeave={() => setHoveredParam(null)}
                     >
-                        <span style={{ width: 24, height: 24, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>ℹ</span>
+                        <FiInfo size={24} />
                         {hoveredParam === param.id && (
                             <div className={styles.tooltip}>
                                 {localizedDesc}
@@ -369,7 +368,7 @@ export const NodeParameters: React.FC<NodeParametersProps & {
         );
     };
 
-    if (!parameters || parameters.length === 0 || isPredicted) {
+    if (!parameters || parameters.length === 0) {
         return null;
     }
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { LuChevronUp, LuChevronDown, LuTrash2, LuCopy } from 'react-icons/lu';
+import { LuChevronUp, LuChevronDown, LuTrash2, LuCopy } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import {
     hasError,

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useTranslation } from '@xgen/i18n';
-import { LuPlus, LuChevronRight } from 'react-icons/lu';
+import { LuPlus, LuChevronRight } from '@xgen/icons';
 import styles from '../styles/canvas-empty-state.module.scss';
 
 export interface CanvasEmptyStateProps {

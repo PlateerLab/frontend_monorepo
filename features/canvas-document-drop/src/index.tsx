@@ -2,7 +2,7 @@
 import './locales';
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { FiX, FiFile } from 'react-icons/fi';
+import { FiX, FiFile } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import type { CanvasPagePlugin } from '@xgen/types';
 import styles from './styles/canvas-document-drop-modal.module.scss';

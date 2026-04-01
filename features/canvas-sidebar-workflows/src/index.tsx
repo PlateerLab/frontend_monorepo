@@ -1,6 +1,6 @@
 import './locales';
 import React, { useState, useEffect } from 'react';
-import { LuArrowLeft, LuRefreshCw } from 'react-icons/lu';
+import { LuArrowLeft, LuRefreshCw } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import type { CanvasPagePlugin } from '@xgen/types';
 import { WorkflowPanelActionButtons } from './components/WorkflowPanelActionButtons';

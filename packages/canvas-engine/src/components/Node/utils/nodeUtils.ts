@@ -134,14 +134,12 @@ export const createCommonEventHandlers = (
 export const getNodeContainerClasses = (
     isSelected: boolean,
     isPreview: boolean,
-    isPredicted: boolean,
     styles: any
 ): string => {
     const classes = [
         styles.node,
         isSelected ? styles.selected : '',
         isPreview ? styles.preview : '',
-        isPredicted ? styles.predicted : ''
     ].filter(Boolean);
 
     return classes.join(' ');
@@ -149,18 +147,14 @@ export const getNodeContainerClasses = (
 
 export const getNodeContainerStyles = (
     position: { x: number; y: number },
-    isPredicted: boolean,
-    predictedOpacity: number = 1.0
 ): React.CSSProperties => ({
     transform: `translate(${position.x}px, ${position.y}px)`,
-    opacity: isPredicted ? predictedOpacity : 1,
     pointerEvents: 'auto' as React.CSSProperties['pointerEvents'],
-    cursor: isPredicted ? 'pointer' : 'default'
+    cursor: 'default'
 });
 
 export const isValidNodeForInteraction = (
     isPreview?: boolean,
-    isPredicted?: boolean
 ): boolean => {
-    return !isPreview && !isPredicted;
+    return !isPreview;
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { LuChevronUp, LuChevronDown } from 'react-icons/lu';
+import { LuChevronUp, LuChevronDown } from '@xgen/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '@xgen/i18n';
 import type { DetailPanelProps } from '../types';

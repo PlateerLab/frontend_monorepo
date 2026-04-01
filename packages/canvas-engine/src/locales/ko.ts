@@ -1,9 +1,8 @@
 export const ko: Record<string, unknown> = {
   addNode: '노드 추가',
+  selectConnectableNode: '연결 가능 노드 선택',
   searchNodes: '노드 검색...',
   noNodesFound: '일치하는 노드가 없습니다',
-  predictedNodes: '연결 가능 노드',
-  noPredictedNodes: '연결 가능한 노드가 없습니다',
   node: {
     parameter: 'PARAMETER',
     parameters: 'PARAMETERS',

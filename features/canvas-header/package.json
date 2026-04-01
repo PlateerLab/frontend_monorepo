@@ -13,7 +13,6 @@
     "@xgen/icons": "workspace:*",
     "@xgen/api-client": "workspace:*",
     "@xgen/auth-provider": "workspace:*",
-    "react": "^19.0.0",
-    "react-icons": "^5.4.0"
+    "react": "^19.0.0"
   }
 }

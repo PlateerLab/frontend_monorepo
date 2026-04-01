@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, type MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { LuX, LuCopy } from 'react-icons/lu';
+import { LuX, LuCopy } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import MiniCanvas, { type Template } from './MiniCanvas';
 import styles from '../styles/template-preview.module.scss';

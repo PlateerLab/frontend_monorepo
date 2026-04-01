@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import type {
     CanvasEdge,
     CanvasNode,
-    PredictedNode,
+    NodeData,
     Position,
     EdgePreview
 } from '@xgen/canvas-types';
@@ -24,7 +24,6 @@ export interface PortMouseEventData {
 interface UsePortHandlersProps {
     edges: CanvasEdge[];
     nodes: CanvasNode[];
-    predictedNodes: PredictedNode[];
     portPositions: Record<string, Position>;
     isDraggingOutput: boolean;
     isDraggingInput: boolean;
@@ -41,19 +40,17 @@ interface UsePortHandlersProps {
     setCurrentOutputType: (value: string | null) => void;
     setCurrentInputType: (value: string | null) => void;
     setSourcePortForConnection: (value: any) => void;
-    setPredictedNodes: React.Dispatch<React.SetStateAction<PredictedNode[]>>;
+    setCompatibleNodes: React.Dispatch<React.SetStateAction<NodeData[]>>;
     setEdges: React.Dispatch<React.SetStateAction<CanvasEdge[]>>;
 
     startEdgeDrag: () => void;
     removeEdge: (edgeId: string) => void;
     addNode: (node: CanvasNode) => void;
     addEdge: (edge: CanvasEdge) => void;
-    clearPredictedNodes: () => void;
+    clearCompatibleNodes: () => void;
     isDuplicateEdge: (sourceNodeId: string, sourcePortId: string, targetNodeId: string, targetPortId: string) => boolean;
-    generatePredictedNodes: (outputType: string, targetPos: Position) => PredictedNode[];
-    generatePredictedOutputNodes: (inputType: string, targetPos: Position) => PredictedNode[];
-
-    isNodePredicted: (nodeId: string) => boolean;
+    findCompatibleInputNodes: (outputType: string) => NodeData[];
+    findCompatibleOutputNodes: (inputType: string) => NodeData[];
 }
 
 interface UsePortHandlersReturn {
@@ -64,7 +61,6 @@ interface UsePortHandlersReturn {
 export const usePortHandlers = ({
     edges,
     nodes,
-    predictedNodes,
     portPositions,
     isDraggingOutput,
     isDraggingInput,
@@ -79,17 +75,16 @@ export const usePortHandlers = ({
     setCurrentOutputType,
     setCurrentInputType,
     setSourcePortForConnection,
-    setPredictedNodes,
+    setCompatibleNodes,
     setEdges,
     startEdgeDrag,
     removeEdge,
     addNode,
     addEdge,
-    clearPredictedNodes,
+    clearCompatibleNodes,
     isDuplicateEdge,
-    generatePredictedNodes,
-    generatePredictedOutputNodes,
-    isNodePredicted
+    findCompatibleInputNodes,
+    findCompatibleOutputNodes,
 }: UsePortHandlersProps): UsePortHandlersReturn => {
 
     const handlePortMouseDown = useCallback((data: PortMouseEventData, mouseEvent?: React.MouseEvent): void => {
@@ -192,6 +187,7 @@ export const usePortHandlers = ({
                 { x: mouseEvent.clientX, y: mouseEvent.clientY }
             );
 
+        // Port click (no drag) → open connectable nodes modal
         if (isClickAction &&
             portClickStart.data.nodeId === nodeId &&
             portClickStart.data.portId === portId &&
@@ -208,19 +204,19 @@ export const usePortHandlers = ({
                     targetPos: portPos
                 });
 
-                let predicted: any[] = [];
+                let compatible: NodeData[] = [];
                 if (portType === 'output') {
                     setIsDraggingOutput(true);
                     setCurrentOutputType(type);
-                    predicted = generatePredictedNodes(type, portPos);
+                    compatible = findCompatibleInputNodes(type);
                 } else if (portType === 'input') {
                     setIsDraggingInput(true);
                     setCurrentInputType(type);
-                    predicted = generatePredictedOutputNodes(type, portPos);
+                    compatible = findCompatibleOutputNodes(type);
                 }
 
-                if (predicted.length > 0) {
-                    setPredictedNodes(predicted);
+                if (compatible.length > 0) {
+                    setCompatibleNodes(compatible);
                 }
             }
 
@@ -249,46 +245,8 @@ export const usePortHandlers = ({
             return;
         }
 
-        // Handle predicted node connection
-        if (isNodePredicted(nodeId)) {
-            const predictedNode = predictedNodes.find(pNode => pNode.id === nodeId);
-            if (predictedNode) {
-                const newNode: CanvasNode = {
-                    id: `${predictedNode.nodeData.id}-${Date.now()}`,
-                    data: predictedNode.nodeData,
-                    position: predictedNode.position,
-                    isExpanded: true,
-                };
-
-                addNode(newNode);
-
-                let newEdge: CanvasEdge;
-                if (isDraggingOutput) {
-                    newEdge = {
-                        id: `edge-${currentEdgePreview.source.nodeId}:${currentEdgePreview.source.portId}-${newNode.id}:${portId}-${Date.now()}`,
-                        source: currentEdgePreview.source,
-                        target: { nodeId: newNode.id, portId, portType }
-                    };
-                } else {
-                    newEdge = {
-                        id: `edge-${newNode.id}:${portId}-${currentEdgePreview.source.nodeId}:${currentEdgePreview.source.portId}-${Date.now()}`,
-                        source: { nodeId: newNode.id, portId, portType: 'output' },
-                        target: currentEdgePreview.source
-                    };
-                }
-
-                addEdge(newEdge);
-                clearPredictedNodes();
-            }
-
-            setEdgePreview(null);
-            setSnappedPortKey(null);
-            setIsSnapTargetValid(true);
-            return;
-        }
-
         // Handle regular node connection
-        clearPredictedNodes();
+        clearCompatibleNodes();
 
         if (isDuplicateEdge(
             currentEdgePreview.source.nodeId,
@@ -335,7 +293,6 @@ export const usePortHandlers = ({
     }, [
         edges,
         nodes,
-        predictedNodes,
         portPositions,
         isDraggingOutput,
         isDraggingInput,
@@ -350,14 +307,13 @@ export const usePortHandlers = ({
         setCurrentOutputType,
         setCurrentInputType,
         setSourcePortForConnection,
-        setPredictedNodes,
+        setCompatibleNodes,
         addNode,
         addEdge,
-        clearPredictedNodes,
+        clearCompatibleNodes,
         isDuplicateEdge,
-        generatePredictedNodes,
-        generatePredictedOutputNodes,
-        isNodePredicted
+        findCompatibleInputNodes,
+        findCompatibleOutputNodes,
     ]);
 
     return {

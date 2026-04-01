@@ -8,7 +8,7 @@ import {
     FiSettings,
     FiChevronDown,
     FiAlertCircle,
-} from 'react-icons/fi';
+} from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import type { CanvasPagePlugin } from '@xgen/types';
 import styles from './styles/node-detail-modal.module.scss';

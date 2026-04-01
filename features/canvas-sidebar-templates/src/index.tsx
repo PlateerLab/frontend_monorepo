@@ -1,6 +1,6 @@
 import './locales';
 import React, { useState, useEffect } from 'react';
-import { LuArrowLeft, LuLayoutTemplate, LuCopy } from 'react-icons/lu';
+import { LuArrowLeft, LuLayoutTemplate, LuCopy } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import type { CanvasPagePlugin } from '@xgen/types';
 import type { Template } from './components/MiniCanvas';

@@ -4,7 +4,7 @@ import type {
     View,
     Position,
     CanvasNode,
-    PredictedNode,
+    NodeData,
     EdgePreview,
     CanvasEdge
 } from '@xgen/canvas-types';
@@ -29,7 +29,6 @@ interface UseCanvasEventHandlersProps {
     portPositions: Record<string, Position>;
     nodes: CanvasNode[];
     edges: CanvasEdge[];
-    predictedNodes: PredictedNode[];
     isDraggingOutput: boolean;
     isDraggingInput: boolean;
     portClickStart: { data: any; timestamp: number; position: { x: number; y: number } } | null;
@@ -46,14 +45,14 @@ interface UseCanvasEventHandlersProps {
     setSnappedPortKey: React.Dispatch<React.SetStateAction<string | null>>;
     setIsSnapTargetValid: React.Dispatch<React.SetStateAction<boolean>>;
     setPortClickStart: React.Dispatch<React.SetStateAction<any>>;
-    setPredictedNodes: React.Dispatch<React.SetStateAction<PredictedNode[]>>;
+    setCompatibleNodes: React.Dispatch<React.SetStateAction<NodeData[]>>;
 
     clearSelection: () => void;
     startCanvasDrag: (e: React.MouseEvent, view: View) => void;
     startSelectionBoxDrag: (e: React.MouseEvent, view: View, containerRect: DOMRect) => void;
-    clearPredictedNodes: () => void;
-    generatePredictedNodes: (outputType: string, targetPos: Position) => PredictedNode[];
-    generatePredictedOutputNodes: (inputType: string, targetPos: Position) => PredictedNode[];
+    clearCompatibleNodes: () => void;
+    findCompatibleInputNodes: (outputType: string) => NodeData[];
+    findCompatibleOutputNodes: (inputType: string) => NodeData[];
     stopDrag: () => void;
     selectNode: (nodeId: string, multi?: boolean) => void;
     selectEdge: (edgeId: string, multi?: boolean) => void;
@@ -63,7 +62,6 @@ interface UseCanvasEventHandlersProps {
     startNodeDrag: (e: React.MouseEvent, nodeId: string, nodePosition: { x: number; y: number }, view: View, selectedNodeIds: Set<string>) => void;
     setDragState: React.Dispatch<React.SetStateAction<DragState>>;
 
-    isNodePredicted: (nodeId: string) => boolean;
     handlePortMouseUp: (data: any, mouseEvent?: React.MouseEvent) => void;
 }
 
@@ -81,7 +79,6 @@ export const useCanvasEventHandlers = ({
     portPositions,
     nodes,
     edges,
-    predictedNodes,
     isDraggingOutput,
     isDraggingInput,
     portClickStart,
@@ -96,13 +93,13 @@ export const useCanvasEventHandlers = ({
     setSnappedPortKey,
     setIsSnapTargetValid,
     setPortClickStart,
-    setPredictedNodes,
+    setCompatibleNodes,
     clearSelection,
     startCanvasDrag,
     startSelectionBoxDrag,
-    clearPredictedNodes,
-    generatePredictedNodes,
-    generatePredictedOutputNodes,
+    clearCompatibleNodes,
+    findCompatibleInputNodes,
+    findCompatibleOutputNodes,
     stopDrag,
     selectNode,
     selectEdge,
@@ -111,7 +108,6 @@ export const useCanvasEventHandlers = ({
     setSelection,
     startNodeDrag,
     setDragState,
-    isNodePredicted,
     handlePortMouseUp
 }: UseCanvasEventHandlersProps): UseCanvasEventHandlersReturn => {
 
@@ -121,7 +117,7 @@ export const useCanvasEventHandlers = ({
         if (e.button !== 0) return;
 
         if (isDraggingOutput || isDraggingInput) {
-            clearPredictedNodes();
+            clearCompatibleNodes();
         }
 
         if (isCtrlOrCmdPressed(e)) {
@@ -134,7 +130,7 @@ export const useCanvasEventHandlers = ({
             clearSelection();
             startCanvasDrag(e, view);
         }
-    }, [isDraggingOutput, isDraggingInput, clearPredictedNodes, clearSelection, startCanvasDrag, startSelectionBoxDrag, view, containerRef]);
+    }, [isDraggingOutput, isDraggingInput, clearCompatibleNodes, clearSelection, startCanvasDrag, startSelectionBoxDrag, view, containerRef]);
 
     const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>): void => {
         if (dragState.type === 'none') return;
@@ -246,17 +242,7 @@ export const useCanvasEventHandlers = ({
             if (closestPortKey) {
                 const parsed = parsePortKey(closestPortKey);
                 if (parsed) {
-                    let targetPort = null;
-
-                    if (isNodePredicted(parsed.nodeId)) {
-                        const predictedNode = predictedNodes.find(pNode => pNode.id === parsed.nodeId);
-                        if (predictedNode?.nodeData.inputs) {
-                            targetPort = predictedNode.nodeData.inputs.find(port => port.id === parsed.portId);
-                        }
-                    } else {
-                        targetPort = findPortData(nodes, parsed.nodeId, parsed.portId, parsed.portType);
-                    }
-
+                    const targetPort = findPortData(nodes, parsed.nodeId, parsed.portId, parsed.portType);
                     const isValid = targetPort ? areTypesCompatible(edgeSource.type, targetPort.type) : false;
                     setIsSnapTargetValid(isValid);
                 }
@@ -270,7 +256,6 @@ export const useCanvasEventHandlers = ({
         dragState,
         view,
         portPositions,
-        predictedNodes,
         nodes,
         edges,
         portClickStart,
@@ -282,27 +267,26 @@ export const useCanvasEventHandlers = ({
         setPortClickStart,
         containerRef,
         edgePreviewRef,
-        isNodePredicted,
         setSelection
     ]);
 
     const handleMouseUp = useCallback((e?: React.MouseEvent<HTMLDivElement>): void => {
+        // Edge dropped on empty canvas → show connectable nodes modal
         if (dragState.type === 'edge' && (isDraggingOutput || isDraggingInput) && !snappedPortKeyRef.current && e) {
             const container = containerRef.current;
             if (container && edgePreviewRef.current) {
-                const rect = container.getBoundingClientRect();
-                const mousePos = getWorldPosition(e.clientX, e.clientY, rect, view);
-
                 const sourceType = edgePreviewRef.current.source.type;
-                let predicted: any[] = [];
+                let compatible: NodeData[] = [];
 
                 if (isDraggingOutput) {
-                    predicted = generatePredictedNodes(sourceType, mousePos);
+                    compatible = findCompatibleInputNodes(sourceType);
                 } else if (isDraggingInput) {
-                    predicted = generatePredictedOutputNodes(sourceType, mousePos);
+                    compatible = findCompatibleOutputNodes(sourceType);
                 }
 
-                setPredictedNodes(predicted);
+                if (compatible.length > 0) {
+                    setCompatibleNodes(compatible);
+                }
                 setEdgePreview(null);
                 stopDrag();
                 return;
@@ -333,9 +317,9 @@ export const useCanvasEventHandlers = ({
         isDraggingOutput,
         isDraggingInput,
         view,
-        generatePredictedNodes,
-        generatePredictedOutputNodes,
-        setPredictedNodes,
+        findCompatibleInputNodes,
+        findCompatibleOutputNodes,
+        setCompatibleNodes,
         setEdgePreview,
         stopDrag,
         setSnappedPortKey,

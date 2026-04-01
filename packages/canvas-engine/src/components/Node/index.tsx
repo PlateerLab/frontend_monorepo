@@ -14,7 +14,6 @@ import type { PortMouseData } from './types';
 export interface NodeComponentProps {
     node: CanvasNode;
     isSelected?: boolean;
-    isPredicted?: boolean;
     isPreview?: boolean;
     onNodeMouseDown?: (e: React.MouseEvent, nodeId: string) => void;
     onNodeDoubleClick?: (e: React.MouseEvent, nodeId: string) => void;
@@ -31,8 +30,6 @@ export interface NodeComponentProps {
     onParameterDelete?: (nodeId: string, paramId: string) => void;
     onClearSelection?: () => void;
     onOpenNodeModal?: (nodeId: string, paramId: string, paramName: string, paramValue: string) => void;
-    onPredictedNodeAccept?: (nodeId: string) => void;
-    onPredictedNodeReject?: (nodeId: string) => void;
     onSchemaSyncRequest?: (nodeId: string) => void;
     snappedPortKey?: string | null;
     isSnapTargetInvalid?: boolean;
@@ -50,7 +47,6 @@ export interface NodeComponentProps {
 const NodeComponent: React.FC<NodeComponentProps> = ({
     node,
     isSelected = false,
-    isPredicted = false,
     isPreview = false,
     onNodeMouseDown,
     onNodeDoubleClick,
@@ -67,8 +63,6 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
     onParameterDelete,
     onClearSelection,
     onOpenNodeModal,
-    onPredictedNodeAccept,
-    onPredictedNodeReject,
     onSchemaSyncRequest,
     snappedPortKey,
     isSnapTargetInvalid,
@@ -91,8 +85,7 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
         nodeName: localizedName,
         nodeDataId: node.data?.nodeDataId ?? '',
         isPreview,
-        isPredicted,
-        isExpanded: !(node.isCollapsed ?? false),
+        isExpanded: node.isExpanded !== undefined ? node.isExpanded : true,
         isBypassed: node.isBypassed ?? false,
         isSelected: node.isSelected ?? false,
         onToggleExpanded: onNodeToggleExpand ? (id: string) => onNodeToggleExpand(id) : undefined,
@@ -103,7 +96,7 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
         handleNameDoubleClick: nodeEditing.handleNameDoubleClick,
     });
 
-    const isCollapsed = node.isCollapsed ?? false;
+    const isExpanded = node.isExpanded !== undefined ? node.isExpanded : true;
     const isBypassed = node.isBypassed ?? false;
     const inputs = node.data?.inputs ?? [];
     const outputs = node.data?.outputs ?? [];
@@ -115,49 +108,48 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
     const containerClasses = useMemo(() => {
         const classes = [styles.node];
         if (isSelected) classes.push(styles.selected);
-        if (isCollapsed) classes.push(styles.collapsed);
+        if (!isExpanded) classes.push(styles.collapsed);
         if (isBypassed) classes.push(styles.bypassed);
-        if (isPredicted) classes.push(styles.predicted);
         if (isPreview) classes.push(styles.preview);
         return classes.join(' ');
-    }, [isSelected, isCollapsed, isBypassed, isPredicted, isPreview]);
+    }, [isSelected, isExpanded, isBypassed, isPreview]);
 
     const containerStyles = useMemo(
-        () => getNodeContainerStyles(node.position, isPredicted),
-        [node.position, isPredicted]
+        () => getNodeContainerStyles(node.position),
+        [node.position]
     );
 
     const handleMouseDown = useCallback(
         (e: React.MouseEvent) => {
-            if (isPreview || isPredicted) return;
+            if (isPreview) return;
             if (onNodeMouseDown) {
                 onNodeMouseDown(e, node.id);
             }
         },
-        [isPreview, isPredicted, node.id, onNodeMouseDown]
+        [isPreview, node.id, onNodeMouseDown]
     );
 
     const handleDoubleClick = useCallback(
         (e: React.MouseEvent) => {
-            if (isPreview || isPredicted) return;
+            if (isPreview) return;
             if (onNodeDoubleClick) {
                 onNodeDoubleClick(e, node.id);
             }
         },
-        [isPreview, isPredicted, node.id, onNodeDoubleClick]
+        [isPreview, node.id, onNodeDoubleClick]
     );
 
     const handleContextMenu = useCallback(
         (e: React.MouseEvent) => {
             e.preventDefault();
             e.stopPropagation();
-            if (isPreview || isPredicted) return;
+            if (isPreview) return;
             if (onNodeContextMenu) {
                 onNodeContextMenu(e, node.id);
             }
             nodeContextMenu.handleContextMenu(e);
         },
-        [isPreview, isPredicted, node.id, onNodeContextMenu, nodeContextMenu]
+        [isPreview, node.id, onNodeContextMenu, nodeContextMenu]
     );
 
     const handleToggleExpand = useCallback(
@@ -196,8 +188,9 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
                 nodeDataId={node.data?.id ?? ''}
                 description={node.data?.description}
                 description_ko={node.data?.description_ko}
+                functionId={node.data?.functionId}
                 isPreview={isPreview}
-                isExpanded={!isCollapsed}
+                isExpanded={isExpanded}
                 isEditingName={nodeEditing.isEditingName}
                 editingName={nodeEditing.editingName}
                 onNameDoubleClick={(e) => nodeEditing.handleNameDoubleClick(e, localizedName, isPreview)}
@@ -208,34 +201,8 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
                 onToggleExpanded={handleToggleExpand}
             />
 
-            {/* Predicted Node Actions */}
-            {isPredicted && (
-                <div className={styles.predictedActions}>
-                    <button
-                        className={styles.acceptButton}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onPredictedNodeAccept?.(node.id);
-                        }}
-                        type="button"
-                    >
-                        Accept
-                    </button>
-                    <button
-                        className={styles.rejectButton}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onPredictedNodeReject?.(node.id);
-                        }}
-                        type="button"
-                    >
-                        Reject
-                    </button>
-                </div>
-            )}
-
             {/* Body Section */}
-            {!isCollapsed ? (
+            {isExpanded ? (
                 <div className={styles.body}>
                     {/* Input/Output Ports */}
                     {hasIO && (
@@ -245,7 +212,6 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
                             outputs={outputs}
                             parameters={parameters}
                             isPreview={isPreview}
-                            isPredicted={isPredicted}
                             onPortMouseDown={onPortMouseDown}
                             onPortMouseUp={onPortMouseUp}
                             registerPortRef={registerPortRef}
@@ -258,7 +224,7 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
                     )}
 
                     {/* Parameters */}
-                    {hasParams && !isPredicted && (
+                    {hasParams && (
                         <>
                             {hasIO && <div className={styles.divider}></div>}
                             <NodeParameters
@@ -266,7 +232,6 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
                                 nodeDataId={node.data?.id ?? ''}
                                 parameters={parameters}
                                 isPreview={isPreview}
-                                isPredicted={isPredicted}
                                 onParameterChange={onParameterChange}
                                 onParameterNameChange={onParameterNameChange}
                                 onParameterAdd={onParameterAdd}
@@ -289,7 +254,6 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
                             outputs={outputs}
                             parameters={parameters}
                             isPreview={isPreview}
-                            isPredicted={isPredicted}
                             onPortMouseDown={onPortMouseDown}
                             onPortMouseUp={onPortMouseUp}
                             registerPortRef={registerPortRef}

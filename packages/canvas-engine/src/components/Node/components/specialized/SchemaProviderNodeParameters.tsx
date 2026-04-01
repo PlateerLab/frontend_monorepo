@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useState } from 'react';
-import { LuTrash2, LuPlus } from 'react-icons/lu';
+import { LuTrash2, LuPlus } from '@xgen/icons';
 import styles from '../../../../styles/Node.module.scss';
 import { useTranslation } from '@xgen/i18n';
 import { getLocalizedDescription } from '../../utils/parameterUtils';

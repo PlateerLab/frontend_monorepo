@@ -6,7 +6,7 @@ export { useNodeManagement } from './hooks/useNodeManagement';
 export { useEdgeManagement } from './hooks/useEdgeManagement';
 export { useMemoManagement } from './hooks/useMemoManagement';
 export { useDragState } from './hooks/useDragState';
-export { usePredictedNodes } from './hooks/usePredictedNodes';
+export { useCompatibleNodes } from './hooks/useCompatibleNodes';
 export { useCanvasEventHandlers } from './hooks/useCanvasEventHandlers';
 export { usePortHandlers } from './hooks/usePortHandlers';
 export { useKeyboardHandlers } from './hooks/useKeyboardHandlers';
@@ -82,7 +82,6 @@ export type {
     UseEdgeManagementReturn,
     UseMemoManagementReturn,
     UseDragStateReturn,
-    UsePredictedNodesReturn,
     UseHistoryManagementReturn,
     HistoryEntry,
     HistoryActionType,
@@ -110,10 +109,8 @@ export { CanvasMemos } from './components/CanvasMemos';
 export type { CanvasMemosProps } from './components/CanvasMemos';
 export { CanvasAddNodesPopup } from './components/CanvasAddNodesPopup';
 export type { CanvasAddNodesPopupProps } from './components/CanvasAddNodesPopup';
-export { CanvasPredictedNodes } from './components/CanvasPredictedNodes';
-export type { CanvasPredictedNodesProps } from './components/CanvasPredictedNodes';
-export { CanvasPredictedNodesPopup } from './components/CanvasPredictedNodesPopup';
-export type { CanvasPredictedNodesPopupProps } from './components/CanvasPredictedNodesPopup';
+export { NodeSelectorPopup } from './components/NodeSelectorPopup';
+export type { NodeSelectorPopupProps } from './components/NodeSelectorPopup';
 
 // Node sub-components
 export { NodeHeader } from './components/Node/components/NodeHeader';

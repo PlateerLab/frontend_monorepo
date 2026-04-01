@@ -5,7 +5,6 @@ interface UseNodeContextMenuProps {
     nodeName: string;
     nodeDataId?: string;
     isPreview?: boolean;
-    isPredicted?: boolean;
     isExpanded?: boolean;
     isBypassed?: boolean;
     isSelected?: boolean;
@@ -38,7 +37,7 @@ interface ContextMenuState {
 
 export const useNodeContextMenu = ({
     nodeId, nodeName, nodeDataId,
-    isPreview = false, isPredicted = false, isExpanded = true,
+    isPreview = false, isExpanded = true,
     isBypassed = false, isSelected = false,
     onToggleExpanded, onToggleBypass, onOpenNodeModal,
     handleNameDoubleClick, onCopyNode, onDeleteNode, onViewDetails,
@@ -48,11 +47,11 @@ export const useNodeContextMenu = ({
     });
 
     const handleContextMenu = useCallback((e: React.MouseEvent): void => {
-        if (isPreview || isPredicted) return;
+        if (isPreview) return;
         e.preventDefault();
         e.stopPropagation();
         setContextMenuState({ isOpen: true, position: { x: e.clientX, y: e.clientY } });
-    }, [isPreview, isPredicted]);
+    }, [isPreview]);
 
     const handleContextMenuClose = useCallback((): void => {
         setContextMenuState(prev => ({ ...prev, isOpen: false }));
@@ -90,7 +89,7 @@ export const useNodeContextMenu = ({
     }, [nodeId, nodeName, nodeDataId, onViewDetails]);
 
     useEffect(() => {
-        if (contextMenuState.isOpen || !isSelected || isPreview || isPredicted) return;
+        if (contextMenuState.isOpen || !isSelected || isPreview) return;
         const handleKeyDown = (e: KeyboardEvent) => {
             const target = e.target as HTMLElement;
             if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') return;
@@ -103,7 +102,7 @@ export const useNodeContextMenu = ({
         };
         document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [contextMenuState.isOpen, isSelected, isPreview, isPredicted, handleContextMenuRename]);
+    }, [contextMenuState.isOpen, isSelected, isPreview, handleContextMenuRename]);
 
     return {
         contextMenuOpen: contextMenuState.isOpen,

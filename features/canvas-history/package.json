@@ -9,8 +9,8 @@
   "dependencies": {
     "@xgen/types": "workspace:*",
     "@xgen/i18n": "workspace:*",
+    "@xgen/icons": "workspace:*",
     "@xgen/canvas-engine": "workspace:*",
-    "react": "^19.0.0",
-    "react-icons": "^5.4.0"
+    "react": "^19.0.0"
   }
 }
