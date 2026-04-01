@@ -204,15 +204,15 @@
   pointer-events: auto;
   display: flex;
   flex-direction: column;
-  gap: $spacing-3;
+  gap: 12px;
   min-width: 320px;
-  max-width: 480px;
-  padding: $spacing-5;
-  border-radius: $radius-lg;
-  border: 2px solid $gray-700;
-  background: $gray-50;
-  color: $gray-700;
-  font-family: $font-family-base;
+  max-width: 420px;
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid #374151;
+  background: #f9fafb;
+  color: #374151;
+  font-family: system-ui, -apple-system, $font-family-base, sans-serif;
   font-size: $font-size-sm;
   box-shadow:
     0 8px 25px rgba(0, 0, 0, 0.15),
@@ -226,32 +226,32 @@
 
 .confirmTitle {
   font-weight: $font-weight-semibold;
-  font-size: $font-size-base;
+  font-size: 1rem;
   line-height: $line-height-tight;
   margin: 0;
+}
 
-  &.danger {
-    color: $error;
-  }
-  &.warning {
-    color: $warning;
-  }
-  &.info {
-    color: $info;
-  }
+.titleDanger {
+  color: #dc2626;
+}
+.titleWarning {
+  color: #f59e0b;
+}
+.titleInfo {
+  color: $info;
 }
 
 .confirmMessage {
-  font-size: $font-size-sm;
+  font-size: 0.9rem;
   color: $gray-700;
-  line-height: $line-height-base;
+  line-height: 1.4;
   margin: 0;
   white-space: pre-line;
 }
 
 .keyboardHint {
-  font-size: $font-size-xs;
-  color: $gray-500;
+  font-size: 0.8rem;
+  color: #6b7280;
   font-style: italic;
   margin: 0;
 }
@@ -260,20 +260,20 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: $spacing-2;
-  margin-top: $spacing-1;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .confirmButton {
-  padding: $spacing-2 $spacing-4;
-  font-size: $font-size-sm;
+  padding: 8px 16px;
+  font-size: 0.85rem;
   font-weight: $font-weight-medium;
   font-family: $font-family-base;
-  border-radius: $radius-md;
+  border-radius: 6px;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: all $transition-fast;
-  box-shadow: $shadow-sm;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
   &:focus-visible {
     outline: 2px solid $primary;
@@ -283,34 +283,35 @@
 
 .cancelButton {
   composes: confirmButton;
-  background: $bg-primary;
+  background: #ffffff;
   color: $gray-700;
-  border-color: $gray-500;
+  border-color: #6b7280;
 
   &:hover {
-    background: $gray-100;
+    background: $gray-50;
+    border-color: #4b5563;
   }
 }
 
 .confirmButtonDanger {
   composes: confirmButton;
-  background: $error;
+  background: #dc2626;
   color: #ffffff;
-  border-color: darken($error, 8%);
+  border-color: #b91c1c;
 
   &:hover {
-    background: darken($error, 6%);
+    background: #b91c1c;
   }
 }
 
 .confirmButtonWarning {
   composes: confirmButton;
-  background: $warning;
+  background: #f59e0b;
   color: #ffffff;
-  border-color: darken($warning, 10%);
+  border-color: #d97706;
 
   &:hover {
-    background: darken($warning, 6%);
+    background: #d97706;
   }
 }
 

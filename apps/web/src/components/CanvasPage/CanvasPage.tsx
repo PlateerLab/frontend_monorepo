@@ -23,6 +23,8 @@ import {
     renameWorkflow as apiRenameWorkflow,
     duplicateWorkflow as apiDuplicateWorkflow,
     deleteWorkflow as apiDeleteWorkflow,
+    executeWorkflowStream,
+    getWorkflowExecutionOrderByData,
 } from '@xgen/api-client';
 
 // Canvas core UI
@@ -112,6 +114,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
     const latestCanvasStateRef = useRef<any>(null);
     const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const uiUpdateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const executionAbortRef = useRef<AbortController | null>(null);
     const isRestorationComplete = useRef(false);
     const pendingWorkflowLoadRef = useRef<{ workflowData: any; workflowName: string; workflowId: string } | null>(null);
     const draggingNodeDataRef = useRef<any>(null);
@@ -153,6 +156,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
     const [executionOutput, setExecutionOutput] = useState<any>(null);
     const [executionLogs, setExecutionLogs] = useState<any[]>([]);
     const [activeNodes, setActiveNodes] = useState<Set<string>>(new Set());
+    const [executionSource, setExecutionSource] = useState<'button' | 'chat' | null>(null);
 
     // ── Modal states ──
     const [nodeModalState, setNodeModalState] = useState<NodeModalState>({
@@ -314,6 +318,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
             window.removeEventListener('beforeunload', handleBeforeUnload);
             if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
             if (uiUpdateTimerRef.current) clearTimeout(uiUpdateTimerRef.current);
+            if (executionAbortRef.current) executionAbortRef.current.abort();
             if (latestCanvasStateRef.current) {
                 setStoredState(STORAGE_KEYS.WORKFLOW_STATE, latestCanvasStateRef.current);
             }
@@ -343,9 +348,14 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         }, 1000);
     }, []);
 
+    const handleExecuteRef = useRef<((inputText?: string) => Promise<void>) | undefined>(undefined);
+
     const handleModeChange = useCallback((mode: CanvasMode) => {
         if (isExecuting) return;
         setCanvasMode(mode);
+        if (mode === 'run') {
+            handleExecuteRef.current?.();
+        }
     }, [isExecuting]);
 
     // ── Zoom handlers ──
@@ -375,15 +385,34 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
             return;
         }
 
-        const loadingId = toast.loading(t('canvas.toast.saving'));
         try {
             const name = validateWorkflowName(workflowName);
+
+            // Always check existence before saving
+            const checkResult = await checkWorkflowExistence(name);
+            if (checkResult.exists) {
+                const overwrite = await toast.confirm({
+                    title: t('canvas.toast.overwriteTitle'),
+                    message: t('canvas.toast.overwriteMessage', { name }),
+                    confirmText: t('canvas.toast.overwriteConfirm'),
+                    cancelText: t('canvas.toast.cancel'),
+                    variant: 'warning',
+                    enableKeyboard: true,
+                    keyboardHint: '💡 Enter → 덮어쓰기 | ESC → 취소',
+                });
+                if (!overwrite) {
+                    setIsSaving(false);
+                    return;
+                }
+            }
+
             let currentId = workflowId;
             if (!currentId || currentId === 'None') {
                 currentId = generateWorkflowId();
                 setWorkflowId(currentId);
             }
 
+            const loadingId = toast.loading(t('canvas.toast.saving'));
             const content = { ...canvasState, workflow_id: currentId, workflow_name: name };
             await apiSaveWorkflow(name, content, currentId, workflowOriginUserId || undefined);
             setStoredState(STORAGE_KEYS.WORKFLOW_NAME, name);
@@ -391,7 +420,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
             toast.update(loadingId, 'success', t('canvas.toast.saveSuccess'));
         } catch (error) {
             const errMsg = error instanceof Error ? error.message : String(error);
-            toast.update(loadingId, 'error', `${t('canvas.toast.saveFailed')}: ${errMsg}`);
+            toast.error(`${t('canvas.toast.saveFailed')}: ${errMsg}`);
         } finally {
             setIsSaving(false);
         }
@@ -557,44 +586,25 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
 
     const handleDuplicate = useCallback(async () => {
         if (!canvasRef.current) return;
-        const loadingId = toast.loading(t('canvas.toast.duplicating'));
-        try {
-            const sourceUserId = isOwner
-                ? (user?.user_id != null ? String(user.user_id) : undefined)
-                : (workflowOriginUserId || undefined);
 
+        const sourceUserId = isOwner
+            ? (user?.user_id != null ? String(user.user_id) : undefined)
+            : (workflowOriginUserId || undefined);
+
+        try {
             const checkResult = await checkWorkflowExistence(workflowName);
-            if (checkResult.exists && workflowId !== 'None') {
-                // Workflow exists in DB — duplicate directly
-                const result = await apiDuplicateWorkflow(workflowId, sourceUserId);
-                if (result?.workflow_id) {
-                    const currentUserId = user?.user_id != null ? String(user.user_id) : undefined;
-                    const loadedData = await apiLoadWorkflow(result.workflow_id, currentUserId);
-                    if (loadedData && canvasRef.current) {
-                        const loadName = result.workflow_name || loadedData.workflow_name || `${workflowName} (copy)`;
-                        const loadContent = loadedData.content || loadedData;
-                        canvasRef.current.loadCanvasState(loadContent as any);
-                        setWorkflowName(loadName);
-                        setWorkflowId(result.workflow_id);
-                        setStoredState(STORAGE_KEYS.WORKFLOW_NAME, loadName);
-                        setStoredState(STORAGE_KEYS.WORKFLOW_ID, result.workflow_id);
-                        // Now we own the copy
-                        setIsOwner(true);
-                        setWorkflowOriginUserId(null);
-                    }
-                }
-                toast.update(loadingId, 'success', t('canvas.toast.duplicateSuccess'));
-            } else {
-                // Workflow not saved to DB yet — ask to save first
-                toast.dismiss(loadingId);
+            const isSavedInDB = checkResult.exists && workflowId !== 'None';
+
+            if (!isSavedInDB) {
+                // Workflow not saved — must save before copying
                 const userConfirmed = await toast.confirm({
                     title: t('canvas.toast.saveBeforeCopyTitle'),
                     message: t('canvas.toast.saveBeforeCopyMessage'),
                     confirmText: t('canvas.toast.saveAndCopy'),
                     cancelText: t('canvas.toast.cancel'),
-                    variant: 'info',
+                    variant: 'warning',
                     enableKeyboard: true,
-                    keyboardHint: '💡 Enter키를 누르면 저장 후 복사됩니다 | ESC로 취소',
+                    keyboardHint: '💡 Enter → 저장 후 복사 | ESC → 취소',
                 });
                 if (!userConfirmed) return;
 
@@ -629,10 +639,40 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                     }
                 }
                 toast.update(savingId, 'success', t('canvas.toast.duplicateSuccess'));
+            } else {
+                // Workflow already saved — confirm before duplicating
+                const userConfirmed = await toast.confirm({
+                    title: t('canvas.toast.duplicateConfirmTitle'),
+                    message: t('canvas.toast.duplicateConfirmMessage', { name: workflowName }),
+                    confirmText: t('canvas.toast.duplicateConfirmButton'),
+                    cancelText: t('canvas.toast.cancel'),
+                    variant: 'info',
+                    enableKeyboard: true,
+                    keyboardHint: '💡 Enter → 복사 | ESC → 취소',
+                });
+                if (!userConfirmed) return;
+
+                const loadingId = toast.loading(t('canvas.toast.duplicating'));
+                const result = await apiDuplicateWorkflow(workflowId, sourceUserId);
+                if (result?.workflow_id) {
+                    const currentUserId = user?.user_id != null ? String(user.user_id) : undefined;
+                    const loadedData = await apiLoadWorkflow(result.workflow_id, currentUserId);
+                    if (loadedData && canvasRef.current) {
+                        const loadName = result.workflow_name || loadedData.workflow_name || `${workflowName} (copy)`;
+                        const loadContent = loadedData.content || loadedData;
+                        canvasRef.current.loadCanvasState(loadContent as any);
+                        setWorkflowName(loadName);
+                        setWorkflowId(result.workflow_id);
+                        setStoredState(STORAGE_KEYS.WORKFLOW_NAME, loadName);
+                        setStoredState(STORAGE_KEYS.WORKFLOW_ID, result.workflow_id);
+                        setIsOwner(true);
+                        setWorkflowOriginUserId(null);
+                    }
+                }
+                toast.update(loadingId, 'success', t('canvas.toast.duplicateSuccess'));
             }
         } catch (error) {
             const errMsg = error instanceof Error ? error.message : String(error);
-            toast.dismiss(loadingId);
             toast.error(`${t('canvas.toast.duplicateFailed')}: ${errMsg}`);
         }
     }, [workflowName, workflowId, workflowOriginUserId, isOwner, user, t, toast]);
@@ -682,6 +722,135 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
     }, []);
 
     // ── Execution handlers ──
+    const handleExecute = useCallback(async (inputText?: string) => {
+        if (!canvasRef.current) {
+            toast.error(t('canvas.toast.canvasNotReady'));
+            return;
+        }
+
+        // Validate canvas
+        const validationResult = (canvasRef.current as any).validateAndPrepareExecution?.();
+        if (validationResult?.error) {
+            toast.error(validationResult.error);
+            return;
+        }
+
+        setIsExecuting(true);
+        setExecutionOutput(null);
+        setExecutionSource(inputText ? 'chat' : 'button');
+        setBottomPanelExpanded(true);
+        setExecutionLogs([]);
+        setActiveNodes(new Set());
+
+        const loadingId = toast.loading(t('canvas.toast.executionRunning'));
+
+        try {
+            const canvasState = canvasRef.current.getCanvasState();
+            const name = validateWorkflowName(workflowName);
+
+            if (!canvasState.nodes || canvasState.nodes.length === 0) {
+                throw new Error(t('canvas.toast.emptyWorkflow'));
+            }
+
+            // Ensure we have a valid workflow ID
+            let currentId = workflowId;
+            if (!currentId || currentId === 'None') {
+                currentId = generateWorkflowId();
+                setWorkflowId(currentId);
+                setStoredState(STORAGE_KEYS.WORKFLOW_ID, currentId);
+            }
+
+            // Save before executing
+            const content = { ...canvasState, workflow_id: currentId, workflow_name: name };
+            await apiSaveWorkflow(name, content, currentId, workflowOriginUserId || undefined);
+
+            // Abort previous execution if any
+            if (executionAbortRef.current) {
+                executionAbortRef.current.abort();
+            }
+            const abortController = new AbortController();
+            executionAbortRef.current = abortController;
+
+            let accumulatedOutput = '';
+            let hasReceivedData = false;
+
+            toast.update(loadingId, 'info', t('canvas.toast.executionRunning'));
+
+            await executeWorkflowStream({
+                workflowName: name,
+                workflowId: currentId,
+                inputData: inputText ? { input: inputText } : undefined,
+                user_id: workflowOriginUserId || user?.user_id || undefined,
+                signal: abortController.signal,
+                onData: (chunk) => {
+                    hasReceivedData = true;
+                    const chunkStr = typeof chunk === 'string' ? chunk : JSON.stringify(chunk, null, 2);
+                    accumulatedOutput += chunkStr;
+                    setExecutionOutput({ stream: accumulatedOutput });
+                },
+                onLog: (log) => {
+                    setExecutionLogs((prev) => [...prev, log]);
+                },
+                onTool: (toolData) => {
+                    setExecutionLogs((prev) => [...prev, toolData]);
+                },
+                onNodeStatus: (nodeId, status) => {
+                    if (status === 'started') {
+                        setActiveNodes((prev) => {
+                            const newSet = new Set(prev);
+                            newSet.add(nodeId);
+                            return newSet;
+                        });
+                    } else if (status === 'completed' || status === 'error') {
+                        setTimeout(() => {
+                            setActiveNodes((prev) => {
+                                const newSet = new Set(prev);
+                                newSet.delete(nodeId);
+                                return newSet;
+                            });
+                        }, 100);
+                    }
+                },
+                onEnd: () => {
+                    setActiveNodes(new Set());
+                    setCanvasMode('edit');
+                    if (!hasReceivedData && accumulatedOutput === '') {
+                        setExecutionOutput({ stream: t('canvas.toast.executionCompleted') });
+                    }
+                    toast.update(loadingId, 'success', t('canvas.toast.executionSuccess'));
+                },
+                onError: (err) => { throw err; },
+            });
+        } catch (error: any) {
+            if (error?.name === 'AbortError') return;
+            const errMsg = error instanceof Error ? error.message : String(error);
+            setExecutionOutput({ error: errMsg });
+            toast.update(loadingId, 'error', `${t('canvas.toast.executionFailed')}: ${errMsg}`);
+            setCanvasMode('edit');
+        } finally {
+            setIsExecuting(false);
+            executionAbortRef.current = null;
+        }
+    }, [workflowId, workflowName, workflowOriginUserId, user, toast, t]);
+
+    // Keep ref in sync for handleModeChange
+    handleExecuteRef.current = handleExecute;
+
+    const handleExecuteWithInput = useCallback(async (inputText?: string) => {
+        await handleExecute(inputText);
+    }, [handleExecute]);
+
+    const handleStopExecution = useCallback(() => {
+        if (executionAbortRef.current) {
+            executionAbortRef.current.abort();
+            executionAbortRef.current = null;
+            setIsExecuting(false);
+            setActiveNodes(new Set());
+            setCanvasMode('edit');
+            toast.warning(t('canvas.toast.executionStopped'));
+        }
+    }, [toast, t]);
+
     const handleClearOutput = useCallback(() => setExecutionOutput(null), []);
     const handleClearLogs = useCallback(() => setExecutionLogs([]), []);
 
@@ -1008,12 +1177,35 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                     <div className={styles.bottomPanel}>
                         {bottomPanels.map((panel) => {
                             const PanelComponent = panel.component;
+                            // Pass execution-specific props based on panel type
+                            const executionProps: Record<string, unknown> = {};
+                            if (panel.id === 'execution-panel') {
+                                executionProps.onExecute = handleExecute;
+                                executionProps.onClear = handleClearOutput;
+                                executionProps.output = executionOutput;
+                                executionProps.isLoading = isExecuting;
+                            }
+                            if (panel.id === 'bottom-execution-log') {
+                                executionProps.output = executionOutput;
+                                executionProps.isLoading = isExecuting;
+                                executionProps.onClearOutput = handleClearOutput;
+                                executionProps.onClearLogs = handleClearLogs;
+                                executionProps.logs = executionLogs;
+                                executionProps.activeNodes = activeNodes;
+                                executionProps.canvasState = currentCanvasState;
+                                executionProps.userId = workflowOriginUserId || (user?.user_id != null ? String(user.user_id) : null);
+                                executionProps.onExecuteWithInput = handleExecuteWithInput;
+                                executionProps.executionSource = executionSource;
+                                executionProps.fetchExecutionOrderByData = getWorkflowExecutionOrderByData;
+                                executionProps.onToggleExpanded = () => setBottomPanelExpanded((prev) => !prev);
+                            }
                             return (
                                 <PanelComponent
                                     key={panel.id}
                                     {...pluginContext}
                                     isExpanded={bottomPanelExpanded}
                                     onToggleExpand={() => setBottomPanelExpanded((prev) => !prev)}
+                                    {...executionProps}
                                 />
                             );
                         })}

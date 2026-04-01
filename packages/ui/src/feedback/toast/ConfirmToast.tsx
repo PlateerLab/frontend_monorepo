@@ -42,7 +42,12 @@ export const ConfirmToast: React.FC<ConfirmToastProps> = ({ item, onResolve }) =
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [item.enableKeyboard, handleConfirm, handleCancel]);
 
-  const variantClass = styles[item.variant] || '';
+  const titleVariantClass =
+    item.variant === 'danger'
+      ? styles.titleDanger
+      : item.variant === 'warning'
+        ? styles.titleWarning
+        : styles.titleInfo;
   const buttonClass =
     item.variant === 'danger'
       ? styles.confirmButtonDanger
@@ -52,7 +57,7 @@ export const ConfirmToast: React.FC<ConfirmToastProps> = ({ item, onResolve }) =
 
   return (
     <div className={styles.confirmToast} role="alertdialog" aria-labelledby={`confirm-title-${item.id}`}>
-      <p id={`confirm-title-${item.id}`} className={`${styles.confirmTitle} ${variantClass}`}>
+      <p id={`confirm-title-${item.id}`} className={`${styles.confirmTitle} ${titleVariantClass}`}>
         {item.title}
       </p>
       <p className={styles.confirmMessage}>{item.message}</p>
