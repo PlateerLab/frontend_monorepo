@@ -1,0 +1,247 @@
+import type { TranslationData } from '@xgen/i18n';
+
+export const ko: TranslationData = {
+  title: '워크플로우',
+  description: '워크플로우를 관리하고 실행하세요',
+  tabs: {
+    storage: '보관함',
+    store: '스토어',
+    scheduler: '스케줄러',
+    tester: '테스터',
+  },
+  filter: {
+    all: '전체',
+    active: '활성',
+    archived: '보관됨',
+    unactive: '비활성',
+    personal: '개인',
+    shared: '공유',
+  },
+  actions: {
+    execute: '실행',
+    edit: '편집',
+    copy: '복제',
+    delete: '삭제',
+    logs: '로그',
+    settings: '설정',
+    deployInfo: '배포 정보',
+    deploySettings: '배포 설정',
+    versions: '버전 기록',
+    createNew: '새 워크플로우',
+  },
+  confirm: {
+    delete: '"{{name}}" 워크플로우를 삭제하시겠습니까?',
+    bulkDelete: '{{count}}개의 워크플로우를 삭제하시겠습니까?',
+  },
+  messages: {
+    readOnly: '읽기 전용 워크플로우입니다',
+    unactive: '비활성화된 워크플로우입니다',
+    loadingAuth: '인증 정보를 불러오는 중...',
+  },
+  error: {
+    title: '오류',
+    loadFailed: '워크플로우를 불러오는데 실패했습니다',
+    noDeletePermission: '삭제 권한이 없습니다',
+  },
+  buttons: {
+    retry: '다시 시도',
+    multiSelectEnable: '다중 선택',
+    multiSelectDisable: '선택 해제',
+    deleteSelected: '선택 삭제',
+  },
+  badges: {
+    live: 'LIVE',
+    draft: 'DRAFT',
+    archived: 'ARCHIVED',
+    disabled: 'DISABLED',
+    shared: 'SHARED',
+    my: 'MY',
+    deployed: 'DEPLOYED',
+    pending: 'PENDING',
+    close: 'CLOSE',
+  },
+  card: {
+    organization: '조직',
+    nodes: '{{count}}개 노드',
+  },
+  empty: {
+    title: '워크플로우가 없습니다',
+    description: '새 워크플로우를 만들어보세요',
+    action: '새 워크플로우 만들기',
+  },
+  // Store
+  store: {
+    title: '워크플로우 스토어',
+    searchPlaceholder: '워크플로우 검색...',
+    filter: {
+      all: '전체',
+      my: '내 워크플로우',
+      template: '템플릿',
+      shared: '공유됨',
+    },
+    addCard: {
+      title: '스토어에 등록',
+      description: '워크플로우를 스토어에 공유하세요',
+    },
+    allTags: '전체 태그',
+    actions: {
+      download: '다운로드',
+      delete: '삭제',
+    },
+    empty: {
+      title: '스토어에 워크플로우가 없습니다',
+      description: '워크플로우를 공유해보세요',
+      searchDescription: '"{{term}}"에 대한 검색 결과가 없습니다',
+      action: '워크플로우 업로드',
+    },
+    messages: {
+      downloadSuccess: '스토어에서 워크플로우를 가져왔습니다',
+      uploadSuccess: '스토어에 업로드되었습니다',
+    },
+    card: {
+      noDescription: '설명 없음',
+      noRating: '평점 없음',
+    },
+    error: {
+      title: '오류',
+      loadFailed: '스토어를 불러오는데 실패했습니다',
+    },
+    buttons: {
+      retry: '다시 시도',
+    },
+    upload: '업로드',
+    refresh: '새로고침',
+    loading: '스토어를 불러오는 중...',
+    uploadModal: {
+      title: '스토어에 업로드',
+      description: '워크플로우를 선택하여 스토어에 공유하세요',
+    },
+  },
+  // Scheduler
+  scheduler: {
+    title: '워크플로우 스케줄러',
+    searchPlaceholder: '스케줄 검색...',
+    filter: {
+      all: '전체',
+      active: '활성',
+      paused: '일시정지',
+      completed: '완료',
+      failed: '실패',
+    },
+    createNew: '새 스케줄',
+    empty: {
+      title: '스케줄이 없습니다',
+      description: '워크플로우 실행 스케줄을 설정하세요',
+      action: '새 스케줄 만들기',
+    },
+    fields: {
+      schedule: '스케줄',
+      nextRun: '다음 실행',
+      lastRun: '마지막 실행',
+      runCount: '실행 횟수',
+    },
+    frequency: {
+      daily: '매일',
+      weekly: '매주',
+      monthly: '매월',
+      cron: 'Cron',
+      interval: '간격',
+      once: '한번',
+      hourly: '매시간',
+    },
+    actions: {
+      pause: '일시정지',
+      resume: '재개',
+      edit: '편집',
+      delete: '삭제',
+      runNow: '지금 실행',
+    },
+    confirm: {
+      delete: '"{{name}}" 스케줄을 삭제하시겠습니까?',
+    },
+    card: {
+      noDescription: '설명 없음',
+    },
+    messages: {
+      pauseSuccess: '스케줄이 일시정지되었습니다',
+      resumeSuccess: '스케줄이 재개되었습니다',
+      runSuccess: '스케줄이 실행되었습니다',
+    },
+    error: {
+      title: '오류',
+      loadFailed: '스케줄을 불러오는데 실패했습니다',
+    },
+    buttons: {
+      retry: '다시 시도',
+    },
+    create: '새 스케줄',
+    refresh: '새로고침',
+    loading: '스케줄을 불러오는 중...',
+    createModal: {
+      title: '스케줄 생성',
+      description: '워크플로우 실행 스케줄을 설정하세요',
+    },
+  },
+  // Tester
+  tester: {
+    title: '워크플로우 테스터',
+    selectWorkflow: '테스트할 워크플로우를 선택하세요',
+    searchPlaceholder: '워크플로우 검색...',
+    filter: {
+      all: '전체',
+      recent: '최근 테스트',
+      running: '실행 중',
+      completed: '완료',
+      error: '오류',
+    },
+    empty: {
+      title: '테스트 기록이 없습니다',
+      description: '워크플로우를 선택하여 테스트를 시작하세요',
+      action: '새 테스트 시작',
+    },
+    actions: {
+      runTest: '테스트 실행',
+      viewLogs: '로그 보기',
+      cancel: '취소',
+      delete: '삭제',
+    },
+    fields: {
+      input: '입력',
+      output: '출력',
+      duration: '실행 시간',
+      status: '상태',
+    },
+    status: {
+      idle: '대기',
+      success: '성공',
+      failed: '실패',
+      running: '실행 중',
+    },
+    steps: {
+      selectWorkflow: '워크플로우 선택',
+      selectWorkflowDesc: '테스트할 워크플로우를 선택하세요',
+      uploadFile: '파일 업로드',
+      uploadFileDesc: '테스트 데이터가 포함된 Excel 파일을 업로드하세요',
+      runTest: '테스트 실행',
+      runTestDesc: '배치 테스트를 실행하고 결과를 확인하세요',
+    },
+    newTest: '새 테스트',
+    refresh: '새로고침',
+    loading: '테스터를 불러오는 중...',
+    error: {
+      title: '오류',
+      loadFailed: '테스트 목록을 불러오는데 실패했습니다',
+    },
+    buttons: {
+      retry: '다시 시도',
+    },
+    create: {
+      title: '배치 테스트 생성',
+      uploadPrompt: 'Excel 파일을 드래그하거나 클릭하여 업로드하세요',
+      uploadHint: '.xlsx, .xls 파일만 지원됩니다',
+      selectWorkflow: '워크플로우 선택',
+      selectPlaceholder: '워크플로우를 선택하세요',
+      start: '테스트 시작',
+    },
+  },
+};

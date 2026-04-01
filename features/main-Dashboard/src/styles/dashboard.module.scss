@@ -1,0 +1,417 @@
+// Design tokens
+$color-gray-50: #f8f9fa;
+$color-gray-100: #f1f3f5;
+$color-gray-200: #e9ecef;
+$color-gray-400: #ced4da;
+$color-gray-500: #7a7f89;
+$color-gray-600: #495057;
+$color-gray-700: #40444d;
+$color-gray-900: #212529;
+$color-primary: #305eeb;
+$color-secondary: #783ced;
+$color-success: #2eb146;
+$color-warning: #f59f00;
+$color-error: #e03131;
+$color-white: #ffffff;
+$color-text-primary: #1d1f23;
+$color-text-secondary: #7a7f89;
+$color-text-muted: #ced4da;
+$color-bg-primary: #ffffff;
+$color-bg-secondary: #f8f9fa;
+$color-border: #e9ecef;
+$color-surface: #ffffff;
+
+// Spacing
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+$spacing-2xl: 3rem;
+
+// Typography
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-2xl: 1.5rem;
+$font-size-3xl: 1.875rem;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$line-height-base: 1.5;
+
+// Layout
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-full: 9999px;
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
+$transition-fast: 0.15s;
+$transition-base: 0.25s;
+
+// ─────────────────────────────────────────────────────────────
+// Dashboard Page Styles
+// ─────────────────────────────────────────────────────────────
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+  padding: $spacing-xl;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Welcome Section
+// ─────────────────────────────────────────────────────────────
+
+.welcome {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.welcomeTitle {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin: 0;
+}
+
+.welcomeSubtitle {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  margin: 0;
+}
+
+// ─────────────────────────────────────────────────────────────
+// KPI Section
+// ─────────────────────────────────────────────────────────────
+
+.kpiSection {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: 0;
+}
+
+.updatedAt {
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-md;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kpiCard {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  padding: $spacing-lg;
+  background-color: $color-bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+
+  &.total {
+    border-left: 4px solid $color-primary;
+  }
+
+  &.normal {
+    border-left: 4px solid $color-success;
+  }
+
+  &.paused {
+    border-left: 4px solid $color-warning;
+  }
+
+  &.error {
+    border-left: 4px solid $color-error;
+  }
+}
+
+.kpiLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin: 0;
+}
+
+.kpiValue {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin: 0;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Two Column Layout
+// ─────────────────────────────────────────────────────────────
+
+.twoColumn {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-xl;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Updates Section
+// ─────────────────────────────────────────────────────────────
+
+.updatesSection {
+  display: flex;
+  flex-direction: column;
+  background-color: $color-bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+}
+
+.updatesSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1px solid $color-border;
+}
+
+.viewAllLink {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-size: $font-size-sm;
+  color: $color-primary;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.updatesList {
+  display: flex;
+  flex-direction: column;
+}
+
+.updateItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1px solid $color-border;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.updatePrefix {
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.updateText {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+
+  &.isLink {
+    color: $color-primary;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Top Workflows Section
+// ─────────────────────────────────────────────────────────────
+
+.workflowsSection {
+  display: flex;
+  flex-direction: column;
+  background-color: $color-bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+}
+
+.workflowsList {
+  display: flex;
+  flex-direction: column;
+}
+
+.workflowItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1px solid $color-border;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.workflowRank {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $color-bg-secondary;
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  color: $color-text-secondary;
+  margin-right: $spacing-md;
+}
+
+.workflowName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+
+  &.isLink {
+    color: $color-primary;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Errors Section
+// ─────────────────────────────────────────────────────────────
+
+.errorsSection {
+  display: flex;
+  flex-direction: column;
+  background-color: $color-bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+}
+
+.errorsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.errorsHeader {
+  background-color: $color-bg-secondary;
+
+  th {
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.errorsBody {
+  tr {
+    border-bottom: 1px solid $color-border;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: rgba($color-primary, 0.02);
+    }
+  }
+
+  td {
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-size-sm;
+    color: $color-text-primary;
+    vertical-align: middle;
+  }
+}
+
+.errorIcon {
+  width: 20px;
+  height: 20px;
+  color: $color-error;
+}
+
+.errorWorkflow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.errorTime {
+  color: $color-text-muted;
+  white-space: nowrap;
+}
+
+.errorMessage {
+  color: $color-text-secondary;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Loading State
+// ─────────────────────────────────────────────────────────────
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid $color-border;
+  border-top-color: $color-primary;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

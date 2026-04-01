@@ -1,0 +1,80 @@
+@use '../styles/variables' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+
+  &.card {
+    background-color: $bg-card;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-md;
+    overflow: hidden;
+  }
+
+  &.page {
+    background-color: transparent;
+  }
+
+  &.fullWidth {
+    background-color: $bg-card;
+    border-radius: 0;
+  }
+
+  &.toolStorage {
+    background-color: $bg-card;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-md;
+    overflow: hidden;
+
+    .body {
+      padding: 0;
+    }
+  }
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-4;
+  padding: $spacing-6;
+  border-bottom: 1px solid $border-color;
+  flex-shrink: 0;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  line-height: $line-height-tight;
+}
+
+.description {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  line-height: $line-height-base;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  flex-shrink: 0;
+}
+
+.body {
+  flex: 1;
+  padding: $spacing-6;
+  overflow-y: auto;
+}

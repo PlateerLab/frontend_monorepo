@@ -1,15 +1,38 @@
 import type { Metadata } from 'next';
-import '@xgen/styles/src/globals.css';
+import '@/app/globals.css';
+import { LanguageProvider } from '@xgen/i18n';
+import { AuthProvider } from '@xgen/auth-provider';
 
 export const metadata: Metadata = {
-  title: 'XGEN',
-  description: 'XGEN AI Platform',
+    title: 'XGEN',
+    description: 'XGEN - Next-Gen AI Workflow Platform',
+    icons: {
+        icon: [
+            { url: '/favicon.png', sizes: '32x32', type: 'image/x-icon' },
+            { url: '/favicon.png', sizes: '32x32', type: 'image/png' }
+        ],
+        shortcut: '/favicon.png',
+        apple: '/favicon.png',
+    },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="ko" suppressHydrationWarning>
-      <body className="antialiased">{children}</body>
-    </html>
-  );
+export default function RootLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) {
+    return (
+        <html lang="en" suppressHydrationWarning>
+            <head>
+                <link rel="icon" href="/favicon.png" sizes="32x32" />
+            </head>
+            <body suppressHydrationWarning>
+                <AuthProvider>
+                    <LanguageProvider>
+                        {children}
+                    </LanguageProvider>
+                </AuthProvider>
+            </body>
+        </html>
+    );
 }

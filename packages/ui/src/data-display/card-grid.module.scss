@@ -1,0 +1,32 @@
+@use '../styles/variables' as *;
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--columns-sm, 1), 1fr);
+  width: 100%;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(var(--columns-md, 2), 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(var(--columns-lg, 3), 1fr);
+  }
+
+  @media (min-width: 1280px) {
+    grid-template-columns: repeat(var(--columns-xl, 4), 1fr);
+  }
+}
+
+// Gap variants
+.gap-sm {
+  gap: $spacing-sm;
+}
+
+.gap-md {
+  gap: $spacing-md;
+}
+
+.gap-lg {
+  gap: $spacing-lg;
+}

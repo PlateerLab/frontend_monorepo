@@ -1,0 +1,649 @@
+// NodeDetailModal.module.scss
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.2s ease-out;
+    overflow: hidden;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modalContent {
+    background: #ffffff;
+    border-radius: 12px;
+    width: 90vw;
+    max-width: 900px;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: slideIn 0.25s ease-out;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 12px 12px 0 0;
+}
+
+.headerInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.nodeName {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nodeIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+}
+
+.nodeId {
+    font-size: 11px;
+    color: #64748b;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.headerMeta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.headerTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.headerTag {
+    font-size: 11px;
+    color: #1d4ed8;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.closeButton:hover {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.modalBody {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 20px 24px;
+
+    // 스크롤바 스타일링
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+        
+        &:hover {
+            background: #94a3b8;
+        }
+    }
+}
+
+.bodyContent {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 200px;
+}
+
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 16px;
+    min-height: 200px;
+    flex: 1;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loadingText {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.errorContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 16px;
+    color: #ef4444;
+    min-height: 200px;
+    flex: 1;
+}
+
+.errorIcon {
+    font-size: 48px;
+}
+
+.errorText {
+    font-size: 14px;
+    text-align: center;
+    max-width: 400px;
+}
+
+.retryButton {
+    margin-top: 8px;
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.retryButton:hover {
+    background: #2563eb;
+}
+
+// ========== 기본 정보 섹션 (설명 + 분류 + 태그 통합) ==========
+.basicInfoSection {
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.descriptionBlock {
+    .description {
+        font-size: 14px;
+        line-height: 1.7;
+        color: #475569;
+        margin: 0;
+    }
+}
+
+.metaInfoRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.categoryBlock {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.metaItem {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.metaLabel {
+    font-size: 11px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+.metaValue {
+    font-size: 13px;
+    color: #334155;
+    font-weight: 500;
+}
+
+.userTipBlock {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-top: 4px;
+
+    .userTipHeader {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 8px;
+    }
+
+    .userTipIcon {
+        font-size: 16px;
+        line-height: 1;
+    }
+
+    .userTipLabel {
+        font-size: 12px;
+        font-weight: 600;
+        color: #92400e;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .userTipText {
+        font-size: 13px;
+        line-height: 1.7;
+        color: #78350f;
+        margin: 0;
+        white-space: pre-line;
+    }
+}
+
+.tagsBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.tagsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tag {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1d4ed8;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+// ========== 접을 수 있는 섹션들 ==========
+.collapsibleSections {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+// Section Styles
+.section {
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    background: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+}
+
+.sectionHeader:hover {
+    background: #e2e8f0;
+}
+
+.sectionIcon {
+    color: #3b82f6;
+    font-size: 16px;
+}
+
+.sectionTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+    flex: 1;
+}
+
+.sectionCount {
+    font-size: 12px;
+    color: #64748b;
+    background: #e2e8f0;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.expandIcon {
+    color: #64748b;
+    font-size: 14px;
+    transition: transform 0.2s;
+}
+
+.expandIcon.expanded {
+    transform: rotate(180deg);
+}
+
+.sectionContent {
+    padding: 16px 18px;
+    background: #ffffff;
+}
+
+// Port & Parameter Lists
+.portList,
+.parameterList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.portItem,
+.parameterItem {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    transition: box-shadow 0.2s;
+}
+
+.portItem:hover,
+.parameterItem:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.portHeader,
+.parameterHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.portName,
+.parameterName {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.portType,
+.parameterType {
+    font-size: 11px;
+    background: #e0e7ff;
+    color: #4338ca;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.inputType {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.outputType {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.portBadges,
+.parameterBadges {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+}
+
+.badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.requiredBadge {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.optionalBadge {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.multiBadge {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.streamBadge {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.portDetails,
+.parameterDetails {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.detailItem {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.detailLabel {
+    color: #94a3b8;
+}
+
+.detailValue {
+    color: #475569;
+    font-weight: 500;
+}
+
+.parameterDescription {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #e2e8f0;
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.parameterOptions {
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+}
+
+.optionsTitle {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.optionsList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.optionItem {
+    font-size: 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 4px 10px;
+    border-radius: 4px;
+    color: #475569;
+}
+
+.defaultValue {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.defaultLabel {
+    color: #94a3b8;
+}
+
+.defaultValueText {
+    color: #334155;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+// Dependency Info
+.dependencyInfo {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #92400e;
+}
+
+.dependencyLabel {
+    font-weight: 500;
+}
+
+// Empty State
+.emptyState {
+    text-align: center;
+    padding: 24px;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+// Modal Footer
+.modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 24px;
+    border-top: 1px solid #e5e7eb;
+    background: #f8fafc;
+    border-radius: 0 0 12px 12px;
+}
+
+.closeFooterButton {
+    padding: 10px 24px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.closeFooterButton:hover {
+    background: #2563eb;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}

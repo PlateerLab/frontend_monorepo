@@ -1,0 +1,1420 @@
+.node {
+    position: absolute;
+    min-width: 400px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: var(--shadow-basic-50);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    font-family: var(--font-base, 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif);
+    user-select: none;
+    -webkit-user-select: none;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+    transition: filter 0.2s ease, opacity 0.2s ease;
+
+    &.selected {
+        border-color: var(--color-secondary-200);
+        // shadow-basic-100의 베이스는 유지하고, 선택 상태에서만 색상을 오버라이드
+        --shadow-basic-100-color: rgba(85, 130, 246, 0.50);
+        /* 선택 상태는 테두리 링 + shadow-basic-100 */
+        box-shadow: 0 0 0 2px rgba(48, 94, 235, 0.4), 0 4px 16px 0 var(--shadow-basic-100-color);
+        z-index: 30;
+    }
+
+    &.bypassed {
+        filter: grayscale(100%);
+        opacity: 0.6;
+
+        // Bypassed 상태일 때 헤더에 표시
+        &::before {
+            content: "BYPASSED";
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #6b7280;
+            color: white;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            z-index: 1;
+            text-transform: uppercase;
+        }
+
+        &:hover {
+            opacity: 0.75;
+        }
+
+        &.selected {
+            border-color: var(--color-secondary-200);
+            --shadow-basic-100-color: rgba(85, 130, 246, 0.50);
+            box-shadow: 0 0 0 2px rgba(48, 94, 235, 0.4), 0 4px 16px 0 var(--shadow-basic-100-color);
+        }
+    }
+
+    &.predicted {
+        border: 1px dashed #10b981;
+        background-color: rgba(255, 255, 255, 0.95);
+        transition: opacity 0.3s ease, transform 0.2s ease, border-style 0.2s ease;
+        z-index: 25;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+
+        // 예측 노드임을 알리는 작은 라벨 추가
+        &::before {
+            content: "Predicted";
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #10b981;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+            z-index: 1;
+        }
+
+        &:hover {
+            transform: translate(0, 0) scale(1.02);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+            border-style: solid;
+            border-color: #059669;
+
+            &::before {
+                background: #059669;
+            }
+        }
+    }
+
+    /* 문서 파일 드래그 시 Search Context 노드 하이라이트 */
+    &:global(.canvas-drop-highlight) {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35), 0 0 24px rgba(59, 130, 246, 0.15) !important;
+        z-index: 35 !important;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+    }
+}
+
+.header {
+    padding: 12px 16px;
+    min-height: 44px;
+    box-sizing: border-box;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 20px;
+    color: #40444d;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.headerContent {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.nodeDescButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: transparent;
+    color: #000;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: help;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 50;
+    flex-shrink: 0;
+    user-select: none;
+
+    &:hover {
+        background-color: transparent;
+        transform: scale(1.1);
+    }
+}
+
+.nodeDescTooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    background-color: rgba(17, 24, 39, 0.95);
+    color: white;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    max-width: 340px;
+    min-width: 200px;
+    text-align: left;
+    pointer-events: none;
+
+    // 말풍선 꼬리
+    &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        right: 6px;
+        border: 6px solid transparent;
+        border-top-color: rgba(17, 24, 39, 0.95);
+    }
+
+    animation: tooltipFadeIn 0.2s ease-out;
+}
+
+.toggleButton {
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #40444d;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    padding: 0;
+
+    &:hover {
+        opacity: 0.8;
+    }
+
+    &:active {
+        opacity: 0.7;
+    }
+
+    svg {
+        pointer-events: none;
+        display: block;
+    }
+}.functionId {
+    font-size: 12px;
+    line-height: 16px;
+    color: #7a7f89;
+    font-weight: 400;
+}
+
+// --- Node Name Editing Styles (Figma: 14px Bold #40444d, line-height 20) ---
+.nodeName {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 20px;
+    color: #40444d;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+    padding: 2px 4px;
+    border-radius: 4px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &:hover {
+        background-color: rgba(59, 130, 246, 0.1);
+    }
+}
+
+.nameInput {
+    background: #fff;
+    border: 2px solid #3b82f6;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 20px;
+    color: #40444d;
+    outline: none;
+    min-width: 100px;
+    max-width: 200px;
+    font-family: inherit;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+
+    &:focus {
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+}
+
+.body {
+    padding: 16px 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+// --- 축소된 노드 스타일 (헤더 + 포트만) ---
+.collapsedBody {
+    padding: 12px 0px;
+    margin-left: -8px;
+    margin-right: -8px;
+    min-height: auto;
+}
+
+.collapsedPorts {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    min-height: 24px;
+}
+
+.collapsedInputs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.collapsedOutputs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.collapsedPortItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.collapsedPortCircle {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid;
+    cursor: crosshair;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 5;
+    background-color: #fff;
+
+    // 타입별 색상 (테두리 색상으로 구분)
+    &.type-STR { border-color: #5D9CF4; }
+    &.type-INT { border-color: #7AD37A; }
+    &.type-FLOAT { border-color: #F7C966; }
+    &.type-ANY { border-color: #9C5BF4; }
+    &.type-STREAM { border-color: #14B8A6; }
+    &.type-BOOL { border-color: #F472B6; }
+    &.type-LIST { border-color: #F97316; }
+    &.type-DICT { border-color: #8B5CF6; }
+    &.type-JSON { border-color: #06B6D4; }
+    &.type-IMAGE { border-color: #EC4899; }
+    &.type-AUDIO { border-color: #84CC16; }
+    &.type-FILE { border-color: #78716C; }
+
+    // 멀티 타입 포트 스타일
+    &.multiType {
+        border-style: double;
+        border-width: 3px;
+        background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 6px;
+            height: 6px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    // 다중 연결 포트 스타일
+    &.multi {
+        border-style: dashed;
+        background-color: #f8fafc;
+    }
+
+    &:hover {
+        transform: scale(1.2);
+        z-index: 10;
+    }
+
+    &.snapping {
+        transform: scale(1.3);
+        border-width: 3px;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+    }
+
+    &.invalid-snap {
+        border-color: #e53e3e !important;
+        background-color: #fed7d7;
+        cursor: not-allowed;
+    }
+}
+
+.collapsedPortType {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6b7280;
+    user-select: none;
+    pointer-events: none;
+}
+
+// 축소 모드일 때 노드 크기 조정
+.node {
+    &.collapsed {
+        min-width: 400px;
+    }
+}// --- IO 섹션 스타일 ---
+// Figma Frame 341: 368×26 한 줄 — INPUT 좌 / OUTPUT(+Plus) 우, 타이포 Bold 12/16 #40444d, letter-spacing 0
+.ioContainer {
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px;
+}
+
+.ioColumns {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex-basis: 48%; // [수정] 너비 미세 조정
+
+    // [추가] Output만 있을 때 컬럼 너비를 100%로
+    &.fullWidth {
+        flex-basis: 100%;
+    }
+}
+
+.outputColumn {
+    align-items: flex-end;
+
+    .portRow {
+        justify-content: flex-end;
+    }
+}
+
+.ioHeaderRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 26px;
+    margin-bottom: 8px; // 다음 포트 블록까지 Figma 간격 8px
+    box-sizing: border-box;
+}
+
+// 타이포: 전역 typo-subtitle3(12px·Pretendard·700) + typo-colorGray600 — /publish/component/typography
+.ioHeaderLabel {
+    text-transform: uppercase;
+}
+
+.ioHeaderOutputGroup {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sectionHeader {
+    margin-bottom: 8px;
+    min-height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-transform: uppercase;
+
+    span {
+        flex: 1;
+    }
+}
+
+// PARAMETER 헤더 전용 (Figma: height 18px, text 12/16 Bold, + 버튼 18x18 radius 4)
+.parameterSectionHeader {
+    margin-bottom: 0;
+    min-height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-transform: uppercase;
+    box-sizing: border-box;
+}
+
+.parameterHeaderLabel {
+    font-family: var(--font-base, 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 700;
+    letter-spacing: 0;
+    color: var(--color-gray-600);
+}
+
+.addOutputButton {
+    background: var(--color-bg-50);
+    border: none;
+    border-radius: 4px; // Figma Icon_Node_Plus
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--color-gray-100);
+    }
+
+    &:active {
+        background: var(--color-gray-200);
+    }
+
+    svg {
+        width: 18px;
+        height: 18px;
+        display: block;
+    }
+}
+
+.deleteOutputButton {
+    margin-left: 6px;
+    background: var(--color-bg-50);
+    border: none;
+    border-radius: 4px;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    vertical-align: middle;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--color-gray-100);
+    }
+
+    &:active {
+        background: var(--color-gray-200);
+    }
+
+    svg {
+        width: 18px;
+        height: 18px;
+        display: block;
+    }
+}
+
+.portLabelEditable {
+    cursor: pointer;
+}
+
+.portNameInput {
+    background: #fff;
+    border: 1px solid #d0d5dd;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    line-height: 16px;
+    color: #40444d;
+    outline: none;
+    min-width: 80px;
+    max-width: 200px;
+    font-family: inherit;
+}
+
+.noOutputsPlaceholder {
+    padding: 8px 12px;
+    color: #7a7f89;
+    font-size: 12px;
+    line-height: 16px;
+    font-style: italic;
+    text-align: center;
+}
+
+.addParameterButton {
+    background: var(--color-bg-50); // #f7f8fa
+    border: none;
+    border-radius: 4px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-gray-600); // plus 아이콘 색: #40444d
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--color-gray-100);
+    }
+
+    &:active {
+        background: var(--color-gray-200);
+    }
+
+    svg {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+.deleteParameterButton {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 3px;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all 0.2s ease;
+    margin-left: 4px;
+
+    &:hover {
+        background: #fef2f2;
+        border-color: #fca5a5;
+        color: #dc2626;
+    }
+
+    &:active {
+        background: #fee2e2;
+    }
+
+    svg {
+        width: 10px;
+        height: 10px;
+    }
+}
+
+.downloadButton {
+    background: #f0f9ff;
+    border: 1px solid #0ea5e9;
+    border-radius: 3px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #0ea5e9;
+    transition: all 0.2s ease;
+    margin-left: 4px;
+
+    &:hover {
+        background: #0ea5e9;
+        color: white;
+        transform: scale(1.1);
+    }
+
+    &:active {
+        background: #0284c7;
+        transform: scale(0.95);
+    }
+
+    svg {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+.portRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.portLabel {
+    flex: 1;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0;
+    color: var(--color-gray-500);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+
+    &.required::after {
+        content: " *";
+        color: #ef4444;
+        font-weight: bold;
+    }
+}
+
+
+.port {
+    position: relative;
+    z-index: 5;
+
+    padding: 2px 10px;
+    height: 20px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0;
+
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    text-align: center;
+    color: var(--color-gray-500);
+
+    background-color: var(--color-white-200);
+    border: 1px solid var(--color-gray-300);
+    transition: all 0.2s ease;
+    cursor: crosshair;
+
+    // 타입별 색상 (Figma: 기본 #d0d5dd, FILE 등 녹색 #a6d3a6 / #59ac59)
+    &.type-STR { border-color: #5D9CF4; color: #5D9CF4; }
+    &.type-INT { border-color: #7AD37A; color: #59ac59; }
+    &.type-FLOAT { border-color: #F7C966; color: #b38600; }
+    &.type-ANY { border-color: #9C5BF4; color: #9C5BF4; }
+    &.type-STREAM { border-color: #14B8A6; color: #14B8A6; }
+    &.type-BOOL { border-color: #F472B6; color: #F472B6; }
+    &.type-LIST { border-color: #F97316; color: #F97316; }
+    &.type-DICT { border-color: #8B5CF6; color: #8B5CF6; }
+    &.type-JSON { border-color: #06B6D4; color: #06B6D4; }
+    &.type-IMAGE { border-color: #EC4899; color: #EC4899; }
+    &.type-AUDIO { border-color: #84CC16; color: #84CC16; }
+    &.type-FILE { border-color: var(--color-success-50); color: var(--color-success-100); background-color: var(--color-white-200); }
+    &.type-TOOL { border-color: var(--color-success-50); color: var(--color-success-100); background-color: var(--color-white-200); }
+
+    // 멀티 타입 포트 스타일 (예: STREAM|STR)
+    &.multiType {
+        border-style: double;
+        border-width: 3px;
+        background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            right: -1px;
+            width: 8px;
+            height: 8px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    // 다중 연결 포트 스타일
+    &.multi {
+        /* Figma에서 multi 연결도 WF Box 투명 배경을 유지 */
+        background-color: var(--color-white-200);
+    }
+
+    // 상호작용 스타일
+    &:hover {
+        transform: scale(1);
+        filter: brightness(0.95);
+    }
+
+    &.snapping {
+        // border-width: 3px;
+        transform: scale(1.05);
+    }
+
+    &.invalid-snap {
+        border-color: #e53e3e !important;
+        background-color: #fed7d7;
+        cursor: not-allowed;
+    }
+}
+
+// .port.multi {
+//     border-radius: 4px;
+//     background-color: #d1d5db;
+// }
+
+.divider {
+    height: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    margin: 16px 0;
+}
+
+.paramSection {
+    padding: 0 16px;
+    // 파라미터 라인에서 input/select/value/Dropdown 박스 폭을 고정
+    // (common Dropdown 기존 기본 폭 211px 기준)
+    --param-field-width: 211px;
+}
+
+.param {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    margin-top: 10px;
+    margin-bottom: 6px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.paramKey {
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--color-gray-500);
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+
+    // 라벨이 길어도 input 박스를 밀지 않도록 제한
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: visible; // 툴팁(.tooltip)이 위로 뜨는 상황을 잘리지 않게
+}
+
+.paramName {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    &.required::after {
+        content: " *";
+        color: #ef4444;
+        font-weight: bold;
+    }
+}
+
+.infoIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: transparent;
+    color: #000;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: help;
+    margin-right: 2px;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 50;
+
+    &:hover {
+        background-color: transparent;
+        transform: scale(1.1);
+    }
+}
+
+.tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(17, 24, 39, 0.95);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-width: 250px;
+    min-width: 150px;
+    text-align: left;
+    pointer-events: none;
+    margin-bottom: 6px;
+
+    // 말풍선 꼬리
+    &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: rgba(17, 24, 39, 0.95);
+    }
+
+    // 애니메이션
+    animation: tooltipFadeIn 0.2s ease-out;
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.refreshButton {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    color: #6b7280;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+
+    &:hover {
+        color: #3b82f6;
+        background-color: #f3f4f6;
+    }
+
+    &:active {
+        color: #2563eb;
+        transform: scale(0.95);
+    }
+
+    &.loading {
+        animation: spin 1s linear infinite;
+        color: #3b82f6;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    svg {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+.deleteButton {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    color: #6b7280;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+
+    &:hover {
+        color: #dc2626;
+        background-color: #fef2f2;
+    }
+
+    &:active {
+        color: #b91c1c;
+        transform: scale(0.95);
+    }
+
+    svg {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.inputWrapper {
+    position: relative;
+    flex: 0 0 var(--param-field-width);
+    width: var(--param-field-width);
+    max-width: none;
+    text-align: right;
+}
+.inputWrapper .paramInput {
+    width: 100%;
+    flex: 0 0 var(--param-field-width);
+    box-sizing: border-box;
+    user-select: none; // 드래그 방지
+}
+
+.expandableWrapper {
+    position: relative;
+    flex: 0 0 var(--param-field-width);
+    width: var(--param-field-width);
+    max-width: none;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    justify-content: flex-end;
+}
+
+.expandableWrapper .paramInput {
+    flex: 0 0 calc(var(--param-field-width) - 28px - 4px);
+    width: 100%;
+    max-width: calc(var(--param-field-width) - 28px - 4px);
+    box-sizing: border-box;
+    user-select: none;
+    min-width: 0;
+}
+
+.expandButton {
+    background: #FFF;
+    border: 1px solid var(--line-50, rgba(0, 0, 0, 0.08));
+    border-radius: var(--radius-1, 8px);
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--color-gray-600);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+
+    &:hover {
+        background: var(--color-gray-100);
+        border-color: var(--color-gray-300);
+        color: var(--color-gray-600);
+    }
+
+    &:active {
+        background: var(--color-gray-200);
+    }
+}
+
+.paramValue {
+    display: flex;
+    height: 28px;
+    justify-content: space-between;
+    align-items: center;
+    flex: 0 0 var(--param-field-width);
+    width: var(--param-field-width);
+    box-sizing: border-box;
+    background: #FFF;
+    border: 1px solid var(--line-50, rgba(0, 0, 0, 0.08));
+    border-radius: var(--radius-1, 8px);
+    padding: 4px 10px;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+    color: var(--color-gray-600);
+}
+
+.paramInput {
+    height: 28px;
+    flex: 0 0 var(--param-field-width);
+    width: var(--param-field-width);
+    box-sizing: border-box;
+    background: #FFF;
+    border: 1px solid var(--line-50, rgba(0, 0, 0, 0.08));
+    border-radius: var(--radius-1, 8px);
+    padding: 4px 10px;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+    color: var(--color-gray-600);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-align: right;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+
+    &:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 1px #3b82f6;
+    }
+}
+
+// --- 파라미터 선택 필드 (Figma: bg #fff, border rgba(0,0,0,0.08), radius 8, height 28) ---
+.paramSelect {
+    height: 28px;
+    flex: 0 0 var(--param-field-width);
+    width: var(--param-field-width);
+    box-sizing: border-box;
+    background: #FFF;
+    border: 1px solid var(--line-50, rgba(0, 0, 0, 0.08));
+    border-radius: var(--radius-1, 8px);
+    padding: 4px 10px;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+    color: var(--color-gray-600);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-align: right;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+
+    &:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 1px #3b82f6;
+        z-index: 1000;
+    }
+
+    &:hover {
+        border-color: #d0d5dd;
+    }
+}
+
+// --- 공통 Dropdown(선택 필드) 레이아웃 ---
+// common Dropdown 컴포넌트의 border/background/height는 Dropdown.module.scss가 담당.
+// 여기서는 워크플로우 파라미터 레이아웃(폭/정렬)만 맞춘다.
+.paramDropdownLayout {
+    height: 28px;
+    flex: 0 0 var(--param-field-width);
+    width: var(--param-field-width);
+    min-width: var(--param-field-width);
+    box-sizing: border-box;
+    cursor: pointer;
+    text-align: right;
+    position: relative;
+    z-index: 1;
+
+    // MUI Select value text is left-aligned by default because the select uses flex.
+    // Match the parameter area's native select/input right-alignment.
+    :global(.MuiSelect-select) {
+        justify-content: flex-end !important;
+        padding-left: 10px !important; // native parameter padding is 4px 10px
+        text-align: right;
+    }
+}
+
+// --- Search Dropdown (드롭다운 내부 검색) ---
+.searchDropdown {
+    position: relative;
+    flex: 0 0 var(--param-field-width);
+    width: var(--param-field-width);
+    max-width: none;
+    margin-left: 0;
+}
+
+.searchDropdownTrigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 28px;
+    box-sizing: border-box;
+    background: #FFF;
+    border: 1px solid var(--line-50, rgba(0, 0, 0, 0.08));
+    border-radius: var(--radius-1, 8px);
+    padding: 4px 10px;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+    color: var(--color-gray-600);
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-align: right;
+
+    &:hover {
+        border-color: #d0d5dd;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 1px #3b82f6;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.searchDropdownValue {
+    flex: 1;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.searchDropdownArrow {
+    font-size: 0.6rem;
+    color: #6b7280;
+    margin-left: 4px;
+}
+
+.searchDropdownPanel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: auto;
+    right: 0;
+    min-width: 200px;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.searchDropdownSearchBox {
+    padding: 8px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.searchDropdownInput {
+    width: 100%;
+    background-color: #f9fafb;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 0.75rem;
+    color: #374151;
+    outline: none;
+
+    &::placeholder {
+        color: #9ca3af;
+    }
+
+    &:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 1px #3b82f6;
+        background-color: #fff;
+    }
+}
+
+.searchDropdownList {
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.searchDropdownItem {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    color: #374151;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.1s;
+
+    &:hover {
+        background-color: #f3f4f6;
+    }
+
+    &.selected {
+        background-color: #eff6ff;
+        color: #2563eb;
+        font-weight: 500;
+    }
+}
+
+.searchDropdownEmpty {
+    padding: 12px;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    text-align: center;
+}
+
+.searchDropdownGroup {
+    &:not(:first-child) {
+        border-top: 1px solid #e5e7eb;
+        margin-top: 4px;
+        padding-top: 4px;
+    }
+}
+
+.searchDropdownGroupLabel {
+    padding: 6px 12px 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.searchDropdownTabs {
+    display: flex;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0 4px;
+}
+
+.searchDropdownTab {
+    flex: 1;
+    padding: 8px 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6b7280;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+
+    &:hover {
+        color: #374151;
+    }
+
+    &.active {
+        color: #2563eb;
+        border-bottom-color: #2563eb;
+    }
+}
+// --- Advanced Parameters Styles (Figma: bg #f2f4f7, radius 8, height 28, 12px #40444d) ---
+.advancedParams {
+    margin-top: 8px;
+    padding-top: 0;
+}
+
+.advancedHeader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    box-sizing: border-box;
+    padding: 6px 12px;
+    background-color: var(--color-gray-100, #f2f4f7);
+    border: 1px solid var(--line-50, rgba(0, 0, 0, 0.08));
+    border-radius: var(--radius-1, 8px);
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+    color: var(--color-gray-600, #40444d);
+    transition: all 0.2s ease;
+    margin-bottom: 8px;
+
+    &:hover {
+        background-color: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #475569;
+    }
+
+    span {
+        user-select: none;
+    }
+}
+
+.inputError {
+    border-color: #d9534f;
+}
+
+.inputError:focus {
+    border-color: #d9534f;
+}
+
+.errorMessage {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    margin-top: 4px;
+    width: 100%;
+    padding: 10px 12px;
+    background-color: rgba(45, 45, 45, 0.95);
+    color: white;
+    font-size: 13px;
+    border-radius: 5px;
+    line-height: 1.4;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    white-space: pre-wrap;
+
+    text-align: start;
+
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.doubleInputWrapper {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+    width: 100%;
+
+    select {
+        margin-top: 4px;
+        max-width: 30%;
+        box-sizing: border-box;
+        user-select: none; // 드래그 방지
+        padding: 0;
+    }
+}

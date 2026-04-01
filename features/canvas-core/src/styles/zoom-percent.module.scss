@@ -1,0 +1,28 @@
+/* Figma ZoomPercent — Design token + shadow/Basic/50 */
+.wrapper {
+  display: inline-flex;
+  height: 36px;
+  padding: 4px 12px;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid var(--line-50, rgba(0, 0, 0, 0.08));
+  background: var(--color-White-300, rgba(255, 255, 255, 0.9));
+  /* shadow/Basic/50 */
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.16);
+  pointer-events: auto;
+
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+}
+
+.percentText {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: #40444d;
+}

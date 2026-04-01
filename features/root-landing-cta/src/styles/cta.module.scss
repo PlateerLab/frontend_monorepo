@@ -1,0 +1,142 @@
+@use "./variables" as *;
+
+@mixin button-base {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+}
+
+.ctaSection {
+    width: 90vw;
+    max-width: 1400px;
+    margin: 3rem auto;
+    position: relative;
+    background: $white;
+    border-radius: 28px;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.06),
+        0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            radial-gradient(ellipse at 20% 0%, rgba(37, 99, 235, 0.04) 0%, transparent 60%),
+            radial-gradient(ellipse at 80% 100%, rgba(124, 58, 237, 0.04) 0%, transparent 60%);
+        pointer-events: none;
+    }
+
+    @media (min-width: 640px) { width: 88vw; }
+    @media (min-width: 1024px) { width: 85vw; margin: 4rem auto; }
+    @media (min-width: 1440px) { width: 80vw; }
+}
+
+.ctaContent {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+
+    @media (min-width: 640px) { padding: 6rem 3rem; }
+    @media (min-width: 1024px) { padding: 7rem 4rem; }
+    @media (min-width: 1440px) { padding: 8rem 5rem; }
+
+    h2 {
+        font-size: 2.25rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        color: $gray-900;
+        letter-spacing: -0.025em;
+
+        @media (min-width: 640px) { font-size: 2.75rem; }
+    }
+
+    p {
+        font-size: 1.125rem;
+        color: $gray-600;
+        margin-bottom: 2.5rem;
+        line-height: 1.7;
+    }
+}
+
+.ctaLabel {
+    margin-bottom: 1.25rem;
+
+    span {
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(124, 58, 237, 0.06));
+        border: 1px solid rgba(37, 99, 235, 0.12);
+        border-radius: 50px;
+        padding: 0.5rem 1.25rem;
+        color: $primary-blue;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        display: inline-block;
+    }
+}
+
+.ctaActions {
+    display: flex;
+    gap: 0.875rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.ctaNote {
+    span {
+        font-size: 0.8125rem;
+        color: $gray-500;
+    }
+}
+
+.ctaBtn {
+    @include button-base;
+    background: linear-gradient(135deg, $primary-blue, $primary-purple);
+    color: $white;
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    padding: 0.875rem 2rem;
+    border-radius: 12px;
+
+    &:hover {
+        background: linear-gradient(135deg, #1d4ed8, #6d28d9);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px rgba(37, 99, 235, 0.35);
+    }
+
+    svg { margin-right: 0.5rem; width: 1.125rem; height: 1.125rem; }
+}
+
+.ctaSecondaryBtn {
+    @include button-base;
+    background: $white;
+    color: $gray-700;
+    border: 1px solid $gray-200;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    padding: 0.875rem 2rem;
+    border-radius: 12px;
+
+    &:hover {
+        background: $gray-50;
+        color: $gray-900;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    svg { margin-right: 0.5rem; width: 1.125rem; height: 1.125rem; }
+}

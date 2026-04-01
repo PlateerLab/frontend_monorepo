@@ -1,0 +1,34 @@
+'use client';
+
+import { useTranslation } from '@xgen/i18n';
+import './locales';
+import type { IntroductionSectionPlugin } from '@xgen/types';
+import styles from './styles/footer.module.scss';
+
+function LandingFooter() {
+  const { t } = useTranslation();
+
+  return (
+    <footer className={styles.footer}>
+      <div className={styles.footerContent}>
+        <div className={styles.footerTop}>
+          <div className={styles.footerBrand}>
+            <h3>{t('footer.brand')}</h3>
+            <p>{t('footer.tagline')}</p>
+          </div>
+        </div>
+        <div className={styles.footerBottom}>
+          <p>{t('footer.copyright')}</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+export const rootLandingFooterPlugin: IntroductionSectionPlugin = {
+  id: 'root-landing-footer',
+  name: 'Landing Footer',
+  footerComponent: LandingFooter,
+};
+
+export default rootLandingFooterPlugin;

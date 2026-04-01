@@ -1,0 +1,329 @@
+@keyframes pop-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.sideMenuContainer {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    min-width: 320px;
+    width: auto;
+    max-width: 600px;
+    height: auto;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 14px; // 둥근 테두리 증가
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06); // 더 깊은 그림자
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    z-index: 1000; // 다른 요소들 위에 보이도록 z-index 설정
+    overflow: hidden; // 내부 콘텐츠가 테두리를 넘지 않도록 함
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+
+    animation: pop-in 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transform-origin: top right; // 오른쪽 위를 기준으로 애니메이션이 발생
+    transition: width 0.3s ease-in-out, height 0.3s ease-in-out;
+
+    display: flex;
+    flex-direction: column;
+
+    &[data-view="addNodes"] {
+        min-width: 400px;
+        width: 400px;
+        max-width: 400px;
+        height: 796px;
+        max-height: 85vh;
+
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+        border-color: #abb1ba;
+    }
+
+    // WorkflowPanel 뷰일 때 크기 확장
+    &[data-view="workflow"] {
+        min-width: 400px; // 확장 시 최소 너비
+        width: auto; // 동적 너비
+        max-width: 600px; // 최대 너비 제한
+        height: 85vh;
+        max-height: 700px;
+    }
+
+    // TemplatePanel 뷰일 때 크기 확장
+    &[data-view="template"] {
+        min-width: 400px; // WorkflowPanel과 동일한 최소 너비
+        width: auto; // 동적 너비
+        max-width: 600px; // 최대 너비 제한
+        height: 85vh;
+        max-height: 700px;
+    }
+}
+
+.addNodeInner {
+    width: 100%;
+    height: 100%;
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 16px;
+    box-sizing: border-box;
+}
+
+.addNodeBody {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.tabsAndList {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+// --- 패널 공통 헤더 ---
+.header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+    flex-shrink: 0;
+    background: #ffffff;
+}
+
+.headerText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    h3 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 32px;
+        color: #40444d;
+        font-family: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        word-wrap: break-word;
+    }
+}
+
+.headerSubtitle {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    color: #7a7f89;
+    font-family: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    word-wrap: break-word;
+}
+
+.backButton {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: rgba(59, 130, 246, 0.08);
+        color: #3b82f6;
+        transform: translateX(-1px);
+    }
+}
+
+.refreshButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    border-radius: 8px;
+    margin-left: auto;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: rgba(48, 94, 235, 0.06);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    &.loading {
+        animation: spin 1s linear infinite;
+    }
+}
+
+.refreshIcon {
+    width: 24px;
+    height: 24px;
+    display: block;
+    color: #40444d;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// --- 메인 메뉴 스타일 ---
+.mainMenu {
+    padding: 12px 8px; // 좌우 패딩을 줄임 (16px → 8px)
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.menuItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 24px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    text-align: left;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: #7a7f89;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+
+    span {
+        font-family: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        word-wrap: break-word;
+    }
+
+    &:hover {
+        background-color: #f0f3fd;
+        color: #305eeb;
+    }
+}
+
+// --- AddNodePanel 스타일 ---
+.searchBar {
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.clearSearchButton {
+    position: absolute;
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+}
+
+.noResults {
+    padding: 12px 8px;
+    color: #7a7f89;
+    font-size: 12px;
+    line-height: 16px;
+    text-align: center;
+}
+
+.tabs {
+    display: flex;
+    gap: 4px;
+    padding: 0;
+    flex-shrink: 0;
+    overflow-x: auto;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    min-width: 64px;
+    height: 36px;
+    padding: 0 12px;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 20px;
+    color: #abb1ba;
+    flex-shrink: 0;
+    border-radius: 8px;
+    border: 1px solid #d0d5dd;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.16s ease;
+
+    svg {
+        font-size: 1rem;
+    }
+
+    span {
+        font-family: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        word-wrap: break-word;
+    }
+
+    &.active {
+        color: #305eeb;
+        border-color: transparent;
+        background-color: #e6ebfc;
+        box-shadow: 0 0 0 1px #c5d2ff;
+    }
+}
+
+.nodeList {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #cccccc transparent;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #d1d1d1;
+        border-radius: 10px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: #a8a8a8;
+    }
+}

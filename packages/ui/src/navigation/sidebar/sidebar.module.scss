@@ -1,0 +1,775 @@
+// ─────────────────────────────────────────────────────────────
+// @xgen/ui Sidebar - Design tokens
+// 디자인 시스템에서 가져온 공통 토큰
+// ─────────────────────────────────────────────────────────────
+
+$figma-gray-50: #f8f9fb;
+$figma-gray-100: #f1f3f5;
+$figma-gray-200: #e9ecef;
+$figma-gray-500: #7a7f89;
+$figma-gray-800: #1d1f23;
+$figma-primary-start: #305eeb;
+$figma-primary-end: #783ced;
+$figma-border: rgba(0, 0, 0, 0.08);
+$figma-shadow-btn: 0px 1px 2px 0px rgba(77, 64, 85, 0.1);
+$figma-font-size: 14px;
+$figma-line-height: 20px;
+$white: #ffffff;
+
+$sidebar-width: 250px;
+$sidebar-collapsed-width: 72px;
+$sidebar-section-padding-y: 10px;
+$sidebar-section-list-padding-y: 8px;
+
+// ─────────────────────────────────────────────────────────────
+// Sidebar Container
+// ─────────────────────────────────────────────────────────────
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: $sidebar-width;
+  height: 100vh;
+  background: $figma-gray-50;
+  border-right: 1px solid $figma-border;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  z-index: 100;
+  overflow: visible;
+  transition: width 0.25s ease-out;
+
+  // Collapsed state
+  &.collapsed {
+    width: $sidebar-collapsed-width;
+    overflow: visible;
+
+    .sidebarHeader {
+      padding: 18px 0;
+      justify-content: center;
+    }
+
+    .headerTop {
+      justify-content: center;
+    }
+
+    .headerModeLabel,
+    .headerAdminButton {
+      display: none;
+    }
+
+    .logoButton {
+      margin: 0;
+      padding: 5px;
+    }
+
+    .sidebarSectionList {
+      padding: $sidebar-section-list-padding-y 0;
+    }
+
+    .sectionToggle {
+      margin: 0 auto;
+      width: 40px;
+      min-width: 40px;
+      padding: $sidebar-section-padding-y;
+      justify-content: center;
+    }
+
+    .toggleTitle,
+    .toggleIcon {
+      display: none;
+    }
+
+    .sectionNav {
+      display: none;
+    }
+
+    .supportButton span:not(.supportChevron),
+    .supportChevron {
+      display: none;
+    }
+
+    .supportButton {
+      justify-content: center;
+      padding: 18px 0;
+    }
+
+    .supportNav {
+      display: none;
+    }
+
+    .userName,
+    .footerLogoutButton {
+      display: none;
+    }
+
+    .footerUserRow {
+      justify-content: center;
+    }
+
+    .userProfileRow {
+      justify-content: center;
+      padding: 18px 0;
+    }
+
+    .collapseToggleBtn {
+      right: 0;
+      transform: translate(50%, -50%);
+    }
+  }
+
+  // Variant styles
+  &.variantAdmin {
+    background: $figma-gray-800;
+
+    .logoText {
+      color: $white;
+    }
+
+    .headerModeLabel {
+      color: rgba($white, 0.6);
+    }
+
+    .sectionToggle {
+      color: $white;
+    }
+
+    .toggleTitle {
+      color: $white;
+    }
+
+    .navItem {
+      color: rgba($white, 0.8);
+
+      &:hover {
+        background-color: rgba($white, 0.1);
+      }
+
+      &.active {
+        background-color: rgba($white, 0.2);
+        color: $white;
+      }
+    }
+  }
+}
+
+.sidebarContent {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebarSectionList {
+  padding: $sidebar-section-list-padding-y 0;
+  flex: 1;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Collapse Toggle Button
+// ─────────────────────────────────────────────────────────────
+
+.collapseToggleBtn {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translate(50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 100px;
+  background: $white;
+  border: none;
+  box-shadow: $figma-shadow-btn;
+  cursor: pointer;
+  z-index: 101;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+
+  &:hover {
+    background: $figma-gray-100;
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Header
+// ─────────────────────────────────────────────────────────────
+
+.sidebarHeader {
+  padding: 18px 22px;
+  border-bottom: 1px solid $figma-border;
+  background: inherit;
+  flex-shrink: 0;
+  min-width: 0;
+  overflow: hidden;
+
+  .headerTop {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .logoButton {
+    background: none;
+    border: none;
+    color: $figma-gray-800;
+    cursor: pointer;
+    padding: 0;
+    min-width: 0;
+    flex-shrink: 0;
+    text-align: left;
+    transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  .logoText {
+    font-family: 'Pretendard', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: $figma-gray-800;
+  }
+
+  .headerModeLabel {
+    font-family: 'Pretendard', sans-serif;
+    font-size: $figma-font-size;
+    font-weight: 700;
+    line-height: $figma-line-height;
+    color: $figma-gray-500;
+    margin: 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .headerAdminButton {
+    margin-left: auto;
+    padding: 6px;
+    border: 1px solid $figma-border;
+    border-radius: 6px;
+    background: $white;
+    color: $figma-gray-800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+      background-color: $figma-gray-100;
+      border-color: $figma-gray-500;
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Section Toggle Button (accordion header)
+// ─────────────────────────────────────────────────────────────
+
+.sectionToggle {
+  width: 100%;
+  padding: $sidebar-section-padding-y 10px;
+  background: transparent;
+  border: none;
+  color: $figma-gray-800;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Pretendard', sans-serif;
+  font-size: $figma-font-size;
+  font-weight: 400;
+  line-height: $figma-line-height;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  border-radius: 8px;
+  margin: 0 16px;
+  width: calc(100% - 32px);
+  box-sizing: border-box;
+
+  &:hover {
+    background-color: $figma-gray-100;
+  }
+
+  span {
+    pointer-events: none;
+  }
+
+  &.active {
+    background: linear-gradient(to right, rgba(48, 94, 235, 0.05), rgba(120, 60, 237, 0.05));
+
+    .toggleSectionIcon svg path {
+      fill: url(#sidebarActiveGradient);
+    }
+
+    .toggleTitle {
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      background-image: linear-gradient(90deg, $figma-primary-start 1.64%, $figma-primary-end 100%);
+    }
+  }
+}
+
+.toggleSectionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: inherit;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.toggleTitle {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  pointer-events: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 400;
+  display: block;
+}
+
+// First section title bold
+.sidebarSectionList .sectionToggle:first-of-type .toggleTitle {
+  font-weight: 700;
+}
+
+.toggleIcon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: $figma-gray-800;
+  transition: transform 0.25s ease;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  &.expanded {
+    transform: rotate(180deg);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Navigation (expanded submenu)
+// ─────────────────────────────────────────────────────────────
+
+.sectionNav {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  transition: grid-template-rows 0.25s ease-out;
+  margin: 0 16px;
+  width: calc(100% - 32px);
+  box-sizing: border-box;
+
+  &.expanded {
+    grid-template-rows: 1fr;
+    background: $white;
+    border-radius: 8px;
+    margin-bottom: $sidebar-section-padding-y;
+    padding: 0;
+    border: 1px solid $figma-border;
+
+    .sectionNavInner {
+      visibility: visible;
+    }
+  }
+
+  &:not(.expanded) .sectionNavInner {
+    visibility: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+.sectionNavInner {
+  min-height: 0;
+  overflow: hidden;
+  padding: 8px 0;
+  transition: padding 0.2s ease-out;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Nav Items (submenu items)
+// ─────────────────────────────────────────────────────────────
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  color: $figma-gray-800;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: 'Pretendard', sans-serif;
+  font-size: $figma-font-size;
+  line-height: $figma-line-height;
+  box-sizing: border-box;
+
+  &:hover {
+    background-color: $figma-gray-100;
+  }
+
+  &.active {
+    background-color: $figma-gray-200;
+    color: $figma-primary-start;
+  }
+
+  &.navItemNoIcon .navText {
+    padding-left: 0;
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  .navText {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+
+    .navTitle {
+      font-weight: 400;
+      font-size: $figma-font-size;
+      margin: 0;
+      color: inherit;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Footer
+// ─────────────────────────────────────────────────────────────
+
+.sidebarFooter {
+  background: inherit;
+  flex-shrink: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sidebarFooterDivider {
+  border: none;
+  border-top: 1px solid $figma-border;
+  margin: 0;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+// Support section
+.supportNav {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  transition: grid-template-rows 0.25s ease-out;
+  margin: 0 16px;
+  width: calc(100% - 32px);
+  box-sizing: border-box;
+
+  &.supportNavExpanded {
+    grid-template-rows: 1fr;
+    margin-bottom: 4px;
+    background: $white;
+    border-radius: 8px;
+    border: 1px solid $figma-border;
+
+    .supportNavInner {
+      visibility: visible;
+    }
+  }
+
+  &:not(.supportNavExpanded) .supportNavInner {
+    visibility: hidden;
+  }
+}
+
+.supportNavInner {
+  min-height: 0;
+  overflow: hidden;
+  padding: 4px 0 8px;
+}
+
+.supportNavItem {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  color: $figma-gray-800;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: 'Pretendard', sans-serif;
+  font-size: $figma-font-size;
+  line-height: $figma-line-height;
+  box-sizing: border-box;
+
+  &:hover {
+    background-color: $figma-gray-100;
+  }
+
+  &.active {
+    background-color: $figma-gray-200;
+    color: $figma-primary-start;
+  }
+}
+
+.supportNavTitle {
+  font-weight: 400;
+  color: inherit;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.supportButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 26px;
+  background: none;
+  border: none;
+  color: $figma-gray-800;
+  cursor: pointer;
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+  border-radius: 8px;
+  font-family: 'Pretendard', sans-serif;
+  font-size: $figma-font-size;
+  font-weight: 400;
+  line-height: $figma-line-height;
+  transition: background-color 0.2s ease;
+
+  .supportButtonLabel {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+
+  &:hover {
+    background-color: $figma-gray-100;
+  }
+
+  &.supportButtonActive {
+    background: linear-gradient(to right, rgba(48, 94, 235, 0.05), rgba(120, 60, 237, 0.05));
+
+    > svg path,
+    > svg circle {
+      stroke: url(#sidebarActiveGradient);
+    }
+
+    .supportButtonLabel {
+      color: transparent;
+      background: linear-gradient(90deg, $figma-primary-start 1.64%, $figma-primary-end 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  .supportChevron {
+    margin-left: auto;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: $figma-gray-800;
+    transition: transform 0.25s ease;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    &.supportChevronExpanded {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+// User profile row
+.footerUserRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.userProfileRow {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 26px;
+  min-height: 50px;
+  box-sizing: border-box;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+
+  &:hover {
+    background-color: $figma-gray-100;
+  }
+}
+
+.footerLogoutButton {
+  flex-shrink: 0;
+  margin-right: 16px;
+  padding: 8px;
+  border: 1px solid $figma-border;
+  border-radius: 6px;
+  background: $white;
+  color: $figma-gray-800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    background-color: $figma-gray-100;
+    border-color: $figma-gray-500;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $figma-primary-start, $figma-primary-end);
+  color: $white;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.userName {
+  font-size: $figma-font-size;
+  font-weight: 600;
+  color: $figma-gray-800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.userRole {
+  font-size: 12px;
+  color: $figma-gray-500;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Popover (for collapsed sidebar)
+// ─────────────────────────────────────────────────────────────
+
+.sidebarPopover {
+  position: fixed;
+  background: $white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid $figma-border;
+  z-index: 1000;
+  padding: 8px 0;
+  min-width: 180px;
+}
+
+.sidebarPopoverItem {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-family: 'Pretendard', sans-serif;
+  font-size: $figma-font-size;
+  line-height: $figma-line-height;
+  color: $figma-gray-800;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: $figma-gray-100;
+  }
+
+  &.active {
+    background-color: $figma-gray-200;
+    color: $figma-primary-start;
+  }
+}

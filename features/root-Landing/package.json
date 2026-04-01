@@ -1,0 +1,11 @@
+{
+  "name": "@xgen/feature-root-Landing",
+  "version": "0.0.0",
+  "private": true,
+  "main": "src/index.tsx",
+  "types": "src/index.tsx",
+  "dependencies": {
+    "@xgen/types": "workspace:*",
+    "react": "^19.0.0"
+  }
+}

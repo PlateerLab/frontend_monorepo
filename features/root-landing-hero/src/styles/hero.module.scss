@@ -1,0 +1,292 @@
+@use "./variables" as *;
+
+.heroSection {
+    width: 90vw;
+    max-width: 1400px;
+    margin: 6rem auto 2rem;
+    padding: 4rem 2rem;
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 28px;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.06),
+        0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+
+    @media (min-width: 640px) {
+        width: 88vw;
+        padding: 4rem 3rem;
+    }
+
+    @media (min-width: 1024px) {
+        width: 85vw;
+        padding: 5rem 4rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        text-align: left;
+        margin: 7rem auto 3rem;
+    }
+
+    @media (min-width: 1440px) {
+        width: 80vw;
+        padding: 5rem 4rem;
+    }
+}
+
+.heroContent {
+    @media (max-width: 1023px) { text-align: center; }
+}
+
+.heroLabel {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+
+    span {
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(124, 58, 237, 0.06));
+        border: 1px solid rgba(37, 99, 235, 0.15);
+        border-radius: 50px;
+        padding: 0.5rem 1.25rem;
+        color: $primary-blue;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+}
+
+.heroTitle {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1.15;
+    color: $gray-900;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.025em;
+
+    @media (min-width: 640px) { font-size: 2.75rem; }
+    @media (min-width: 1024px) { font-size: 3.25rem; }
+}
+
+.titleHighlight {
+    display: block;
+    font-style: normal;
+}
+
+.titleGradient {
+    display: block;
+    background: linear-gradient(135deg, $primary-blue, $primary-purple);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-top: 0.25rem;
+    font-weight: 700;
+}
+
+.heroDescription {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: $gray-600;
+    margin-bottom: 2rem;
+    max-width: 560px;
+
+    img {
+        display: inline;
+        vertical-align: baseline;
+        margin-right: -0.35rem;
+        transform: translateY(0.8px);
+    }
+
+    @media (min-width: 1024px) { margin-bottom: 2.5rem; }
+}
+
+.heroStats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    @media (min-width: 1024px) { justify-content: flex-start; }
+}
+
+.statItem {
+    text-align: center;
+    padding: 1rem 1.25rem;
+    background: $white;
+    border-radius: 14px;
+    border: 1px solid $gray-100;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    transition: all 0.25s ease;
+    min-width: 120px;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    strong {
+        display: block;
+        font-size: 1.375rem;
+        font-weight: 800;
+        color: $gray-900;
+        margin-bottom: 0.25rem;
+    }
+
+    span {
+        font-size: 0.8125rem;
+        color: $gray-500;
+        font-weight: 500;
+    }
+}
+
+.heroActions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    @media (min-width: 1024px) { justify-content: flex-start; }
+}
+
+.primaryBtn {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(135deg, $primary-blue, $primary-purple);
+    color: $white;
+    padding: 0.875rem 2rem;
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    border-radius: 12px;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+
+    &:hover {
+        background: linear-gradient(135deg, #1d4ed8, #6d28d9);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px rgba(37, 99, 235, 0.35);
+    }
+
+    svg { margin-right: 0.625rem; width: 1.125rem; height: 1.125rem; }
+}
+
+.heroVisual {
+    display: none;
+
+    @media (min-width: 1024px) { display: block; position: relative; }
+}
+
+.heroImage { position: relative; perspective: 1000px; }
+
+.mockupScreen {
+    background: $white;
+    border: 1px solid $gray-200;
+    border-radius: 16px;
+    overflow: hidden;
+    transform: rotateY(-5deg) rotateX(2deg);
+    box-shadow:
+        0 25px 50px rgba(0, 0, 0, 0.12),
+        0 0 0 1px rgba(255, 255, 255, 0.2);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover { transform: rotateY(-2deg) rotateX(1deg) scale(1.02); }
+}
+
+.mockupHeader {
+    padding: 0.875rem 1.25rem;
+    background: $gray-50;
+    border-bottom: 1px solid $gray-100;
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+
+    span { color: $gray-700; font-size: 0.8125rem; font-weight: 600; }
+}
+
+.mockupDots {
+    display: flex;
+    gap: 0.375rem;
+
+    span {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+
+        &:nth-child(1) { background: #ff5f57; }
+        &:nth-child(2) { background: #ffbd2e; }
+        &:nth-child(3) { background: #28ca42; }
+    }
+}
+
+.mockupContent {
+    padding: 2rem;
+    min-height: 200px;
+    background: $gray-50;
+}
+
+.mockupNodes {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.mockupNode {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.25rem 1rem;
+    border-radius: 14px;
+    border: 1px solid $gray-200;
+    background: $white;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+    svg { width: 24px; height: 24px; }
+    span { font-size: 0.6875rem; font-weight: 600; color: $gray-600; letter-spacing: 0.025em; }
+
+    &.input {
+        border-color: rgba(37, 99, 235, 0.2);
+        color: $primary-blue;
+        &:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12); }
+    }
+
+    &.ai {
+        border-color: rgba(124, 58, 237, 0.2);
+        color: $primary-purple;
+        &:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(124, 58, 237, 0.12); }
+    }
+
+    &.output {
+        border-color: rgba(5, 150, 105, 0.2);
+        color: $primary-green;
+        &:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(5, 150, 105, 0.12); }
+    }
+}
+
+.mockupFlow {
+    width: 36px;
+    height: 2px;
+    background: linear-gradient(90deg, $gray-200, $gray-300, $gray-200);
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        right: -3px;
+        top: -2px;
+        width: 0;
+        height: 0;
+        border-left: 5px solid $gray-300;
+        border-top: 3px solid transparent;
+        border-bottom: 3px solid transparent;
+    }
+}

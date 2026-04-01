@@ -503,6 +503,7 @@ function AdminPage() {
 ## 7. 네이밍 규칙
 
 ### 파일명: kebab-case만
+### 계층적 구조는 이어붙일 수 있음 예(main-workflow-management-scheduler)
 
 ```
 ⭕ content-area.tsx

@@ -1,0 +1,67 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+
+  /* ─── Design System Color Tokens (Figma XGEN-BO-Design) ─── */
+
+  /* Gray */
+  --color-gray-100: #f2f4f7;
+  --color-gray-200: #e4e7ec;
+  --color-gray-300: #d0d5dd;
+  --color-gray-400: #abb1ba;
+  --color-gray-500: #7a7f89;
+  --color-gray-600: #40444d;
+  --color-gray-700: #282b31;
+  --color-gray-800: #1d1f23;
+  --color-gray-900: #17181c;
+
+  /* White */
+  --color-white-200: rgba(255, 255, 255, 0.60);
+
+  /* Secondary (Blue) */
+  --color-secondary-200: #305eeb;
+
+  /* Success */
+  --color-success-50:  #a6d3a6;
+  --color-success-100: #59ac59;
+
+  /* Background / Line */
+  --color-bg-50: #f7f8fa;
+  --line-50: rgba(0, 0, 0, 0.08);
+
+  /* Radius */
+  --radius-1: 8px;
+
+  /* Shadow */
+  --shadow-basic-50: 0 2px 8px 0 rgba(0, 0, 0, 0.16);
+
+  /* Typography */
+  --font-base: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-base, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── Typography Utility Classes (Figma publish/component/typography) ─── */
+.typo-subtitle3 {
+  font-family: var(--font-base);
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0;
+  color: #121212;
+  margin: 0;
+}
+
+.typo-colorGray600 {
+  color: var(--color-gray-600);
+}

@@ -1,0 +1,584 @@
+@use "sass:color";
+
+// ============================================================================
+// Canvas Document Drop Modal
+// 캔버스에 문서 파일을 드롭했을 때 표시되는 컬렉션 선택/생성 + 업로드 위저드 모달
+// ============================================================================
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 1rem;
+    animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+    width: 100%;
+    max-width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+// ─── Header ─────────────────────────────────────────────────────────────────
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 0;
+    flex-shrink: 0;
+}
+
+.title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 28px;
+    color: #1d1f23;
+    font-family: 'Pretendard', sans-serif;
+}
+
+.closeButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #7a7f89;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.15s, color 0.15s;
+
+    &:hover {
+        background: #f2f4f7;
+        color: #40444d;
+    }
+}
+
+// ─── File Info ───────────────────────────────────────────────────────────────
+
+.fileInfo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 16px 24px 0;
+    padding: 10px 14px;
+    background: #f8f9fb;
+    border: 1px solid #e8ebf0;
+    border-radius: 8px;
+}
+
+.fileIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #305eeb 0%, #783ced 100%);
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.fileDetails {
+    flex: 1;
+    min-width: 0;
+}
+
+.fileName {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 18px;
+    color: #1d1f23;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fileSize {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    color: #7a7f89;
+    margin-top: 2px;
+}
+
+// ─── Body ────────────────────────────────────────────────────────────────────
+
+.body {
+    padding: 16px 24px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+// ─── Step Indicator ──────────────────────────────────────────────────────────
+
+.stepIndicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.stepDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d0d5dd;
+    transition: background-color 0.2s;
+
+    &.active {
+        background: #305eeb;
+    }
+
+    &.completed {
+        background: #12b76a;
+    }
+}
+
+.stepLabel {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 18px;
+    color: #7a7f89;
+    margin-left: 4px;
+}
+
+// ─── Step 1: Collection Select ───────────────────────────────────────────────
+
+.sectionLabel {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 18px;
+    color: #40444d;
+    margin-bottom: 8px;
+}
+
+.searchInput {
+    width: 100%;
+    height: 36px;
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 20px;
+    color: #40444d;
+    font-family: 'Pretendard', sans-serif;
+    background: #ffffff;
+    border: 1px solid #e8ebf0;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+    margin-bottom: 8px;
+
+    &:focus {
+        outline: none;
+        border-color: #305eeb;
+    }
+
+    &::placeholder {
+        color: #abb1ba;
+    }
+}
+
+.collectionList {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e8ebf0;
+    border-radius: 8px;
+    margin-bottom: 12px;
+
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: #d0d5dd;
+        border-radius: 2px;
+    }
+}
+
+.collectionItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid #f2f4f7;
+    transition: background-color 0.1s;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover {
+        background: #f8f9fb;
+    }
+
+    &.selected {
+        background: rgba(48, 94, 235, 0.06);
+    }
+}
+
+.collectionName {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 18px;
+    color: #1d1f23;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.collectionMeta {
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 16px;
+    color: #abb1ba;
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
+.radioIndicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #d0d5dd;
+    flex-shrink: 0;
+    margin-right: 10px;
+    transition: border-color 0.15s;
+    position: relative;
+
+    &.checked {
+        border-color: #305eeb;
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #305eeb;
+        }
+    }
+}
+
+.emptyList {
+    padding: 24px 14px;
+    text-align: center;
+    font-size: 13px;
+    color: #7a7f89;
+    line-height: 20px;
+}
+
+.listLoading {
+    padding: 24px 14px;
+    text-align: center;
+    font-size: 13px;
+    color: #7a7f89;
+}
+
+// ─── Divider ─────────────────────────────────────────────────────────────────
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0 12px;
+}
+
+.dividerLine {
+    flex: 1;
+    height: 1px;
+    background: #e8ebf0;
+}
+
+.dividerText {
+    font-size: 12px;
+    font-weight: 500;
+    color: #abb1ba;
+    white-space: nowrap;
+}
+
+// ─── Create Collection Form ──────────────────────────────────────────────────
+
+.createForm {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.createInput {
+    flex: 1;
+    height: 36px;
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 20px;
+    color: #40444d;
+    font-family: 'Pretendard', sans-serif;
+    background: #ffffff;
+    border: 1px solid #e8ebf0;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+
+    &:focus {
+        outline: none;
+        border-color: #305eeb;
+    }
+
+    &::placeholder {
+        color: #abb1ba;
+    }
+
+    &:disabled {
+        background: #f2f4f7;
+        cursor: not-allowed;
+    }
+}
+
+.createButton {
+    height: 36px;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Pretendard', sans-serif;
+    border-radius: 8px;
+    border: 1px solid #305eeb;
+    background: #305eeb;
+    color: #ffffff;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: filter 0.15s;
+
+    &:hover:not(:disabled) {
+        filter: brightness(0.92);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+// ─── Step 2: Upload Progress ─────────────────────────────────────────────────
+
+.uploadSection {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.uploadTarget {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #40444d;
+    line-height: 18px;
+}
+
+.uploadTargetLabel {
+    font-weight: 400;
+    color: #7a7f89;
+}
+
+.uploadTargetName {
+    font-weight: 600;
+    color: #305eeb;
+}
+
+.progressContainer {
+    width: 100%;
+}
+
+.progressBar {
+    width: 100%;
+    height: 6px;
+    background: #e8ebf0;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, #305eeb 0%, #783ced 100%);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.progressText {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 16px;
+    color: #7a7f89;
+}
+
+.progressPhase {
+    font-weight: 400;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.progressPercent {
+    font-weight: 600;
+    color: #305eeb;
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
+// ─── Step 3: Complete ────────────────────────────────────────────────────────
+
+.completeSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    gap: 12px;
+}
+
+.completeIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(18, 183, 106, 0.1);
+    color: #12b76a;
+}
+
+.completeText {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 22px;
+    color: #1d1f23;
+    text-align: center;
+}
+
+// ─── Error ───────────────────────────────────────────────────────────────────
+
+.errorMessage {
+    margin-top: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 18px;
+    color: #f04438;
+    background: rgba(240, 68, 56, 0.06);
+    border: 1px solid rgba(240, 68, 56, 0.15);
+    border-radius: 6px;
+}
+
+// ─── Footer ──────────────────────────────────────────────────────────────────
+
+.footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 24px 20px;
+    flex-shrink: 0;
+}
+
+.footerButton {
+    height: 40px;
+    padding: 0 20px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Pretendard', sans-serif;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s, border-color 0.15s, filter 0.15s;
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    &.cancel {
+        background: #ffffff;
+        border: 1px solid #d0d5dd;
+        color: #40444d;
+
+        &:hover:not(:disabled) {
+            background: #f8f9fb;
+        }
+    }
+
+    &.primary {
+        background: linear-gradient(90deg, #305eeb 0%, #783ced 100%);
+        border: none;
+        color: #ffffff;
+
+        &:hover:not(:disabled) {
+            filter: brightness(0.95);
+        }
+    }
+}
+
+// ─── Loading Spinner ─────────────────────────────────────────────────────────
+
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-right: 6px;
+}
+
+.spinnerDark {
+    border: 2px solid rgba(48, 94, 235, 0.2);
+    border-top-color: #305eeb;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

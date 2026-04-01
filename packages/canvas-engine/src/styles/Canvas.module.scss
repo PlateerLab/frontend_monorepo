@@ -1,0 +1,42 @@
+// Canvas container styles
+// Note: CSS variables used here should be defined at the app level or via a theme provider
+
+$canvas-background: #f8f9fa !default;
+
+.canvasContainer {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: $canvas-background;
+    background-image: radial-gradient(rgba(0, 0, 0, 0.16) 0.9px, transparent 0.9px);
+    background-size: 20px 20px;
+    background-position: 0 0;
+    position: relative;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.canvasGrid {
+    width: 5000vw;
+    height: 5000vh;
+    position: relative;
+    transform-origin: 0 0;
+    user-select: none;
+    -webkit-user-select: none;
+
+    background: transparent;
+}
+
+.svgLayer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 10;
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@xgen/feature-canvas-sidebar-nodes",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.tsx",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "dependencies": {
+    "@xgen/types": "workspace:*",
+    "@xgen/i18n": "workspace:*",
+    "@xgen/icons": "workspace:*",
+    "react": "^19.0.0",
+    "react-icons": "^5.4.0"
+  }
+}

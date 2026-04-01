@@ -1,0 +1,488 @@
+// Figma 224-17149 기준: 높이·패딩·간격 정리
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 66px;
+    padding-left: 24px;
+    padding-right: 24px;
+    min-height: 66px;
+    max-height: 66px;
+    background-color: #ffffff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    transition: left 0.25s ease-out, width 0.25s ease-out;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.leftSection {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+    flex: 1 1 0;
+
+    button {
+        background: none;
+        border: none;
+        padding: 8px;
+        margin: 0;
+        transition: background-color 0.2s ease;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #f0f0f0;
+        }
+    }
+}
+
+.workflowNameSection {
+    min-width: 120px;
+    max-width: 360px;
+}
+
+.displayMode {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    height: 28px;
+    padding: 0 8px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+    min-width: 120px;
+    box-sizing: border-box;
+
+    &:hover {
+        background-color: #f8f9fa;
+    }
+}
+
+.workflowName {
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #495057;
+    cursor: pointer;
+    flex-grow: 1;
+    text-align: left;
+    min-width: 0;
+}
+
+.editMode {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 28px;
+    box-sizing: border-box;
+}
+
+.workflowInput {
+    height: 28px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #495057;
+    border: 1px solid #3b82f6;
+    border-radius: 6px;
+    padding: 0 8px;
+    background-color: #ffffff;
+    outline: none;
+    min-width: 120px;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    box-sizing: border-box;
+
+    &:focus {
+        border-color: #2563eb;
+    }
+}
+
+.editButton {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    flex-shrink: 0;
+    font-size: 1.25rem; // 아이콘 20px
+    transition: background-color 0.2s ease;
+
+    svg {
+        width: 1em;
+        height: 1em;
+        flex-shrink: 0;
+    }
+
+    &:hover {
+        background-color: #e9ecef;
+    }
+
+    // 연필(편집) 아이콘만 작게 — 24×24 버튼에 16px 아이콘, grey 500
+    &.editButtonPencil {
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        min-height: 24px;
+        font-size: 1rem; // 16px
+        color: #6b7280; // grey 500
+    }
+}
+
+.sharedIndicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: #6c757d;
+    padding: 4px;
+    border-radius: 4px;
+    min-width: 24px;
+    min-height: 24px;
+    flex-shrink: 0;
+    cursor: help;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: #e9ecef;
+        color: #495057;
+        transform: scale(1.1);
+    }
+}
+
+.saveButton {
+    color: #28a745;
+
+    &:hover {
+        background-color: #d4edda;
+    }
+}
+
+.cancelButton {
+    color: #dc3545;
+
+    &:hover {
+        background-color: #f8d7da;
+    }
+}
+
+.nav {
+    ul {
+        display: flex;
+        align-items: center;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        gap: 8px; // 메뉴 사이 간격
+    }
+
+    li button {
+        background: none;
+        border: none;
+        padding: 8px 16px;
+        font-size: 0.95rem; // 15px
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+            background-color: #f1f3f5;
+        }
+    }
+}
+
+.centerSection {
+    display: flex;
+    align-items: center;
+}
+
+.editRunGroup {
+    display: flex;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    background: #f5f5f5;
+}
+
+.editRunButton {
+    padding: 6px 14px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    color: #495057;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    &:hover {
+        background: #eee;
+    }
+    &.active {
+        background: #fff;
+        color: #212529;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+}
+
+.runIcon {
+    width: 14px;
+    height: 14px;
+}
+
+.rightSection {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.dropdownWrap {
+    position: relative;
+}
+
+// 새 워크플로우 — 파란 배경 (primary), 버튼 높이 28px
+.newWorkflowDropdownTrigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 28px;
+    padding: 0 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+    background: #2563eb;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    box-sizing: border-box;
+
+    &:hover {
+        background: #1d4ed8;
+    }
+}
+
+.chevron {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    opacity: 0.9;
+}
+
+.newWorkflowDropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    min-width: 180px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+
+    button {
+        display: block;
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 0.875rem;
+        text-align: left;
+        border: none;
+        background: none;
+        cursor: pointer;
+        color: #495057;
+
+        &:hover {
+            background: #f8f9fa;
+        }
+        &:not(:last-child) {
+            border-bottom: 1px solid #f0f0f0;
+        }
+    }
+}
+
+// 저장·복사 — 흰 배경 + 회색 텍스트/보더, 버튼 높이 28px
+.textButton {
+    height: 28px;
+    padding: 0 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #40444d;
+    background: #fff;
+    border: 1px solid #40444d;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+        background: #f8f9fa;
+    }
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+// 배포하기 — 흰 배경 + 파란 텍스트/보더, 버튼 높이 28px
+.deploySettingsButton {
+    height: 28px;
+    padding: 0 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #2563eb;
+    background: #fff;
+    border: 1px solid #2563eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover:not(:disabled) {
+        background: #eff6ff;
+    }
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.deployButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #059669;
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: #047857;
+        transform: translateY(-1px);
+    }
+    &:disabled {
+        background-color: #cccccc;
+        color: #666666;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+}
+
+.deployTestButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #847deb;
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: #4c59cf;
+        transform: translateY(-1px);
+    }
+    &:disabled {
+        background-color: #cccccc;
+        color: #666666;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+}
+
+// 아이콘 버튼(노드 추가, 자동 워크플로우) — 28px 터치 영역
+.menuButton {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    padding: 0;
+    background: none;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    box-sizing: border-box;
+
+    &:hover {
+        background-color: #f0f0f0;
+    }
+
+    &.active {
+        background-color: #e1eaf7;
+    }
+}
+
+.autoWorkflowButton {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    
+    &:hover {
+        background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+.historyBadge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 1px 4px;
+    border-radius: 8px;
+    min-width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: none;
+}

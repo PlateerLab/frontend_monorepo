@@ -1,0 +1,44 @@
+.edgeGroup {
+    pointer-events: auto;
+
+    &:hover .edgePath,
+    &.selected .edgePath {
+        stroke: #8b5cf6;
+        stroke-width: 4;
+        filter: drop-shadow(0 0 4px rgba(167, 139, 250, 0.5));
+    }
+
+    &.preview .edgePath {
+        stroke: #c4b5fd;
+        stroke-dasharray: 16, 12;
+        opacity: 0.8;
+    }
+}
+
+.edgePath {
+    stroke: #a78bfa;
+    stroke-width: 3.5;
+    fill: none;
+    transition: stroke 0.2s ease, stroke-width 0.2s ease, filter 0.2s ease;
+    pointer-events: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 2px rgba(167, 139, 250, 0.3));
+}
+
+.edgeHitbox {
+    fill: none;
+    stroke: transparent;
+    stroke-width: 24px;
+}
+
+.edgesContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 10;
+}
