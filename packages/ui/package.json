@@ -17,6 +17,8 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "sass": "^1.77.0"
   },
   "peerDependencies": {

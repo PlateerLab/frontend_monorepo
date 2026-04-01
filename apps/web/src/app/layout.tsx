@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import '@/app/globals.css';
 import { LanguageProvider } from '@xgen/i18n';
 import { AuthProvider } from '@xgen/auth-provider';
+import { ToastProvider } from '@xgen/ui';
 
 export const metadata: Metadata = {
     title: 'XGEN',
@@ -29,7 +30,9 @@ export default function RootLayout({
             <body suppressHydrationWarning>
                 <AuthProvider>
                     <LanguageProvider>
-                        {children}
+                        <ToastProvider position="bottom-right" offset={{ x: 60, y: 60 }}>
+                            {children}
+                        </ToastProvider>
                     </LanguageProvider>
                 </AuthProvider>
             </body>

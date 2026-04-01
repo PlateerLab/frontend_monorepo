@@ -1,0 +1,361 @@
+@use '../../styles/variables' as *;
+
+// ─────────────────────────────────────────────────────────────
+// Toast Container
+// ─────────────────────────────────────────────────────────────
+
+.toastContainer {
+  position: fixed;
+  z-index: $z-toast;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  pointer-events: none;
+  max-height: calc(100vh - 120px);
+  overflow: hidden;
+
+  // Position variants
+  &.topLeft {
+    top: 0;
+    left: 0;
+  }
+  &.topCenter {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  &.topRight {
+    top: 0;
+    right: 0;
+  }
+  &.bottomLeft {
+    bottom: 0;
+    left: 0;
+    flex-direction: column-reverse;
+  }
+  &.bottomCenter {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: column-reverse;
+  }
+  &.bottomRight {
+    bottom: 0;
+    right: 0;
+    flex-direction: column-reverse;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Toast Item
+// ─────────────────────────────────────────────────────────────
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-3;
+  min-width: 300px;
+  max-width: 480px;
+  padding: $spacing-3 $spacing-4;
+  border-radius: $radius-lg;
+  border: 2px solid transparent;
+  font-family: $font-family-base;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-base;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  box-shadow: $shadow-lg;
+  transition: opacity $transition-base, transform $transition-base;
+  animation: toastSlideIn 0.25s ease-out;
+
+  &.removing {
+    animation: toastSlideOut 0.2s ease-in forwards;
+  }
+}
+
+// ─── Type variants ───
+
+.success {
+  background: $bg-primary;
+  color: $gray-700;
+  border-color: $success;
+  box-shadow: 0 4px 12px rgba(46, 177, 70, 0.15);
+}
+
+.error {
+  background: rgba($error, 0.92);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+}
+
+.warning {
+  background: $warning;
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.info {
+  background: $bg-primary;
+  color: $gray-700;
+  border-color: $info;
+  box-shadow: 0 4px 12px rgba(48, 94, 235, 0.15);
+}
+
+.loading {
+  background: $gray-600;
+  color: #ffffff;
+  border-color: transparent;
+}
+
+// ─── Icon ───
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.iconSuccess {
+  color: $success;
+}
+.iconError {
+  color: #ffffff;
+}
+.iconWarning {
+  color: #ffffff;
+}
+.iconInfo {
+  color: $info;
+}
+.iconLoading {
+  color: #ffffff;
+}
+
+// ─── Content ───
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.message {
+  margin: 0;
+  white-space: pre-line;
+}
+
+// ─── Close button ───
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: 0;
+  margin-top: 1px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: opacity $transition-fast;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// ─── Loading spinner ───
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Confirm Toast
+// ─────────────────────────────────────────────────────────────
+
+.confirmToast {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  min-width: 320px;
+  max-width: 480px;
+  padding: $spacing-5;
+  border-radius: $radius-lg;
+  border: 2px solid $gray-700;
+  background: $gray-50;
+  color: $gray-700;
+  font-family: $font-family-base;
+  font-size: $font-size-sm;
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.15),
+    0 4px 10px rgba(0, 0, 0, 0.1);
+  animation: toastSlideIn 0.25s ease-out;
+
+  &.removing {
+    animation: toastSlideOut 0.2s ease-in forwards;
+  }
+}
+
+.confirmTitle {
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-base;
+  line-height: $line-height-tight;
+  margin: 0;
+
+  &.danger {
+    color: $error;
+  }
+  &.warning {
+    color: $warning;
+  }
+  &.info {
+    color: $info;
+  }
+}
+
+.confirmMessage {
+  font-size: $font-size-sm;
+  color: $gray-700;
+  line-height: $line-height-base;
+  margin: 0;
+  white-space: pre-line;
+}
+
+.keyboardHint {
+  font-size: $font-size-xs;
+  color: $gray-500;
+  font-style: italic;
+  margin: 0;
+}
+
+.confirmActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $spacing-2;
+  margin-top: $spacing-1;
+}
+
+.confirmButton {
+  padding: $spacing-2 $spacing-4;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  font-family: $font-family-base;
+  border-radius: $radius-md;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all $transition-fast;
+  box-shadow: $shadow-sm;
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+}
+
+.cancelButton {
+  composes: confirmButton;
+  background: $bg-primary;
+  color: $gray-700;
+  border-color: $gray-500;
+
+  &:hover {
+    background: $gray-100;
+  }
+}
+
+.confirmButtonDanger {
+  composes: confirmButton;
+  background: $error;
+  color: #ffffff;
+  border-color: darken($error, 8%);
+
+  &:hover {
+    background: darken($error, 6%);
+  }
+}
+
+.confirmButtonWarning {
+  composes: confirmButton;
+  background: $warning;
+  color: #ffffff;
+  border-color: darken($warning, 10%);
+
+  &:hover {
+    background: darken($warning, 6%);
+  }
+}
+
+.confirmButtonInfo {
+  composes: confirmButton;
+  background: $info;
+  color: #ffffff;
+  border-color: darken($info, 8%);
+
+  &:hover {
+    background: darken($info, 6%);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Animations
+// ─────────────────────────────────────────────────────────────
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

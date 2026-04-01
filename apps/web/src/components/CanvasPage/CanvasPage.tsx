@@ -6,6 +6,7 @@ import type { RouteComponentProps, MainFeatureModule, CanvasPagePlugin, CanvasPl
 import { FeatureRegistry } from '@xgen/types';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
+import { useToast } from '@xgen/ui';
 
 // Canvas packages
 import { Canvas } from '@xgen/canvas-engine';
@@ -102,6 +103,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
     const { t } = useTranslation();
     const searchParams = useSearchParams();
     const { user } = useAuth();
+    const { toast } = useToast();
 
     // ── Refs ──
     const canvasRef = useRef<CanvasRef>(null);
@@ -365,8 +367,16 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
     const handleSave = useCallback(async () => {
         if (isSaving || !canvasRef.current) return;
         setIsSaving(true);
+
+        const canvasState = canvasRef.current.getCanvasState();
+        if (!canvasState.nodes || canvasState.nodes.length === 0) {
+            toast.warning(t('canvas.toast.emptyWorkflow'));
+            setIsSaving(false);
+            return;
+        }
+
+        const loadingId = toast.loading(t('canvas.toast.saving'));
         try {
-            const canvasState = canvasRef.current.getCanvasState();
             const name = validateWorkflowName(workflowName);
             let currentId = workflowId;
             if (!currentId || currentId === 'None') {
@@ -374,21 +384,18 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                 setWorkflowId(currentId);
             }
 
-            if (!canvasState.nodes || canvasState.nodes.length === 0) {
-                console.warn('Cannot save empty workflow');
-                setIsSaving(false);
-                return;
-            }
-
             const content = { ...canvasState, workflow_id: currentId, workflow_name: name };
             await apiSaveWorkflow(name, content, currentId, workflowOriginUserId || undefined);
             setStoredState(STORAGE_KEYS.WORKFLOW_NAME, name);
+
+            toast.update(loadingId, 'success', t('canvas.toast.saveSuccess'));
         } catch (error) {
-            console.error('Failed to save workflow:', error);
+            const errMsg = error instanceof Error ? error.message : String(error);
+            toast.update(loadingId, 'error', `${t('canvas.toast.saveFailed')}: ${errMsg}`);
         } finally {
             setIsSaving(false);
         }
-    }, [isSaving, workflowId, workflowName, workflowOriginUserId]);
+    }, [isSaving, workflowId, workflowName, workflowOriginUserId, toast, t]);
 
     // ── Side panel toggle ──
     const handleSidePanelToggle = useCallback((panelId: string) => {
@@ -397,16 +404,25 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
 
     const handleNewWorkflow = useCallback(async () => {
         if (isCreatingNewWorkflow) return;
+
+        const hasCurrentWork = canvasRef.current &&
+            (canvasRef.current.getCanvasState().nodes.length > 0 || canvasRef.current.getCanvasState().edges.length > 0);
+
+        if (hasCurrentWork) {
+            const confirmed = await toast.confirm({
+                title: t('canvas.toast.newWorkflowTitle'),
+                message: t('canvas.toast.newWorkflowMessage'),
+                confirmText: t('canvas.toast.newWorkflowConfirm'),
+                cancelText: t('canvas.toast.cancel'),
+                variant: 'warning',
+                enableKeyboard: true,
+                keyboardHint: '💡 Enter키를 누르면 계속됩니다 | ESC로 취소',
+            });
+            if (!confirmed) return;
+        }
+
         setIsCreatingNewWorkflow(true);
-
         try {
-            const hasCurrentWork = canvasRef.current &&
-                (canvasRef.current.getCanvasState().nodes.length > 0 || canvasRef.current.getCanvasState().edges.length > 0);
-
-            if (hasCurrentWork && !window.confirm(t('canvas.confirmNewWorkflow', 'Start a new workflow? Unsaved changes may be lost.'))) {
-                return;
-            }
-
             let newName = 'Workflow';
             try {
                 const existing = await apiListWorkflows();
@@ -435,34 +451,41 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                 const centeredView = canvasRef.current.getCenteredView();
                 canvasRef.current.loadWorkflow({ nodes: [], edges: [], memos: [], view: centeredView });
             }
+
+            toast.success(t('canvas.toast.newWorkflowCreated'));
         } finally {
             setIsCreatingNewWorkflow(false);
         }
-    }, [t, isCreatingNewWorkflow]);
+    }, [t, isCreatingNewWorkflow, toast]);
 
     const handleExport = useCallback(() => {
         if (!canvasRef.current) return;
-        const canvasState = canvasRef.current.getCanvasState();
-        const name = validateWorkflowName(workflowName);
-        const exportData = {
-            workflow_name: name,
-            workflow_id: workflowId !== 'None' ? workflowId : generateWorkflowId(),
-            view: canvasState.view || { x: 0, y: 0, scale: 1 },
-            nodes: canvasState.nodes || [],
-            edges: canvasState.edges || [],
-            memos: canvasState.memos || [],
-        };
-        const json = JSON.stringify(exportData, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${name}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }, [workflowId, workflowName]);
+        try {
+            const canvasState = canvasRef.current.getCanvasState();
+            const name = validateWorkflowName(workflowName);
+            const exportData = {
+                workflow_name: name,
+                workflow_id: workflowId !== 'None' ? workflowId : generateWorkflowId(),
+                view: canvasState.view || { x: 0, y: 0, scale: 1 },
+                nodes: canvasState.nodes || [],
+                edges: canvasState.edges || [],
+                memos: canvasState.memos || [],
+            };
+            const json = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${name}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            toast.success(t('canvas.toast.exportSuccess'));
+        } catch (error) {
+            toast.error(t('canvas.toast.exportFailed'));
+        }
+    }, [workflowId, workflowName, toast, t]);
 
     const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -485,12 +508,13 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
             setStoredState(STORAGE_KEYS.WORKFLOW_ID, newId);
             setStoredState(STORAGE_KEYS.WORKFLOW_NAME, importedName);
             setStoredState(STORAGE_KEYS.WORKFLOW_STATE, nextState);
+            toast.success(t('canvas.toast.importSuccess', { name: importedName }));
         } catch (error) {
-            console.error('Failed to import workflow:', error);
+            toast.error(t('canvas.toast.importFailed'));
         } finally {
             e.target.value = '';
         }
-    }, []);
+    }, [toast, t]);
 
     // ── Empty state actions ──
     const handleEmptyAddStartNode = useCallback(() => {
@@ -533,6 +557,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
 
     const handleDuplicate = useCallback(async () => {
         if (!canvasRef.current) return;
+        const loadingId = toast.loading(t('canvas.toast.duplicating'));
         try {
             const sourceUserId = isOwner
                 ? (user?.user_id != null ? String(user.user_id) : undefined)
@@ -558,12 +583,22 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                         setWorkflowOriginUserId(null);
                     }
                 }
+                toast.update(loadingId, 'success', t('canvas.toast.duplicateSuccess'));
             } else {
                 // Workflow not saved to DB yet — ask to save first
-                const userConfirmed = window.confirm(
-                    t('canvas.saveBeforeCopy', '워크플로우를 복사하려면 먼저 저장해야 합니다. 저장하시겠습니까?'),
-                );
+                toast.dismiss(loadingId);
+                const userConfirmed = await toast.confirm({
+                    title: t('canvas.toast.saveBeforeCopyTitle'),
+                    message: t('canvas.toast.saveBeforeCopyMessage'),
+                    confirmText: t('canvas.toast.saveAndCopy'),
+                    cancelText: t('canvas.toast.cancel'),
+                    variant: 'info',
+                    enableKeyboard: true,
+                    keyboardHint: '💡 Enter키를 누르면 저장 후 복사됩니다 | ESC로 취소',
+                });
                 if (!userConfirmed) return;
+
+                const savingId = toast.loading(t('canvas.toast.savingAndDuplicating'));
 
                 // Save first
                 const canvasState = canvasRef.current.getCanvasState();
@@ -593,11 +628,14 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                         setWorkflowOriginUserId(null);
                     }
                 }
+                toast.update(savingId, 'success', t('canvas.toast.duplicateSuccess'));
             }
         } catch (error) {
-            console.error('Failed to duplicate workflow:', error);
+            const errMsg = error instanceof Error ? error.message : String(error);
+            toast.dismiss(loadingId);
+            toast.error(`${t('canvas.toast.duplicateFailed')}: ${errMsg}`);
         }
-    }, [workflowName, workflowId, workflowOriginUserId, isOwner, user, t]);
+    }, [workflowName, workflowId, workflowOriginUserId, isOwner, user, t, toast]);
 
     // ── Node modal handlers ──
     const handleOpenNodeModal = useCallback((nodeId: string, paramId: string, paramName: string, currentValue: string) => {
@@ -707,7 +745,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                     setStoredState(STORAGE_KEYS.WORKFLOW_STATE, nextState);
                     return;
                 } catch (error) {
-                    console.error('Failed to import dropped workflow:', error);
+                    toast.error(t('canvas.toast.importDropFailed'));
                     return;
                 }
             }
@@ -742,9 +780,9 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                 } as any);
             }
         } catch (error) {
-            console.error('Failed to drop node:', error);
+            toast.error(t('canvas.toast.dropNodeFailed'));
         }
-    }, []);
+    }, [toast, t]);
 
     // ── Wrapped panel components for SideMenu ──
     const AddNodePanelWrapped = useMemo(() => {
@@ -856,7 +894,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         return (
             <div className={styles.loadingContainer}>
                 <div className={styles.spinner} />
-                <p className={styles.loadingText}>{t('canvas.loading', 'Canvas를 불러오는 중...')}</p>
+                <p className={styles.loadingText}>{t('canvas.loading')}</p>
             </div>
         );
     }
