@@ -435,23 +435,11 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
               activeKey={statusFilter}
               onChange={(key) => setStatusFilter(key as WorkflowFilter)}
             />
-            <div className="flex gap-2">
-              {ownerTabs.map((tab) => (
-                <button
-                  key={tab.key}
-                  className={`inline-flex items-center gap-1 px-3 py-1 text-sm border rounded-full cursor-pointer transition-all ${
-                    ownerFilter === tab.key
-                      ? 'bg-primary border-primary text-white [&_svg]:text-white'
-                      : 'bg-transparent border-border text-muted-foreground hover:border-primary hover:text-primary'
-                  }`}
-                  onClick={() => setOwnerFilter(tab.key as WorkflowOwnerFilter)}
-                >
-                  {tab.key === 'personal' && <UserIcon />}
-                  {tab.key === 'shared' && <UsersIcon />}
-                  {tab.label}
-                </button>
-              ))}
-            </div>
+            <FilterTabs
+              tabs={ownerTabs}
+              activeKey={ownerFilter}
+              onChange={(key) => setOwnerFilter(key as WorkflowOwnerFilter)}
+            />
           </div>
           <SearchInput
             value={search}
