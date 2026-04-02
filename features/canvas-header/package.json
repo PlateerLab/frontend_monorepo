@@ -11,6 +11,7 @@
     "@xgen/types": "workspace:*",
     "@xgen/i18n": "workspace:*",
     "@xgen/icons": "workspace:*",
+    "@xgen/ui": "workspace:*",
     "@xgen/api-client": "workspace:*",
     "@xgen/auth-provider": "workspace:*",
     "react": "^19.0.0"

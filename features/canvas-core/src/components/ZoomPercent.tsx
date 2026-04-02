@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import styles from '../styles/zoom-percent.module.scss';
+import { cn } from '@xgen/ui';
 
 export interface ZoomPercentProps {
     /** Zoom percentage value (e.g. 100 → "100%") */
@@ -17,11 +17,15 @@ const ZoomPercent: React.FC<ZoomPercentProps> = ({
 }) => {
     return (
         <div
-            className={`${styles.wrapper} ${disabled ? styles.disabled : ''} ${className}`.trim()}
+            className={cn(
+                'inline-flex h-9 py-1 px-3 items-center gap-3 rounded-lg border border-black/[0.08] bg-white/90 shadow-[0_2px_8px_0_rgba(0,0,0,0.16)] pointer-events-auto',
+                disabled && 'pointer-events-none opacity-60',
+                className,
+            )}
             role="status"
             aria-label={`Zoom ${Math.round(value)}%`}
         >
-            <span className={styles.percentText}>{Math.round(value)}%</span>
+            <span className="text-sm font-normal leading-5 text-gray-600">{Math.round(value)}%</span>
         </div>
     );
 };

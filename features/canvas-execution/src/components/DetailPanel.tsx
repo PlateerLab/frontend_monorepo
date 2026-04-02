@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { LuChevronUp, LuChevronDown } from '@xgen/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '@xgen/i18n';
+import { cn } from '@xgen/ui';
 import type { DetailPanelProps } from '../types';
-import styles from '../styles/detail-panel.module.scss';
 
 // ── Helpers ────────────────────────────────────────────────────
 
@@ -249,7 +249,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
         : <pre style={{ fontSize: '0.75rem', whiteSpace: 'pre-wrap' }}>{logs.map((l: any) => JSON.stringify(l)).join('\n')}</pre>;
 
     const contentInner = (
-        <div className={styles.contentContainer}>
+        <div className="grow overflow-y-auto overflow-x-hidden text-sm bg-white">
             {activeTab === 'Graph' && graphContent}
             {activeTab === 'Detail' && detailLogContent}
         </div>
@@ -257,14 +257,19 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
 
     // ── Render Modes ───────────────────────────────────────────
 
+    const toggleBtnClass = 'flex items-center justify-center p-1 border-none rounded-md bg-[#f8f9fa] text-[#495057] text-sm cursor-pointer transition-all duration-200 min-w-6 h-6 hover:bg-[#e9ecef] hover:text-[#343a40] hover:scale-105';
+    const tabBtnClass = 'py-1 px-3 border-none rounded-md text-sm font-medium cursor-pointer bg-transparent text-[#868e96] transition-all duration-200 hover:text-[#495057]';
+    const tabActiveClass = 'bg-white text-[#343a40] shadow-[0_2px_4px_rgba(0,0,0,0.05)]';
+    const layoutBtnClass = 'py-1 px-2.5 border border-[#dee2e6] rounded-md bg-white text-[#343a40] text-xs font-semibold cursor-pointer transition-colors duration-200 hover:enabled:bg-[#e9ecef] hover:enabled:border-[#ced4da] disabled:text-[#adb5bd] disabled:bg-[#f1f3f5] disabled:border-[#e9ecef] disabled:cursor-not-allowed';
+
     if (embedded && embeddedLayout === 'split') {
         return (
-            <div className={styles.embeddedSplit}>
-                <div className={styles.graphColumn}>
-                    <div className={styles.graphColumnScroll}>{graphContent}</div>
+            <div className="flex flex-1 min-h-0 min-w-0 overflow-hidden">
+                <div className="flex-[2_2_0] min-w-0 overflow-hidden flex flex-col bg-[#f7f8fa]">
+                    <div className="overflow-y-auto flex-1 min-h-0 py-3 px-4 text-[0.8rem]">{graphContent}</div>
                 </div>
-                <div className={styles.detailLogColumn}>
-                    <div className={styles.detailLogColumnScroll}>{detailLogContent}</div>
+                <div className="flex-[3_3_0] min-w-0 overflow-hidden flex flex-col border-l border-black/[0.08] bg-white">
+                    <div className="overflow-y-auto flex-1 min-h-0 py-3 px-4 bg-white">{detailLogContent}</div>
                 </div>
             </div>
         );
@@ -272,10 +277,10 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
 
     if (embedded) {
         return (
-            <div className={styles.embeddedWrapper}>
-                <div className={styles.headerControls}>
+            <div className="flex flex-col h-full min-h-0 overflow-hidden py-3 px-4 pb-4 bg-transparent">
+                <div className="flex items-center gap-2 flex-wrap justify-end mb-2">
                     {activeTab === 'Graph' && (
-                        <button className={styles.applyLayoutButton}
+                        <button className={layoutBtnClass}
                             onClick={(e) => { e.stopPropagation(); onApplyLayout?.(); }}
                             disabled={!canApplyLayout}
                             title={t('canvas.detailPanel.applyLayoutTooltip', 'Apply layout')}
@@ -283,12 +288,12 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                             {t('canvas.detailPanel.applyLayout', 'Apply Layout')}
                         </button>
                     )}
-                    <div className={styles.tabs}>
-                        <button className={`${styles.tabButton} ${activeTab === 'Graph' ? styles.active : ''}`}
+                    <div className="flex gap-1 bg-[#f1f3f5] p-1 rounded-lg">
+                        <button className={cn(tabBtnClass, activeTab === 'Graph' && tabActiveClass)}
                             onClick={(e) => { e.stopPropagation(); setActiveTab('Graph'); }} type="button">
                             {t('canvas.detailPanel.graph', 'Graph')}
                         </button>
-                        <button className={`${styles.tabButton} ${activeTab === 'Detail' ? styles.active : ''}`}
+                        <button className={cn(tabBtnClass, activeTab === 'Detail' && tabActiveClass)}
                             onClick={(e) => { e.stopPropagation(); setActiveTab('Detail'); }} type="button">
                             {t('canvas.detailPanel.detail', 'Detail')}
                         </button>
@@ -300,16 +305,23 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
     }
 
     return (
-        <div className={`${styles.detailPanel} ${!isExpanded ? styles.collapsed : ''} ${!hasData && activeTab === 'Graph' ? styles.empty : ''}`}>
-            <div className={styles.header}>
-                <div className={styles.titleSection}>
-                    <button onClick={() => setIsExpanded(!isExpanded)} className={styles.toggleButton} type="button"
+        <div className={cn(
+            'w-[450px] max-h-[40vh] bg-white/90 backdrop-blur-[10px] rounded-xl shadow-[0_8px_25px_rgba(0,0,0,0.15)] border border-black/10 flex flex-col overflow-hidden transition-[width] duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] select-none',
+            !isExpanded && 'max-h-none h-auto w-[200px]',
+            !hasData && activeTab === 'Graph' && 'px-4 py-1 pb-2',
+        )}>
+            <div className={cn(
+                'flex justify-between items-center px-4 py-2 border-b border-[#e0e0e0] shrink-0 transition-[border-bottom] duration-300',
+                !isExpanded && 'border-b-transparent',
+            )}>
+                <div className="flex items-center gap-2 grow min-w-0">
+                    <button onClick={() => setIsExpanded(!isExpanded)} className={toggleBtnClass} type="button"
                         title={isExpanded ? 'Collapse Panel' : 'Expand Panel'}>
                         {isExpanded ? <LuChevronUp /> : <LuChevronDown />}
                     </button>
-                    <div className={styles.headerControls}>
+                    <div className="flex items-center gap-2 flex-wrap justify-end ml-auto max-w-full">
                         {isExpanded && activeTab === 'Graph' && (
-                            <button className={styles.applyLayoutButton}
+                            <button className={layoutBtnClass}
                                 onClick={(e) => { e.stopPropagation(); onApplyLayout?.(); }}
                                 disabled={!canApplyLayout}
                                 title={t('canvas.detailPanel.applyLayoutTooltip', 'Apply layout')}
@@ -317,12 +329,12 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                                 {t('canvas.detailPanel.applyLayout', 'Apply Layout')}
                             </button>
                         )}
-                        <div className={styles.tabs}>
-                            <button className={`${styles.tabButton} ${activeTab === 'Graph' ? styles.active : ''}`}
+                        <div className="flex gap-1 bg-[#f1f3f5] p-1 rounded-lg">
+                            <button className={cn(tabBtnClass, activeTab === 'Graph' && tabActiveClass)}
                                 onClick={(e) => { e.stopPropagation(); setActiveTab('Graph'); }} type="button">
                                 {t('canvas.detailPanel.graph', 'Graph')}
                             </button>
-                            <button className={`${styles.tabButton} ${activeTab === 'Detail' ? styles.active : ''}`}
+                            <button className={cn(tabBtnClass, activeTab === 'Detail' && tabActiveClass)}
                                 onClick={(e) => { e.stopPropagation(); setActiveTab('Detail'); }} type="button">
                                 {t('canvas.detailPanel.detail', 'Detail')}
                             </button>

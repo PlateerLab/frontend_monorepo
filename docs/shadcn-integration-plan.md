@@ -887,6 +887,414 @@ Canvas Features는 의도적으로 `@xgen/ui`를 사용하지 않는다:
 | **canvas-header** | 변경 최소화 | |
 | **canvas-history** | 변경 최소화 | |
 
+### 9-2-1. Canvas Feature 상세 인벤토리 (전체 파일 감사)
+
+> 모든 canvas-* Feature를 파일 수준까지 감사한 결과이다. 파일 경로는 `features/` 기준 상대 경로.
+
+---
+
+#### Feature 1: `canvas-header`
+
+| 항목 | 내용 |
+|------|------|
+| **컴포넌트** | `src/index.tsx` (~220 lines) |
+| **SCSS** | `src/styles/header.module.scss` (~500 lines) |
+| **@xgen/ui 사용** | ❌ 없음 |
+| **@xgen/icons** | LuCheck, LuX, LuPencil, LuUsers, LuChevronDown, LuCirclePlus, LuSparkles |
+
+**커스텀 UI 패턴:**
+- 커스텀 드롭다운 메뉴 (수동 open/close state) → **shadcn DropdownMenu 교체 후보**
+- 인라인 편집 모드 (input + save/cancel 버튼) → **shadcn Input + Button**
+- 커스텀 버튼 variants (textButton, deploySettingsButton, menuButton, newWorkflowDropdownTrigger) → **shadcn Button variants**
+- 공유 상태 표시기 (LuUsers) → **shadcn Badge**
+
+**인라인 스타일:**
+- Header 엘리먼트: `style={{ left: sidebarLayout.isOpen ? 240 : 80, width: ... }}` (사이드바 레이아웃 동적 계산)
+
+**SCSS 핵심 패턴:**
+- `position: fixed; top: 0` (고정 헤더)
+- 하드코딩 색상: `#2563eb`, `#1d4ed8`, `#fff`, `#495057`, `#40444d`, `#28a745`, `#dc3545`
+- `28px` 버튼 높이, `8px` border-radius
+- 전환 효과: `transition: all 0.2s`
+- 반응형 코드 없음
+
+---
+
+#### Feature 2: `canvas-core`
+
+| 항목 | 내용 |
+|------|------|
+| **컴포넌트** | `src/index.tsx` (barrel), `CanvasEmptyState.tsx` (~85), `EditRunFloating.tsx` (~55), `SideMenu.tsx` (~90), `Zoombox.tsx` (~60), `ZoomPercent.tsx` (~30) |
+| **SCSS** | `canvas-empty-state.module.scss` (~100), `edit-run-floating.module.scss` (~90), `side-menu.module.scss` (~340), `zoombox.module.scss` (~55), `zoom-percent.module.scss` (~28) |
+| **@xgen/ui 사용** | ❌ 없음 |
+| **@xgen/icons** | LuPlus, LuChevronRight, LuCirclePlus, LuCircleHelp, LuSettings, LuLayoutGrid, LuLayoutTemplate |
+
+**커스텀 UI 패턴:**
+- 카드 버튼 (empty state CTA) → **shadcn Card + Button**
+- 세그먼트 Edit/Run 토글 (pill shape) → **shadcn ToggleGroup**
+- 사이드 메뉴 + pop-in 애니메이션 + `data-view` attribute variants → **커스텀 유지** (특수 레이아웃)
+- 줌 컨트롤 (+ / − / fit) → **커스텀 유지**
+
+**SCSS 핵심 패턴:**
+- `@keyframes pop-in` + `animation: pop-in 0.3s ease-out` (SideMenu)
+- `data-view` attribute로 사이즈 변형 (`[data-view="addNodes"]`, `[data-view="template"]` 등)
+- CSS custom properties: `var(--line-50)`, `var(--color-White-300)`
+- `shadow/Basic/50` 커스텀 box-shadow 패턴
+- ⚠️ **`side-menu.module.scss`이 4개 Feature에 중복** (아래 참조)
+
+---
+
+#### Feature 3: `canvas-execution` (최대 규모)
+
+| 항목 | 내용 |
+|------|------|
+| **컴포넌트 (14개)** | `BottomPanel.tsx` (~130), `BottomPanelHeader.tsx` (~85), `BottomPanelContent.tsx` (~25), `ExecutionPanel.tsx` (~110, LEGACY), `DetailPanel.tsx` (~250+, LEGACY), `BottomExecutionLogPanel.tsx` (~100, LEGACY), `CanvasExecutionLogPanel.tsx` (~65, LEGACY), `CanvasBottomPanelContent.tsx` (~280+, LEGACY), `ChatTab.tsx` (~80), `ExecutorTab.tsx` (~30), `ExecutionColumn.tsx` (~45), `ExecutionOrderColumn.tsx` (~120), `LogColumn.tsx` (~110), `ResizeHandle.tsx` (~65) |
+| **Context** | `BottomPanelContext.tsx` (~12), `BottomPanelProvider.tsx` (~250) |
+| **Hooks** | `useResizePanel.ts` (~90), `useChatPersistence.ts` (~60), `useExecutionOrder.ts` (~100), `useBottomPanelShortcuts.ts` (~65) |
+| **Types** | `types.ts` (~200 lines) — 포괄적 타입 정의 |
+| **SCSS (15개)** | `_variables.scss` (~100, 디자인 토큰), `bottom-panel.module.scss` (~20), `bottom-panel-header.module.scss` (~100), `bottom-panel-content.module.scss` (~15), `execution-panel.module.scss` (~170), `detail-panel.module.scss` (~200+), `chat-tab.module.scss` (~100), `executor-tab.module.scss` (~30), `execution-column.module.scss` (~60), `execution-order.module.scss` (~120), `log-column.module.scss` (~80), `resize-handle.module.scss` (~25), `bottom-execution-log-panel.module.scss` (~200), `canvas-execution-log-panel.module.scss` (~100), `canvas-bottom-panel-content.module.scss` (~300+) |
+| **@xgen/ui 사용** | ❌ 없음 |
+| **외부 의존** | `framer-motion` (DetailPanel.tsx) |
+| **@xgen/icons** | LuPlay, LuTrash2, LuCircleX, LuChevronUp, LuChevronDown, LuCopy, LuCheck, LuSend, LuX, FiMaximize2, FiMinimize2 |
+
+**커스텀 UI 패턴:**
+- 3-컬럼 리사이즈 가능 하단 패널 (execution/order/log) → **커스텀 유지**
+- 채팅 인터페이스 (버블 + 입력) → **커스텀 유지**
+- 탭 (Chat/Executor) → **shadcn Tabs 교체 후보**
+- 실행 순서 리스트 + 상태 아이콘 → **커스텀 유지** (고도 특화)
+- 로그 뷰어 + 검색/필터 툴바 → **커스텀 유지**
+- 리사이즈 드래그 핸들 → **커스텀 유지**
+- 로딩 점 애니메이션 → 커스텀
+
+**인라인 스타일 (가장 많음):**
+- `DetailPanel.tsx`: 실행 순서 시각화에 **30+ 인라인 style 객체** (LEGACY)
+- `CanvasBottomPanelContent.tsx`: 광범위한 인라인 스타일 (LEGACY)
+- `LogColumn.tsx`: 폴백 뷰어에 인라인 스타일
+
+**SCSS 핵심 패턴 — 자체 디자인 토큰 시스템:**
+```scss
+// _variables.scss — canvas-execution 전용 토큰
+$bg-primary: #ffffff;
+$bg-secondary: #f8f9fb;
+$text-primary: #1d1f23;
+$text-secondary: #7a7f89;
+$color-primary: #305eeb;
+$spacing-xs: 4px;
+$font-size-sm: 12px;
+// ... 약 40개 변수
+```
+- `@use 'variables'` 패턴으로 모든 SCSS에서 참조
+- `@keyframes bouncing-dots`, `@keyframes pulse` 애니메이션
+- 고정 컬럼 폭: `$col-execution-width: 500px`, `$col-order-width: 252px`
+- **_variables.scss를 Tailwind CSS 변수 시스템으로 전환하는 모범 사례 후보**
+
+---
+
+#### Feature 4: `canvas-deploy`
+
+| 항목 | 내용 |
+|------|------|
+| **컴포넌트** | `src/index.tsx` (~300+ lines) |
+| **SCSS** | `src/styles/deploy-modal.module.scss` (~300 lines) |
+| **@xgen/ui 사용** | ✅ `Dialog, DialogContent, DialogHeader, DialogTitle, Tabs, TabsList, TabsTrigger, TabsContent, RadioGroup, RadioGroupItem` |
+| **@xgen/icons** | LuX, LuExternalLink, LuCode, LuTerminal, LuShare2, LuCopy, LuPlus, LuCheck, LuLoader |
+
+**이미 @xgen/ui를 가장 많이 사용하는 Feature. 교체 불필요.**
+
+**잔여 커스텀 UI:**
+- 커스텀 CodeBlock (복사 버튼 포함) → **커스텀 유지** (특화 UI)
+- 커스텀 토글 버튼 (배포 상태) → **shadcn Switch 교체 후보**
+- 네스티드 API 언어 탭 커스텀 스타일링 → 기존 Tabs 확장
+
+**SCSS 핵심 패턴:**
+- 다크 코드 블록: `background: #1e1e1e`
+- `@keyframes slideUp` 애니메이션
+- `12px` border-radius
+- 커스텀 토글 버튼 상태 관리
+
+---
+
+#### Feature 5: `canvas-sidebar-nodes`
+
+| 항목 | 내용 |
+|------|------|
+| **컴포넌트** | `src/index.tsx` (~200, AddNodePanel), `NodeList.tsx` (~30), `DraggableNodeItem.tsx` (~100) |
+| **SCSS** | `node-list.module.scss` (~50), `side-menu.module.scss` (~200+, ⚠️ 중복) |
+| **@xgen/ui 사용** | ✅ `Tabs, TabsList, TabsTrigger, SearchInput` |
+| **@xgen/icons** | 없음 (인라인 SVG chevron) |
+
+**잔여 커스텀 UI:**
+- 아코디언 노드 리스트 (수동 토글) → **shadcn Accordion 교체 후보**
+- 드래그앤드롭 노드 아이템 + 더블클릭 핸들러 → **커스텀 유지** (드래그 동작 특화)
+
+**인라인 스타일:**
+- NodeList: chevron 아이콘에 인라인 `mask-image` 스타일
+- DraggableNodeItem: `style={{ cursor: 'grab' }}`
+
+**⚠️ side-menu.module.scss 중복**: canvas-core와 동일한 파일 (340 lines)
+
+---
+
+#### Feature 6: `canvas-sidebar-templates`
+
+| 항목 | 내용 |
+|------|------|
+| **컴포넌트** | `src/index.tsx` (~200, TemplatePanel), `MiniCanvas.tsx` (~200), `TemplatePreview.tsx` (~80) |
+| **SCSS** | `workflow-panel.module.scss` (~300), `mini-canvas.module.scss` (~115), `template-preview.module.scss` (~200), `side-menu.module.scss` (~200+, ⚠️ 중복) |
+| **@xgen/ui 사용** | ✅ `Dialog, DialogContent, DialogHeader, DialogTitle` (TemplatePreview만) |
+| **@xgen/icons** | LuArrowLeft, LuLayoutTemplate, LuCopy |
+
+**잔여 커스텀 UI:**
+- 템플릿 카드 리스트 + 카테고리/상태 표시 → **shadcn Card 교체 후보**
+- MiniCanvas 인터랙티브 프리뷰 (pan/zoom) → **커스텀 유지** (캔버스 렌더링)
+- 태그 뱃지 → **shadcn Badge 교체 후보**
+
+**인라인 스타일:**
+- MiniCanvas: 노드 위치/스타일링에 광범위한 인라인 스타일 (캔버스 좌표 기반 — 커스텀 유지 필수)
+
+**SCSS 핵심 패턴:**
+- 그라디언트 배경: `linear-gradient(135deg, ...)` 카드/아이콘
+- 카테고리 뱃지 색상 시스템
+- ⚠️ `side-menu.module.scss` 중복 + `workflow-panel.module.scss`도 sidebar-workflows와 중복
+
+---
+
+#### Feature 7: `canvas-sidebar-workflows`
+
+| 항목 | 내용 |
+|------|------|
+| **컴포넌트** | `src/index.tsx` (~200, WorkflowPanel), `WorkflowPanelList.tsx` (~80), `WorkflowPanelActionButtons.tsx` (~30) |
+| **SCSS** | `workflow-panel.module.scss` (~200, ⚠️ 중복), `side-menu.module.scss` (~200+, ⚠️ 중복) |
+| **@xgen/ui 사용** | ❌ 없음 |
+| **@xgen/icons** | LuArrowLeft, LuRefreshCw, LuFolderOpen, LuDownload |
+
+**커스텀 UI 패턴:**
+- 워크플로우 리스트 (로드/삭제 액션) → **shadcn Card + Button**
+- 액션 버튼 그룹 (로컬 로드/내보내기) → **shadcn Button**
+- 새로고침 버튼 + 스핀 애니메이션 → **shadcn Button + loading state**
+- 리스트 헤더 + 카운트 뱃지 → **shadcn Badge**
+
+**SCSS 핵심 패턴:**
+- `#007bff` 파란 버튼, `#dc3545` 빨간 삭제 버튼
+- 그라디언트 리스트 헤더
+- ⚠️ 2개 SCSS 모두 다른 Feature와 중복
+
+---
+
+#### Feature 8: `canvas-node-detail`
+
+| 항목 | 내용 |
+|------|------|
+| **컴포넌트** | `src/index.tsx` (~300+, NodeDetailModal), `NodeModal.tsx` (~60) |
+| **SCSS** | `node-detail-modal.module.scss` (~200+), `node-modal.module.scss` (~130) |
+| **@xgen/ui 사용** | ✅ `Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle` (양쪽 모두) |
+| **@xgen/icons** | FiCpu, FiArrowDownCircle, FiArrowUpCircle, FiSettings, FiChevronDown, FiAlertCircle |
+
+**이미 @xgen/ui Dialog 사용 중.**
+
+**잔여 커스텀 UI:**
+- 접이식 섹션 (expand/collapse) → **shadcn Accordion/Collapsible 교체 후보**
+- 뱃지 시스템 (required, multi, type) → **shadcn Badge 교체 후보**
+- 포트/파라미터 상세 리스트 → 커스텀 유지 가능
+- 로딩 스피너 → **shadcn Spinner/Loading**
+- 에러 상태 + 재시도 → 커스텀
+
+**인라인 스타일:**
+- `style={{ whiteSpace: 'pre-line' }}` (설명 텍스트)
+
+**SCSS 핵심 패턴:**
+- `@keyframes slideIn` 슬라이드 애니메이션
+- 그라디언트 헤더 배경
+- monospace 폰트 (ID 표시)
+- 태그 뱃지 그라디언트: `background: linear-gradient(135deg, ...)`
+
+---
+
+#### Feature 9: `canvas-ai-generator`
+
+| 항목 | 내용 |
+|------|------|
+| **컴포넌트** | `src/index.tsx` (~280+ lines) |
+| **SCSS** | `auto-workflow-sidebar.module.scss` (~350), `AutoWorkflowSidebar.module.scss` (~450, ⚠️ 동일 내용 중복 파일) |
+| **@xgen/ui 사용** | ✅ `Select, SelectTrigger, SelectValue, SelectContent, SelectItem` |
+| **@xgen/icons** | LuX, LuSparkles, LuBot, LuWand2 |
+
+**잔여 커스텀 UI:**
+- 풀페이지 사이드바 오버레이 → **shadcn Sheet 교체 후보**
+- 에이전트 노드 선택 카드 (클릭/키보드) → **shadcn Card**
+- 요구사항 textarea → **shadcn Textarea**
+- 워크플로우 이름 input → **shadcn Input**
+- 생성 버튼 (그라디언트) → **shadcn Button**
+
+**SCSS 핵심 패턴:**
+- `@keyframes fadeIn` + `@keyframes slideIn` 애니메이션
+- 480px 고정 사이드바 폭
+- 그라디언트 배경: `linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)`
+- 에이전트 카드 선택 상태: `box-shadow: 0 0 0 2px rgba(59,130,246,0.2)`
+- 생성 버튼: `background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)`
+- ⚠️ `auto-workflow-sidebar.module.scss`과 `AutoWorkflowSidebar.module.scss` **내용 동일** → 하나 삭제
+
+---
+
+#### Feature 10: `canvas-history`
+
+| 항목 | 내용 |
+|------|------|
+| **컴포넌트** | `src/index.tsx` (~190 lines, HistoryPanel) |
+| **SCSS** | `src/styles/history-panel.module.scss` (~260 lines) |
+| **@xgen/ui 사용** | ❌ 없음 |
+| **@xgen/icons** | FaTrashAlt |
+
+**커스텀 UI 패턴:**
+- 오른쪽 슬라이드 패널 (450px) → **shadcn Sheet 교체 후보**
+- 히스토리 아이템 리스트 (Photoshop 스타일 active/future/past 상태) → **커스텀 유지** (특화 UX)
+- 액션 타입 컬러 뱃지 (7개 색상 하드코딩) → **shadcn Badge + color variants**
+- 현재 상태 뱃지 (green) → **shadcn Badge variant="success"**
+- 비우기 버튼 + 확인 → **shadcn Button + AlertDialog**
+- 닫기 버튼 (원형) → **shadcn Button variant="ghost"**
+
+**인라인 스타일:**
+- `style={{ backgroundColor: ACTION_TYPE_COLORS[entry.actionType] }}` (액션 뱃지 동적 색상)
+
+**SCSS 핵심 패턴:**
+- Tailwind 색상과 유사한 하드코딩 값: `#3B82F6`, `#10B981`, `#EF4444`, `#8B5CF6`, `#F59E0B`, `#EC4899`, `#F97316`
+- `transform: translateX(100%)` → `translateX(0)` 슬라이드 트랜지션
+- `.active`: `background: #dbeafe; border-left: 3px solid #3b82f6`
+- `.future`: `opacity: 0.4`
+- monospace 타임스탬프: `font-family: 'Monaco', 'Menlo', 'Consolas', monospace`
+- 반응형 `@media (max-width: 768px)` 포함
+
+---
+
+#### Feature 11: `canvas-document-drop`
+
+| 항목 | 내용 |
+|------|------|
+| **컴포넌트** | `src/index.tsx` (~220 lines, CanvasDocumentDropModal) |
+| **SCSS** | `src/styles/canvas-document-drop-modal.module.scss` (~400 lines) |
+| **@xgen/ui 사용** | ✅ `Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle` |
+| **@xgen/icons** | FiFile |
+
+**이미 @xgen/ui Dialog 사용 중.**
+
+**잔여 커스텀 UI:**
+- 컬렉션 리스트 + 라디오 인디케이터 → **shadcn RadioGroup 교체 후보**
+- 검색 인풋 → **shadcn Input (또는 SearchInput)**
+- 생성 폼 (인풋 + 버튼) → **shadcn Input + Button**
+- 파일 정보 카드 (아이콘 + 이름 + 크기) → **커스텀 유지** (간단)
+- 구분선 (or 새로 만들기) → **shadcn Separator + label**
+- 스피너 → **shadcn Spinner**
+- 에러 메시지 → 커스텀
+
+**인라인 스타일:**
+- 재시도 버튼: `style={{ marginTop: 8, fontSize: 12, height: 30, padding: '0 12px' }}`
+
+**SCSS 핵심 패턴:**
+- `@keyframes fadeIn`, `@keyframes slideUp` 애니메이션
+- 커스텀 라디오 인디케이터: `.radioIndicator.checked::after` (6px 내부 원)
+- 파일 아이콘 그라디언트: `linear-gradient(135deg, #305eeb 0%, #783ced 100%)`
+- Pretendard 폰트 패밀리
+
+---
+
+#### App 컴포넌트: `CanvasPage` (apps/web)
+
+| 항목 | 내용 |
+|------|------|
+| **컴포넌트** | `CanvasPage.tsx` (~1300+ lines) |
+| **SCSS** | `CanvasPage.module.scss` (~85 lines) |
+| **@xgen/ui 사용** | ✅ `useToast` (hook만) |
+| **@xgen/api-client** | `useNodes`, `saveWorkflow`, `loadWorkflow`, `checkWorkflowExistence`, `listWorkflows`, `listWorkflowsDetail`, `renameWorkflow`, `duplicateWorkflow`, `deleteWorkflow`, `executeWorkflowStream`, `getWorkflowExecutionOrderByData` |
+
+**역할:** 모든 canvas-* Feature를 조립하는 Page-level orchestrator. UI 프리미티브 교체 대상 아님.
+
+**CanvasPage가 조립하는 Feature:**
+- `@xgen/feature-canvas-core` → SideMenu, EditRunFloating, Zoombox, ZoomPercent, CanvasEmptyState
+- `@xgen/feature-canvas-sidebar-nodes` → AddNodePanel
+- `@xgen/feature-canvas-sidebar-templates` → TemplatePanel
+- `@xgen/feature-canvas-sidebar-workflows` → WorkflowPanel
+- `@xgen/feature-canvas-deploy` → DeploymentModal
+- `@xgen/canvas-engine` → Canvas (핵심 캔버스 엔진)
+- 플러그인 시스템: `FeatureRegistry.getCanvasPagePlugins()`로 동적 로딩
+
+**SCSS 핵심 패턴:**
+- CSS custom properties 사용: `var(--canvas-bg)`, `var(--border-color)`, `var(--primary-color)`, `var(--text-secondary)`, `var(--panel-bg)`
+- `@keyframes spin` (로딩 스피너)
+- 매우 간결한 레이아웃 전용 스타일 (85 lines)
+
+---
+
+### 9-2-2. 횡단 분석: SCSS 중복 및 공통 패턴
+
+#### 중복 SCSS 파일 목록
+
+| 파일명 | 중복 위치 | 라인 수 | 조치 |
+|--------|----------|---------|------|
+| `side-menu.module.scss` | canvas-core, canvas-sidebar-nodes, canvas-sidebar-templates, canvas-sidebar-workflows | ~340 × 4 = **1360 lines** | ⚠️ **즉시 중복 제거** → `@xgen/canvas-layout` 또는 공유 패키지로 이관 |
+| `workflow-panel.module.scss` | canvas-sidebar-templates, canvas-sidebar-workflows | ~250 × 2 = **500 lines** | ⚠️ 공유 패키지로 이관 |
+| `AutoWorkflowSidebar.module.scss` / `auto-workflow-sidebar.module.scss` | canvas-ai-generator (동일 디렉토리 내 2개) | ~400 × 2 = **800 lines** | ⚠️ **파일 하나 삭제** |
+
+**총 불필요 중복: ~2660 lines**
+
+#### @xgen/ui 사용 현황 요약
+
+| Feature | Dialog | Tabs | Select | RadioGroup | SearchInput | Toast |
+|---------|--------|------|--------|------------|-------------|-------|
+| canvas-header | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| canvas-core | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| canvas-execution | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| canvas-deploy | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ |
+| canvas-sidebar-nodes | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ |
+| canvas-sidebar-templates | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| canvas-sidebar-workflows | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| canvas-node-detail | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| canvas-ai-generator | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
+| canvas-document-drop | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| canvas-history | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| CanvasPage (app) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+
+#### 하드코딩 색상 핫스팟 (Tailwind 전환 시 주의)
+
+| 하드코딩 색상 | 사용처 | Tailwind 대응 |
+|-------------|--------|--------------|
+| `#2563eb` / `#305eeb` | header, execution, deploy, document-drop, node-detail | `primary` (CSS 변수) |
+| `#1d4ed8` | header, ai-generator | `primary/dark` |
+| `#1d1f23` | execution, document-drop | `foreground` |
+| `#40444d` | header, execution | `foreground/muted` |
+| `#7a7f89` | execution, document-drop | `muted-foreground` |
+| `#f8f9fb` | execution, document-drop, ai-generator | `muted` |
+| `#e8ebf0` | document-drop | `border` |
+| `#28a745` / `#10B981` | header, history | `success` |
+| `#dc3545` / `#EF4444` | header, history, sidebar-workflows | `destructive` |
+| `#007bff` | sidebar-workflows | `primary` (구 Bootstrap 색) |
+
+#### 인라인 스타일 핫스팟 (리팩토링 대상)
+
+| 파일 | 인라인 스타일 수 | 심각도 | 비고 |
+|------|----------------|--------|------|
+| `DetailPanel.tsx` (canvas-execution) | 30+ 객체 | 🔴 높음 | LEGACY — 실행 순서 시각화 |
+| `CanvasBottomPanelContent.tsx` (canvas-execution) | 20+ 객체 | 🔴 높음 | LEGACY — 실행 로그 |
+| `MiniCanvas.tsx` (canvas-sidebar-templates) | 15+ 객체 | 🟡 중간 | 캔버스 좌표 — 유지 필수 |
+| `canvas-header/index.tsx` | 5+ 객체 | 🟡 중간 | 사이드바 레이아웃 계산 |
+| `canvas-history/index.tsx` | 7 | 🟡 중간 | 액션 뱃지 동적 색상 |
+
+#### shadcn 프리미티브 교체 후보 총 집계
+
+| shadcn 컴포넌트 | 교체 대상 | 예상 영향 Feature |
+|----------------|----------|-----------------|
+| **DropdownMenu** | canvas-header 커스텀 드롭다운 | canvas-header |
+| **ToggleGroup** | canvas-core EditRunFloating | canvas-core |
+| **Accordion** | canvas-sidebar-nodes NodeList, canvas-node-detail 접이식 섹션 | sidebar-nodes, node-detail |
+| **Sheet** | canvas-ai-generator 사이드바, canvas-history 패널 | ai-generator, history |
+| **Card** | canvas-core empty state, sidebar-templates, sidebar-workflows, ai-generator | 4 Features |
+| **Badge** | canvas-header 공유표시, sidebar-templates 태그, sidebar-workflows 카운트, node-detail 타입뱃지, history 액션뱃지 | 5 Features |
+| **Button** (variants) | 모든 Feature의 커스텀 버튼 | 전체 |
+| **Input** | canvas-header 인라인편집, ai-generator, document-drop | 3 Features |
+| **Textarea** | canvas-ai-generator 요구사항 | ai-generator |
+| **Switch** | canvas-deploy 토글 | deploy |
+| **Separator** | canvas-document-drop 구분선 | document-drop |
+| **Tabs** | canvas-execution Chat/Executor 탭 | execution |
+
 ### 9-3. Canvas package.json 의존성 추가
 
 canvas-* Features가 `@xgen/ui`를 사용하려면 `package.json`에 의존성을 추가해야 한다:

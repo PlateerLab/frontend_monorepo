@@ -1,8 +1,9 @@
 import './locales';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { LuCheck, LuX, LuPencil, LuUsers, LuChevronDown, LuCirclePlus, LuSparkles } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
-import styles from './styles/header.module.scss';
+import { Button, DropdownMenu } from '@xgen/ui';
+import type { DropdownMenuItem } from '@xgen/ui';
 import type { CanvasPagePlugin, CanvasHeaderProps } from '@xgen/types';
 
 export type CanvasMode = 'edit' | 'run';
@@ -29,20 +30,8 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [editValue, setEditValue] = useState<string>('');
     const [oldWorkflowName, setOldWorkflowName] = useState<string>('');
-    const [newWorkflowDropdownOpen, setNewWorkflowDropdownOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const { t } = useTranslation();
-
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-                setNewWorkflowDropdownOpen(false);
-            }
-        };
-        if (newWorkflowDropdownOpen) document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [newWorkflowDropdownOpen]);
 
     useEffect(() => {
         if (externalWorkflowName) {
@@ -115,9 +104,30 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
         }
     }, [handleSaveClick, handleCancelClick]);
 
+    const dropdownItems = useMemo<DropdownMenuItem[]>(() => {
+        const items: DropdownMenuItem[] = [
+            { key: 'empty', label: t('canvas.header.emptyWorkflow', 'Empty Workflow') },
+        ];
+        if (onTemplateStart) {
+            items.push({ key: 'template', label: t('canvas.header.startFromTemplate', 'Start from Template') });
+        }
+        if (onImportWorkflow) {
+            items.push({ key: 'import', label: t('canvas.header.importWorkflow', 'Import Workflow') });
+        }
+        return items;
+    }, [t, onTemplateStart, onImportWorkflow]);
+
+    const handleDropdownSelect = useCallback((key: string) => {
+        switch (key) {
+            case 'empty': onNewWorkflow(); break;
+            case 'template': onTemplateStart?.(); break;
+            case 'import': onImportWorkflow?.(); break;
+        }
+    }, [onNewWorkflow, onTemplateStart, onImportWorkflow]);
+
     return (
         <header
-            className={styles.header}
+            className="flex justify-between items-center h-[66px] px-6 min-h-[66px] max-h-[66px] bg-white border-b border-black/[0.08] shrink-0 shadow-sm z-[1000] fixed top-0 left-0 w-full transition-[left,width] duration-[250ms] ease-out select-none"
             style={
                 sidebarLayout !== undefined
                     ? {
@@ -127,52 +137,58 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                     : undefined
             }
         >
-            <div className={styles.leftSection}>
-                <div className={styles.workflowNameSection}>
+            {/* Left — Workflow name */}
+            <div className="flex items-center gap-4 min-w-0 flex-1">
+                <div className="min-w-[120px] max-w-[360px]">
                     {isEditing ? (
-                        <div className={styles.editMode}>
+                        <div className="flex items-center gap-1 h-7">
                             <input
                                 ref={inputRef}
                                 type="text"
                                 value={editValue}
                                 onChange={(e) => setEditValue(e.target.value)}
                                 onKeyDown={handleKeyDown}
-                                className={styles.workflowInput}
+                                className="h-7 text-sm font-semibold text-gray-600 border border-blue-500 rounded-md px-2 bg-white outline-none min-w-[120px] shadow-[0_0_0_2px_rgba(59,130,246,0.1)] focus:border-blue-600"
                                 placeholder={t('canvas.header.workflowNamePlaceholder', 'Workflow name')}
                             />
                             <button
                                 onClick={handleSaveClick}
-                                className={`${styles.editButton} ${styles.saveButton}`}
+                                className="inline-flex items-center justify-center w-7 h-7 min-w-7 min-h-7 shrink-0 text-xl rounded cursor-pointer bg-transparent border-none p-0 text-green-600 transition-colors hover:bg-green-100"
                                 title={t('canvas.header.saveName', 'Save')}
                                 type="button"
                             >
-                                <LuCheck />
+                                <LuCheck className="w-[1em] h-[1em] shrink-0" />
                             </button>
                             <button
                                 onClick={handleCancelClick}
-                                className={`${styles.editButton} ${styles.cancelButton}`}
+                                className="inline-flex items-center justify-center w-7 h-7 min-w-7 min-h-7 shrink-0 text-xl rounded cursor-pointer bg-transparent border-none p-0 text-red-500 transition-colors hover:bg-red-100"
                                 title={t('canvas.header.cancel', 'Cancel')}
                                 type="button"
                             >
-                                <LuX />
+                                <LuX className="w-[1em] h-[1em] shrink-0" />
                             </button>
                         </div>
                     ) : (
-                        <div className={styles.displayMode}>
-                            <span className={styles.workflowName}>{workflowName}</span>
+                        <div className="flex items-center justify-between gap-2 h-7 px-2 rounded-md transition-colors min-w-[120px] hover:bg-gray-50">
+                            <span className="text-sm font-semibold leading-tight text-gray-600 cursor-pointer flex-grow text-left min-w-0">
+                                {workflowName}
+                            </span>
                             {!isOwner && (
-                                <span className={styles.sharedIndicator} title={t('canvas.header.sharedWorkflowTooltip', 'Shared')}>
+                                <span
+                                    className="flex items-center justify-center text-[0.9rem] text-gray-500 p-1 rounded min-w-6 min-h-6 shrink-0 cursor-help transition-all hover:bg-gray-200 hover:text-gray-600 hover:scale-110"
+                                    title={t('canvas.header.sharedWorkflowTooltip', 'Shared')}
+                                >
                                     <LuUsers />
                                 </span>
                             )}
                             {isOwner && (
                                 <button
                                     onClick={handleEditClick}
-                                    className={`${styles.editButton} ${styles.editButtonPencil}`}
+                                    className="inline-flex items-center justify-center w-6 h-6 min-w-6 min-h-6 shrink-0 text-base rounded cursor-pointer bg-transparent border-none p-0 text-gray-500 transition-colors hover:bg-gray-200"
                                     title={t('canvas.header.editWorkflowName', 'Edit name')}
                                     type="button"
                                 >
-                                    <LuPencil />
+                                    <LuPencil className="w-[1em] h-[1em] shrink-0" />
                                 </button>
                             )}
                         </div>
@@ -180,62 +196,73 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                 </div>
             </div>
 
-            <div className={styles.rightSection}>
-                <div className={styles.dropdownWrap} ref={dropdownRef}>
-                    <button
-                        type="button"
-                        className={styles.newWorkflowDropdownTrigger}
-                        onClick={() => setNewWorkflowDropdownOpen((v) => !v)}
-                        aria-expanded={newWorkflowDropdownOpen}
-                    >
-                        {t('canvas.header.newWorkflow', 'New Workflow')}
-                        <LuChevronDown className={styles.chevron} />
-                    </button>
-                    {newWorkflowDropdownOpen && (
-                        <div className={styles.newWorkflowDropdown}>
-                            <button type="button" onClick={() => { onNewWorkflow(); setNewWorkflowDropdownOpen(false); }}>
-                                {t('canvas.header.emptyWorkflow', 'Empty Workflow')}
-                            </button>
-                            {onTemplateStart && (
-                                <button type="button" onClick={() => { onTemplateStart(); setNewWorkflowDropdownOpen(false); }}>
-                                    {t('canvas.header.startFromTemplate', 'Start from Template')}
-                                </button>
-                            )}
-                            {onImportWorkflow && (
-                                <button type="button" onClick={() => { onImportWorkflow(); setNewWorkflowDropdownOpen(false); }}>
-                                    {t('canvas.header.importWorkflow', 'Import Workflow')}
-                                </button>
-                            )}
-                        </div>
-                    )}
-                </div>
-                <button onClick={onSave} className={styles.textButton} title={t('canvas.header.saveWorkflow', 'Save')} type="button">
+            {/* Right — Actions */}
+            <div className="flex items-center gap-2 shrink-0">
+                <DropdownMenu
+                    trigger={
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            padding="compact"
+                            className="h-7 rounded-lg text-sm font-medium"
+                            rightIcon={<LuChevronDown className="w-4 h-4 shrink-0 opacity-90" />}
+                        >
+                            {t('canvas.header.newWorkflow', 'New Workflow')}
+                        </Button>
+                    }
+                    items={dropdownItems}
+                    onSelect={handleDropdownSelect}
+                    placement="bottom-start"
+                    width={180}
+                />
+                <Button
+                    variant="outline"
+                    size="sm"
+                    padding="compact"
+                    className="h-7 rounded-lg text-sm font-medium text-gray-700 border-gray-700"
+                    onClick={onSave}
+                    title={t('canvas.header.saveWorkflow', 'Save')}
+                >
                     {t('canvas.header.save', 'Save')}
-                </button>
+                </Button>
                 {onDuplicate && (
-                    <button onClick={onDuplicate} className={styles.textButton} title={t('canvas.header.copyWorkflow', 'Copy')} type="button">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        padding="compact"
+                        className="h-7 rounded-lg text-sm font-medium text-gray-700 border-gray-700"
+                        onClick={onDuplicate}
+                        title={t('canvas.header.copyWorkflow', 'Copy')}
+                    >
                         {t('canvas.header.copy', 'Copy')}
-                    </button>
+                    </Button>
                 )}
-                <button
-                    type="button"
-                    className={styles.deploySettingsButton}
+                <Button
+                    variant="outline"
+                    size="sm"
+                    padding="compact"
+                    className="h-7 rounded-lg text-sm font-medium text-primary border-primary hover:bg-blue-50"
                     onClick={onDeploy}
                     title={t('canvas.header.deploy', 'Deploy')}
                 >
                     {t('canvas.header.deploy', 'Deploy')}
-                </button>
+                </Button>
                 {onAddNodeClick && (
-                    <button type="button" className={styles.menuButton} onClick={onAddNodeClick} title={t('canvas.header.addNode', 'Add Node')}>
+                    <button
+                        type="button"
+                        className="flex items-center justify-center w-7 h-7 min-w-7 min-h-7 p-0 bg-transparent border-none text-gray-600 cursor-pointer rounded-lg select-none transition-colors hover:bg-gray-100"
+                        onClick={onAddNodeClick}
+                        title={t('canvas.header.addNode', 'Add Node')}
+                    >
                         <LuCirclePlus />
                     </button>
                 )}
                 {onAutoWorkflowClick && (
                     <button
-                        onClick={onAutoWorkflowClick}
-                        className={styles.menuButton}
-                        title={t('canvas.header.autoWorkflow', 'Auto Workflow')}
                         type="button"
+                        className="flex items-center justify-center w-7 h-7 min-w-7 min-h-7 p-0 bg-transparent border-none text-gray-600 cursor-pointer rounded-lg select-none transition-colors hover:bg-gray-100"
+                        onClick={onAutoWorkflowClick}
+                        title={t('canvas.header.autoWorkflow', 'Auto Workflow')}
                     >
                         <LuSparkles />
                     </button>

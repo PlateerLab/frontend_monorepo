@@ -2,7 +2,6 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from '@xgen/i18n';
 import { useBottomPanel } from '../context/BottomPanelContext';
 import type { LogEntry, LogViewerProps } from '../types';
-import styles from '../styles/log-column.module.scss';
 
 // ── Fallback Log Viewer ────────────────────────────────────────
 
@@ -18,6 +17,8 @@ const DefaultLogViewer: React.FC<LogViewerProps> = ({ logs, className }) => (
         ))}
     </div>
 );
+
+const filterLabelClass = 'flex items-center gap-1 text-[11px] text-[#7a7f89] cursor-pointer whitespace-nowrap select-none [&_input[type=checkbox]]:m-0 [&_input[type=checkbox]]:accent-primary';
 
 // ── Log Column ─────────────────────────────────────────────────
 
@@ -39,7 +40,6 @@ const LogColumn: React.FC<LogColumnInternalProps> = ({ LogViewerComponent }) => 
     const filteredLogs = useMemo(() => {
         let filtered = logs;
 
-        // Level filters
         if (!showDebug) {
             filtered = filtered.filter(l => l.level !== 'DEBUG');
         }
@@ -47,7 +47,6 @@ const LogColumn: React.FC<LogColumnInternalProps> = ({ LogViewerComponent }) => 
             filtered = filtered.filter(l => !l.event_type);
         }
 
-        // Text search
         if (searchQuery.trim()) {
             const q = searchQuery.toLowerCase();
             filtered = filtered.filter(l =>
@@ -64,17 +63,17 @@ const LogColumn: React.FC<LogColumnInternalProps> = ({ LogViewerComponent }) => 
     const noResults = hasSearch && filteredLogs.length === 0;
 
     return (
-        <div className={styles.column}>
-            <div className={styles.toolbar}>
+        <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
+            <div className="flex items-center gap-2 py-1.5 px-3 border-b border-black/[0.08] bg-[#fafbfc] shrink-0">
                 <input
                     type="text"
-                    className={styles.searchInput}
+                    className="flex-1 py-1 px-2 border border-gray-300 rounded-lg text-xs leading-[18px] text-[#40444d] bg-white outline-none min-w-0 focus:border-primary placeholder:text-gray-400"
                     placeholder={t('canvas.bottomPanel.logViewer.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <div className={styles.filterGroup}>
-                    <label className={styles.filterLabel}>
+                <div className="flex items-center gap-1.5">
+                    <label className={filterLabelClass}>
                         <input
                             type="checkbox"
                             checked={showDebug}
@@ -82,7 +81,7 @@ const LogColumn: React.FC<LogColumnInternalProps> = ({ LogViewerComponent }) => 
                         />
                         {t('canvas.bottomPanel.logViewer.showDebug')}
                     </label>
-                    <label className={styles.filterLabel}>
+                    <label className={filterLabelClass}>
                         <input
                             type="checkbox"
                             checked={showTools}
@@ -91,7 +90,7 @@ const LogColumn: React.FC<LogColumnInternalProps> = ({ LogViewerComponent }) => 
                         {t('canvas.bottomPanel.logViewer.showTools')}
                     </label>
                 </div>
-                <label className={styles.autoScrollLabel}>
+                <label className={`${filterLabelClass} ml-auto`}>
                     <input
                         type="checkbox"
                         checked={autoScroll}
@@ -101,14 +100,14 @@ const LogColumn: React.FC<LogColumnInternalProps> = ({ LogViewerComponent }) => 
                 </label>
             </div>
             {noResults ? (
-                <div className={styles.noMatch}>
+                <div className="p-4 text-xs text-[#7a7f89] text-center">
                     {t('canvas.bottomPanel.logViewer.noMatch')}
                 </div>
             ) : (
                 <Viewer
                     logs={filteredLogs}
                     onClearLogs={clearLogs}
-                    className={styles.logViewerFill}
+                    className="flex-1 min-h-0 overflow-hidden flex flex-col text-[15px]"
                 />
             )}
         </div>

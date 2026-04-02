@@ -4,8 +4,8 @@ import { BottomPanelProvider } from '../context/BottomPanelProvider';
 import ResizeHandle from './ResizeHandle';
 import BottomPanelHeader from './BottomPanelHeader';
 import BottomPanelContent from './BottomPanelContent';
+import { cn } from '@xgen/ui';
 import type { LogViewerProps, BottomPanelProviderProps } from '../types';
-import styles from '../styles/bottom-panel.module.scss';
 
 // ── Inner panel (requires context) ────────────────────────────
 
@@ -19,15 +19,13 @@ const BottomPanelInner: React.FC<BottomPanelInnerProps> = ({ LogViewerComponent 
     const isExpanded = panelMode === 'expanded';
     const isFullscreen = panelMode === 'fullscreen';
 
-    const modeClass = isFullscreen
-        ? styles.fullscreen
-        : isExpanded
-            ? styles.expanded
-            : '';
-
     return (
         <div
-            className={`${styles.wrapper} ${modeClass}`}
+            className={cn(
+                'absolute left-0 right-0 bottom-0 flex flex-col z-[11] pointer-events-none [&>*]:pointer-events-auto',
+                isFullscreen && 'h-[calc(100vh-56px)]',
+                isExpanded && !isFullscreen && 'h-[var(--panel-height,300px)]',
+            )}
             style={isExpanded ? { '--panel-height': `${panelHeight}px` } as React.CSSProperties : undefined}
         >
             {isExpanded && (

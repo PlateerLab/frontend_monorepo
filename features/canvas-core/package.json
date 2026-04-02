@@ -10,6 +10,7 @@
         "@xgen/types": "workspace:*",
         "@xgen/i18n": "workspace:*",
         "@xgen/icons": "workspace:*",
+        "@xgen/ui": "workspace:*",
         "@xgen/canvas-engine": "workspace:*",
         "react": "^19.0.0"
     }

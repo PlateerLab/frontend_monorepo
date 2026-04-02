@@ -1,6 +1,5 @@
 import React, { useCallback, useRef, useEffect } from 'react';
 import type { ResizeHandleProps } from '../types';
-import styles from '../styles/resize-handle.module.scss';
 
 const MIN_PANEL_HEIGHT = 150;
 const MAX_VH_RATIO = 0.6; // 60vh
@@ -59,8 +58,13 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({ onResize, onResizeEnd, disa
     if (disabled) return null;
 
     return (
-        <div className={styles.resizeHandle} onMouseDown={handleMouseDown} role="separator" aria-orientation="horizontal">
-            <div className={styles.indicator} />
+        <div
+            className="absolute -top-[3px] left-0 right-0 h-1.5 cursor-ns-resize z-[1] flex items-center justify-center group hover:[&>div]:bg-primary"
+            onMouseDown={handleMouseDown}
+            role="separator"
+            aria-orientation="horizontal"
+        >
+            <div className="w-9 h-[3px] rounded-sm bg-transparent transition-[background] duration-150" />
         </div>
     );
 };

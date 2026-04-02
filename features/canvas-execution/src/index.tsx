@@ -1,4 +1,5 @@
 import './locales';
+import './styles/animations.css';
 import type { CanvasPagePlugin } from '@xgen/types';
 
 // ── Types (New) ────────────────────────────────────────────────

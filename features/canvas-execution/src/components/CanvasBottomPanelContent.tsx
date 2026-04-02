@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { LuSend } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
+import { cn } from '@xgen/ui';
 import {
     hasError,
     hasOutputs,
     isStreamingOutput,
     type ExecutionOutput,
 } from '../types';
-import styles from '../styles/canvas-bottom-panel-content.module.scss';
 
 // ── Helpers ────────────────────────────────────────────────────
 
@@ -265,26 +265,30 @@ const CanvasBottomPanelContent: React.FC<CanvasBottomPanelContentProps> = ({
         (executionOrder.execution_order && executionOrder.execution_order.length > 0)
     );
 
+    const tabClass = 'flex-1 py-2 border-none bg-transparent text-xs font-medium text-gray-400 cursor-pointer relative flex items-center justify-center gap-1.5 transition-colors duration-150 hover:text-[#40444d]';
+    const tabActiveClass = "text-primary font-semibold after:content-[''] after:absolute after:bottom-0 after:left-4 after:right-4 after:h-0.5 after:bg-primary after:rounded-[1px]";
+    const bouncingDotsClass = 'flex gap-1 py-1 [&_span]:w-1.5 [&_span]:h-1.5 [&_span]:rounded-full [&_span]:bg-gray-400 [&_span]:animate-[bouncing-dots_1.2s_infinite] [&_span:nth-child(2)]:delay-200 [&_span:nth-child(3)]:delay-[400ms]';
+
     return (
-        <div className={styles.box}>
+        <div className="flex flex-1 min-h-0 bg-white border border-black/[0.08] border-t-0 overflow-hidden">
             {/* Left: Execution with Chat / Executor tabs */}
-            <div className={styles.colExecution}>
-                <div className={styles.executionTabs}>
+            <div className="shrink-0 basis-[500px] w-[500px] min-w-[500px] max-w-[500px] flex flex-col border-r border-black/[0.08]">
+                <div className="flex border-b border-black/[0.08] shrink-0 bg-[#fafbfc]">
                     <button
                         type="button"
-                        className={`${styles.executionTab} ${executionTab === 'chat' ? styles.executionTabActive : ''}`}
+                        className={cn(tabClass, executionTab === 'chat' && tabActiveClass)}
                         onClick={() => setExecutionTab('chat')}
                     >
                         {t('canvas.executionPanel.tabChat', 'Chat')}
                     </button>
                     <button
                         type="button"
-                        className={`${styles.executionTab} ${executionTab === 'executor' ? styles.executionTabActive : ''}`}
+                        className={cn(tabClass, executionTab === 'executor' && tabActiveClass)}
                         onClick={() => setExecutionTab('executor')}
                     >
                         {t('canvas.executionPanel.tabExecutor', 'Executor')}
                         {executionSource === 'button' && isExecuting && (
-                            <span className={styles.executionTabDot} />
+                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary animate-[exec-pulse_1s_infinite]" />
                         )}
                     </button>
                 </div>
@@ -292,32 +296,37 @@ const CanvasBottomPanelContent: React.FC<CanvasBottomPanelContentProps> = ({
                 {/* Chat tab */}
                 {executionTab === 'chat' && (
                     <>
-                        <div className={styles.chatArea} ref={chatScrollRef}>
+                        <div className="flex-1 overflow-y-auto py-3 px-4 flex flex-col gap-2 text-xs font-normal leading-4 text-[#40444d]" ref={chatScrollRef}>
                             {chatMessages.length === 0 ? (
-                                <span className={styles.placeholder}>
+                                <span className="text-[#7a7f89]">
                                     {t('canvas.executionPanel.chatPlaceholder', 'Send a message to execute the workflow')}
                                 </span>
                             ) : (
                                 chatMessages.map((msg) => (
                                     <div
                                         key={msg.id}
-                                        className={`${styles.chatBubble} ${msg.role === 'user' ? styles.chatUser : styles.chatAssistant}`}
+                                        className={cn(
+                                            'max-w-[85%] py-2 px-3 rounded-[10px] break-words',
+                                            msg.role === 'user'
+                                                ? 'self-end bg-primary text-white rounded-br-sm'
+                                                : 'self-start bg-gray-100 text-[#40444d] rounded-bl-sm',
+                                        )}
                                     >
                                         {msg.role === 'assistant' && !msg.content && isExecuting ? (
-                                            <div className={styles.chatTyping}>
+                                            <div className={bouncingDotsClass}>
                                                 <span /><span /><span />
                                             </div>
                                         ) : (
-                                            <pre className={styles.chatContent}>{msg.content}</pre>
+                                            <pre className="m-0 whitespace-pre-wrap break-words text-xs leading-[18px]">{msg.content}</pre>
                                         )}
                                     </div>
                                 ))
                             )}
                         </div>
                         {onExecuteWithInput && (
-                            <div className={styles.chatInputBar}>
+                            <div className="flex items-end gap-1.5 py-2 px-3 border-t border-black/[0.08] bg-[#fafbfc] shrink-0">
                                 <textarea
-                                    className={styles.chatInput}
+                                    className="flex-1 py-1.5 px-2.5 border border-gray-300 rounded-lg text-xs leading-[18px] text-[#40444d] bg-white resize-none min-h-[30px] max-h-[60px] outline-none transition-[border-color] duration-150 focus:border-primary focus:shadow-[0_0_0_2px_rgba(37,99,235,0.1)] placeholder:text-gray-400 disabled:opacity-50"
                                     value={chatInput}
                                     onChange={(e) => setChatInput(e.target.value)}
                                     onKeyDown={handleChatKeyDown}
@@ -326,7 +335,7 @@ const CanvasBottomPanelContent: React.FC<CanvasBottomPanelContentProps> = ({
                                     rows={1}
                                 />
                                 <button
-                                    className={styles.chatSendBtn}
+                                    className="flex items-center justify-center w-[30px] h-[30px] border-none rounded-lg bg-primary text-white cursor-pointer shrink-0 transition-[background] duration-150 hover:enabled:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed [&_svg]:w-3.5 [&_svg]:h-3.5"
                                     onClick={handleSendChat}
                                     disabled={isExecuting || !chatInput.trim()}
                                     title={t('canvas.executionPanel.send', 'Send')}
@@ -341,19 +350,19 @@ const CanvasBottomPanelContent: React.FC<CanvasBottomPanelContentProps> = ({
 
                 {/* Executor tab */}
                 {executionTab === 'executor' && (
-                    <div className={styles.executorArea}>
+                    <div className="flex-1 overflow-y-auto py-3 px-4 text-xs font-normal leading-4 text-[#40444d]">
                         {!buttonResultText && !(executionSource === 'button' && isExecuting) ? (
-                            <span className={styles.placeholder}>
+                            <span className="text-[#7a7f89]">
                                 {t('canvas.executionPanel.placeholder', 'Run workflow to see results')}
                             </span>
                         ) : (
                             <>
                                 {executionSource === 'button' && isExecuting && !buttonResultText && (
-                                    <div className={styles.executorLoading}>
+                                    <div className={bouncingDotsClass}>
                                         <span /><span /><span />
                                     </div>
                                 )}
-                                <pre className={styles.executionPre}>{buttonResultText}</pre>
+                                <pre className="m-0 whitespace-pre-wrap break-words">{buttonResultText}</pre>
                             </>
                         )}
                     </div>
@@ -361,10 +370,10 @@ const CanvasBottomPanelContent: React.FC<CanvasBottomPanelContentProps> = ({
             </div>
 
             {/* Middle: Execution Order Graph */}
-            <div className={styles.colOrder}>
-                <div className={styles.orderInner}>
+            <div className="shrink-0 basis-[252px] min-w-0 bg-[#f7f8fa] border-r border-black/[0.08] overflow-auto">
+                <div className="p-4">
                     {isLoading && !executionOrder && (
-                        <div className={styles.orderLoading}>...</div>
+                        <div className="text-xs text-[#7a7f89]">...</div>
                     )}
                     {filteredOrder.map((group: string[], index: number) => {
                         const groupKey = group.join('-');
@@ -375,17 +384,20 @@ const CanvasBottomPanelContent: React.FC<CanvasBottomPanelContentProps> = ({
                         return (
                             <div
                                 key={groupKey}
-                                className={`${styles.orderRow} ${group.length > 1 ? styles.orderRowGroup : ''}`}
+                                className={cn(
+                                    'flex items-center gap-4 mb-2.5 last:mb-0',
+                                    group.length > 1 && 'items-start',
+                                )}
                             >
-                                <span className={styles.orderNum}>{index + 1}</span>
+                                <span className="text-xs font-bold leading-4 text-[#40444d] shrink-0">{index + 1}</span>
                                 {group.length === 1 ? (
-                                    <span className={styles.orderNodeName}>{getNodeName(group[0])}</span>
+                                    <span className="text-xs font-normal leading-4 text-[#40444d] min-w-0">{getNodeName(group[0])}</span>
                                 ) : (
-                                    <div className={styles.orderGroupColumn}>
+                                    <div className="flex flex-col gap-1 min-w-0 flex-1 border-l border-black/[0.08] pl-2.5">
                                         {group.map((nodeId: string, subIndex: number) => (
-                                            <div key={nodeId} className={styles.orderSubItem}>
-                                                <span className={styles.orderSubIndex}>{subIndex + 1}.</span>
-                                                <span className={styles.orderSubName}>{getNodeName(nodeId)}</span>
+                                            <div key={nodeId} className="flex items-center min-w-0">
+                                                <span className="text-xs font-normal text-[#40444d] mr-1.5 shrink-0">{subIndex + 1}.</span>
+                                                <span className="text-xs font-normal leading-4 text-[#40444d] min-w-0">{getNodeName(nodeId)}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -394,7 +406,7 @@ const CanvasBottomPanelContent: React.FC<CanvasBottomPanelContentProps> = ({
                         );
                     })}
                     {!isLoading && (!hasExecutionData || filteredOrder.length === 0) && (
-                        <div className={styles.orderEmpty}>
+                        <div className="text-xs text-[#7a7f89]">
                             {t('canvas.detailPanel.noExecutionOrderData', 'No execution order data')}
                         </div>
                     )}
@@ -402,11 +414,11 @@ const CanvasBottomPanelContent: React.FC<CanvasBottomPanelContentProps> = ({
             </div>
 
             {/* Right: Log Viewer */}
-            <div className={styles.colLog}>
+            <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
                 {LogViewerComponent ? (
-                    <LogViewerComponent logs={logs} onClearLogs={onClearLogs} className={styles.logViewerFill} />
+                    <LogViewerComponent logs={logs} onClearLogs={onClearLogs} className="flex-1 min-h-0 overflow-hidden flex flex-col text-[15px]" />
                 ) : (
-                    <pre className={styles.logViewerFill} style={{ padding: 16, margin: 0, whiteSpace: 'pre-wrap', overflowY: 'auto' }}>
+                    <pre className="flex-1 min-h-0 overflow-y-auto p-4 m-0 whitespace-pre-wrap text-[15px]">
                         {logs.map((l: any) => JSON.stringify(l)).join('\n')}
                     </pre>
                 )}
