@@ -82,10 +82,49 @@ export type { ToggleProps } from './inputs/toggle';
 export { DropdownMenu } from './navigation/dropdown-menu';
 export type { DropdownMenuProps, DropdownMenuItem } from './navigation/dropdown-menu';
 
-// Sidebar Components - 범용 사이드바 (admin, main, mypage, support 등)
-export { Sidebar, SidebarSection, SidebarPopover } from './navigation/sidebar';
+// Sidebar Components — 조합형 사이드바 프리미티브 + 호환 API
+export {
+  // Composed (backward-compatible)
+  Sidebar,
+  // Primitives
+  SidebarLayout,
+  SidebarCollapseToggle,
+  SidebarHeader as SidebarHeaderPrimitive,
+  SidebarHeaderTop,
+  SidebarLogoButton,
+  SidebarModeLabel,
+  SidebarContent,
+  SidebarSectionList,
+  SidebarSectionToggle,
+  SidebarSectionNav,
+  SidebarNavItem,
+  SidebarFooter,
+  SidebarDivider,
+  SidebarUserProfile as SidebarUserProfilePrimitive,
+  SidebarFooterButton,
+  SidebarSupportSection,
+  SidebarPopover,
+  // Legacy
+  SidebarSection,
+} from './navigation/sidebar';
 export type {
   SidebarProps,
+  SidebarLayoutProps,
+  SidebarCollapseToggleProps,
+  SidebarHeaderProps,
+  SidebarHeaderTopProps,
+  SidebarLogoButtonProps,
+  SidebarModeLabelProps,
+  SidebarContentProps,
+  SidebarSectionListProps,
+  SidebarSectionToggleProps,
+  SidebarSectionNavProps,
+  SidebarNavItemProps,
+  SidebarFooterProps,
+  SidebarDividerProps,
+  SidebarUserProfileProps,
+  SidebarFooterButtonProps,
+  SidebarSupportSectionProps,
   SidebarSectionProps,
   SidebarPopoverProps,
   PopoverItem,
@@ -94,9 +133,9 @@ export type {
   SidebarMenuItem,
   SidebarSectionId,
   SidebarSupportItem,
-  SidebarUserProfile,
+  SidebarUserProfileType,
   SidebarLogo,
-  SidebarHeader,
+  SidebarHeaderType,
   SidebarSupport,
   SidebarVariant,
 } from './navigation/sidebar';

@@ -1,17 +1,20 @@
 ﻿'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { motion } from 'framer-motion';
 import { useTranslation } from '@xgen/i18n';
-import { FiChevronLeft, FiChevronRight, FiChevronUp, FiHelpCircle, FiSettings, FiLogOut } from '@xgen/icons';
-import type { SidebarConfig, SidebarSection as SidebarSectionType, SidebarSectionId } from '@xgen/types';
-import { SidebarSection } from './sidebar-section';
-import { SidebarPopover, PopoverItem } from './sidebar-popover';
+import type { SidebarSection as SidebarSectionType, SidebarSectionId } from '@xgen/types';
+import { SidebarLayout } from './sidebar-layout';
+import { SidebarCollapseToggle } from './sidebar-collapse-toggle';
+import { SidebarHeader, SidebarHeaderTop, SidebarLogoButton, SidebarModeLabel } from './sidebar-header';
+import { SidebarContent } from './sidebar-content';
+import { SidebarSectionList, SidebarSectionToggle, SidebarSectionNav, SidebarNavItem } from './sidebar-section-primitives';
+import { SidebarFooter, SidebarDivider, SidebarUserProfile, SidebarFooterButton, SidebarSupportSection } from './sidebar-footer';
+import { SidebarPopover, type PopoverItem } from './sidebar-popover';
 import { cn } from '../../lib/utils';
 
-// ─────────────────────────────────────────────────────────────
-// Section Icons (기본 아이콘)
-// ─────────────────────────────────────────────────────────────
+// ---------------------------------------------------------------------------
+// Section Icons
+// ---------------------------------------------------------------------------
 
 const DefaultSectionIcons: Record<string, React.ReactNode> = {
   workspace: (
@@ -61,7 +64,7 @@ const DefaultSectionIcons: Record<string, React.ReactNode> = {
   ),
 };
 
-const getDefaultIcon = (sectionId: string): React.ReactNode => {
+function getDefaultIcon(sectionId: string): React.ReactNode {
   if (sectionId.includes('workspace') || sectionId.includes('dashboard')) return DefaultSectionIcons.workspace;
   if (sectionId.includes('chat')) return DefaultSectionIcons.chat;
   if (sectionId.includes('workflow') || sectionId.includes('canvas')) return DefaultSectionIcons.workflow;
@@ -70,10 +73,14 @@ const getDefaultIcon = (sectionId: string): React.ReactNode => {
   if (sectionId.includes('support') || sectionId.includes('faq')) return DefaultSectionIcons.support;
   if (sectionId.includes('admin')) return DefaultSectionIcons.admin;
   return DefaultSectionIcons.workspace;
-};
+}
+
+// ---------------------------------------------------------------------------
+// Sidebar (SidebarConfig-based API, backward compatible)
+// ---------------------------------------------------------------------------
 
 export interface SidebarProps {
-  config: SidebarConfig;
+  config: import('@xgen/types').SidebarConfig;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ config }) => {
@@ -82,6 +89,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ config }) => {
     logo, header, sections, support, user, onLogout, onNavigate, onLogoClick,
     collapsed = false, onToggle, activeItemId = '', variant = 'main', className,
   } = config;
+
+  const isOpen = !collapsed;
 
   const [expandedSection, setExpandedSection] = useState<SidebarSectionId | null>(null);
   const [supportExpanded, setSupportExpanded] = useState(false);
@@ -135,170 +144,164 @@ export const Sidebar: React.FC<SidebarProps> = ({ config }) => {
   const isSupportActive = support?.items.some((item) => item.id === activeItemId) || false;
 
   return (
-    <motion.aside
+    <SidebarLayout
+      isOpen={isOpen}
+      openWidth={250}
+      closedWidth={72}
       className={cn(
-        'flex flex-col h-full border-r border-border bg-card relative transition-all duration-300',
-        collapsed ? 'w-16' : 'w-60',
         variant === 'admin' && 'bg-gray-900 text-gray-100 border-gray-700',
         className,
       )}
-      initial={{ x: '-100%' }}
-      animate={{ x: 0 }}
-      exit={{ x: '-100%' }}
-      transition={{ type: 'tween', duration: 0.3 }}
     >
-      {/* SVG gradient for active state */}
-      <svg aria-hidden="true" style={{ position: 'absolute', width: 0, height: 0 }}>
-        <defs>
-          <linearGradient id="sidebarActiveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0.0164" stopColor="#305EEB" />
-            <stop offset="1" stopColor="#783CED" />
-          </linearGradient>
-        </defs>
-      </svg>
-
-      {/* Collapse Toggle */}
       {onToggle && (
-        <button
-          onClick={onToggle}
-          className="absolute -right-3 top-6 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card shadow-sm hover:bg-gray-50 transition-colors"
-          title={collapsed ? t('sidebar.openSidebar') : t('sidebar.closeSidebar')}
-          aria-label={collapsed ? t('sidebar.openSidebar') : t('sidebar.closeSidebar')}
-        >
-          {collapsed ? <FiChevronRight className="w-3.5 h-3.5" /> : <FiChevronLeft className="w-3.5 h-3.5" />}
-        </button>
+        <SidebarCollapseToggle
+          isOpen={isOpen}
+          onToggle={onToggle}
+          openTitle={t('sidebar.openSidebar')}
+          closeTitle={t('sidebar.closeSidebar')}
+        />
       )}
 
-      <div className="flex flex-col h-full overflow-hidden">
-        {/* Header */}
-        <div className={cn('px-3 pt-4 pb-2', collapsed && 'px-2')}>
-          <div className="flex items-center gap-2">
-            <button
-              className="text-lg font-bold text-foreground hover:opacity-80 transition-opacity"
-              onClick={handleLogoClick}
-            >
+      <SidebarHeader className={collapsed ? 'px-0 flex justify-center' : undefined}>
+        <SidebarHeaderTop className={collapsed ? 'justify-center' : undefined}>
+          <SidebarLogoButton onClick={handleLogoClick}>
+            <span className="font-pretendard text-[var(--subtitle1-font-size,14px)] font-bold leading-[var(--subtitle1-line-height,20px)]">
               {collapsed ? (logo?.collapsed || 'X') : (logo?.expanded || 'XGEN')}
+            </span>
+          </SidebarLogoButton>
+          {!collapsed && header?.modeLabelKey && (
+            <SidebarModeLabel className={variant === 'admin' ? 'text-[var(--color-info-200)]' : undefined}>
+              {t(header.modeLabelKey)}
+            </SidebarModeLabel>
+          )}
+          {!collapsed && header?.showAdminButton && header?.onAdminClick && (
+            <button
+              type="button"
+              onClick={header.onAdminClick}
+              className="ml-auto p-[6px] border border-[var(--color-line-50)] rounded-[6px] bg-white text-[var(--color-gray-800)] cursor-pointer flex items-center justify-center transition-colors hover:bg-[var(--color-bg-50)] hover:border-[var(--color-gray-500)]"
+              title={t('common.adminPage')}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
             </button>
-            {!collapsed && header?.modeLabelKey && (
-              <span className="text-xs text-muted-foreground">{t(header.modeLabelKey)}</span>
-            )}
-            {!collapsed && header?.showAdminButton && header?.onAdminClick && (
-              <button
-                type="button"
-                onClick={header.onAdminClick}
-                className="ml-auto p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors"
-                title={t('common.adminPage')}
-              >
-                <FiSettings className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        </div>
+          )}
+        </SidebarHeaderTop>
+      </SidebarHeader>
 
-        {/* Sections */}
-        <div className="flex-1 overflow-y-auto px-2 py-1 flex flex-col gap-0.5">
-          {sections.map((section) => (
-            <SidebarSection
-              key={section.id}
-              section={section}
-              isExpanded={expandedSection === section.id}
-              onToggle={() => toggleSection(section.id)}
-              activeItemId={activeItemId}
-              onItemClick={onNavigate}
-              isSidebarCollapsed={collapsed}
-              onCollapsedSectionClick={(e) => handleCollapsedSectionClick(section.id, e)}
-              isPopoverOpen={openPopover === section.id}
-              defaultIcon={getDefaultIcon(section.id)}
-            />
-          ))}
-        </div>
+      <SidebarContent>
+        <SidebarSectionList>
+          {sections.map((section) => {
+            const hasActiveItem = section.items.some((item) => item.id === activeItemId);
+            const isExpanded = expandedSection === section.id;
+            const isActive = isExpanded || openPopover === section.id || hasActiveItem;
 
-        {/* Footer */}
-        <div className="mt-auto px-2 pb-3">
-          <hr className="border-border mb-2" />
+            const handleToggleClick = (e: React.MouseEvent) => {
+              if (collapsed) {
+                handleCollapsedSectionClick(section.id, e);
+              } else {
+                toggleSection(section.id);
+              }
+            };
 
-          {/* Support */}
-          {support && (
-            <>
-              {!collapsed && (
-                <nav
-                  className={cn(
-                    'overflow-hidden transition-all duration-200',
-                    supportExpanded ? 'max-h-48 opacity-100 mb-1' : 'max-h-0 opacity-0',
-                  )}
-                >
-                  <div className="pl-3 flex flex-col gap-0.5">
-                    {support.items.map((item) => (
-                      <button
+            return (
+              <React.Fragment key={section.id}>
+                <SidebarSectionToggle
+                  title={t(section.titleKey)}
+                  icon={getDefaultIcon(section.id)}
+                  isExpanded={isExpanded}
+                  isActive={isActive}
+                  isSidebarClosed={collapsed}
+                  onClick={handleToggleClick}
+                />
+                {!collapsed && (
+                  <SidebarSectionNav isExpanded={isExpanded}>
+                    {section.items.map((item) => (
+                      <SidebarNavItem
                         key={item.id}
-                        className={cn(
-                          'w-full text-left px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:bg-gray-50 transition-colors',
-                          activeItemId === item.id && 'text-primary font-medium bg-primary/5',
-                        )}
+                        id={item.id}
+                        title={t(item.titleKey)}
+                        isActive={activeItemId === item.id}
+                        disabled={item.disabled}
+                        badge={item.badge}
                         onClick={() => onNavigate(item.id, item.href)}
-                      >
-                        {t(item.titleKey)}
-                      </button>
+                      />
                     ))}
-                  </div>
-                </nav>
-              )}
+                  </SidebarSectionNav>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </SidebarSectionList>
+      </SidebarContent>
 
+      <SidebarFooter>
+        {support && (
+          <>
+            {!collapsed ? (
+              <SidebarSupportSection
+                label={t(support.titleKey)}
+                isExpanded={supportExpanded}
+                isActive={isSupportActive}
+                isSidebarClosed={collapsed}
+                onToggle={() => setSupportExpanded((prev) => !prev)}
+              >
+                {support.items.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className="w-full flex items-center px-4 py-[10px] text-[var(--color-gray-800)] bg-transparent border-none text-left cursor-pointer text-[var(--subtitle1-font-size,14px)] leading-[var(--subtitle1-line-height,20px)] hover:bg-[var(--color-bg-50)]"
+                    onClick={() => onNavigate(item.id, item.href)}
+                  >
+                    <span className="font-normal overflow-hidden text-ellipsis whitespace-nowrap">{t(item.titleKey)}</span>
+                  </button>
+                ))}
+              </SidebarSupportSection>
+            ) : (
               <button
                 type="button"
+                onClick={handleSupportClickWhenCollapsed}
                 className={cn(
-                  'w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors',
-                  'hover:bg-gray-50 text-muted-foreground',
-                  (isSupportActive || supportExpanded) && 'text-primary bg-primary/5',
+                  'flex items-center justify-center p-[18px]',
+                  'bg-transparent border-none cursor-pointer w-full',
+                  'text-[var(--color-gray-800)]',
+                  (isSupportActive || openPopover === 'support') && 'bg-[var(--color-primary-w-50)]',
                 )}
-                onClick={collapsed ? handleSupportClickWhenCollapsed : () => setSupportExpanded((prev) => !prev)}
                 data-sidebar-trigger
               >
-                <FiHelpCircle className="w-5 h-5 shrink-0" />
-                {!collapsed && (
-                  <>
-                    <span className="flex-1 text-left">{t(support.titleKey)}</span>
-                    <span className={cn('w-4 h-4 transition-transform duration-200', supportExpanded && 'rotate-180')}>
-                      <FiChevronUp />
-                    </span>
-                  </>
-                )}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
               </button>
+            )}
+            <SidebarDivider />
+          </>
+        )}
 
-              <hr className="border-border my-2" />
-            </>
-          )}
+        {user && (
+          <div className={cn('flex items-center gap-2 w-full', collapsed && 'justify-center')}>
+            <SidebarUserProfile name={user.name} isSidebarClosed={collapsed} />
+            {!collapsed && onLogout && (
+              <SidebarFooterButton
+                onClick={onLogout}
+                title={t('common.logout')}
+                variant="logout"
+                icon={
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                }
+              />
+            )}
+          </div>
+        )}
+      </SidebarFooter>
 
-          {/* User */}
-          {user && (
-            <div className="flex items-center gap-2">
-              <button className="flex items-center gap-2 flex-1 min-w-0 p-1.5 rounded-md hover:bg-gray-50 transition-colors" type="button">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-semibold shrink-0">
-                  {user.avatar || user.name.charAt(0).toUpperCase()}
-                </div>
-                {!collapsed && (
-                  <div className="flex flex-col min-w-0 text-left">
-                    <span className="text-sm font-medium text-foreground truncate">{user.name}</span>
-                    {user.role && <span className="text-[11px] text-muted-foreground truncate">{user.role}</span>}
-                  </div>
-                )}
-              </button>
-              {!collapsed && onLogout && (
-                <button
-                  type="button"
-                  className="p-1.5 rounded-md text-muted-foreground hover:text-error hover:bg-error/5 transition-colors"
-                  onClick={onLogout}
-                  title={t('common.logout')}
-                >
-                  <FiLogOut className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Popover for collapsed state */}
       {openPopover && (
         <SidebarPopover
           anchorRect={popoverAnchor}
@@ -308,7 +311,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ config }) => {
           onClose={() => setOpenPopover(null)}
         />
       )}
-    </motion.aside>
+    </SidebarLayout>
   );
 };
 

@@ -1,18 +1,59 @@
-'use client';
+﻿'use client';
 
-// ─────────────────────────────────────────────────────────────
-// @xgen/ui - Sidebar 컴포넌트
-// 범용 사이드바 - admin, main, mypage, support 등 모든 페이지에서 사용
-// ─────────────────────────────────────────────────────────────
+// ---------------------------------------------------------------------------
+// @xgen/ui - Sidebar Components
+// Composable sidebar primitives + backward-compatible Sidebar (SidebarConfig)
+// ---------------------------------------------------------------------------
 
+// Composed Sidebar (backward-compatible API)
 export { Sidebar } from './sidebar';
 export type { SidebarProps } from './sidebar';
 
-export { SidebarSection } from './sidebar-section';
-export type { SidebarSectionProps } from './sidebar-section';
+// --- Primitives ---
 
+// Layout Shell
+export { SidebarLayout } from './sidebar-layout';
+export type { SidebarLayoutProps } from './sidebar-layout';
+
+// Collapse Toggle
+export { SidebarCollapseToggle } from './sidebar-collapse-toggle';
+export type { SidebarCollapseToggleProps } from './sidebar-collapse-toggle';
+
+// Header
+export { SidebarHeader, SidebarHeaderTop, SidebarLogoButton, SidebarModeLabel } from './sidebar-header';
+export type { SidebarHeaderProps, SidebarHeaderTopProps, SidebarLogoButtonProps, SidebarModeLabelProps } from './sidebar-header';
+
+// Content
+export { SidebarContent } from './sidebar-content';
+export type { SidebarContentProps } from './sidebar-content';
+
+// Section primitives
+export { SidebarSectionList, SidebarSectionToggle, SidebarSectionNav, SidebarNavItem } from './sidebar-section-primitives';
+export type { SidebarSectionListProps, SidebarSectionToggleProps, SidebarSectionNavProps, SidebarNavItemProps } from './sidebar-section-primitives';
+
+// Footer
+export {
+  SidebarFooter,
+  SidebarDivider,
+  SidebarUserProfile,
+  SidebarFooterButton,
+  SidebarSupportSection,
+} from './sidebar-footer';
+export type {
+  SidebarFooterProps,
+  SidebarDividerProps,
+  SidebarUserProfileProps,
+  SidebarFooterButtonProps,
+  SidebarSupportSectionProps,
+} from './sidebar-footer';
+
+// Popover
 export { SidebarPopover } from './sidebar-popover';
 export type { SidebarPopoverProps, PopoverItem } from './sidebar-popover';
+
+// Legacy SidebarSection (accordion) - kept for backward compat
+export { SidebarSection } from './sidebar-section';
+export type { SidebarSectionProps } from './sidebar-section';
 
 // Types re-exported from @xgen/types for convenience
 export type {
@@ -21,9 +62,9 @@ export type {
   SidebarMenuItem,
   SidebarSectionId,
   SidebarSupportItem,
-  SidebarUserProfile,
+  SidebarUserProfile as SidebarUserProfileType,
   SidebarLogo,
-  SidebarHeader,
+  SidebarHeader as SidebarHeaderType,
   SidebarSupport,
   SidebarVariant,
 } from '@xgen/types';

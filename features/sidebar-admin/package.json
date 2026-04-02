@@ -1,0 +1,21 @@
+{
+  "name": "@xgen/sidebar-admin",
+  "version": "0.0.0",
+  "private": true,
+  "main": "src/index.tsx",
+  "types": "src/index.tsx",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "dependencies": {
+    "@xgen/i18n": "workspace:*",
+    "@xgen/icons": "workspace:*",
+    "@xgen/types": "workspace:*",
+    "@xgen/ui": "workspace:*",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19"
+  }
+}

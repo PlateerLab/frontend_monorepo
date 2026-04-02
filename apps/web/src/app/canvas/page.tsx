@@ -2,9 +2,8 @@
 
 import React, { Suspense, useEffect, useState, useCallback, useMemo, lazy } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sidebar } from '@xgen/ui';
-import type { SidebarConfig } from '@xgen/ui';
-import type { SidebarSection as SidebarSectionType } from '@xgen/types';
+import { MainSidebar } from '@xgen/sidebar-main';
+import type { MainSidebarSection } from '@xgen/sidebar-main';
 import { useTranslation } from '@xgen/i18n';
 import { AuthGuard, useAuth } from '@xgen/auth-provider';
 import { featureRegistry, initializeFeatures } from '@/features';
@@ -36,25 +35,6 @@ const LoadingSpinner: React.FC = () => (
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
 );
-
-// ─────────────────────────────────────────────────────────────
-// Transform feature sidebar sections to @xgen/ui format
-// ─────────────────────────────────────────────────────────────
-
-function transformToSidebarSections(
-    featureSections: FeatureSidebarSection[]
-): SidebarSectionType[] {
-    return featureSections.map((section) => ({
-        id: section.id,
-        titleKey: section.titleKey,
-        items: section.items.map((item) => ({
-            id: item.id,
-            titleKey: item.titleKey,
-            descriptionKey: item.descriptionKey,
-            icon: item.iconComponent,
-        })),
-    }));
-}
 
 // ─────────────────────────────────────────────────────────────
 // Canvas Page Content Component
@@ -97,42 +77,20 @@ function CanvasPageContent() {
         setSidebarCollapsed(prev => !prev);
     }, []);
 
-    const sidebarSections = useMemo(
-        () => transformToSidebarSections(sections),
+    // Transform sections for MainSidebar
+    const mainSidebarSections: MainSidebarSection[] = useMemo(
+        () => sections.map((section) => ({
+            id: section.id,
+            titleKey: section.titleKey,
+            items: section.items.map((item) => ({
+                id: item.id,
+                titleKey: item.titleKey,
+                descriptionKey: item.descriptionKey,
+                iconComponent: item.iconComponent,
+            })),
+        })),
         [sections]
     );
-
-    const sidebarConfig: SidebarConfig = useMemo(() => ({
-        logo: {
-            expanded: 'XGEN',
-            collapsed: 'X',
-        },
-        header: {
-            modeLabelKey: 'sidebar.userMode',
-            showAdminButton: false,
-        },
-        sections: sidebarSections,
-        support: {
-            titleKey: 'sidebar.support.title',
-            items: [
-                { id: 'service-request', titleKey: 'sidebar.support.request.title', href: '/support?view=inquiry' },
-                { id: 'faq', titleKey: 'sidebar.support.faq.title' },
-            ],
-        },
-        user: {
-            name: user?.username || 'User',
-            role: user?.is_admin ? 'Admin' : 'Member',
-        },
-        onNavigate: handleNavigate,
-        onLogoClick: () => handleNavigate('main-dashboard'),
-        onLogout: () => {
-            logout();
-        },
-        collapsed: sidebarCollapsed,
-        onToggle: handleSidebarToggle,
-        activeItemId: 'canvas',
-        variant: 'main',
-    }), [sidebarSections, handleNavigate, sidebarCollapsed, handleSidebarToggle, user, logout]);
 
     if (!pluginsReady) {
         return <LoadingSpinner />;
@@ -140,7 +98,16 @@ function CanvasPageContent() {
 
     return (
         <div className={styles.container}>
-            <Sidebar config={sidebarConfig} />
+            <MainSidebar
+                sections={mainSidebarSections}
+                activeItemId="canvas"
+                collapsed={sidebarCollapsed}
+                userName={user?.username}
+                isAdmin={user?.is_admin}
+                onNavigate={handleNavigate}
+                onToggle={handleSidebarToggle}
+                onLogout={() => logout()}
+            />
 
             <main className={`${styles.content} ${sidebarCollapsed ? styles.sidebarCollapsed : ''}`}>
                 <Suspense fallback={<LoadingSpinner />}>

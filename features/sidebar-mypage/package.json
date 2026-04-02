@@ -1,0 +1,14 @@
+{
+  "name": "@xgen/sidebar-mypage",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "dependencies": {
+    "@xgen/i18n": "workspace:*",
+    "@xgen/types": "workspace:*",
+    "@xgen/ui": "workspace:*",
+    "framer-motion": "^12.12.1",
+    "react": "^19.1.0"
+  }
+}
