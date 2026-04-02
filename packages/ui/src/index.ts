@@ -60,8 +60,11 @@ export { ResourceCardGrid } from './data-display/resource-card-grid';
 export type { ResourceCardGridProps } from './data-display/resource-card-grid';
 
 // Input Components
-export { Button } from './inputs/button';
-export type { ButtonProps, ButtonVariant, ButtonSize } from './inputs/button';
+export { Button, buttonVariants as inputButtonVariants } from './inputs/button';
+export type { ButtonProps, ButtonVariant, ButtonSize, ButtonPadding } from './inputs/button';
+
+export { LanguageToggle } from './inputs/language-toggle';
+export type { LanguageToggleProps, LanguageOption } from './inputs/language-toggle';
 
 export { SearchInput } from './inputs/search-input';
 export type { SearchInputProps } from './inputs/search-input';

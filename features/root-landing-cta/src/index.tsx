@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useTranslation } from '@xgen/i18n';
 import './locales';
 import { FiPlay, FiTrendingUp } from '@xgen/icons';
+import { Button } from '@xgen/ui';
 import type { IntroductionSectionPlugin } from '@xgen/types';
 
 function LandingCta() {
@@ -18,14 +19,18 @@ function LandingCta() {
         <h2>{t('cta.title')}</h2>
         <p>{t('cta.description')}</p>
         <div className="flex gap-3.5 justify-center flex-wrap mb-6">
-          <Link href="/canvas" className="inline-flex items-center justify-center no-underline cursor-pointer transition-all duration-[250ms] ease-[cubic-bezier(0.4,0,0.2,1)] border-none bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-[0_8px_24px_rgba(37,99,235,0.25)] font-semibold text-[0.9375rem] py-3.5 px-8 rounded-xl hover:from-blue-700 hover:to-purple-700 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(37,99,235,0.35)] [&_svg]:mr-2 [&_svg]:w-[1.125rem] [&_svg]:h-[1.125rem]">
-            <FiPlay />
-            {t('cta.startFree')}
-          </Link>
-          <Link href="/main" className="inline-flex items-center justify-center no-underline cursor-pointer transition-all duration-[250ms] ease-[cubic-bezier(0.4,0,0.2,1)] bg-white text-gray-700 border border-gray-200 font-semibold text-[0.9375rem] py-3.5 px-8 rounded-xl hover:bg-gray-50 hover:text-gray-900 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)] [&_svg]:mr-2 [&_svg]:w-[1.125rem] [&_svg]:h-[1.125rem]">
-            <FiTrendingUp />
-            {t('cta.exploreManagement')}
-          </Link>
+          <Button variant="gradient" size="lg" asChild className="rounded-xl shadow-[0_8px_24px_rgba(37,99,235,0.25)] hover:shadow-[0_12px_32px_rgba(37,99,235,0.35)] [&_svg]:mr-1 [&_svg]:w-[1.125rem] [&_svg]:h-[1.125rem]">
+            <Link href="/canvas">
+              <FiPlay />
+              {t('cta.startFree')}
+            </Link>
+          </Button>
+          <Button variant="outline" size="lg" asChild className="rounded-xl font-semibold [&_svg]:mr-1 [&_svg]:w-[1.125rem] [&_svg]:h-[1.125rem]">
+            <Link href="/main">
+              <FiTrendingUp />
+              {t('cta.exploreManagement')}
+            </Link>
+          </Button>
         </div>
         <div className="[&_span]:text-[0.8125rem] [&_span]:text-gray-500">
           <span>{t('cta.note')}</span>

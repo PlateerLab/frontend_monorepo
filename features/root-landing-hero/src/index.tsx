@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useTranslation } from '@xgen/i18n';
 import './locales';
 import { FiPlay, FiLayers, FiCpu, FiZap } from '@xgen/icons';
+import { Button } from '@xgen/ui';
 import type { IntroductionSectionPlugin } from '@xgen/types';
 
 function LandingHero() {
@@ -46,10 +47,12 @@ function LandingHero() {
         </div>
 
         <div className="flex items-center gap-4 flex-wrap justify-center lg:justify-start">
-          <Link href="/main" className="inline-flex items-center bg-gradient-to-br from-blue-600 to-purple-600 text-white py-3.5 px-8 shadow-[0_8px_24px_rgba(37,99,235,0.25)] font-semibold text-[0.9375rem] rounded-xl border-none no-underline cursor-pointer transition-all duration-[250ms] hover:from-blue-700 hover:to-purple-700 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(37,99,235,0.35)] [&_svg]:mr-2.5 [&_svg]:w-[1.125rem] [&_svg]:h-[1.125rem]">
-            <FiPlay />
-            {t('hero.cta')}
-          </Link>
+          <Button variant="gradient" size="lg" asChild className="rounded-xl shadow-[0_8px_24px_rgba(37,99,235,0.25)] hover:shadow-[0_12px_32px_rgba(37,99,235,0.35)] [&_svg]:mr-1 [&_svg]:w-[1.125rem] [&_svg]:h-[1.125rem]">
+            <Link href="/main">
+              <FiPlay />
+              {t('hero.cta')}
+            </Link>
+          </Button>
         </div>
       </div>
 

@@ -8,6 +8,7 @@
     "@xgen/types": "workspace:*",
     "@xgen/i18n": "workspace:*",
     "@xgen/icons": "workspace:*",
+    "@xgen/ui": "workspace:*",
     "next": "^16.2.1",
     "react": "^19.0.0"
   }

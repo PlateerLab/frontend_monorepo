@@ -33,12 +33,6 @@ body {
   font-family: var(--font-sans);
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 /* ─── Typography Utility Classes (Figma publish/component/typography) ─── */
 .typo-subtitle3 {
   font-family: var(--font-base);
