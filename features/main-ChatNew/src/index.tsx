@@ -434,7 +434,6 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
               tabs={statusTabs}
               activeKey={statusFilter}
               onChange={(key) => setStatusFilter(key as WorkflowFilter)}
-              variant="pills"
             />
             <div className="flex gap-2">
               {ownerTabs.map((tab) => (
