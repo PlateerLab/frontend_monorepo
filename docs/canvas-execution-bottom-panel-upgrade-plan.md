@@ -1,8 +1,8 @@
 # Canvas 하단 패널(Bottom Panel) 고도화 계획서
 
-> **작성일:** 2025-04-02  
-> **대상 Feature:** `@xgen/feature-canvas-execution` (`features/canvas-execution/`)  
-> **원본 코드:** `xgen-frontend/src/app/components/pages/workflow/canvas/components/`  
+> **작성일:** 2025-04-02
+> **대상 Feature:** `@xgen/feature-canvas-execution` (`features/canvas-execution/`)
+> **원본 코드:** `xgen-frontend/src/app/components/pages/workflow/canvas/components/`
 > **관련 Plugin:** `canvasExecutionPlugin` → `CanvasPagePlugin.bottomPanels` 슬롯
 
 ---
@@ -459,26 +459,26 @@ interface BottomPanelState {
   // 패널 상태
   panelMode: 'collapsed' | 'expanded' | 'fullscreen';
   panelHeight: number;           // px, 펼침 시 높이
-  
+
   // 실행 상태
   executionOutput: ExecutionOutput;
   executionSource: 'button' | 'chat' | null;
   isExecuting: boolean;
-  
+
   // 채팅 상태
   chatMessages: ChatMessage[];
   chatInput: string;
-  
+
   // Executor 상태
   buttonResultText: string;
-  
+
   // 실행 순서
   executionOrder: ExecutionOrderData | null;
   isLoadingOrder: boolean;
-  
+
   // 로그
   logs: LogEntry[];
-  
+
   // 탭 상태
   activeExecutionTab: 'chat' | 'executor';
 }
@@ -488,16 +488,16 @@ interface BottomPanelActions {
   togglePanel: () => void;
   setFullscreen: (enabled: boolean) => void;
   setPanelHeight: (height: number) => void;
-  
+
   // 실행 제어
   executeWithInput: (text?: string) => Promise<void>;
   clearOutput: () => void;
   clearLogs: () => void;
-  
+
   // 채팅 제어
   sendChatMessage: (text: string) => void;
   setChatInput: (text: string) => void;
-  
+
   // 탭 제어
   setActiveExecutionTab: (tab: 'chat' | 'executor') => void;
 }
@@ -513,19 +513,19 @@ type BottomPanelContextValue = BottomPanelState & BottomPanelActions;
 interface BottomPanelProviderProps {
   // 외부에서 주입되는 콜백 (캔버스 페이지 ↔ 하단 패널 연동)
   onExecute: (inputText?: string) => Promise<void>;
-  
+
   // 외부에서 주입되는 데이터
   workflowId: string;
   workflowName: string;
   userId?: string | null;
   canvasState?: any;
-  
+
   // 외부에서 주입되는 컴포넌트 (DI)
   LogViewerComponent?: React.ComponentType<LogViewerProps>;
-  
+
   // API 주입 (테스트 용이성)
   fetchExecutionOrderByData?: (data: any) => Promise<any>;
-  
+
   children: React.ReactNode;
 }
 ```
@@ -659,7 +659,7 @@ $breakpoint-compact: 900px;
 
 .content {
   display: flex;
-  
+
   @media (max-width: $breakpoint-compact) {
     // 실행 순서 컬럼 숨김, Order 정보를 Execution 컬럼 하단에 축소 표시
     .colOrder { display: none; }
@@ -855,22 +855,22 @@ export interface BottomPanelProps {
   workflowName: string;
   userId?: string | null;
   canvasState?: CanvasState;
-  
+
   // 실행 결과 (외부 → 내부)
   executionOutput: ExecutionOutput;
   executionLogs: LogEntry[];
   isExecuting: boolean;
   executionSource: 'button' | 'chat' | null;
-  
+
   // 실행 순서 노드 상태 (실시간)
   nodeStates?: Map<string, ExecutionNodeState>;
-  
+
   // DI: API 함수
   fetchExecutionOrderByData?: (data: any) => Promise<ExecutionOrderData>;
-  
+
   // DI: 외부 컴포넌트
   LogViewerComponent?: React.ComponentType<LogViewerProps>;
-  
+
   // 미리보기 모드
   mockExecutionOrder?: ExecutionOrderData | null;
 }
