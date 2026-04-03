@@ -127,7 +127,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
 
     return (
         <header
-            className="flex justify-between items-center h-[66px] px-6 min-h-[66px] max-h-[66px] bg-white border-b border-black/[0.08] shrink-0 shadow-sm z-[1000] fixed top-0 left-0 w-full transition-[left,width] duration-[250ms] ease-out select-none"
+            className="flex justify-between items-center h-14 px-[22px] min-h-14 max-h-14 bg-[var(--color-bg-50)] border-b border-[var(--color-line-50)] shrink-0 z-[1000] fixed top-0 left-0 w-full transition-[left,width] duration-[250ms] ease-out select-none"
             style={
                 sidebarLayout !== undefined
                     ? {
@@ -148,7 +148,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                                 value={editValue}
                                 onChange={(e) => setEditValue(e.target.value)}
                                 onKeyDown={handleKeyDown}
-                                className="h-7 text-sm font-semibold text-gray-600 border border-blue-500 rounded-md px-2 bg-white outline-none min-w-[120px] shadow-[0_0_0_2px_rgba(59,130,246,0.1)] focus:border-blue-600"
+                                className="h-7 text-sm font-bold text-[var(--color-gray-800)] border border-[var(--color-secondary-200)] rounded-md px-2 bg-white outline-none min-w-[120px] shadow-[0_0_0_2px_rgba(48,94,235,0.1)] focus:border-[var(--color-secondary-200)]"
                                 placeholder={t('canvas.header.workflowNamePlaceholder', 'Workflow name')}
                             />
                             <button
@@ -169,13 +169,13 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                             </button>
                         </div>
                     ) : (
-                        <div className="flex items-center justify-between gap-2 h-7 px-2 rounded-md transition-colors min-w-[120px] hover:bg-gray-50">
-                            <span className="text-sm font-semibold leading-tight text-gray-600 cursor-pointer flex-grow text-left min-w-0">
+                        <div className="flex items-center justify-between gap-2 h-7 px-2 rounded-md transition-colors min-w-[120px] hover:bg-black/[0.04]">
+                            <span className="text-sm font-bold leading-tight text-[var(--color-gray-800)] cursor-pointer flex-grow text-left min-w-0">
                                 {workflowName}
                             </span>
                             {!isOwner && (
                                 <span
-                                    className="flex items-center justify-center text-[0.9rem] text-gray-500 p-1 rounded min-w-6 min-h-6 shrink-0 cursor-help transition-all hover:bg-gray-200 hover:text-gray-600 hover:scale-110"
+                                    className="flex items-center justify-center text-[0.9rem] text-[var(--color-gray-500)] p-1 rounded min-w-6 min-h-6 shrink-0 cursor-help transition-all hover:bg-black/[0.06] hover:text-[var(--color-gray-600)] hover:scale-110"
                                     title={t('canvas.header.sharedWorkflowTooltip', 'Shared')}
                                 >
                                     <LuUsers />
@@ -184,7 +184,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                             {isOwner && (
                                 <button
                                     onClick={handleEditClick}
-                                    className="inline-flex items-center justify-center w-6 h-6 min-w-6 min-h-6 shrink-0 text-base rounded cursor-pointer bg-transparent border-none p-0 text-gray-500 transition-colors hover:bg-gray-200"
+                                    className="inline-flex items-center justify-center w-6 h-6 min-w-6 min-h-6 shrink-0 text-base rounded cursor-pointer bg-transparent border-none p-0 text-[var(--color-gray-500)] transition-colors hover:bg-black/[0.06]"
                                     title={t('canvas.header.editWorkflowName', 'Edit name')}
                                     type="button"
                                 >
@@ -219,7 +219,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                     variant="outline"
                     size="sm"
                     padding="compact"
-                    className="h-7 rounded-lg text-sm font-medium text-gray-700 border-gray-700"
+                    className="h-7 rounded-lg text-sm font-medium text-[var(--color-gray-800)] border-[var(--color-line-50)]"
                     onClick={onSave}
                     title={t('canvas.header.saveWorkflow', 'Save')}
                 >
@@ -230,7 +230,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                         variant="outline"
                         size="sm"
                         padding="compact"
-                        className="h-7 rounded-lg text-sm font-medium text-gray-700 border-gray-700"
+                        className="h-7 rounded-lg text-sm font-medium text-[var(--color-gray-800)] border-[var(--color-line-50)]"
                         onClick={onDuplicate}
                         title={t('canvas.header.copyWorkflow', 'Copy')}
                     >
@@ -241,7 +241,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                     variant="outline"
                     size="sm"
                     padding="compact"
-                    className="h-7 rounded-lg text-sm font-medium text-primary border-primary hover:bg-blue-50"
+                    className="h-7 rounded-lg text-sm font-medium text-[var(--color-secondary-200)] border-[var(--color-secondary-200)] hover:bg-[var(--color-secondary-200)]/5"
                     onClick={onDeploy}
                     title={t('canvas.header.deploy', 'Deploy')}
                 >
@@ -250,7 +250,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                 {onAddNodeClick && (
                     <button
                         type="button"
-                        className="flex items-center justify-center w-7 h-7 min-w-7 min-h-7 p-0 bg-transparent border-none text-gray-600 cursor-pointer rounded-lg select-none transition-colors hover:bg-gray-100"
+                        className="flex items-center justify-center w-7 h-7 min-w-7 min-h-7 p-0 bg-transparent border-none text-[var(--color-gray-600)] cursor-pointer rounded-lg select-none transition-colors hover:bg-black/[0.04]"
                         onClick={onAddNodeClick}
                         title={t('canvas.header.addNode', 'Add Node')}
                     >
@@ -260,7 +260,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                 {onAutoWorkflowClick && (
                     <button
                         type="button"
-                        className="flex items-center justify-center w-7 h-7 min-w-7 min-h-7 p-0 bg-transparent border-none text-gray-600 cursor-pointer rounded-lg select-none transition-colors hover:bg-gray-100"
+                        className="flex items-center justify-center w-7 h-7 min-w-7 min-h-7 p-0 bg-transparent border-none text-[var(--color-gray-600)] cursor-pointer rounded-lg select-none transition-colors hover:bg-black/[0.04]"
                         onClick={onAutoWorkflowClick}
                         title={t('canvas.header.autoWorkflow', 'Auto Workflow')}
                     >

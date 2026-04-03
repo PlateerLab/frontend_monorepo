@@ -1,10 +1,10 @@
 // 사이드 패널 스타일 - 오른쪽에서 슬라이드
 .panel {
     position: fixed;
-    top: 66px; // Header 높이만큼 아래로
+    top: 56px; // Header 높이만큼 아래로 (h-14 = 3.5rem = 56px)
     right: 0;
     width: 450px;
-    height: calc(100vh - 66px);
+    height: calc(100vh - 56px);
     background: white;
     border-left: 1px solid #e5e7eb;
     box-shadow: -4px 0 15px -3px rgba(0, 0, 0, 0.1);

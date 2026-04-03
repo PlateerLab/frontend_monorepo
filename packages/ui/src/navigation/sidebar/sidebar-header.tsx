@@ -24,7 +24,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   return (
     <div
       className={cn(
-        'px-[22px] py-[18px] border-b border-[var(--color-line-50)] bg-[var(--color-bg-50)] flex-shrink-0 min-w-0 overflow-hidden',
+        'h-14 px-[22px] flex items-center border-b border-[var(--color-line-50)] bg-[var(--color-bg-50)] flex-shrink-0 min-w-0 overflow-hidden',
         className,
       )}
     >
