@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import type { WorkflowDetail, CardBadge, WorkflowStatusFilter, WorkflowOwnerFilter, WorkflowTabPlugin, WorkflowTabPluginProps } from '@xgen/types';
-import { Button, EmptyState, ResourceCardGrid } from '@xgen/ui';
+import { Button, EmptyState, ResourceCardGrid, FilterTabs } from '@xgen/ui';
 import { FiFolder, FiPlay, FiEdit2, FiCopy, FiTrash2, FiSettings, FiFileText, FiServer, FiGitBranch, FiUser, FiClock, FiCheckSquare, FiRefreshCw, FiPlus } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
@@ -332,27 +332,21 @@ export const WorkflowStorage: React.FC<WorkflowStorageProps> = ({ onNavigate }) 
       {/* Header */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-4">
-          {statusTabs.map((tab) => (
-            <button
-              key={tab.key}
-              className={`px-3 py-1.5 border-none bg-transparent text-muted-foreground text-[13px] font-medium cursor-pointer rounded transition-all duration-150 hover:text-foreground ${statusFilter === tab.key ? 'bg-white text-primary shadow-sm' : ''}`}
-              onClick={() => setStatusFilter(tab.key as WorkflowStatusFilter)}
-            >
-              {tab.label}
-            </button>
-          ))}
+          <FilterTabs
+            tabs={statusTabs}
+            activeKey={statusFilter}
+            onChange={(key) => setStatusFilter(key as WorkflowStatusFilter)}
+            variant="underline"
+          />
         </div>
 
         <div className="flex items-center gap-2">
-          {ownerTabs.map((tab) => (
-            <button
-              key={tab.key}
-              className={`px-3 py-1.5 border-none bg-transparent text-muted-foreground text-[13px] font-medium cursor-pointer rounded transition-all duration-150 hover:text-foreground ${ownerFilter === tab.key ? 'bg-white text-primary shadow-sm' : ''}`}
-              onClick={() => setOwnerFilter(tab.key as WorkflowOwnerFilter)}
-            >
-              {tab.label}
-            </button>
-          ))}
+          <FilterTabs
+            tabs={ownerTabs}
+            activeKey={ownerFilter}
+            onChange={(key) => setOwnerFilter(key as WorkflowOwnerFilter)}
+            variant="underline"
+          />
 
           <Button
             variant={isMultiSelectMode ? 'primary' : 'outline'}
