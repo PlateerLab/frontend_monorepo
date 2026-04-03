@@ -2,7 +2,8 @@ import type { TranslationData } from '@xgen/i18n';
 
 export const ko: TranslationData = {
   documents: {
-    title: '지식 관리',
+    title: '문서 관리',
+    description: '컬렉션, 파일, 레포지토리, 데이터베이스를 관리합니다.',
     searchPlaceholder: '검색...',
     upload: '업로드',
     empty: { title: '데이터가 없습니다', description: '데이터를 추가하세요' },

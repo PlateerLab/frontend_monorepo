@@ -2,7 +2,8 @@ import type { TranslationData } from '@xgen/i18n';
 
 export const en: TranslationData = {
   documents: {
-    title: 'Knowledge Management',
+    title: 'Document Management',
+    description: 'Manage collections, files, repositories, and databases.',
     searchPlaceholder: 'Search...',
     upload: 'Upload',
     empty: { title: 'No data', description: 'Add your data' },

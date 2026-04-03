@@ -189,7 +189,7 @@ export async function initializeFeatures(): Promise<void> {
     import('@xgen/main-auth-profile'),
 
     // Knowledge Section
-    import('@xgen/main-documents'),
+    import('@xgen/main-documents-orchestrator'),
 
     // Support Section
     import('@xgen/main-ServiceRequest'),
@@ -217,6 +217,24 @@ export async function initializeFeatures(): Promise<void> {
   CoreRegistry.registerWorkflowTabPlugin(wfStoreMod.workflowStorePlugin);
   CoreRegistry.registerWorkflowTabPlugin(wfSchedulerMod.workflowSchedulerPlugin);
   CoreRegistry.registerWorkflowTabPlugin(wfTesterMod.workflowTesterPlugin);
+
+  // Register Document Tab Plugins (순서 = 탭 순서)
+  const [
+    docCollectionsMod,
+    docFileStorageMod,
+    docRepositoriesMod,
+    docDbConnectionsMod,
+  ] = await Promise.all([
+    import('@xgen/main-documents-collections'),
+    import('@xgen/main-documents-file-storage'),
+    import('@xgen/main-documents-repositories'),
+    import('@xgen/main-documents-db-connections'),
+  ]);
+
+  CoreRegistry.registerDocumentTabPlugin(docCollectionsMod.documentsCollectionsPlugin);
+  CoreRegistry.registerDocumentTabPlugin(docFileStorageMod.documentsFileStoragePlugin);
+  CoreRegistry.registerDocumentTabPlugin(docRepositoriesMod.documentsRepositoriesPlugin);
+  CoreRegistry.registerDocumentTabPlugin(docDbConnectionsMod.documentsDbConnectionsPlugin);
 
   // Register Canvas Page Plugins
   registerCanvasPlugins();

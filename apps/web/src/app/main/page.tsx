@@ -41,10 +41,14 @@ function MainPageContent() {
   // Initialize features on mount
   useEffect(() => {
     async function init() {
-      await initializeFeatures();
-      const sidebarSections = featureRegistry.getSidebarSections();
-      setSections(sidebarSections);
-      setInitialized(true);
+      try {
+        await initializeFeatures();
+        const sidebarSections = featureRegistry.getSidebarSections();
+        setSections(sidebarSections);
+        setInitialized(true);
+      } catch (err) {
+        console.error('[MainPage] initializeFeatures failed:', err);
+      }
     }
     init();
   }, []);
