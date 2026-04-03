@@ -70,10 +70,13 @@ export const commonEn: TranslationData = {
       intro: { title: 'Workflow Introduction' },
       canvas: { title: 'Canvas' },
       workflows: { title: 'Workflows' },
-      documents: { title: 'Documents' },
       tools: { title: 'Tool Storage' },
       prompts: { title: 'Prompt Storage' },
       authProfile: { title: 'Auth Profile', description: 'Manage API authentication' },
+    },
+    knowledge: {
+      title: 'Knowledge',
+      collections: { title: 'Knowledge Collections' },
     },
     model: {
       title: 'Model',

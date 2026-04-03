@@ -601,12 +601,11 @@ const DocumentsPage: React.FC<DocumentsPageProps> = () => {
 export const mainDocumentsFeature: MainFeatureModule = {
   id: 'main-Documents',
   name: 'Documents',
-  sidebarSection: 'workflow',
+  sidebarSection: 'knowledge',
   sidebarItems: [
     {
       id: 'documents',
-      titleKey: 'sidebar.workflow.documents.title',
-      descriptionKey: 'sidebar.workflow.documents.description',
+      titleKey: 'sidebar.knowledge.collections.title',
     },
   ],
   routes: {
