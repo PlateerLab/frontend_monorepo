@@ -434,11 +434,13 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
               tabs={statusTabs}
               activeKey={statusFilter}
               onChange={(key) => setStatusFilter(key as WorkflowFilter)}
+              variant="underline"
             />
             <FilterTabs
               tabs={ownerTabs}
               activeKey={ownerFilter}
               onChange={(key) => setOwnerFilter(key as WorkflowOwnerFilter)}
+              variant="underline"
             />
           </div>
           <SearchInput

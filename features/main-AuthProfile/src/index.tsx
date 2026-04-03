@@ -495,6 +495,7 @@ const AuthProfilePage: React.FC<AuthProfilePageProps> = ({
               tabs={storeFilterTabs}
               activeKey={storeFilterMode}
               onChange={(key) => setStoreFilterMode(key as AuthProfileStoreFilter)}
+              variant="underline"
             />
             <Button
               variant="icon"
@@ -616,6 +617,7 @@ const AuthProfilePage: React.FC<AuthProfilePageProps> = ({
             tabs={statusTabs}
             activeKey={statusFilter}
             onChange={(key) => setStatusFilter(key as AuthProfileFilter)}
+            variant="underline"
           />
           <Button variant="primary" onClick={handleCreateNew}>
             <FiPlus />

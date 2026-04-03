@@ -319,6 +319,7 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
             tabs={filterTabs}
             activeKey={filter}
             onChange={(key) => setFilter(key as ChatHistoryFilter)}
+            variant="underline"
           />
           <SearchInput
             value={search}

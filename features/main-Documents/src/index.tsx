@@ -411,7 +411,6 @@ const DocumentsPage: React.FC<DocumentsPageProps> = () => {
             tabs={viewModeTabs}
             activeKey={viewMode}
             onChange={handleViewModeChange}
-            variant="underline"
           />
           <div className="flex items-center gap-3">
             {showOwnerFilter && (
@@ -419,6 +418,7 @@ const DocumentsPage: React.FC<DocumentsPageProps> = () => {
                 tabs={ownerFilterTabs}
                 activeKey={ownerFilter}
                 onChange={(key) => setOwnerFilter(key as OwnerFilter)}
+                variant="underline"
               />
             )}
             <SearchInput
