@@ -9,6 +9,7 @@ import {
   getCookie,
   setCookie,
   clearAllAuthCookies,
+  decodeJwtPayload,
   type TokenValidationResult,
 } from '@xgen/api-client';
 
@@ -64,20 +65,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, onAuthStat
   const lastCheckedTokenRef = useRef<string | null>(null);
 
   // ──────────────────────────────────────────────────────────
-  // 쿠키에서 인증 상태 복원
+  // 쿠키에서 인증 상태 복원 (JWT 디코드 방식)
   // ──────────────────────────────────────────────────────────
   const refreshAuth = useCallback(async () => {
     const accessToken = getCookie('access_token');
-    const userId = getCookie('user_id');
-    const username = getCookie('username');
 
-    if (accessToken && userId && username) {
-      // 쿠키에서 기본 정보 복원
-      setUser({
-        id: userId,
-        user_id: parseInt(userId, 10),
-        username,
-      });
+    if (accessToken) {
+      // JWT payload에서 사용자 정보 추출 (쿠키 노출 없이)
+      const payload = decodeJwtPayload(accessToken);
+
+      if (payload) {
+        setUser({
+          id: payload.sub,
+          user_id: parseInt(payload.sub, 10),
+          username: payload.username,
+          is_admin: payload.is_admin,
+        });
+      } else {
+        // JWT 디코드 실패 → 인증 정보 클리어
+        setUser(null);
+        setAvailableUserSections([]);
+        setAvailableAdminSections([]);
+      }
 
       // 섹션 정보 복원 (쿠키에서)
       const savedUserSections = getCookie('available_user_section');
@@ -193,12 +202,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, onAuthStat
       });
 
       if (result.success && result.access_token) {
-        // 사용자 정보 설정
+        // JWT payload에서 사용자 정보 추출
+        const payload = decodeJwtPayload(result.access_token);
         const newUser: User = {
-          id: result.user_id.toString(),
-          user_id: result.user_id,
-          username: result.username,
+          id: payload?.sub ?? result.user_id.toString(),
+          user_id: payload ? parseInt(payload.sub, 10) : result.user_id,
+          username: payload?.username ?? result.username,
           email: credentials.email,
+          is_admin: payload?.is_admin,
         };
         setUser(newUser);
 

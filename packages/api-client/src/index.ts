@@ -107,6 +107,8 @@ export {
   validateToken,
   getCurrentUser,
   getUserFromCookie,
+  getUserFromToken,
+  decodeJwtPayload,
   hashPassword,
   getCookie,
   setCookie,
@@ -120,6 +122,7 @@ export type {
   SignupResult,
   TokenValidationResult,
   UserInfo,
+  JwtPayload,
 } from './auth';
 
 // Workflow API exports

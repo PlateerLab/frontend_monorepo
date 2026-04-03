@@ -107,6 +107,7 @@ function CanvasPageContent() {
                 onNavigate={handleNavigate}
                 onToggle={handleSidebarToggle}
                 onLogout={() => logout()}
+                onAdminClick={user?.is_admin ? () => router.push('/admin') : undefined}
             />
 
             <main className={`${styles.content} ${sidebarCollapsed ? styles.sidebarCollapsed : ''}`}>
