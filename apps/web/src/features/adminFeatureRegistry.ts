@@ -23,24 +23,48 @@ export async function initializeAdminFeatures(): Promise<void> {
 
   try {
     const featureModules = await Promise.all([
-      // 사용자 & 조직
-      import('@xgen/feature-admin-UserOrg'),
-      // 워크플로우 리소스
-      import('@xgen/feature-admin-WorkflowResource'),
-      // 환경 설정
-      import('@xgen/feature-admin-Setting'),
-      // 시스템 상태
-      import('@xgen/feature-admin-System'),
-      // 데이터 관리
-      import('@xgen/feature-admin-Data'),
-      // 보안 & 감사
-      import('@xgen/feature-admin-Security'),
-      // MCP 관리
-      import('@xgen/feature-admin-MCP'),
-      // MLOps
-      import('@xgen/feature-admin-MLOps'),
-      // AI 거버넌스
-      import('@xgen/feature-admin-Governance'),
+      // 사용자 & 조직 (admin-user)
+      import('@xgen/feature-admin-users'),
+      import('@xgen/feature-admin-user-create'),
+      import('@xgen/feature-admin-group-permissions'),
+      // 워크플로우 리소스 (admin-workflow)
+      import('@xgen/feature-admin-workflow-management'),
+      import('@xgen/feature-admin-workflow-monitoring'),
+      import('@xgen/feature-admin-test-monitoring'),
+      import('@xgen/feature-admin-agent-traces'),
+      import('@xgen/feature-admin-chat-monitoring'),
+      import('@xgen/feature-admin-user-token-dashboard'),
+      import('@xgen/feature-admin-node-management'),
+      import('@xgen/feature-admin-workflow-store'),
+      import('@xgen/feature-admin-prompt-store'),
+      // 환경 설정 (admin-setting)
+      import('@xgen/feature-admin-system-settings'),
+      import('@xgen/feature-admin-system-config'),
+      // 시스템 상태 (admin-system)
+      import('@xgen/feature-admin-system-monitor'),
+      import('@xgen/feature-admin-system-health'),
+      import('@xgen/feature-admin-backend-logs'),
+      // 데이터 관리 (admin-data)
+      import('@xgen/feature-admin-database'),
+      import('@xgen/feature-admin-data-scraper'),
+      import('@xgen/feature-admin-storage'),
+      import('@xgen/feature-admin-backup'),
+      // 보안 & 감사 (admin-security)
+      import('@xgen/feature-admin-security-settings'),
+      import('@xgen/feature-admin-audit-logs'),
+      import('@xgen/feature-admin-error-logs'),
+      // MCP 관리 (admin-mcp)
+      import('@xgen/feature-admin-mcp-market'),
+      import('@xgen/feature-admin-mcp-station'),
+      // MLOps (admin-ml)
+      import('@xgen/feature-admin-ml-model-control'),
+      // AI 거버넌스 (admin-governance)
+      import('@xgen/feature-admin-gov-workflow-approval'),
+      import('@xgen/feature-admin-gov-risk-management'),
+      import('@xgen/feature-admin-gov-monitoring'),
+      import('@xgen/feature-admin-gov-control-policy'),
+      import('@xgen/feature-admin-gov-operation-history'),
+      import('@xgen/feature-admin-gov-audit-tracking'),
     ]);
 
     const features = featureModules.map(mod => mod.default || Object.values(mod)[0]);

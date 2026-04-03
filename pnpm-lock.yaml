@@ -32,33 +32,105 @@ importers:
       '@xgen/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@xgen/feature-admin-Data':
+      '@xgen/feature-admin-agent-traces':
         specifier: workspace:*
-        version: link:../../features/admin-Data
-      '@xgen/feature-admin-Governance':
+        version: link:../../features/admin-agent-traces
+      '@xgen/feature-admin-audit-logs':
         specifier: workspace:*
-        version: link:../../features/admin-Governance
-      '@xgen/feature-admin-MCP':
+        version: link:../../features/admin-audit-logs
+      '@xgen/feature-admin-backend-logs':
         specifier: workspace:*
-        version: link:../../features/admin-MCP
-      '@xgen/feature-admin-MLOps':
+        version: link:../../features/admin-backend-logs
+      '@xgen/feature-admin-backup':
         specifier: workspace:*
-        version: link:../../features/admin-MLOps
-      '@xgen/feature-admin-Security':
+        version: link:../../features/admin-backup
+      '@xgen/feature-admin-chat-monitoring':
         specifier: workspace:*
-        version: link:../../features/admin-Security
-      '@xgen/feature-admin-Setting':
+        version: link:../../features/admin-chat-monitoring
+      '@xgen/feature-admin-data-scraper':
         specifier: workspace:*
-        version: link:../../features/admin-Setting
-      '@xgen/feature-admin-System':
+        version: link:../../features/admin-data-scraper
+      '@xgen/feature-admin-database':
         specifier: workspace:*
-        version: link:../../features/admin-System
-      '@xgen/feature-admin-UserOrg':
+        version: link:../../features/admin-database
+      '@xgen/feature-admin-error-logs':
         specifier: workspace:*
-        version: link:../../features/admin-UserOrg
-      '@xgen/feature-admin-WorkflowResource':
+        version: link:../../features/admin-error-logs
+      '@xgen/feature-admin-gov-audit-tracking':
         specifier: workspace:*
-        version: link:../../features/admin-WorkflowResource
+        version: link:../../features/admin-gov-audit-tracking
+      '@xgen/feature-admin-gov-control-policy':
+        specifier: workspace:*
+        version: link:../../features/admin-gov-control-policy
+      '@xgen/feature-admin-gov-monitoring':
+        specifier: workspace:*
+        version: link:../../features/admin-gov-monitoring
+      '@xgen/feature-admin-gov-operation-history':
+        specifier: workspace:*
+        version: link:../../features/admin-gov-operation-history
+      '@xgen/feature-admin-gov-risk-management':
+        specifier: workspace:*
+        version: link:../../features/admin-gov-risk-management
+      '@xgen/feature-admin-gov-workflow-approval':
+        specifier: workspace:*
+        version: link:../../features/admin-gov-workflow-approval
+      '@xgen/feature-admin-group-permissions':
+        specifier: workspace:*
+        version: link:../../features/admin-group-permissions
+      '@xgen/feature-admin-mcp-market':
+        specifier: workspace:*
+        version: link:../../features/admin-mcp-market
+      '@xgen/feature-admin-mcp-station':
+        specifier: workspace:*
+        version: link:../../features/admin-mcp-station
+      '@xgen/feature-admin-ml-model-control':
+        specifier: workspace:*
+        version: link:../../features/admin-ml-model-control
+      '@xgen/feature-admin-node-management':
+        specifier: workspace:*
+        version: link:../../features/admin-node-management
+      '@xgen/feature-admin-prompt-store':
+        specifier: workspace:*
+        version: link:../../features/admin-prompt-store
+      '@xgen/feature-admin-security-settings':
+        specifier: workspace:*
+        version: link:../../features/admin-security-settings
+      '@xgen/feature-admin-storage':
+        specifier: workspace:*
+        version: link:../../features/admin-storage
+      '@xgen/feature-admin-system-config':
+        specifier: workspace:*
+        version: link:../../features/admin-system-config
+      '@xgen/feature-admin-system-health':
+        specifier: workspace:*
+        version: link:../../features/admin-system-health
+      '@xgen/feature-admin-system-monitor':
+        specifier: workspace:*
+        version: link:../../features/admin-system-monitor
+      '@xgen/feature-admin-system-settings':
+        specifier: workspace:*
+        version: link:../../features/admin-system-settings
+      '@xgen/feature-admin-test-monitoring':
+        specifier: workspace:*
+        version: link:../../features/admin-test-monitoring
+      '@xgen/feature-admin-user-create':
+        specifier: workspace:*
+        version: link:../../features/admin-user-create
+      '@xgen/feature-admin-user-token-dashboard':
+        specifier: workspace:*
+        version: link:../../features/admin-user-token-dashboard
+      '@xgen/feature-admin-users':
+        specifier: workspace:*
+        version: link:../../features/admin-users
+      '@xgen/feature-admin-workflow-management':
+        specifier: workspace:*
+        version: link:../../features/admin-workflow-management
+      '@xgen/feature-admin-workflow-monitoring':
+        specifier: workspace:*
+        version: link:../../features/admin-workflow-monitoring
+      '@xgen/feature-admin-workflow-store':
+        specifier: workspace:*
+        version: link:../../features/admin-workflow-store
       '@xgen/feature-auth-LoginForm':
         specifier: workspace:*
         version: link:../../features/auth-LoginForm
@@ -226,7 +298,7 @@ importers:
         specifier: ^5
         version: 5.9.3
 
-  features/admin-Data:
+  features/admin-agent-traces:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -246,11 +318,8 @@ importers:
       '@xgen/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
 
-  features/admin-Governance:
+  features/admin-audit-logs:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -270,11 +339,8 @@ importers:
       '@xgen/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
 
-  features/admin-MCP:
+  features/admin-backend-logs:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -294,11 +360,8 @@ importers:
       '@xgen/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
 
-  features/admin-MLOps:
+  features/admin-backup:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -318,11 +381,8 @@ importers:
       '@xgen/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
 
-  features/admin-Security:
+  features/admin-chat-monitoring:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -342,11 +402,8 @@ importers:
       '@xgen/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
 
-  features/admin-Setting:
+  features/admin-data-scraper:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -366,11 +423,8 @@ importers:
       '@xgen/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
 
-  features/admin-System:
+  features/admin-database:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -390,11 +444,8 @@ importers:
       '@xgen/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
 
-  features/admin-UserOrg:
+  features/admin-error-logs:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -414,11 +465,8 @@ importers:
       '@xgen/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
 
-  features/admin-WorkflowResource:
+  features/admin-gov-audit-tracking:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -438,9 +486,510 @@ importers:
       '@xgen/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
+
+  features/admin-gov-control-policy:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-gov-monitoring:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-gov-operation-history:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-gov-risk-management:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-gov-workflow-approval:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-group-permissions:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-mcp-market:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-mcp-station:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-ml-model-control:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-node-management:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-prompt-store:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-security-settings:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-storage:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-system-config:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-system-health:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-system-monitor:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-system-settings:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-test-monitoring:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-user-create:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-user-token-dashboard:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-users:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-workflow-management:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-workflow-monitoring:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-workflow-store:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
 
   features/auth-LoginForm:
     dependencies:
