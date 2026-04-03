@@ -1253,5 +1253,77 @@ class FeatureRegistryClass {
 
 export const FeatureRegistry = new FeatureRegistryClass();
 
+// ─────────────────────────────────────────────────────────────
+// Admin User & Group Types
+// /admin 사용자 관리, 그룹 관리에서 공통으로 사용
+// ─────────────────────────────────────────────────────────────
+
+/** Admin 사용자 타입 */
+export type AdminUserType = 'superuser' | 'admin' | 'standard';
+
+/** Admin 사용자 */
+export interface AdminUser {
+  id: number;
+  email: string;
+  username: string;
+  full_name: string | null;
+  created_at: string;
+  updated_at: string;
+  is_active: boolean;
+  is_admin: boolean;
+  user_type: AdminUserType;
+  groups: string[] | null;
+  last_login?: string | null;
+  last_login_ip?: string | null;
+  password_hash?: string;
+  preferences?: Record<string, unknown>;
+  available_admin_sections?: string[];
+  available_user_sections?: string[];
+}
+
+/** Admin 그룹 */
+export interface AdminGroup {
+  group_name: string;
+  available: boolean;
+  available_sections: string[];
+}
+
+/** Admin 페이지네이션 정보 */
+export interface AdminPaginationInfo {
+  page: number;
+  page_size: number;
+  offset: number;
+  total_returned: number;
+}
+
+/** 사용자 목록 API 응답 */
+export interface AdminUsersResponse {
+  users: AdminUser[];
+  pagination: AdminPaginationInfo;
+}
+
+/** 사용 가능한 유저 섹션 목록 */
+export const AVAILABLE_USER_SECTIONS = [
+  'canvas',
+  'workflows',
+  'documents',
+  'tool-storage',
+  'prompt-store',
+  'scenario-recorder',
+  'data-station',
+  'data-storage',
+  'train',
+  'train-monitor',
+  'eval',
+  'model-storage',
+  'model-upload',
+  'model-hub',
+  'model-inference',
+  'ml-train',
+  'ml-train-monitor',
+] as const;
+
+export type AvailableUserSection = (typeof AVAILABLE_USER_SECTIONS)[number];
+
 // Re-export React types for convenience
 export type { ComponentType, FC, ReactNode } from 'react';

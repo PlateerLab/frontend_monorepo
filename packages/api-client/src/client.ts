@@ -174,17 +174,21 @@ export class ApiClient {
     }
   }
 
-  async delete<T>(endpoint: string, config?: RequestConfig): Promise<ApiResponse<T>> {
+  async delete<T>(endpoint: string, body?: unknown, config?: RequestConfig): Promise<ApiResponse<T>> {
     const url = this.buildUrl(endpoint, config?.params);
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), config?.timeout || this.timeout);
 
     try {
-      const response = await fetch(url, {
+      const fetchInit: RequestInit = {
         method: 'DELETE',
         headers: this.buildHeaders(config?.headers),
         signal: config?.signal || controller.signal,
-      });
+      };
+      if (body !== undefined && body !== null) {
+        fetchInit.body = JSON.stringify(body);
+      }
+      const response = await fetch(url, fetchInit);
 
       return this.handleResponse<T>(response);
     } finally {

@@ -182,3 +182,26 @@ export {
   getWorkflowExecutionOrderByData,
   getWorkflowExecutionLayoutByData,
 } from './tracker';
+
+// Admin User API exports
+export {
+  getAllUsers,
+  getStandbyUsers,
+  approveUser,
+  deleteUser as deleteAdminUser,
+  editUser,
+  addUserGroup,
+  removeUserGroup,
+  updateUserAvailableAdminSections,
+  updateUserAvailableUserSections,
+} from './admin-users';
+
+// Admin Group API exports
+export {
+  getAllGroups,
+  getAllGroupsList,
+  createGroup,
+  getGroupUsers,
+  updateGroupPermissions,
+  deleteGroup,
+} from './admin-groups';

@@ -59,6 +59,19 @@ export type {
 export { ResourceCardGrid } from './data-display/resource-card-grid';
 export type { ResourceCardGridProps } from './data-display/resource-card-grid';
 
+// DataTable - 정렬 가능한 데이터 테이블
+export { DataTable } from './data-display/data-table';
+export type {
+  DataTableProps,
+  DataTableColumn,
+  SortRule,
+  SortDirection,
+} from './data-display/data-table';
+
+// StatusBadge - 상태 배지 (활성/비활성/대기 등)
+export { StatusBadge } from './data-display/status-badge';
+export type { StatusBadgeProps, StatusBadgeVariant } from './data-display/status-badge';
+
 // Input Components
 export { Button, buttonVariants as inputButtonVariants } from './inputs/button';
 export type { ButtonProps, ButtonVariant, ButtonSize, ButtonPadding } from './inputs/button';
