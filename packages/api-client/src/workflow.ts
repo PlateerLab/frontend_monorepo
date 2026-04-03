@@ -496,3 +496,174 @@ export async function generateEmbedJs(params: {
     const response = await client.post<{ url: string }>('/api/workflow/generate-embed', params);
     return response.data;
 }
+
+// ─────────────────────────────────────────────────────────────
+// Admin Workflow Management APIs
+// ─────────────────────────────────────────────────────────────
+
+export interface AdminWorkflowMeta {
+    id: number;
+    workflow_id: string;
+    workflow_name: string;
+    username: string;
+    user_id: number;
+    node_count: number;
+    updated_at: string;
+    created_at?: string;
+    has_startnode?: boolean;
+    has_endnode?: boolean;
+    is_shared: boolean;
+    share_group?: string | null;
+    share_permissions?: string | null;
+    description?: string;
+    inquire_deploy?: boolean;
+    is_accepted?: boolean;
+    is_deployed?: boolean;
+    error?: string;
+}
+
+export async function getAllWorkflowMetaAdmin(
+    page = 1,
+    pageSize = 1000,
+    userId?: number | null,
+): Promise<{ workflows: AdminWorkflowMeta[] }> {
+    const client = getClient();
+    const params = new URLSearchParams({
+        page: String(page),
+        page_size: String(pageSize),
+    });
+    if (userId != null) params.set('user_id', String(userId));
+    const response = await client.get<{ workflows: AdminWorkflowMeta[] }>(
+        `/api/admin/workflow/all-list?${params}`,
+    );
+    return response.data;
+}
+
+export async function deleteWorkflowAdmin(
+    workflowId: string,
+    userId: number,
+): Promise<void> {
+    const client = getClient();
+    await client.delete(
+        `/api/admin/workflow/delete/${encodeURIComponent(workflowId)}?user_id=${userId}`,
+    );
+}
+
+export async function updateWorkflowAdmin(
+    workflowId: string,
+    updateData: Record<string, unknown>,
+): Promise<any> {
+    const client = getClient();
+    const response = await client.post<any>(
+        `/api/admin/workflow/update/${encodeURIComponent(workflowId)}`,
+        updateData,
+    );
+    return response.data;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Admin Workflow Monitoring APIs
+// ─────────────────────────────────────────────────────────────
+
+export interface AdminIOLog {
+    id: number;
+    user_id: number;
+    workflow_name: string;
+    workflow_id: string;
+    interaction_id: string;
+    input_data: string;
+    output_data: string;
+    llm_eval_score?: number | null;
+    user_score?: number | null;
+    mode?: string;
+    created_at: string;
+}
+
+export async function getAdminAllIOLogs(
+    page = 1,
+    pageSize = 50,
+    userId?: number | null,
+    workflowId?: string | null,
+    workflowName?: string | null,
+): Promise<{ logs: AdminIOLog[]; total: number }> {
+    const client = getClient();
+    const params = new URLSearchParams({
+        page: String(page),
+        page_size: String(pageSize),
+    });
+    if (userId != null) params.set('user_id', String(userId));
+    if (workflowId) params.set('workflow_id', workflowId);
+    if (workflowName) params.set('workflow_name', workflowName);
+    const response = await client.get<{ logs: AdminIOLog[]; total: number }>(
+        `/api/admin/workflow/all-io-logs?${params}`,
+    );
+    return response.data;
+}
+
+export interface AdminPerformanceData {
+    summary: {
+        total_executions: number;
+        avg_processing_time_ms: number;
+        avg_cpu_usage_percent: number;
+        avg_ram_usage_mb: number;
+    };
+    nodes: AdminNodePerformance[];
+}
+
+export interface AdminNodePerformance {
+    node_name: string;
+    avg_processing_time_ms: number;
+    avg_cpu_usage_percent: number;
+    avg_ram_usage_mb: number;
+    avg_gpu_usage_percent: number;
+    avg_gpu_memory_mb: number;
+    execution_count: number;
+}
+
+export async function getWorkflowPerformanceAdmin(
+    userId: number,
+    workflowName: string,
+    workflowId: string,
+): Promise<AdminPerformanceData> {
+    const client = getClient();
+    const params = new URLSearchParams({
+        user_id: String(userId),
+        workflow_name: workflowName,
+        workflow_id: workflowId,
+    });
+    const response = await client.get<AdminPerformanceData>(
+        `/api/admin/workflow/performance?${params}`,
+    );
+    return response.data;
+}
+
+export async function deleteWorkflowPerformanceAdmin(
+    userId: number,
+    workflowName: string,
+    workflowId: string,
+): Promise<void> {
+    const client = getClient();
+    const params = new URLSearchParams({
+        user_id: String(userId),
+        workflow_name: workflowName,
+        workflow_id: workflowId,
+    });
+    await client.delete(`/api/admin/workflow/performance?${params}`);
+}
+
+export async function getAdminIOLogsForWorkflow(
+    userId: number,
+    workflowName: string,
+    workflowId: string,
+): Promise<AdminIOLog[]> {
+    const client = getClient();
+    const params = new URLSearchParams({
+        user_id: String(userId),
+        workflow_name: workflowName,
+        workflow_id: workflowId,
+    });
+    const response = await client.get<{ logs: AdminIOLog[] }>(
+        `/api/admin/workflow/admin-io-logs?${params}`,
+    );
+    return response.data.logs ?? [];
+}

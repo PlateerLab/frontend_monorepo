@@ -150,6 +150,14 @@ export {
   deleteWorkflowIOLogs,
   getDeployStatus,
   generateEmbedJs,
+  // Admin workflow APIs
+  getAllWorkflowMetaAdmin,
+  deleteWorkflowAdmin,
+  updateWorkflowAdmin,
+  getAdminAllIOLogs,
+  getWorkflowPerformanceAdmin,
+  deleteWorkflowPerformanceAdmin,
+  getAdminIOLogsForWorkflow,
 } from './workflow';
 export type {
   WorkflowContent,
@@ -159,6 +167,10 @@ export type {
   WorkflowExistence,
   ExecuteWorkflowOptions,
   DeployStatus,
+  AdminWorkflowMeta,
+  AdminIOLog,
+  AdminPerformanceData,
+  AdminNodePerformance,
 } from './workflow';
 
 // Node API exports
