@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import type { WorkflowStoreItem, CardBadge, WorkflowTabPlugin, WorkflowTabPluginProps } from '@xgen/types';
-import { Button, ResourceCardGrid, EmptyState } from '@xgen/ui';
+import { Button, ResourceCardGrid, EmptyState, FilterTabs } from '@xgen/ui';
 import { FiFolder, FiDownload, FiSearch, FiRefreshCw, FiUpload, FiStar, FiUser, FiCalendar, FiBox } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
@@ -191,17 +191,12 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh }
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex gap-1 p-1 bg-muted rounded-lg">
-            {filterTabs.map((tab) => (
-              <button
-                key={tab.key}
-                className={`px-3 py-1.5 border-none bg-transparent text-muted-foreground text-[13px] font-medium cursor-pointer rounded transition-all duration-150 hover:text-foreground ${filterMode === tab.key ? 'bg-white text-primary shadow-sm' : ''}`}
-                onClick={() => setFilterMode(tab.key as StoreFilterMode)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+          <FilterTabs
+            tabs={filterTabs}
+            activeKey={filterMode}
+            onChange={(key) => setFilterMode(key as StoreFilterMode)}
+            variant="underline"
+          />
 
           <Button
             variant="outline"

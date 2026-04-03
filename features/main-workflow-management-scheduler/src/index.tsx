@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import type { WorkflowSchedule, ScheduleStatus, CardBadge, WorkflowTabPlugin, WorkflowTabPluginProps } from '@xgen/types';
-import { Button, ResourceCardGrid, EmptyState } from '@xgen/ui';
+import { Button, ResourceCardGrid, EmptyState, FilterTabs } from '@xgen/ui';
 import { FiFolder, FiPlay, FiPause, FiTrash2, FiRefreshCw, FiPlus, FiClock, FiCalendar, FiCheckSquare, FiAlertCircle } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
@@ -189,17 +189,12 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className 
       {/* Header */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-4">
-          <div className="flex gap-1 p-1 bg-muted rounded-lg">
-            {filterTabs.map((tab) => (
-              <button
-                key={tab.key}
-                className={`px-3 py-1.5 border-none bg-transparent text-muted-foreground text-[13px] font-medium cursor-pointer rounded transition-all duration-150 hover:text-foreground ${filterStatus === tab.key ? 'bg-white text-primary shadow-sm' : ''}`}
-                onClick={() => setFilterStatus(tab.key as ScheduleFilterStatus)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+          <FilterTabs
+            tabs={filterTabs}
+            activeKey={filterStatus}
+            onChange={(key) => setFilterStatus(key as ScheduleFilterStatus)}
+            variant="underline"
+          />
         </div>
 
         <div className="flex items-center gap-2">
