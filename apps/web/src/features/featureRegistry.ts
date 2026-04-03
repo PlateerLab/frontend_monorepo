@@ -40,6 +40,7 @@ class FeatureRegistry {
     'dashboard',
     'chat',
     'workflow',
+    'knowledge',
     'support',
     'settings',
   ];

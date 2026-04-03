@@ -66,14 +66,17 @@ export const commonKo: TranslationData = {
       current: { title: '현재 채팅' },
     },
     workflow: {
-      title: 'Workflow Management',
+      title: '워크플로우',
       intro: { title: '워크플로우 소개' },
       canvas: { title: '캔버스' },
       workflows: { title: '워크플로우 목록' },
-      documents: { title: '문서' },
       tools: { title: '도구 저장소' },
       prompts: { title: '프롬프트 저장소' },
       authProfile: { title: '인증 프로필', description: 'API 인증 정보 관리' },
+    },
+    knowledge: {
+      title: '지식관리',
+      collections: { title: '지식컬렉션' },
     },
     model: {
       title: '모델',
