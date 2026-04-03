@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from '@xgen/i18n';
+import { ToggleSwitch } from '@xgen/ui';
 import { useBottomPanel } from '../context/BottomPanelContext';
 import type { LogEntry, LogViewerProps } from '../types';
 
@@ -17,8 +18,6 @@ const DefaultLogViewer: React.FC<LogViewerProps> = ({ logs, className }) => (
         ))}
     </div>
 );
-
-const filterLabelClass = 'flex items-center gap-1 text-[11px] text-[var(--color-gray-500)] cursor-pointer whitespace-nowrap select-none [&_input[type=checkbox]]:m-0 [&_input[type=checkbox]]:accent-primary';
 
 // ── Log Column ─────────────────────────────────────────────────
 
@@ -64,7 +63,7 @@ const LogColumn: React.FC<LogColumnInternalProps> = ({ LogViewerComponent }) => 
 
     return (
         <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
-            <div className="flex items-center gap-2 py-1.5 px-3 border-b border-[var(--color-line-50)] bg-[var(--color-bg-50)] shrink-0">
+            <div className="flex items-center gap-3 py-1.5 px-3 border-b border-[var(--color-line-50)] bg-[var(--color-bg-50)] shrink-0">
                 <input
                     type="text"
                     className="flex-1 py-1 px-2 border border-[var(--color-line-50)] rounded-lg text-xs leading-[18px] text-[var(--color-gray-600)] bg-white outline-none min-w-0 focus:border-primary placeholder:text-[var(--color-gray-400)]"
@@ -72,32 +71,30 @@ const LogColumn: React.FC<LogColumnInternalProps> = ({ LogViewerComponent }) => 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <div className="flex items-center gap-1.5">
-                    <label className={filterLabelClass}>
-                        <input
-                            type="checkbox"
-                            checked={showDebug}
-                            onChange={(e) => setShowDebug(e.target.checked)}
-                        />
-                        {t('canvas.bottomPanel.logViewer.showDebug')}
-                    </label>
-                    <label className={filterLabelClass}>
-                        <input
-                            type="checkbox"
-                            checked={showTools}
-                            onChange={(e) => setShowTools(e.target.checked)}
-                        />
-                        {t('canvas.bottomPanel.logViewer.showTools')}
-                    </label>
-                </div>
-                <label className={`${filterLabelClass} ml-auto`}>
-                    <input
-                        type="checkbox"
-                        checked={autoScroll}
-                        onChange={(e) => setAutoScroll(e.target.checked)}
+                <div className="flex items-center gap-3">
+                    <ToggleSwitch
+                        checked={showDebug}
+                        onChange={setShowDebug}
+                        label={t('canvas.bottomPanel.logViewer.showDebug')}
+                        size="sm"
+                        color="teal"
                     />
-                    {t('canvas.bottomPanel.logViewer.autoScroll')}
-                </label>
+                    <ToggleSwitch
+                        checked={showTools}
+                        onChange={setShowTools}
+                        label={t('canvas.bottomPanel.logViewer.showTools')}
+                        size="sm"
+                        color="teal"
+                    />
+                </div>
+                <ToggleSwitch
+                    checked={autoScroll}
+                    onChange={setAutoScroll}
+                    label={t('canvas.bottomPanel.logViewer.autoScroll')}
+                    size="sm"
+                    color="green"
+                    className="ml-auto"
+                />
             </div>
             {noResults ? (
                 <div className="p-4 text-xs text-[var(--color-gray-500)] text-center">

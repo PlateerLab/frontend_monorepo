@@ -78,6 +78,12 @@ export type { FormFieldProps } from './inputs/form-field';
 export { Toggle } from './inputs/toggle';
 export type { ToggleProps } from './inputs/toggle';
 
+export { Checkbox } from './inputs/checkbox';
+export type { CheckboxProps } from './inputs/checkbox';
+
+export { ToggleSwitch } from './inputs/toggle-switch';
+export type { ToggleSwitchProps, ToggleSwitchColor } from './inputs/toggle-switch';
+
 // Navigation Components
 export { DropdownMenu } from './navigation/dropdown-menu';
 export type { DropdownMenuProps, DropdownMenuItem } from './navigation/dropdown-menu';
