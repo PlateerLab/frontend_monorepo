@@ -375,5 +375,111 @@
       "description": "Contact our support team",
       "link": "Contact Us"
     }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "description": "View the overall system status at a glance."
+    },
+    "sidebar": {
+      "backToChat": "Back to Chat",
+      "sections": {
+        "user": "Users & Organizations",
+        "workflow": "Workflow Resources",
+        "setting": "Settings",
+        "system": "System Status",
+        "data": "Data Management",
+        "security": "Security & Audit",
+        "mcp": "MCP Management",
+        "ml": "MLOps",
+        "governance": "AI Governance"
+      },
+      "user": {
+        "users": { "title": "User Management", "description": "View and manage users" },
+        "userCreate": { "title": "Create User", "description": "Register new users" },
+        "groupPermissions": { "title": "Group Permissions", "description": "Configure group permissions" }
+      },
+      "workflow": {
+        "workflowManagement": { "title": "Workflow Management", "description": "Create and manage workflows" },
+        "workflowMonitoring": { "title": "Workflow Monitoring", "description": "Monitor execution status" },
+        "testMonitoring": { "title": "Test Monitoring", "description": "Monitor test executions" },
+        "agentTraces": { "title": "Agent Traces", "description": "Trace agent executions" },
+        "chatMonitoring": { "title": "Chat Monitoring", "description": "Monitor chat logs" },
+        "userTokenDashboard": { "title": "User Tokens", "description": "Token usage dashboard" },
+        "nodeManagement": { "title": "Node Management", "description": "Manage workflow nodes" },
+        "workflowStore": { "title": "Workflow Store", "description": "Browse shared workflows" },
+        "promptStore": { "title": "Prompt Store", "description": "Browse shared prompts" }
+      },
+      "setting": {
+        "systemSettings": { "title": "System Settings", "description": "General system settings" },
+        "systemConfig": { "title": "System Config", "description": "Configuration file viewer" }
+      },
+      "system": {
+        "systemMonitor": { "title": "System Monitor", "description": "Real-time system monitoring" },
+        "systemHealth": { "title": "System Health", "description": "Service health check" },
+        "backendLogs": { "title": "Backend Logs", "description": "Real-time backend logs" }
+      },
+      "data": {
+        "database": { "title": "Database", "description": "Database management" },
+        "dataScraper": { "title": "Data Scraper", "description": "Data collection management" },
+        "storage": { "title": "Storage", "description": "File storage management" },
+        "backup": { "title": "Backup", "description": "Backup and restore" }
+      },
+      "security": {
+        "securitySettings": { "title": "Security Settings", "description": "Security policy settings" },
+        "auditLogs": { "title": "Audit Logs", "description": "Access audit logs" },
+        "errorLogs": { "title": "Error Logs", "description": "System error logs" }
+      },
+      "mcp": {
+        "mcpMarket": { "title": "MCP Market", "description": "MCP server marketplace" },
+        "mcpStation": { "title": "MCP Station", "description": "MCP server management" }
+      },
+      "ml": {
+        "mlModelControl": { "title": "ML Model Control", "description": "ML model workspace" }
+      },
+      "governance": {
+        "workflowApproval": { "title": "Workflow Approval", "description": "Workflow deployment approval" },
+        "riskManagement": { "title": "Risk Management", "description": "AI risk management" },
+        "monitoring": { "title": "Governance Monitoring", "description": "Real-time governance monitoring" },
+        "controlPolicy": { "title": "Control Policy", "description": "AI control policy management" },
+        "operationHistory": { "title": "Operation History", "description": "View operation history" },
+        "auditTracking": { "title": "Audit Tracking", "description": "Audit tracking management" }
+      }
+    },
+    "pages": {
+      "users": { "title": "User Management", "description": "View and manage the user list." },
+      "userCreate": { "title": "Create User", "description": "Register a new user." },
+      "groupPermissions": { "title": "Group Permissions", "description": "Configure permissions by group." },
+      "workflowManagement": { "title": "Workflow Management", "description": "Create and manage workflows." },
+      "workflowMonitoring": { "title": "Workflow Monitoring", "description": "Monitor workflow execution status." },
+      "testMonitoring": { "title": "Test Monitoring", "description": "Monitor test executions." },
+      "agentTraces": { "title": "Agent Traces", "description": "Trace agent executions." },
+      "nodeManagement": { "title": "Node Management", "description": "Manage workflow nodes." },
+      "chatMonitoring": { "title": "Chat Monitoring", "description": "Monitor chat logs." },
+      "userTokenDashboard": { "title": "User Token Dashboard", "description": "View token usage." },
+      "workflowStore": { "title": "Workflow Store", "description": "Browse shared workflows." },
+      "promptStore": { "title": "Prompt Store", "description": "Browse shared prompts." },
+      "systemSettings": { "title": "System Settings", "description": "Manage general system settings." },
+      "systemConfig": { "title": "System Config", "description": "View system configuration files." },
+      "systemMonitor": { "title": "System Monitor", "description": "Monitor the system in real-time." },
+      "systemHealth": { "title": "System Health", "description": "Check service health status." },
+      "backendLogs": { "title": "Backend Logs", "description": "View real-time backend logs." },
+      "database": { "title": "Database", "description": "Manage databases." },
+      "dataScraper": { "title": "Data Scraper", "description": "Manage data collection." },
+      "storage": { "title": "Storage", "description": "Manage file storage." },
+      "backup": { "title": "Backup", "description": "Manage backup and restore." },
+      "securitySettings": { "title": "Security Settings", "description": "Configure security policies." },
+      "auditLogs": { "title": "Audit Logs", "description": "View access audit logs." },
+      "errorLogs": { "title": "Error Logs", "description": "View system error logs." },
+      "mcpMarket": { "title": "MCP Market", "description": "Browse MCP server marketplace." },
+      "mcpStation": { "title": "MCP Station", "description": "Manage MCP servers." },
+      "mlModelControl": { "title": "ML Model Control", "description": "Manage ML model workspace." },
+      "govWorkflowApproval": { "title": "Workflow Approval", "description": "Approve workflow deployments." },
+      "govRiskManagement": { "title": "Risk Management", "description": "Manage AI risks." },
+      "govMonitoring": { "title": "Governance Monitoring", "description": "Monitor governance in real-time." },
+      "govControlPolicy": { "title": "Control Policy", "description": "Manage AI control policies." },
+      "govOperationHistory": { "title": "Operation History", "description": "View operation history." },
+      "govAuditTracking": { "title": "Audit Tracking", "description": "Manage audit tracking." }
+    }
   }
 }

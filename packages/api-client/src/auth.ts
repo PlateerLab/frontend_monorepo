@@ -57,6 +57,15 @@ export interface UserInfo {
   user_type?: string;
 }
 
+/** JWT 토큰 payload 구조 */
+export interface JwtPayload {
+  sub: string;
+  username: string;
+  is_admin: boolean;
+  exp: number;
+  type: string;
+}
+
 // ============================================================================
 // Utility Functions
 // ============================================================================
@@ -122,8 +131,35 @@ export function deleteCookie(name: string): void {
 export function clearAllAuthCookies(): void {
   deleteCookie('access_token');
   deleteCookie('refresh_token');
-  deleteCookie('user_id');
-  deleteCookie('username');
+}
+
+// ============================================================================
+// JWT Decode
+// ============================================================================
+
+/**
+ * JWT 토큰의 payload를 디코드합니다.
+ * 서명 검증은 수행하지 않습니다 (백엔드 validateToken에서 수행).
+ * user_id, username, is_admin 등 사용자 정보를 쿠키 노출 없이 추출합니다.
+ */
+export function decodeJwtPayload(token: string): JwtPayload | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+
+    // Base64url → Base64 변환
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    // 패딩 추가
+    const padded = base64.padEnd(base64.length + (4 - (base64.length % 4)) % 4, '=');
+    const jsonStr = atob(padded);
+    // UTF-8 바이트를 올바르게 디코드
+    const decoded = decodeURIComponent(
+      Array.from(jsonStr, (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+    );
+    return JSON.parse(decoded) as JwtPayload;
+  } catch {
+    return null;
+  }
 }
 
 // ============================================================================
@@ -144,18 +180,12 @@ export async function login(data: LoginData): Promise<LoginResult> {
 
   const result = response.data;
 
-  // 쿠키에 인증 정보 저장
+  // 쿠키에 토큰만 저장 (user_id, username 등은 JWT에서 디코드하여 사용)
   if (result.access_token) {
     setCookie('access_token', result.access_token);
   }
   if (result.refresh_token) {
     setCookie('refresh_token', result.refresh_token);
-  }
-  if (result.user_id) {
-    setCookie('user_id', result.user_id.toString());
-  }
-  if (result.username) {
-    setCookie('username', result.username);
   }
 
   return result;
@@ -295,18 +325,26 @@ export async function getCurrentUser(): Promise<UserInfo | null> {
 }
 
 /**
- * 쿠키에서 사용자 정보 읽기 (API 호출 없이)
+ * access_token JWT에서 사용자 정보 디코드 (API 호출 없이)
+ * 쿠키에 개별 사용자 정보를 노출하지 않고 JWT payload에서 추출합니다.
  */
-export function getUserFromCookie(): UserInfo | null {
-  const userId = getCookie('user_id');
-  const username = getCookie('username');
+export function getUserFromToken(): UserInfo | null {
+  const token = getCookie('access_token');
+  if (!token) return null;
 
-  if (!userId || !username) {
-    return null;
-  }
+  const payload = decodeJwtPayload(token);
+  if (!payload) return null;
 
   return {
-    user_id: parseInt(userId, 10),
-    username,
+    user_id: parseInt(payload.sub, 10),
+    username: payload.username,
+    is_admin: payload.is_admin,
   };
+}
+
+/**
+ * @deprecated JWT 디코드 방식으로 전환됨. getUserFromToken()을 사용하세요.
+ */
+export function getUserFromCookie(): UserInfo | null {
+  return getUserFromToken();
 }

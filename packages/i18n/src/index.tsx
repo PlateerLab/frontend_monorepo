@@ -35,6 +35,10 @@ import {
 import { commonKo } from './locales/common-ko';
 import { commonEn } from './locales/common-en';
 
+// Extended translations (JSON)
+import koJson from './locales/ko.json';
+import enJson from './locales/en.json';
+
 // ─────────────────────────────────────────────────────────────
 // 초기화: 공통 번역 등록
 // ─────────────────────────────────────────────────────────────
@@ -44,6 +48,11 @@ registerTranslationBundle('common', { ko: commonKo.common, en: commonEn.common }
 registerTranslationBundle('toast', { ko: commonKo.toast, en: commonEn.toast });
 registerTranslationBundle('sidebar', { ko: commonKo.sidebar, en: commonEn.sidebar });
 registerTranslationBundle('header', { ko: commonKo.header, en: commonEn.header });
+
+// Admin 번역 등록
+if (koJson.admin && enJson.admin) {
+  registerTranslationBundle('admin', { ko: koJson.admin as any, en: enJson.admin as any });
+}
 
 // ─────────────────────────────────────────────────────────────
 // Context & Provider

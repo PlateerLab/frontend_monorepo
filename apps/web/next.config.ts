@@ -60,6 +60,17 @@ const nextConfig: NextConfig = {
         '@xgen/feature-canvas-ai-generator',
         '@xgen/feature-canvas-node-detail',
         '@xgen/feature-canvas-document-drop',
+        '@xgen/sidebar-main',
+        '@xgen/sidebar-admin',
+        '@xgen/feature-admin-UserOrg',
+        '@xgen/feature-admin-WorkflowResource',
+        '@xgen/feature-admin-Setting',
+        '@xgen/feature-admin-System',
+        '@xgen/feature-admin-Data',
+        '@xgen/feature-admin-Security',
+        '@xgen/feature-admin-MCP',
+        '@xgen/feature-admin-MLOps',
+        '@xgen/feature-admin-Governance',
     ],
     // Docker/로컬 환경용 API 프록시 (원본 xgen-frontend과 동일한 구조)
     // K3s 환경에서는 Istio VirtualService가 라우팅하므로 rewrites 비활성화

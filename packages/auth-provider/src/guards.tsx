@@ -81,13 +81,18 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
         if (result.valid) {
           lastCheckedTokenRef.current = token;
           setIsValidated(true);
+        } else if (result.user_id === null && result.username === null) {
+          // validateToken 내부에서 네트워크 에러 등으로 실패 → 쿠키 기반 통과
+          // (valid:false + user_id:null = API 호출 자체가 실패한 경우)
+          lastCheckedTokenRef.current = token;
+          setIsValidated(true);
         } else {
-          // 토큰 무효 → 로그인으로
+          // 서버가 명시적으로 토큰 무효 판정 → 로그인으로
           redirectToLogin();
         }
       })
       .catch(() => {
-        // 검증 실패해도 쿠키 기반으로 통과시킴 (네트워크 에러 등)
+        // .then() 핸들러 자체 에러 → 쿠키 기반 통과
         setIsValidated(true);
       })
       .finally(() => {
