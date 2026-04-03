@@ -1,0 +1,18 @@
+{
+  "name": "@xgen/feature-admin-setting-llm",
+  "version": "0.0.0",
+  "private": true,
+  "main": "src/index.tsx",
+  "types": "src/index.tsx",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "dependencies": {
+    "@xgen/types": "workspace:*",
+    "@xgen/ui": "workspace:*",
+    "@xgen/i18n": "workspace:*",
+    "@xgen/icons": "workspace:*",
+    "@xgen/api-client": "workspace:*",
+    "@xgen/admin-setting-shared": "workspace:*"
+  }
+}

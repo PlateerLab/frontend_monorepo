@@ -105,29 +105,58 @@
     "closeSidebar": "Close Sidebar",
     "chat": {
       "title": "Chat",
-      "intro": { "title": "Chat Introduction" },
-      "history": { "title": "Chat History" },
-      "new": { "title": "New Chat" },
-      "current": { "title": "Current Chat" }
+      "intro": {
+        "title": "Chat Introduction"
+      },
+      "history": {
+        "title": "Chat History"
+      },
+      "new": {
+        "title": "New Chat"
+      },
+      "current": {
+        "title": "Current Chat"
+      }
     },
     "workflow": {
       "title": "Workflow",
-      "intro": { "title": "Workflow Introduction" },
-      "canvas": { "title": "Canvas" },
-      "workflows": { "title": "Workflows" },
-      "documents": { "title": "Documents" },
-      "tools": { "title": "Tool Storage" },
-      "prompts": { "title": "Prompt Storage" },
-      "profile": { "title": "Profile" }
+      "intro": {
+        "title": "Workflow Introduction"
+      },
+      "canvas": {
+        "title": "Canvas"
+      },
+      "workflows": {
+        "title": "Workflows"
+      },
+      "documents": {
+        "title": "Documents"
+      },
+      "tools": {
+        "title": "Tool Storage"
+      },
+      "prompts": {
+        "title": "Prompt Storage"
+      },
+      "profile": {
+        "title": "Profile"
+      }
     },
     "support": {
       "title": "Support",
-      "request": { "title": "Service Request" },
-      "faq": { "title": "FAQ" }
+      "request": {
+        "title": "Service Request"
+      },
+      "faq": {
+        "title": "FAQ"
+      }
     },
     "workspace": {
       "title": "Workspace",
-      "mainDashboard": { "title": "Dashboard", "description": "Main Dashboard" }
+      "mainDashboard": {
+        "title": "Dashboard",
+        "description": "Main Dashboard"
+      }
     }
   },
   "dashboard": {
@@ -168,21 +197,44 @@
     },
     "quickStart": {
       "title": "Quick Start",
-      "step1": { "title": "Select Workflow", "description": "Choose an AI workflow to use" },
-      "step2": { "title": "Ask Question", "description": "Enter your question in natural language" },
-      "step3": { "title": "Get Answer", "description": "Review the AI-generated answer" }
+      "step1": {
+        "title": "Select Workflow",
+        "description": "Choose an AI workflow to use"
+      },
+      "step2": {
+        "title": "Ask Question",
+        "description": "Enter your question in natural language"
+      },
+      "step3": {
+        "title": "Get Answer",
+        "description": "Review the AI-generated answer"
+      }
     },
     "additionalFeatures": {
       "title": "Additional Features",
-      "history": { "title": "Chat History", "description": "Review previous conversations anytime" },
-      "multimodal": { "title": "Multimodal", "description": "Use text, images, and files together" },
-      "workflow": { "title": "Workflow Integration", "description": "Execute workflows directly from chat" }
+      "history": {
+        "title": "Chat History",
+        "description": "Review previous conversations anytime"
+      },
+      "multimodal": {
+        "title": "Multimodal",
+        "description": "Use text, images, and files together"
+      },
+      "workflow": {
+        "title": "Workflow Integration",
+        "description": "Execute workflows directly from chat"
+      }
     }
   },
   "chatHistory": {
     "title": "Chat History",
     "searchPlaceholder": "Search chats...",
-    "filter": { "all": "All", "active": "Active", "deleted": "Deleted", "deploy": "Deployed" },
+    "filter": {
+      "all": "All",
+      "active": "Active",
+      "deleted": "Deleted",
+      "deploy": "Deployed"
+    },
     "interactions": "interactions",
     "continue": "Continue",
     "delete": "Delete",
@@ -203,12 +255,30 @@
   },
   "chatNew": {
     "title": "New Chat",
-    "header": { "title": "Select Workflow", "subtitle": "Choose a workflow to start the conversation" },
+    "header": {
+      "title": "Select Workflow",
+      "subtitle": "Choose a workflow to start the conversation"
+    },
     "searchPlaceholder": "Search workflows...",
-    "sections": { "favorites": "Favorites", "all": "All Workflows" },
-    "filter": { "all": "All", "active": "Active", "draft": "Draft" },
-    "owner": { "all": "All", "personal": "Personal", "shared": "Shared" },
-    "status": { "active": "Active", "draft": "Draft", "archived": "Archived" },
+    "sections": {
+      "favorites": "Favorites",
+      "all": "All Workflows"
+    },
+    "filter": {
+      "all": "All",
+      "active": "Active",
+      "draft": "Draft"
+    },
+    "owner": {
+      "all": "All",
+      "personal": "Personal",
+      "shared": "Shared"
+    },
+    "status": {
+      "active": "Active",
+      "draft": "Draft",
+      "archived": "Archived"
+    },
     "addFavorite": "Add to Favorites",
     "removeFavorite": "Remove from Favorites",
     "startChat": "Start Chat",
@@ -218,7 +288,10 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "daysAgo": "days ago",
-    "empty": { "title": "No workflows", "description": "Create a workflow first" },
+    "empty": {
+      "title": "No workflows",
+      "description": "Create a workflow first"
+    },
     "error": {
       "loadFailed": "Failed to load workflows",
       "draftWorkflow": "Draft workflows cannot be used",
@@ -255,12 +328,26 @@
     },
     "features": {
       "title": "Key Features",
-      "canvas": { "title": "Visual Canvas", "description": "Intuitive drag and drop interface" },
-      "nodes": { "title": "Various Nodes", "description": "AI, data, and logic nodes provided" },
-      "ai": { "title": "AI Integration", "description": "Easy integration with various AI models" },
-      "deploy": { "title": "One-click Deploy", "description": "Instant API deployment" }
+      "canvas": {
+        "title": "Visual Canvas",
+        "description": "Intuitive drag and drop interface"
+      },
+      "nodes": {
+        "title": "Various Nodes",
+        "description": "AI, data, and logic nodes provided"
+      },
+      "ai": {
+        "title": "AI Integration",
+        "description": "Easy integration with various AI models"
+      },
+      "deploy": {
+        "title": "One-click Deploy",
+        "description": "Instant API deployment"
+      }
     },
-    "quickActions": { "title": "Quick Actions" },
+    "quickActions": {
+      "title": "Quick Actions"
+    },
     "actions": {
       "createCanvas": "Create Canvas",
       "viewTools": "View Tools",
@@ -278,7 +365,12 @@
     "title": "Workflows",
     "searchPlaceholder": "Search workflows...",
     "createNew": "New Workflow",
-    "filter": { "all": "All", "published": "Published", "draft": "Draft", "archived": "Archived" },
+    "filter": {
+      "all": "All",
+      "published": "Published",
+      "draft": "Draft",
+      "archived": "Archived"
+    },
     "viewList": "List View",
     "viewGrid": "Grid View",
     "edit": "Edit",
@@ -303,31 +395,56 @@
       "recommended": "Recommended",
       "popular": "Popular",
       "advanced": "Advanced",
-      "blank": { "title": "Blank Canvas", "description": "Start from scratch" },
-      "chatbot": { "title": "Chatbot", "description": "Create a conversational AI bot" },
-      "rag": { "title": "RAG Pipeline", "description": "Retrieval Augmented Generation" },
-      "agent": { "title": "AI Agent", "description": "Autonomous AI agent" }
+      "blank": {
+        "title": "Blank Canvas",
+        "description": "Start from scratch"
+      },
+      "chatbot": {
+        "title": "Chatbot",
+        "description": "Create a conversational AI bot"
+      },
+      "rag": {
+        "title": "RAG Pipeline",
+        "description": "Retrieval Augmented Generation"
+      },
+      "agent": {
+        "title": "AI Agent",
+        "description": "Autonomous AI agent"
+      }
     }
   },
   "documents": {
     "title": "Documents",
     "searchPlaceholder": "Search documents...",
     "upload": "Upload",
-    "empty": { "title": "No documents", "description": "Upload documents" }
+    "empty": {
+      "title": "No documents",
+      "description": "Upload documents"
+    }
   },
   "toolStorage": {
     "title": "Tool Storage",
     "searchPlaceholder": "Search tools...",
     "createNew": "New Tool",
-    "filter": { "all": "All" },
-    "empty": { "title": "No tools", "description": "Create a new tool" }
+    "filter": {
+      "all": "All"
+    },
+    "empty": {
+      "title": "No tools",
+      "description": "Create a new tool"
+    }
   },
   "promptStorage": {
     "title": "Prompt Storage",
     "searchPlaceholder": "Search prompts...",
     "createNew": "New Prompt",
-    "filter": { "all": "All" },
-    "empty": { "title": "No prompts", "description": "Create a new prompt" }
+    "filter": {
+      "all": "All"
+    },
+    "empty": {
+      "title": "No prompts",
+      "description": "Create a new prompt"
+    }
   },
   "profile": {
     "title": "Profile",
@@ -353,8 +470,18 @@
     "title": "Service Request",
     "searchPlaceholder": "Search requests...",
     "newRequest": "New Request",
-    "tabs": { "all": "All", "open": "Open", "inProgress": "In Progress", "resolved": "Resolved" },
-    "summary": { "open": "Open", "inProgress": "In Progress", "resolved": "Resolved", "urgent": "Urgent" },
+    "tabs": {
+      "all": "All",
+      "open": "Open",
+      "inProgress": "In Progress",
+      "resolved": "Resolved"
+    },
+    "summary": {
+      "open": "Open",
+      "inProgress": "In Progress",
+      "resolved": "Resolved",
+      "urgent": "Urgent"
+    },
     "by": "By",
     "view": "View",
     "time": {
@@ -362,13 +489,22 @@
       "hoursAgo": "hours ago",
       "daysAgo": "days ago"
     },
-    "empty": { "title": "No requests", "description": "Create a new request" }
+    "empty": {
+      "title": "No requests",
+      "description": "Create a new request"
+    }
   },
   "faq": {
     "title": "FAQ",
     "subtitle": "Frequently Asked Questions",
     "searchPlaceholder": "Search questions...",
-    "tabs": { "all": "All", "gettingStarted": "Getting Started", "models": "Models", "data": "Data", "api": "API" },
+    "tabs": {
+      "all": "All",
+      "gettingStarted": "Getting Started",
+      "models": "Models",
+      "data": "Data",
+      "api": "API"
+    },
     "wasHelpful": "Was this helpful?",
     "contact": {
       "title": "Have more questions?",
@@ -395,91 +531,321 @@
         "governance": "AI Governance"
       },
       "user": {
-        "users": { "title": "User Management", "description": "View and manage users" },
-        "userCreate": { "title": "Create User", "description": "Register new users" },
-        "groupPermissions": { "title": "Group Permissions", "description": "Configure group permissions" }
+        "users": {
+          "title": "User Management",
+          "description": "View and manage users"
+        },
+        "userCreate": {
+          "title": "Create User",
+          "description": "Register new users"
+        },
+        "groupPermissions": {
+          "title": "Group Permissions",
+          "description": "Configure group permissions"
+        }
       },
       "workflow": {
-        "workflowManagement": { "title": "Workflow Management", "description": "Create and manage workflows" },
-        "workflowMonitoring": { "title": "Workflow Monitoring", "description": "Monitor execution status" },
-        "testMonitoring": { "title": "Test Monitoring", "description": "Monitor test executions" },
-        "agentTraces": { "title": "Agent Traces", "description": "Trace agent executions" },
-        "chatMonitoring": { "title": "Chat Monitoring", "description": "Monitor chat logs" },
-        "userTokenDashboard": { "title": "User Tokens", "description": "Token usage dashboard" },
-        "nodeManagement": { "title": "Node Management", "description": "Manage workflow nodes" },
-        "workflowStore": { "title": "Workflow Store", "description": "Browse shared workflows" },
-        "promptStore": { "title": "Prompt Store", "description": "Browse shared prompts" }
+        "workflowManagement": {
+          "title": "Workflow Management",
+          "description": "Create and manage workflows"
+        },
+        "workflowMonitoring": {
+          "title": "Workflow Monitoring",
+          "description": "Monitor execution status"
+        },
+        "testMonitoring": {
+          "title": "Test Monitoring",
+          "description": "Monitor test executions"
+        },
+        "agentTraces": {
+          "title": "Agent Traces",
+          "description": "Trace agent executions"
+        },
+        "chatMonitoring": {
+          "title": "Chat Monitoring",
+          "description": "Monitor chat logs"
+        },
+        "userTokenDashboard": {
+          "title": "User Tokens",
+          "description": "Token usage dashboard"
+        },
+        "nodeManagement": {
+          "title": "Node Management",
+          "description": "Manage workflow nodes"
+        },
+        "workflowStore": {
+          "title": "Workflow Store",
+          "description": "Browse shared workflows"
+        },
+        "promptStore": {
+          "title": "Prompt Store",
+          "description": "Browse shared prompts"
+        }
       },
       "setting": {
-        "systemSettings": { "title": "System Settings", "description": "General system settings" },
-        "systemConfig": { "title": "System Config", "description": "Configuration file viewer" }
+        "systemSettings": {
+          "title": "System Settings",
+          "description": "General system settings"
+        },
+        "systemConfig": {
+          "title": "System Config",
+          "description": "Configuration file viewer"
+        },
+        "llm": {
+          "title": "LLM Settings",
+          "description": "Configure LLM providers"
+        },
+        "vl": {
+          "title": "Vision Language",
+          "description": "Configure vision language models"
+        },
+        "embed": {
+          "title": "Embeddings & Search",
+          "description": "Configure embeddings, rerankers, and vector DB"
+        },
+        "audio": {
+          "title": "Audio Models",
+          "description": "Configure STT and TTS"
+        },
+        "guarder": {
+          "title": "Content Guarder",
+          "description": "Configure content safety and PII protection"
+        },
+        "vastai": {
+          "title": "GPU Cloud",
+          "description": "Configure Vast.ai GPU cloud"
+        },
+        "modelServing": {
+          "title": "Model Serving",
+          "description": "Manage model serving"
+        },
+        "database": {
+          "title": "Database",
+          "description": "Configure database connections"
+        }
       },
       "system": {
-        "systemMonitor": { "title": "System Monitor", "description": "Real-time system monitoring" },
-        "systemHealth": { "title": "System Health", "description": "Service health check" },
-        "backendLogs": { "title": "Backend Logs", "description": "Real-time backend logs" }
+        "systemMonitor": {
+          "title": "System Monitor",
+          "description": "Real-time system monitoring"
+        },
+        "systemHealth": {
+          "title": "System Health",
+          "description": "Service health check"
+        },
+        "backendLogs": {
+          "title": "Backend Logs",
+          "description": "Real-time backend logs"
+        }
       },
       "data": {
-        "database": { "title": "Database", "description": "Database management" },
-        "dataScraper": { "title": "Data Scraper", "description": "Data collection management" },
-        "storage": { "title": "Storage", "description": "File storage management" },
-        "backup": { "title": "Backup", "description": "Backup and restore" }
+        "database": {
+          "title": "Database",
+          "description": "Database management"
+        },
+        "dataScraper": {
+          "title": "Data Scraper",
+          "description": "Data collection management"
+        },
+        "storage": {
+          "title": "Storage",
+          "description": "File storage management"
+        },
+        "backup": {
+          "title": "Backup",
+          "description": "Backup and restore"
+        }
       },
       "security": {
-        "securitySettings": { "title": "Security Settings", "description": "Security policy settings" },
-        "auditLogs": { "title": "Audit Logs", "description": "Access audit logs" },
-        "errorLogs": { "title": "Error Logs", "description": "System error logs" }
+        "securitySettings": {
+          "title": "Security Settings",
+          "description": "Security policy settings"
+        },
+        "auditLogs": {
+          "title": "Audit Logs",
+          "description": "Access audit logs"
+        },
+        "errorLogs": {
+          "title": "Error Logs",
+          "description": "System error logs"
+        }
       },
       "mcp": {
-        "mcpMarket": { "title": "MCP Market", "description": "MCP server marketplace" },
-        "mcpStation": { "title": "MCP Station", "description": "MCP server management" }
+        "mcpMarket": {
+          "title": "MCP Market",
+          "description": "MCP server marketplace"
+        },
+        "mcpStation": {
+          "title": "MCP Station",
+          "description": "MCP server management"
+        }
       },
       "ml": {
-        "mlModelControl": { "title": "ML Model Control", "description": "ML model workspace" }
+        "mlModelControl": {
+          "title": "ML Model Control",
+          "description": "ML model workspace"
+        }
       },
       "governance": {
-        "workflowApproval": { "title": "Workflow Approval", "description": "Workflow deployment approval" },
-        "riskManagement": { "title": "Risk Management", "description": "AI risk management" },
-        "monitoring": { "title": "Governance Monitoring", "description": "Real-time governance monitoring" },
-        "controlPolicy": { "title": "Control Policy", "description": "AI control policy management" },
-        "operationHistory": { "title": "Operation History", "description": "View operation history" },
-        "auditTracking": { "title": "Audit Tracking", "description": "Audit tracking management" }
+        "workflowApproval": {
+          "title": "Workflow Approval",
+          "description": "Workflow deployment approval"
+        },
+        "riskManagement": {
+          "title": "Risk Management",
+          "description": "AI risk management"
+        },
+        "monitoring": {
+          "title": "Governance Monitoring",
+          "description": "Real-time governance monitoring"
+        },
+        "controlPolicy": {
+          "title": "Control Policy",
+          "description": "AI control policy management"
+        },
+        "operationHistory": {
+          "title": "Operation History",
+          "description": "View operation history"
+        },
+        "auditTracking": {
+          "title": "Audit Tracking",
+          "description": "Audit tracking management"
+        }
       }
     },
     "pages": {
-      "users": { "title": "User Management", "description": "View and manage the user list." },
-      "userCreate": { "title": "Create User", "description": "Register a new user." },
-      "groupPermissions": { "title": "Group Permissions", "description": "Configure permissions by group." },
-      "workflowManagement": { "title": "Workflow Management", "description": "Create and manage workflows." },
-      "workflowMonitoring": { "title": "Workflow Monitoring", "description": "Monitor workflow execution status." },
-      "testMonitoring": { "title": "Test Monitoring", "description": "Monitor test executions." },
-      "agentTraces": { "title": "Agent Traces", "description": "Trace agent executions." },
-      "nodeManagement": { "title": "Node Management", "description": "Manage workflow nodes." },
-      "chatMonitoring": { "title": "Chat Monitoring", "description": "Monitor chat logs." },
-      "userTokenDashboard": { "title": "User Token Dashboard", "description": "View token usage." },
-      "workflowStore": { "title": "Workflow Store", "description": "Browse shared workflows." },
-      "promptStore": { "title": "Prompt Store", "description": "Browse shared prompts." },
-      "systemSettings": { "title": "System Settings", "description": "Manage general system settings." },
-      "systemConfig": { "title": "System Config", "description": "View system configuration files." },
-      "systemMonitor": { "title": "System Monitor", "description": "Monitor the system in real-time." },
-      "systemHealth": { "title": "System Health", "description": "Check service health status." },
-      "backendLogs": { "title": "Backend Logs", "description": "View real-time backend logs." },
-      "database": { "title": "Database", "description": "Manage databases." },
-      "dataScraper": { "title": "Data Scraper", "description": "Manage data collection." },
-      "storage": { "title": "Storage", "description": "Manage file storage." },
-      "backup": { "title": "Backup", "description": "Manage backup and restore." },
-      "securitySettings": { "title": "Security Settings", "description": "Configure security policies." },
-      "auditLogs": { "title": "Audit Logs", "description": "View access audit logs." },
-      "errorLogs": { "title": "Error Logs", "description": "View system error logs." },
-      "mcpMarket": { "title": "MCP Market", "description": "Browse MCP server marketplace." },
-      "mcpStation": { "title": "MCP Station", "description": "Manage MCP servers." },
-      "mlModelControl": { "title": "ML Model Control", "description": "Manage ML model workspace." },
-      "govWorkflowApproval": { "title": "Workflow Approval", "description": "Approve workflow deployments." },
-      "govRiskManagement": { "title": "Risk Management", "description": "Manage AI risks." },
-      "govMonitoring": { "title": "Governance Monitoring", "description": "Monitor governance in real-time." },
-      "govControlPolicy": { "title": "Control Policy", "description": "Manage AI control policies." },
-      "govOperationHistory": { "title": "Operation History", "description": "View operation history." },
-      "govAuditTracking": { "title": "Audit Tracking", "description": "Manage audit tracking." }
+      "users": {
+        "title": "User Management",
+        "description": "View and manage the user list."
+      },
+      "userCreate": {
+        "title": "Create User",
+        "description": "Register a new user."
+      },
+      "groupPermissions": {
+        "title": "Group Permissions",
+        "description": "Configure permissions by group."
+      },
+      "workflowManagement": {
+        "title": "Workflow Management",
+        "description": "Create and manage workflows."
+      },
+      "workflowMonitoring": {
+        "title": "Workflow Monitoring",
+        "description": "Monitor workflow execution status."
+      },
+      "testMonitoring": {
+        "title": "Test Monitoring",
+        "description": "Monitor test executions."
+      },
+      "agentTraces": {
+        "title": "Agent Traces",
+        "description": "Trace agent executions."
+      },
+      "nodeManagement": {
+        "title": "Node Management",
+        "description": "Manage workflow nodes."
+      },
+      "chatMonitoring": {
+        "title": "Chat Monitoring",
+        "description": "Monitor chat logs."
+      },
+      "userTokenDashboard": {
+        "title": "User Token Dashboard",
+        "description": "View token usage."
+      },
+      "workflowStore": {
+        "title": "Workflow Store",
+        "description": "Browse shared workflows."
+      },
+      "promptStore": {
+        "title": "Prompt Store",
+        "description": "Browse shared prompts."
+      },
+      "systemSettings": {
+        "title": "System Settings",
+        "description": "Manage general system settings."
+      },
+      "systemConfig": {
+        "title": "System Config",
+        "description": "View system configuration files."
+      },
+      "systemMonitor": {
+        "title": "System Monitor",
+        "description": "Monitor the system in real-time."
+      },
+      "systemHealth": {
+        "title": "System Health",
+        "description": "Check service health status."
+      },
+      "backendLogs": {
+        "title": "Backend Logs",
+        "description": "View real-time backend logs."
+      },
+      "database": {
+        "title": "Database",
+        "description": "Manage databases."
+      },
+      "dataScraper": {
+        "title": "Data Scraper",
+        "description": "Manage data collection."
+      },
+      "storage": {
+        "title": "Storage",
+        "description": "Manage file storage."
+      },
+      "backup": {
+        "title": "Backup",
+        "description": "Manage backup and restore."
+      },
+      "securitySettings": {
+        "title": "Security Settings",
+        "description": "Configure security policies."
+      },
+      "auditLogs": {
+        "title": "Audit Logs",
+        "description": "View access audit logs."
+      },
+      "errorLogs": {
+        "title": "Error Logs",
+        "description": "View system error logs."
+      },
+      "mcpMarket": {
+        "title": "MCP Market",
+        "description": "Browse MCP server marketplace."
+      },
+      "mcpStation": {
+        "title": "MCP Station",
+        "description": "Manage MCP servers."
+      },
+      "mlModelControl": {
+        "title": "ML Model Control",
+        "description": "Manage ML model workspace."
+      },
+      "govWorkflowApproval": {
+        "title": "Workflow Approval",
+        "description": "Approve workflow deployments."
+      },
+      "govRiskManagement": {
+        "title": "Risk Management",
+        "description": "Manage AI risks."
+      },
+      "govMonitoring": {
+        "title": "Governance Monitoring",
+        "description": "Monitor governance in real-time."
+      },
+      "govControlPolicy": {
+        "title": "Control Policy",
+        "description": "Manage AI control policies."
+      },
+      "govOperationHistory": {
+        "title": "Operation History",
+        "description": "View operation history."
+      },
+      "govAuditTracking": {
+        "title": "Audit Tracking",
+        "description": "Manage audit tracking."
+      }
     },
     "userManagement": {
       "userList": {
@@ -1258,6 +1624,425 @@
           "yes": "Yes",
           "no": "No",
           "close": "Close"
+        }
+      }
+    },
+    "settings": {
+      "title": "System Settings",
+      "description": "Configure system integrations and services.",
+      "back": "Back",
+      "settingsSuffix": "Settings",
+      "loading": "Loading...",
+      "loadFailed": "Failed to load settings",
+      "unknownError": "Unknown error",
+      "retry": "Retry",
+      "invalidValue": "Invalid value",
+      "updateFailed": "Failed to update setting",
+      "connectionTestStarted": "Testing connection...",
+      "connectionTestFailed": "Connection test failed",
+      "preparingForm": "Preparing settings form...",
+      "common": {
+        "envVar": "Env",
+        "configPath": "Path",
+        "notSaved": "Not saved",
+        "saving": "Saving...",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "selectPlaceholder": "Select...",
+        "testConnection": "Test Connection",
+        "settings": "Settings"
+      },
+      "categories": {
+        "llm": {
+          "name": "LLM (Large Language Models)",
+          "description": "Configure AI language model providers"
+        },
+        "collection": {
+          "name": "Vision Language Models",
+          "description": "Configure vision/image understanding models"
+        },
+        "vectordb": {
+          "name": "Embeddings & Vector Search",
+          "description": "Configure embedding models, rerankers, and vector database"
+        },
+        "audiomodel": {
+          "name": "Audio Models (STT & TTS)",
+          "description": "Configure speech-to-text and text-to-speech"
+        },
+        "guarder": {
+          "name": "Content Guarder",
+          "description": "Configure content safety filters and PII protection"
+        },
+        "vastai": {
+          "name": "Vast.ai GPU Cloud",
+          "description": "Configure GPU cloud resources"
+        },
+        "modelServing": {
+          "name": "Model Serving",
+          "description": "Manage deployed model serving"
+        },
+        "database": {
+          "name": "Database",
+          "description": "Configure database connections and settings"
+        }
+      },
+      "configViewer": {
+        "title": "System Configuration",
+        "subtitle": "View and edit all system configuration values.",
+        "loading": "Loading configuration...",
+        "loadFailed": "Failed to load configuration",
+        "unknownError": "Unknown error",
+        "retry": "Retry",
+        "refresh": "Refresh",
+        "totalSettings": "Total Settings",
+        "savedSettings": "Configured",
+        "defaultSettings": "Default",
+        "all": "All",
+        "configured": "Configured",
+        "defaultValue": "Default",
+        "currentValue": "Current",
+        "defaultValueLabel": "Default",
+        "editCurrentValue": "Edit",
+        "save": "Save",
+        "cancel": "Cancel",
+        "invalidValue": "Invalid value",
+        "updateFailed": "Update failed",
+        "noSettings": "No settings found.",
+        "categories": {
+          "database": "Database",
+          "application": "Application",
+          "workflow": "Workflow",
+          "node": "Node",
+          "vectorDatabase": "Vector DB",
+          "other": "Other"
+        }
+      },
+      "llm": {
+        "title": "LLM Configuration",
+        "description": "Configure language model providers and parameters.",
+        "refresh": "Refresh",
+        "loading": "Loading LLM configuration...",
+        "defaultSettings": "Default Provider",
+        "defaultProvider": "Default LLM Provider",
+        "defaultProviderDesc": "Select the default LLM provider for the system.",
+        "providerChanged": "Provider changed to {{provider}}",
+        "providerChangeFailed": "Failed to change provider",
+        "testConnection": "Test Connection",
+        "testing": "Testing...",
+        "loadError": "Failed to load LLM status",
+        "providerGrid": "All Providers",
+        "default": "Default",
+        "available": "Available",
+        "unavailable": "Unavailable",
+        "configured": "Configured",
+        "config": {
+          "title": "Configuration"
+        },
+        "tabs": {
+          "default": "Default",
+          "openai": "OpenAI",
+          "gemini": "Gemini",
+          "anthropic": "Anthropic",
+          "aws": "AWS Bedrock",
+          "vllm": "vLLM",
+          "sglang": "SGLang"
+        },
+        "providers": {
+          "openai": "OpenAI",
+          "gemini": "Google Gemini",
+          "anthropic": "Anthropic",
+          "aws": "AWS Bedrock",
+          "vllm": "vLLM",
+          "sglang": "SGLang"
+        },
+        "fields": {
+          "apiKey": "API Key",
+          "apiBaseUrl": "API Base URL",
+          "defaultModel": "Default Model",
+          "temperature": "Temperature",
+          "temperatureDesc": "Controls randomness (0=deterministic, higher=more random).",
+          "maxTokens": "Max Tokens",
+          "maxTokensDesc": "Maximum number of tokens to generate.",
+          "openaiApiKeyDesc": "Your OpenAI API key.",
+          "openaiBaseUrlDesc": "Custom API base URL (optional).",
+          "openaiModelDesc": "Select the default OpenAI model.",
+          "geminiApiKeyDesc": "Your Google Gemini API key.",
+          "geminiBaseUrlDesc": "Custom Gemini API base URL (optional).",
+          "geminiModelDesc": "Select the default Gemini model.",
+          "anthropicApiKeyDesc": "Your Anthropic API key.",
+          "anthropicBaseUrlDesc": "Custom Anthropic API base URL (optional).",
+          "anthropicModelDesc": "Select the default Anthropic model.",
+          "awsAccessKeyId": "AWS Access Key ID",
+          "awsAccessKeyIdDesc": "Your AWS access key ID.",
+          "awsSecretAccessKey": "AWS Secret Access Key",
+          "awsSecretAccessKeyDesc": "Your AWS secret access key.",
+          "awsSessionToken": "AWS Session Token",
+          "awsSessionTokenDesc": "AWS session token (optional).",
+          "awsRegion": "AWS Region",
+          "awsRegionDesc": "Select the AWS region for Bedrock.",
+          "awsEndpointUrl": "Bedrock Endpoint URL",
+          "awsEndpointUrlDesc": "Custom Bedrock endpoint URL (optional).",
+          "vllmBaseUrlDesc": "vLLM server base URL.",
+          "vllmApiKeyDesc": "vLLM API key (optional).",
+          "vllmModelNameDesc": "Model name loaded in vLLM.",
+          "modelName": "Model Name",
+          "topP": "Top P",
+          "topPDesc": "Nucleus sampling parameter.",
+          "stream": "Stream",
+          "streamDesc": "Enable streaming responses.",
+          "sglBaseUrlDesc": "SGLang server base URL.",
+          "sglApiKeyDesc": "SGLang API key (optional).",
+          "sglModelNameDesc": "Model name loaded in SGLang.",
+          "defaultProvider": "Default LLM Provider",
+          "defaultProviderDesc": "Select the default LLM provider."
+        }
+      },
+      "vl": {
+        "title": "Vision Language Configuration",
+        "description": "Configure vision/image understanding model providers.",
+        "refresh": "Refresh",
+        "loading": "Loading VL configuration...",
+        "defaultSettings": "Default Provider",
+        "defaultProvider": "Default VL Provider",
+        "defaultProviderDesc": "Select the default vision language model provider.",
+        "tabs": {
+          "default": "Default",
+          "openai": "OpenAI",
+          "anthropic": "Anthropic",
+          "gemini": "Gemini",
+          "aws": "AWS Bedrock",
+          "vllm": "vLLM"
+        },
+        "fields": {
+          "apiKey": "API Key",
+          "apiBaseUrl": "API Base URL",
+          "defaultModel": "Default Model",
+          "temperature": "Temperature",
+          "temperatureDesc": "Controls randomness.",
+          "maxTokens": "Max Tokens",
+          "maxTokensDesc": "Maximum tokens to generate.",
+          "imageQuality": "Image Quality",
+          "imageQualityDesc": "Image processing quality level.",
+          "batchSize": "Batch Size",
+          "batchSizeDesc": "Number of images to process in a batch.",
+          "modelName": "Model Name",
+          "noModel": "No Model (Text Extraction)",
+          "openaiApiKeyDesc": "OpenAI API key for vision.",
+          "openaiBaseUrlDesc": "Custom base URL (optional).",
+          "openaiModelDesc": "Select vision model.",
+          "anthropicApiKeyDesc": "Anthropic API key for vision.",
+          "anthropicModelDesc": "Select Claude vision model.",
+          "geminiApiKeyDesc": "Gemini API key for vision.",
+          "geminiModelDesc": "Select Gemini vision model.",
+          "awsAccessKeyId": "AWS Access Key ID",
+          "awsAccessKeyIdDesc": "AWS access key.",
+          "awsSecretAccessKey": "AWS Secret Access Key",
+          "awsSecretAccessKeyDesc": "AWS secret key.",
+          "awsRegion": "AWS Region",
+          "awsRegionDesc": "AWS region for Bedrock.",
+          "awsEndpointUrl": "Endpoint URL",
+          "awsEndpointUrlDesc": "Custom endpoint (optional).",
+          "awsModelDesc": "Select Bedrock vision model.",
+          "vllmBaseUrlDesc": "vLLM server URL.",
+          "vllmApiKeyDesc": "vLLM API key (optional).",
+          "vllmModelNameDesc": "vLLM vision model name.",
+          "defaultProvider": "Default VL Provider",
+          "defaultProviderDesc": "Select the default VL provider."
+        }
+      },
+      "embed": {
+        "title": "Embeddings & Vector Search",
+        "description": "Configure embedding models, rerankers, and vector database.",
+        "loading": "Loading embeddings configuration...",
+        "loadFailed": "Failed to load embeddings configuration.",
+        "tabs": {
+          "embedding": "Embedding Model",
+          "reranker": "Reranker",
+          "vectordb": "Vector Database"
+        },
+        "embedding": {
+          "title": "Embedding Model",
+          "description": "Configure the text embedding model.",
+          "testConnection": "Test Embedding"
+        },
+        "reranker": {
+          "title": "Reranker",
+          "description": "Configure the reranker model.",
+          "testConnection": "Test Reranker"
+        },
+        "vectordb": {
+          "title": "Vector Database",
+          "description": "Configure the Qdrant vector database connection.",
+          "testConnection": "Test Connection"
+        },
+        "fields": {
+          "provider": "Provider",
+          "providerDesc": "Select the embedding provider.",
+          "model": "Model",
+          "modelDesc": "Select the embedding model.",
+          "apiKey": "API Key",
+          "apiKeyDesc": "API key for the provider.",
+          "customUrl": "Custom URL",
+          "customUrlDesc": "URL for custom embedding server.",
+          "rerankerProvider": "Reranker Provider",
+          "rerankerProviderDesc": "Select the reranker provider.",
+          "rerankerModel": "Reranker Model",
+          "rerankerModelDesc": "Select the reranker model.",
+          "rerankerDevice": "Device",
+          "rerankerDeviceDesc": "Device to run the reranker on.",
+          "rerankerVllmUrl": "vLLM URL",
+          "rerankerVllmUrlDesc": "vLLM server URL for reranker.",
+          "rerankerVllmModel": "vLLM Model",
+          "rerankerVllmModelDesc": "Model name in vLLM.",
+          "vectorDimension": "Vector Dimension",
+          "vectorDimensionDesc": "Dimension of embedding vectors.",
+          "host": "Host",
+          "hostDesc": "Qdrant server host.",
+          "port": "Port",
+          "portDesc": "Qdrant server port.",
+          "grpc": "Use gRPC",
+          "grpcDesc": "Enable gRPC connection.",
+          "grpcPort": "gRPC Port",
+          "grpcPortDesc": "Qdrant gRPC port."
+        }
+      },
+      "audio": {
+        "title": "Audio Models",
+        "description": "Configure speech-to-text and text-to-speech models.",
+        "loading": "Loading audio configuration...",
+        "loadFailed": "Failed to load audio configuration.",
+        "tabs": {
+          "stt": "STT (Speech-to-Text)",
+          "tts": "TTS (Text-to-Speech)"
+        },
+        "stt": {
+          "title": "Speech-to-Text",
+          "description": "Configure the STT provider.",
+          "testConnection": "Test STT"
+        },
+        "tts": {
+          "title": "Text-to-Speech",
+          "description": "Configure the TTS provider.",
+          "testConnection": "Test TTS"
+        },
+        "fields": {
+          "provider": "Provider",
+          "providerDesc": "Select the audio provider.",
+          "model": "Model",
+          "modelDesc": "Select the model.",
+          "device": "Device",
+          "deviceDesc": "Device to run the model on.",
+          "language": "Language",
+          "languageDesc": "Default language code.",
+          "speaker": "Speaker",
+          "speakerDesc": "Default speaker voice."
+        }
+      },
+      "guarder": {
+        "title": "Content Guarder",
+        "description": "Configure content safety filters and PII protection.",
+        "loading": "Loading guarder configuration...",
+        "configLoadFailed": "Failed to load guarder configuration.",
+        "modelConfig": {
+          "title": "Model Configuration"
+        },
+        "fields": {
+          "enabled": "Enable Guarder",
+          "enabledDesc": "Enable or disable the content guarder.",
+          "rigorousFilter": "Rigorous Filter",
+          "rigorousFilterDesc": "Enable strict content filtering.",
+          "provider": "Provider",
+          "providerDesc": "Select the guarder provider.",
+          "modelName": "Model Name",
+          "modelNameDesc": "Guarder model name."
+        },
+        "pii": {
+          "title": "PII Protection",
+          "add": "Add Policy",
+          "newPolicy": "New PII Policy",
+          "policyName": "Policy Name",
+          "regexPattern": "Regex Pattern",
+          "action": "Action",
+          "actions": "Actions",
+          "empty": "No PII policies configured.",
+          "loadFailed": "Failed to load PII policies.",
+          "createSuccess": "PII policy created.",
+          "createFailed": "Failed to create PII policy.",
+          "updateSuccess": "PII policy updated.",
+          "updateFailed": "Failed to update PII policy.",
+          "deleteSuccess": "PII policy deleted.",
+          "deleteFailed": "Failed to delete PII policy.",
+          "validationError": "Please fill in all required fields."
+        }
+      },
+      "vastai": {
+        "title": "Vast.ai GPU Cloud",
+        "description": "Configure Vast.ai GPU cloud resources.",
+        "loading": "Loading Vast.ai configuration...",
+        "configLoadFailed": "Failed to load Vast.ai configuration.",
+        "config": {
+          "title": "API Configuration"
+        },
+        "testConnection": "Test Connection",
+        "fields": {
+          "apiKey": "API Key",
+          "apiKeyDesc": "Your Vast.ai API key.",
+          "diskGb": "Default Disk (GB)",
+          "diskGbDesc": "Default disk space in GB.",
+          "gpuRam": "Default GPU RAM (GB)",
+          "gpuRamDesc": "Default GPU memory in GB."
+        },
+        "gpuManagement": {
+          "title": "GPU Instance Management",
+          "comingSoon": "Advanced GPU instance management features are being prepared."
+        }
+      },
+      "modelServing": {
+        "title": "Model Serving",
+        "description": "View and manage deployed model serving infrastructure.",
+        "loading": "Loading model serving status...",
+        "loadFailed": "Failed to load model serving status.",
+        "retry": "Retry",
+        "refresh": "Refresh",
+        "noData": "No model serving data available.",
+        "gpuEnvironment": "GPU Environment",
+        "gpu": {
+          "name": "GPU Name",
+          "memory": "GPU Memory",
+          "count": "GPU Count"
+        },
+        "loadedModels": "Loaded Models",
+        "model": {
+          "name": "Name",
+          "type": "Type",
+          "status": "Status"
+        },
+        "deployManagement": "Deploy & Management",
+        "comingSoon": "Advanced model deployment and management features are being prepared."
+      },
+      "database": {
+        "title": "Database Configuration",
+        "description": "Configure database connection settings.",
+        "loading": "Loading database configuration...",
+        "loadFailed": "Failed to load database configuration.",
+        "testConnection": "Test Connection",
+        "fields": {
+          "dbType": "Database Type",
+          "dbTypeDesc": "Select the database type.",
+          "pgHost": "PostgreSQL Host",
+          "pgHostDesc": "PostgreSQL server host address.",
+          "pgPort": "PostgreSQL Port",
+          "pgPortDesc": "PostgreSQL server port.",
+          "pgDb": "Database Name",
+          "pgDbDesc": "PostgreSQL database name.",
+          "pgUser": "Username",
+          "pgUserDesc": "PostgreSQL username.",
+          "pgPassword": "Password",
+          "pgPasswordDesc": "PostgreSQL password.",
+          "sqlitePath": "SQLite File Path",
+          "sqlitePathDesc": "Path to the SQLite database file.",
+          "autoMigration": "Auto Migration",
+          "autoMigrationDesc": "Automatically run database migrations on schema changes."
         }
       }
     }

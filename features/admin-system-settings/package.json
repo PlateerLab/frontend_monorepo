@@ -13,6 +13,14 @@
     "@xgen/i18n": "workspace:*",
     "@xgen/api-client": "workspace:*",
     "@xgen/auth-provider": "workspace:*",
-    "@xgen/icons": "workspace:*"
+    "@xgen/icons": "workspace:*",
+    "@xgen/feature-admin-setting-llm": "workspace:*",
+    "@xgen/feature-admin-setting-vl": "workspace:*",
+    "@xgen/feature-admin-setting-embed": "workspace:*",
+    "@xgen/feature-admin-setting-audio": "workspace:*",
+    "@xgen/feature-admin-setting-guarder": "workspace:*",
+    "@xgen/feature-admin-setting-vastai": "workspace:*",
+    "@xgen/feature-admin-setting-model-serving": "workspace:*",
+    "@xgen/feature-admin-setting-database": "workspace:*"
   }
 }

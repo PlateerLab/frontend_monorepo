@@ -121,7 +121,7 @@ function AdminPageContent() {
       <main className={`${styles.content} ${!sidebarOpen ? styles.sidebarCollapsed : ''}`}>
         <Suspense fallback={<LoadingSpinner />}>
           {CurrentComponent ? (
-            <CurrentComponent />
+            <CurrentComponent onNavigate={handleItemClick} />
           ) : (
             <AdminDashboard />
           )}

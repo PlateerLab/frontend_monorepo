@@ -9,6 +9,7 @@
 // -----------------------------------------------------------------------------
 export {
   // Arrows & Navigation
+  FiArrowLeft,
   FiArrowRight,
   FiArrowDownCircle,
   FiArrowUpCircle,
@@ -74,10 +75,14 @@ export {
 
   // System & Infrastructure
   FiCpu,
+  FiDatabase,
   FiServer,
   FiGitBranch,
   FiSettings,
   FiGlobe,
+  FiImage,
+  FiLink,
+  FiMic,
   FiShield,
 
   // Communication
@@ -148,3 +153,45 @@ export {
 export {
   FaTrashAlt,
 } from 'react-icons/fa';
+
+export {
+  FaAws,
+} from 'react-icons/fa6';
+
+// -----------------------------------------------------------------------------
+// Simple Icons (react-icons/si) — AI Provider Brands
+// -----------------------------------------------------------------------------
+export {
+  SiOpenai,
+  SiAnthropic,
+} from 'react-icons/si';
+
+// -----------------------------------------------------------------------------
+// Remix Icons (react-icons/ri) — AI Provider Brands
+// -----------------------------------------------------------------------------
+export {
+  RiGeminiFill,
+} from 'react-icons/ri';
+
+// -----------------------------------------------------------------------------
+// Bootstrap Icons (react-icons/bs) — Hardware & Data
+// -----------------------------------------------------------------------------
+export {
+  BsCpu,
+  BsDatabaseUp,
+  BsGpuCard,
+} from 'react-icons/bs';
+
+// -----------------------------------------------------------------------------
+// Ionicons (react-icons/io5) — Security
+// -----------------------------------------------------------------------------
+export {
+  IoDocumentLock,
+} from 'react-icons/io5';
+
+// -----------------------------------------------------------------------------
+// Tabler Icons (react-icons/tb)
+// -----------------------------------------------------------------------------
+export {
+  TbBrandGolang,
+} from 'react-icons/tb';

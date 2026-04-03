@@ -105,29 +105,58 @@
     "closeSidebar": "사이드바 닫기",
     "chat": {
       "title": "채팅",
-      "intro": { "title": "채팅 소개" },
-      "history": { "title": "채팅 기록" },
-      "new": { "title": "새 채팅" },
-      "current": { "title": "현재 채팅" }
+      "intro": {
+        "title": "채팅 소개"
+      },
+      "history": {
+        "title": "채팅 기록"
+      },
+      "new": {
+        "title": "새 채팅"
+      },
+      "current": {
+        "title": "현재 채팅"
+      }
     },
     "workflow": {
       "title": "워크플로우",
-      "intro": { "title": "워크플로우 소개" },
-      "canvas": { "title": "캔버스" },
-      "workflows": { "title": "워크플로우 목록" },
-      "documents": { "title": "문서" },
-      "tools": { "title": "도구 저장소" },
-      "prompts": { "title": "프롬프트 저장소" },
-      "profile": { "title": "프로필" }
+      "intro": {
+        "title": "워크플로우 소개"
+      },
+      "canvas": {
+        "title": "캔버스"
+      },
+      "workflows": {
+        "title": "워크플로우 목록"
+      },
+      "documents": {
+        "title": "문서"
+      },
+      "tools": {
+        "title": "도구 저장소"
+      },
+      "prompts": {
+        "title": "프롬프트 저장소"
+      },
+      "profile": {
+        "title": "프로필"
+      }
     },
     "support": {
       "title": "지원",
-      "request": { "title": "서비스 요청" },
-      "faq": { "title": "FAQ" }
+      "request": {
+        "title": "서비스 요청"
+      },
+      "faq": {
+        "title": "FAQ"
+      }
     },
     "workspace": {
       "title": "워크스페이스",
-      "mainDashboard": { "title": "대시보드", "description": "메인 대시보드" }
+      "mainDashboard": {
+        "title": "대시보드",
+        "description": "메인 대시보드"
+      }
     }
   },
   "dashboard": {
@@ -168,21 +197,44 @@
     },
     "quickStart": {
       "title": "빠른 시작",
-      "step1": { "title": "워크플로우 선택", "description": "사용할 AI 워크플로우를 선택하세요" },
-      "step2": { "title": "질문하기", "description": "자연어로 질문을 입력하세요" },
-      "step3": { "title": "답변 받기", "description": "AI가 생성한 답변을 확인하세요" }
+      "step1": {
+        "title": "워크플로우 선택",
+        "description": "사용할 AI 워크플로우를 선택하세요"
+      },
+      "step2": {
+        "title": "질문하기",
+        "description": "자연어로 질문을 입력하세요"
+      },
+      "step3": {
+        "title": "답변 받기",
+        "description": "AI가 생성한 답변을 확인하세요"
+      }
     },
     "additionalFeatures": {
       "title": "추가 기능",
-      "history": { "title": "대화 기록", "description": "이전 대화를 언제든 확인하세요" },
-      "multimodal": { "title": "멀티모달", "description": "텍스트, 이미지, 파일을 함께 사용하세요" },
-      "workflow": { "title": "워크플로우 연동", "description": "채팅에서 바로 워크플로우를 실행하세요" }
+      "history": {
+        "title": "대화 기록",
+        "description": "이전 대화를 언제든 확인하세요"
+      },
+      "multimodal": {
+        "title": "멀티모달",
+        "description": "텍스트, 이미지, 파일을 함께 사용하세요"
+      },
+      "workflow": {
+        "title": "워크플로우 연동",
+        "description": "채팅에서 바로 워크플로우를 실행하세요"
+      }
     }
   },
   "chatHistory": {
     "title": "채팅 기록",
     "searchPlaceholder": "채팅 검색...",
-    "filter": { "all": "전체", "active": "활성", "deleted": "삭제됨", "deploy": "배포" },
+    "filter": {
+      "all": "전체",
+      "active": "활성",
+      "deleted": "삭제됨",
+      "deploy": "배포"
+    },
     "interactions": "대화",
     "continue": "계속하기",
     "delete": "삭제",
@@ -203,12 +255,30 @@
   },
   "chatNew": {
     "title": "새 채팅",
-    "header": { "title": "워크플로우 선택", "subtitle": "대화를 시작할 워크플로우를 선택하세요" },
+    "header": {
+      "title": "워크플로우 선택",
+      "subtitle": "대화를 시작할 워크플로우를 선택하세요"
+    },
     "searchPlaceholder": "워크플로우 검색...",
-    "sections": { "favorites": "즐겨찾기", "all": "전체 워크플로우" },
-    "filter": { "all": "전체", "active": "활성", "draft": "초안" },
-    "owner": { "all": "전체", "personal": "개인", "shared": "공유" },
-    "status": { "active": "활성", "draft": "초안", "archived": "보관됨" },
+    "sections": {
+      "favorites": "즐겨찾기",
+      "all": "전체 워크플로우"
+    },
+    "filter": {
+      "all": "전체",
+      "active": "활성",
+      "draft": "초안"
+    },
+    "owner": {
+      "all": "전체",
+      "personal": "개인",
+      "shared": "공유"
+    },
+    "status": {
+      "active": "활성",
+      "draft": "초안",
+      "archived": "보관됨"
+    },
     "addFavorite": "즐겨찾기 추가",
     "removeFavorite": "즐겨찾기 제거",
     "startChat": "채팅 시작",
@@ -218,7 +288,10 @@
     "today": "오늘",
     "yesterday": "어제",
     "daysAgo": "일 전",
-    "empty": { "title": "워크플로우가 없습니다", "description": "먼저 워크플로우를 생성하세요" },
+    "empty": {
+      "title": "워크플로우가 없습니다",
+      "description": "먼저 워크플로우를 생성하세요"
+    },
     "error": {
       "loadFailed": "워크플로우를 불러오지 못했습니다",
       "draftWorkflow": "초안 상태의 워크플로우는 사용할 수 없습니다",
@@ -255,12 +328,26 @@
     },
     "features": {
       "title": "주요 기능",
-      "canvas": { "title": "비주얼 캔버스", "description": "직관적인 드래그 앤 드롭 인터페이스" },
-      "nodes": { "title": "다양한 노드", "description": "AI, 데이터, 로직 노드 제공" },
-      "ai": { "title": "AI 통합", "description": "다양한 AI 모델과 쉽게 연동" },
-      "deploy": { "title": "원클릭 배포", "description": "API로 즉시 배포 가능" }
+      "canvas": {
+        "title": "비주얼 캔버스",
+        "description": "직관적인 드래그 앤 드롭 인터페이스"
+      },
+      "nodes": {
+        "title": "다양한 노드",
+        "description": "AI, 데이터, 로직 노드 제공"
+      },
+      "ai": {
+        "title": "AI 통합",
+        "description": "다양한 AI 모델과 쉽게 연동"
+      },
+      "deploy": {
+        "title": "원클릭 배포",
+        "description": "API로 즉시 배포 가능"
+      }
     },
-    "quickActions": { "title": "빠른 실행" },
+    "quickActions": {
+      "title": "빠른 실행"
+    },
     "actions": {
       "createCanvas": "캔버스 생성",
       "viewTools": "도구 보기",
@@ -278,7 +365,12 @@
     "title": "워크플로우",
     "searchPlaceholder": "워크플로우 검색...",
     "createNew": "새 워크플로우",
-    "filter": { "all": "전체", "published": "배포됨", "draft": "초안", "archived": "보관됨" },
+    "filter": {
+      "all": "전체",
+      "published": "배포됨",
+      "draft": "초안",
+      "archived": "보관됨"
+    },
     "viewList": "목록 보기",
     "viewGrid": "그리드 보기",
     "edit": "편집",
@@ -303,31 +395,56 @@
       "recommended": "추천",
       "popular": "인기",
       "advanced": "고급",
-      "blank": { "title": "빈 캔버스", "description": "처음부터 시작하기" },
-      "chatbot": { "title": "챗봇", "description": "대화형 AI 봇 만들기" },
-      "rag": { "title": "RAG 파이프라인", "description": "검색 증강 생성" },
-      "agent": { "title": "AI 에이전트", "description": "자율 AI 에이전트" }
+      "blank": {
+        "title": "빈 캔버스",
+        "description": "처음부터 시작하기"
+      },
+      "chatbot": {
+        "title": "챗봇",
+        "description": "대화형 AI 봇 만들기"
+      },
+      "rag": {
+        "title": "RAG 파이프라인",
+        "description": "검색 증강 생성"
+      },
+      "agent": {
+        "title": "AI 에이전트",
+        "description": "자율 AI 에이전트"
+      }
     }
   },
   "documents": {
     "title": "문서",
     "searchPlaceholder": "문서 검색...",
     "upload": "업로드",
-    "empty": { "title": "문서가 없습니다", "description": "문서를 업로드하세요" }
+    "empty": {
+      "title": "문서가 없습니다",
+      "description": "문서를 업로드하세요"
+    }
   },
   "toolStorage": {
     "title": "도구 저장소",
     "searchPlaceholder": "도구 검색...",
     "createNew": "새 도구",
-    "filter": { "all": "전체" },
-    "empty": { "title": "도구가 없습니다", "description": "새 도구를 만들어보세요" }
+    "filter": {
+      "all": "전체"
+    },
+    "empty": {
+      "title": "도구가 없습니다",
+      "description": "새 도구를 만들어보세요"
+    }
   },
   "promptStorage": {
     "title": "프롬프트 저장소",
     "searchPlaceholder": "프롬프트 검색...",
     "createNew": "새 프롬프트",
-    "filter": { "all": "전체" },
-    "empty": { "title": "프롬프트가 없습니다", "description": "새 프롬프트를 만들어보세요" }
+    "filter": {
+      "all": "전체"
+    },
+    "empty": {
+      "title": "프롬프트가 없습니다",
+      "description": "새 프롬프트를 만들어보세요"
+    }
   },
   "profile": {
     "title": "프로필",
@@ -353,8 +470,18 @@
     "title": "서비스 요청",
     "searchPlaceholder": "요청 검색...",
     "newRequest": "새 요청",
-    "tabs": { "all": "전체", "open": "열림", "inProgress": "진행중", "resolved": "해결됨" },
-    "summary": { "open": "열림", "inProgress": "진행중", "resolved": "해결됨", "urgent": "긴급" },
+    "tabs": {
+      "all": "전체",
+      "open": "열림",
+      "inProgress": "진행중",
+      "resolved": "해결됨"
+    },
+    "summary": {
+      "open": "열림",
+      "inProgress": "진행중",
+      "resolved": "해결됨",
+      "urgent": "긴급"
+    },
     "by": "요청자",
     "view": "보기",
     "time": {
@@ -362,13 +489,22 @@
       "hoursAgo": "시간 전",
       "daysAgo": "일 전"
     },
-    "empty": { "title": "요청이 없습니다", "description": "새 요청을 생성하세요" }
+    "empty": {
+      "title": "요청이 없습니다",
+      "description": "새 요청을 생성하세요"
+    }
   },
   "faq": {
     "title": "FAQ",
     "subtitle": "자주 묻는 질문",
     "searchPlaceholder": "질문 검색...",
-    "tabs": { "all": "전체", "gettingStarted": "시작하기", "models": "모델", "data": "데이터", "api": "API" },
+    "tabs": {
+      "all": "전체",
+      "gettingStarted": "시작하기",
+      "models": "모델",
+      "data": "데이터",
+      "api": "API"
+    },
     "wasHelpful": "도움이 되었나요?",
     "contact": {
       "title": "더 궁금한 점이 있으신가요?",
@@ -395,91 +531,321 @@
         "governance": "AI 거버넌스"
       },
       "user": {
-        "users": { "title": "사용자 관리", "description": "사용자 목록 조회 및 관리" },
-        "userCreate": { "title": "사용자 생성", "description": "새 사용자 등록" },
-        "groupPermissions": { "title": "그룹 권한", "description": "그룹별 권한 설정" }
+        "users": {
+          "title": "사용자 관리",
+          "description": "사용자 목록 조회 및 관리"
+        },
+        "userCreate": {
+          "title": "사용자 생성",
+          "description": "새 사용자 등록"
+        },
+        "groupPermissions": {
+          "title": "그룹 권한",
+          "description": "그룹별 권한 설정"
+        }
       },
       "workflow": {
-        "workflowManagement": { "title": "워크플로우 관리", "description": "워크플로우 생성 및 관리" },
-        "workflowMonitoring": { "title": "워크플로우 모니터링", "description": "실행 상태 모니터링" },
-        "testMonitoring": { "title": "테스트 모니터링", "description": "테스트 실행 모니터링" },
-        "agentTraces": { "title": "에이전트 추적", "description": "에이전트 실행 추적" },
-        "chatMonitoring": { "title": "채팅 모니터링", "description": "채팅 로그 모니터링" },
-        "userTokenDashboard": { "title": "사용자 토큰", "description": "토큰 사용량 대시보드" },
-        "nodeManagement": { "title": "노드 관리", "description": "워크플로우 노드 관리" },
-        "workflowStore": { "title": "워크플로우 스토어", "description": "공유 워크플로우 탐색" },
-        "promptStore": { "title": "프롬프트 스토어", "description": "공유 프롬프트 탐색" }
+        "workflowManagement": {
+          "title": "워크플로우 관리",
+          "description": "워크플로우 생성 및 관리"
+        },
+        "workflowMonitoring": {
+          "title": "워크플로우 모니터링",
+          "description": "실행 상태 모니터링"
+        },
+        "testMonitoring": {
+          "title": "테스트 모니터링",
+          "description": "테스트 실행 모니터링"
+        },
+        "agentTraces": {
+          "title": "에이전트 추적",
+          "description": "에이전트 실행 추적"
+        },
+        "chatMonitoring": {
+          "title": "채팅 모니터링",
+          "description": "채팅 로그 모니터링"
+        },
+        "userTokenDashboard": {
+          "title": "사용자 토큰",
+          "description": "토큰 사용량 대시보드"
+        },
+        "nodeManagement": {
+          "title": "노드 관리",
+          "description": "워크플로우 노드 관리"
+        },
+        "workflowStore": {
+          "title": "워크플로우 스토어",
+          "description": "공유 워크플로우 탐색"
+        },
+        "promptStore": {
+          "title": "프롬프트 스토어",
+          "description": "공유 프롬프트 탐색"
+        }
       },
       "setting": {
-        "systemSettings": { "title": "시스템 설정", "description": "시스템 전반 설정" },
-        "systemConfig": { "title": "시스템 구성", "description": "구성 파일 뷰어" }
+        "systemSettings": {
+          "title": "시스템 설정",
+          "description": "시스템 전반 설정"
+        },
+        "systemConfig": {
+          "title": "시스템 구성",
+          "description": "구성 파일 뷰어"
+        },
+        "llm": {
+          "title": "LLM 설정",
+          "description": "LLM 프로바이더 설정"
+        },
+        "vl": {
+          "title": "비전 언어 모델",
+          "description": "비전 언어 모델 설정"
+        },
+        "embed": {
+          "title": "임베딩 & 검색",
+          "description": "임베딩, 리랭커, 벡터DB 설정"
+        },
+        "audio": {
+          "title": "오디오 모델",
+          "description": "STT/TTS 설정"
+        },
+        "guarder": {
+          "title": "콘텐츠 가더",
+          "description": "콘텐츠 안전 및 PII 보호 설정"
+        },
+        "vastai": {
+          "title": "GPU 클라우드",
+          "description": "Vast.ai GPU 클라우드 설정"
+        },
+        "modelServing": {
+          "title": "모델 서빙",
+          "description": "모델 서빙 관리"
+        },
+        "database": {
+          "title": "데이터베이스",
+          "description": "데이터베이스 연결 설정"
+        }
       },
       "system": {
-        "systemMonitor": { "title": "시스템 모니터", "description": "실시간 시스템 모니터링" },
-        "systemHealth": { "title": "시스템 상태", "description": "서비스 헬스 체크" },
-        "backendLogs": { "title": "백엔드 로그", "description": "백엔드 실시간 로그" }
+        "systemMonitor": {
+          "title": "시스템 모니터",
+          "description": "실시간 시스템 모니터링"
+        },
+        "systemHealth": {
+          "title": "시스템 상태",
+          "description": "서비스 헬스 체크"
+        },
+        "backendLogs": {
+          "title": "백엔드 로그",
+          "description": "백엔드 실시간 로그"
+        }
       },
       "data": {
-        "database": { "title": "데이터베이스", "description": "DB 관리" },
-        "dataScraper": { "title": "데이터 스크래퍼", "description": "데이터 수집 관리" },
-        "storage": { "title": "스토리지", "description": "파일 스토리지 관리" },
-        "backup": { "title": "백업", "description": "백업 및 복원" }
+        "database": {
+          "title": "데이터베이스",
+          "description": "DB 관리"
+        },
+        "dataScraper": {
+          "title": "데이터 스크래퍼",
+          "description": "데이터 수집 관리"
+        },
+        "storage": {
+          "title": "스토리지",
+          "description": "파일 스토리지 관리"
+        },
+        "backup": {
+          "title": "백업",
+          "description": "백업 및 복원"
+        }
       },
       "security": {
-        "securitySettings": { "title": "보안 설정", "description": "보안 정책 설정" },
-        "auditLogs": { "title": "감사 로그", "description": "접근 감사 로그" },
-        "errorLogs": { "title": "에러 로그", "description": "시스템 에러 로그" }
+        "securitySettings": {
+          "title": "보안 설정",
+          "description": "보안 정책 설정"
+        },
+        "auditLogs": {
+          "title": "감사 로그",
+          "description": "접근 감사 로그"
+        },
+        "errorLogs": {
+          "title": "에러 로그",
+          "description": "시스템 에러 로그"
+        }
       },
       "mcp": {
-        "mcpMarket": { "title": "MCP 마켓", "description": "MCP 서버 마켓플레이스" },
-        "mcpStation": { "title": "MCP 스테이션", "description": "MCP 서버 관리" }
+        "mcpMarket": {
+          "title": "MCP 마켓",
+          "description": "MCP 서버 마켓플레이스"
+        },
+        "mcpStation": {
+          "title": "MCP 스테이션",
+          "description": "MCP 서버 관리"
+        }
       },
       "ml": {
-        "mlModelControl": { "title": "ML 모델 관리", "description": "ML 모델 워크스페이스" }
+        "mlModelControl": {
+          "title": "ML 모델 관리",
+          "description": "ML 모델 워크스페이스"
+        }
       },
       "governance": {
-        "workflowApproval": { "title": "워크플로우 승인", "description": "워크플로우 배포 승인" },
-        "riskManagement": { "title": "리스크 관리", "description": "AI 리스크 관리" },
-        "monitoring": { "title": "거버넌스 모니터링", "description": "거버넌스 실시간 모니터링" },
-        "controlPolicy": { "title": "제어 정책", "description": "AI 제어 정책 관리" },
-        "operationHistory": { "title": "운영 이력", "description": "운영 이력 조회" },
-        "auditTracking": { "title": "감사 추적", "description": "감사 추적 관리" }
+        "workflowApproval": {
+          "title": "워크플로우 승인",
+          "description": "워크플로우 배포 승인"
+        },
+        "riskManagement": {
+          "title": "리스크 관리",
+          "description": "AI 리스크 관리"
+        },
+        "monitoring": {
+          "title": "거버넌스 모니터링",
+          "description": "거버넌스 실시간 모니터링"
+        },
+        "controlPolicy": {
+          "title": "제어 정책",
+          "description": "AI 제어 정책 관리"
+        },
+        "operationHistory": {
+          "title": "운영 이력",
+          "description": "운영 이력 조회"
+        },
+        "auditTracking": {
+          "title": "감사 추적",
+          "description": "감사 추적 관리"
+        }
       }
     },
     "pages": {
-      "users": { "title": "사용자 관리", "description": "사용자 목록을 조회하고 관리합니다." },
-      "userCreate": { "title": "사용자 생성", "description": "새 사용자를 등록합니다." },
-      "groupPermissions": { "title": "그룹 권한", "description": "그룹별 권한을 설정합니다." },
-      "workflowManagement": { "title": "워크플로우 관리", "description": "워크플로우를 생성하고 관리합니다." },
-      "workflowMonitoring": { "title": "워크플로우 모니터링", "description": "워크플로우 실행 상태를 모니터링합니다." },
-      "testMonitoring": { "title": "테스트 모니터링", "description": "테스트 실행을 모니터링합니다." },
-      "agentTraces": { "title": "에이전트 추적", "description": "에이전트 실행을 추적합니다." },
-      "nodeManagement": { "title": "노드 관리", "description": "워크플로우 노드를 관리합니다." },
-      "chatMonitoring": { "title": "채팅 모니터링", "description": "채팅 로그를 모니터링합니다." },
-      "userTokenDashboard": { "title": "사용자 토큰 대시보드", "description": "토큰 사용량을 확인합니다." },
-      "workflowStore": { "title": "워크플로우 스토어", "description": "공유 워크플로우를 탐색합니다." },
-      "promptStore": { "title": "프롬프트 스토어", "description": "공유 프롬프트를 탐색합니다." },
-      "systemSettings": { "title": "시스템 설정", "description": "시스템 전반 설정을 관리합니다." },
-      "systemConfig": { "title": "시스템 구성", "description": "시스템 구성 파일을 확인합니다." },
-      "systemMonitor": { "title": "시스템 모니터", "description": "시스템을 실시간으로 모니터링합니다." },
-      "systemHealth": { "title": "시스템 상태", "description": "서비스 헬스 체크를 확인합니다." },
-      "backendLogs": { "title": "백엔드 로그", "description": "백엔드 실시간 로그를 확인합니다." },
-      "database": { "title": "데이터베이스", "description": "데이터베이스를 관리합니다." },
-      "dataScraper": { "title": "데이터 스크래퍼", "description": "데이터 수집을 관리합니다." },
-      "storage": { "title": "스토리지", "description": "파일 스토리지를 관리합니다." },
-      "backup": { "title": "백업", "description": "백업 및 복원을 관리합니다." },
-      "securitySettings": { "title": "보안 설정", "description": "보안 정책을 설정합니다." },
-      "auditLogs": { "title": "감사 로그", "description": "접근 감사 로그를 확인합니다." },
-      "errorLogs": { "title": "에러 로그", "description": "시스템 에러 로그를 확인합니다." },
-      "mcpMarket": { "title": "MCP 마켓", "description": "MCP 서버 마켓플레이스를 탐색합니다." },
-      "mcpStation": { "title": "MCP 스테이션", "description": "MCP 서버를 관리합니다." },
-      "mlModelControl": { "title": "ML 모델 관리", "description": "ML 모델 워크스페이스를 관리합니다." },
-      "govWorkflowApproval": { "title": "워크플로우 승인", "description": "워크플로우 배포를 승인합니다." },
-      "govRiskManagement": { "title": "리스크 관리", "description": "AI 리스크를 관리합니다." },
-      "govMonitoring": { "title": "거버넌스 모니터링", "description": "거버넌스를 실시간으로 모니터링합니다." },
-      "govControlPolicy": { "title": "제어 정책", "description": "AI 제어 정책을 관리합니다." },
-      "govOperationHistory": { "title": "운영 이력", "description": "운영 이력을 조회합니다." },
-      "govAuditTracking": { "title": "감사 추적", "description": "감사 추적을 관리합니다." }
+      "users": {
+        "title": "사용자 관리",
+        "description": "사용자 목록을 조회하고 관리합니다."
+      },
+      "userCreate": {
+        "title": "사용자 생성",
+        "description": "새 사용자를 등록합니다."
+      },
+      "groupPermissions": {
+        "title": "그룹 권한",
+        "description": "그룹별 권한을 설정합니다."
+      },
+      "workflowManagement": {
+        "title": "워크플로우 관리",
+        "description": "워크플로우를 생성하고 관리합니다."
+      },
+      "workflowMonitoring": {
+        "title": "워크플로우 모니터링",
+        "description": "워크플로우 실행 상태를 모니터링합니다."
+      },
+      "testMonitoring": {
+        "title": "테스트 모니터링",
+        "description": "테스트 실행을 모니터링합니다."
+      },
+      "agentTraces": {
+        "title": "에이전트 추적",
+        "description": "에이전트 실행을 추적합니다."
+      },
+      "nodeManagement": {
+        "title": "노드 관리",
+        "description": "워크플로우 노드를 관리합니다."
+      },
+      "chatMonitoring": {
+        "title": "채팅 모니터링",
+        "description": "채팅 로그를 모니터링합니다."
+      },
+      "userTokenDashboard": {
+        "title": "사용자 토큰 대시보드",
+        "description": "토큰 사용량을 확인합니다."
+      },
+      "workflowStore": {
+        "title": "워크플로우 스토어",
+        "description": "공유 워크플로우를 탐색합니다."
+      },
+      "promptStore": {
+        "title": "프롬프트 스토어",
+        "description": "공유 프롬프트를 탐색합니다."
+      },
+      "systemSettings": {
+        "title": "시스템 설정",
+        "description": "시스템 전반 설정을 관리합니다."
+      },
+      "systemConfig": {
+        "title": "시스템 구성",
+        "description": "시스템 구성 파일을 확인합니다."
+      },
+      "systemMonitor": {
+        "title": "시스템 모니터",
+        "description": "시스템을 실시간으로 모니터링합니다."
+      },
+      "systemHealth": {
+        "title": "시스템 상태",
+        "description": "서비스 헬스 체크를 확인합니다."
+      },
+      "backendLogs": {
+        "title": "백엔드 로그",
+        "description": "백엔드 실시간 로그를 확인합니다."
+      },
+      "database": {
+        "title": "데이터베이스",
+        "description": "데이터베이스를 관리합니다."
+      },
+      "dataScraper": {
+        "title": "데이터 스크래퍼",
+        "description": "데이터 수집을 관리합니다."
+      },
+      "storage": {
+        "title": "스토리지",
+        "description": "파일 스토리지를 관리합니다."
+      },
+      "backup": {
+        "title": "백업",
+        "description": "백업 및 복원을 관리합니다."
+      },
+      "securitySettings": {
+        "title": "보안 설정",
+        "description": "보안 정책을 설정합니다."
+      },
+      "auditLogs": {
+        "title": "감사 로그",
+        "description": "접근 감사 로그를 확인합니다."
+      },
+      "errorLogs": {
+        "title": "에러 로그",
+        "description": "시스템 에러 로그를 확인합니다."
+      },
+      "mcpMarket": {
+        "title": "MCP 마켓",
+        "description": "MCP 서버 마켓플레이스를 탐색합니다."
+      },
+      "mcpStation": {
+        "title": "MCP 스테이션",
+        "description": "MCP 서버를 관리합니다."
+      },
+      "mlModelControl": {
+        "title": "ML 모델 관리",
+        "description": "ML 모델 워크스페이스를 관리합니다."
+      },
+      "govWorkflowApproval": {
+        "title": "워크플로우 승인",
+        "description": "워크플로우 배포를 승인합니다."
+      },
+      "govRiskManagement": {
+        "title": "리스크 관리",
+        "description": "AI 리스크를 관리합니다."
+      },
+      "govMonitoring": {
+        "title": "거버넌스 모니터링",
+        "description": "거버넌스를 실시간으로 모니터링합니다."
+      },
+      "govControlPolicy": {
+        "title": "제어 정책",
+        "description": "AI 제어 정책을 관리합니다."
+      },
+      "govOperationHistory": {
+        "title": "운영 이력",
+        "description": "운영 이력을 조회합니다."
+      },
+      "govAuditTracking": {
+        "title": "감사 추적",
+        "description": "감사 추적을 관리합니다."
+      }
     },
     "userManagement": {
       "userList": {
@@ -1258,6 +1624,425 @@
           "yes": "예",
           "no": "아니오",
           "close": "닫기"
+        }
+      }
+    },
+    "settings": {
+      "title": "시스템 설정",
+      "description": "시스템 통합 및 서비스를 구성합니다.",
+      "back": "뒤로",
+      "settingsSuffix": "설정",
+      "loading": "로딩 중...",
+      "loadFailed": "설정을 불러오는데 실패했습니다",
+      "unknownError": "알 수 없는 오류",
+      "retry": "재시도",
+      "invalidValue": "유효하지 않은 값",
+      "updateFailed": "설정 업데이트 실패",
+      "connectionTestStarted": "연결 테스트 중...",
+      "connectionTestFailed": "연결 테스트 실패",
+      "preparingForm": "설정 양식을 준비하는 중...",
+      "common": {
+        "envVar": "환경변수",
+        "configPath": "경로",
+        "notSaved": "미저장",
+        "saving": "저장 중...",
+        "enabled": "활성화",
+        "disabled": "비활성화",
+        "selectPlaceholder": "선택...",
+        "testConnection": "연결 테스트",
+        "settings": "설정"
+      },
+      "categories": {
+        "llm": {
+          "name": "LLM (대규모 언어 모델)",
+          "description": "AI 언어 모델 프로바이더 설정"
+        },
+        "collection": {
+          "name": "비전 언어 모델",
+          "description": "비전/이미지 이해 모델 설정"
+        },
+        "vectordb": {
+          "name": "임베딩 & 벡터 검색",
+          "description": "임베딩 모델, 리랭커, 벡터 데이터베이스 설정"
+        },
+        "audiomodel": {
+          "name": "오디오 모델 (STT & TTS)",
+          "description": "음성 인식 및 음성 합성 설정"
+        },
+        "guarder": {
+          "name": "콘텐츠 가더",
+          "description": "콘텐츠 안전 필터 및 PII 보호 설정"
+        },
+        "vastai": {
+          "name": "Vast.ai GPU 클라우드",
+          "description": "GPU 클라우드 리소스 설정"
+        },
+        "modelServing": {
+          "name": "모델 서빙",
+          "description": "배포된 모델 서빙 관리"
+        },
+        "database": {
+          "name": "데이터베이스",
+          "description": "데이터베이스 연결 및 설정 구성"
+        }
+      },
+      "configViewer": {
+        "title": "시스템 구성",
+        "subtitle": "모든 시스템 구성 값을 확인하고 편집합니다.",
+        "loading": "구성을 불러오는 중...",
+        "loadFailed": "구성을 불러오는데 실패했습니다",
+        "unknownError": "알 수 없는 오류",
+        "retry": "재시도",
+        "refresh": "새로고침",
+        "totalSettings": "전체 설정",
+        "savedSettings": "설정됨",
+        "defaultSettings": "기본값",
+        "all": "전체",
+        "configured": "설정됨",
+        "defaultValue": "기본값",
+        "currentValue": "현재 값",
+        "defaultValueLabel": "기본값",
+        "editCurrentValue": "편집",
+        "save": "저장",
+        "cancel": "취소",
+        "invalidValue": "유효하지 않은 값",
+        "updateFailed": "업데이트 실패",
+        "noSettings": "설정이 없습니다.",
+        "categories": {
+          "database": "데이터베이스",
+          "application": "애플리케이션",
+          "workflow": "워크플로우",
+          "node": "노드",
+          "vectorDatabase": "벡터 DB",
+          "other": "기타"
+        }
+      },
+      "llm": {
+        "title": "LLM 설정",
+        "description": "언어 모델 프로바이더 및 파라미터를 설정합니다.",
+        "refresh": "새로고침",
+        "loading": "LLM 설정을 불러오는 중...",
+        "defaultSettings": "기본 프로바이더",
+        "defaultProvider": "기본 LLM 프로바이더",
+        "defaultProviderDesc": "시스템의 기본 LLM 프로바이더를 선택합니다.",
+        "providerChanged": "프로바이더가 {{provider}}(으)로 변경되었습니다",
+        "providerChangeFailed": "프로바이더 변경 실패",
+        "testConnection": "연결 테스트",
+        "testing": "테스트 중...",
+        "loadError": "LLM 상태를 불러오는데 실패했습니다",
+        "providerGrid": "전체 프로바이더",
+        "default": "기본",
+        "available": "사용 가능",
+        "unavailable": "사용 불가",
+        "configured": "설정됨",
+        "config": {
+          "title": "구성"
+        },
+        "tabs": {
+          "default": "기본",
+          "openai": "OpenAI",
+          "gemini": "Gemini",
+          "anthropic": "Anthropic",
+          "aws": "AWS Bedrock",
+          "vllm": "vLLM",
+          "sglang": "SGLang"
+        },
+        "providers": {
+          "openai": "OpenAI",
+          "gemini": "Google Gemini",
+          "anthropic": "Anthropic",
+          "aws": "AWS Bedrock",
+          "vllm": "vLLM",
+          "sglang": "SGLang"
+        },
+        "fields": {
+          "apiKey": "API 키",
+          "apiBaseUrl": "API 기본 URL",
+          "defaultModel": "기본 모델",
+          "temperature": "Temperature",
+          "temperatureDesc": "무작위성을 제어합니다 (0=결정적, 높을수록 무작위).",
+          "maxTokens": "최대 토큰",
+          "maxTokensDesc": "생성할 최대 토큰 수.",
+          "openaiApiKeyDesc": "OpenAI API 키.",
+          "openaiBaseUrlDesc": "사용자 정의 API 기본 URL (선택사항).",
+          "openaiModelDesc": "기본 OpenAI 모델을 선택합니다.",
+          "geminiApiKeyDesc": "Google Gemini API 키.",
+          "geminiBaseUrlDesc": "사용자 정의 Gemini API 기본 URL (선택사항).",
+          "geminiModelDesc": "기본 Gemini 모델을 선택합니다.",
+          "anthropicApiKeyDesc": "Anthropic API 키.",
+          "anthropicBaseUrlDesc": "사용자 정의 Anthropic API 기본 URL (선택사항).",
+          "anthropicModelDesc": "기본 Anthropic 모델을 선택합니다.",
+          "awsAccessKeyId": "AWS 액세스 키 ID",
+          "awsAccessKeyIdDesc": "AWS 액세스 키 ID.",
+          "awsSecretAccessKey": "AWS 시크릿 액세스 키",
+          "awsSecretAccessKeyDesc": "AWS 시크릿 액세스 키.",
+          "awsSessionToken": "AWS 세션 토큰",
+          "awsSessionTokenDesc": "AWS 세션 토큰 (선택사항).",
+          "awsRegion": "AWS 리전",
+          "awsRegionDesc": "Bedrock용 AWS 리전을 선택합니다.",
+          "awsEndpointUrl": "Bedrock 엔드포인트 URL",
+          "awsEndpointUrlDesc": "사용자 정의 Bedrock 엔드포인트 URL (선택사항).",
+          "vllmBaseUrlDesc": "vLLM 서버 기본 URL.",
+          "vllmApiKeyDesc": "vLLM API 키 (선택사항).",
+          "vllmModelNameDesc": "vLLM에 로드된 모델명.",
+          "modelName": "모델명",
+          "topP": "Top P",
+          "topPDesc": "핵 샘플링 파라미터.",
+          "stream": "스트림",
+          "streamDesc": "스트리밍 응답을 활성화합니다.",
+          "sglBaseUrlDesc": "SGLang 서버 기본 URL.",
+          "sglApiKeyDesc": "SGLang API 키 (선택사항).",
+          "sglModelNameDesc": "SGLang에 로드된 모델명.",
+          "defaultProvider": "기본 LLM 프로바이더",
+          "defaultProviderDesc": "기본 LLM 프로바이더를 선택합니다."
+        }
+      },
+      "vl": {
+        "title": "비전 언어 모델 설정",
+        "description": "비전/이미지 이해 모델 프로바이더를 설정합니다.",
+        "refresh": "새로고침",
+        "loading": "VL 설정을 불러오는 중...",
+        "defaultSettings": "기본 프로바이더",
+        "defaultProvider": "기본 VL 프로바이더",
+        "defaultProviderDesc": "기본 비전 언어 모델 프로바이더를 선택합니다.",
+        "tabs": {
+          "default": "기본",
+          "openai": "OpenAI",
+          "anthropic": "Anthropic",
+          "gemini": "Gemini",
+          "aws": "AWS Bedrock",
+          "vllm": "vLLM"
+        },
+        "fields": {
+          "apiKey": "API 키",
+          "apiBaseUrl": "API 기본 URL",
+          "defaultModel": "기본 모델",
+          "temperature": "Temperature",
+          "temperatureDesc": "무작위성을 제어합니다.",
+          "maxTokens": "최대 토큰",
+          "maxTokensDesc": "생성할 최대 토큰 수.",
+          "imageQuality": "이미지 품질",
+          "imageQualityDesc": "이미지 처리 품질 수준.",
+          "batchSize": "배치 크기",
+          "batchSizeDesc": "한 번에 처리할 이미지 수.",
+          "modelName": "모델명",
+          "noModel": "모델 없음 (텍스트 추출)",
+          "openaiApiKeyDesc": "비전용 OpenAI API 키.",
+          "openaiBaseUrlDesc": "사용자 정의 기본 URL (선택사항).",
+          "openaiModelDesc": "비전 모델을 선택합니다.",
+          "anthropicApiKeyDesc": "비전용 Anthropic API 키.",
+          "anthropicModelDesc": "Claude 비전 모델을 선택합니다.",
+          "geminiApiKeyDesc": "비전용 Gemini API 키.",
+          "geminiModelDesc": "Gemini 비전 모델을 선택합니다.",
+          "awsAccessKeyId": "AWS 액세스 키 ID",
+          "awsAccessKeyIdDesc": "AWS 액세스 키.",
+          "awsSecretAccessKey": "AWS 시크릿 액세스 키",
+          "awsSecretAccessKeyDesc": "AWS 시크릿 키.",
+          "awsRegion": "AWS 리전",
+          "awsRegionDesc": "Bedrock용 AWS 리전.",
+          "awsEndpointUrl": "엔드포인트 URL",
+          "awsEndpointUrlDesc": "사용자 정의 엔드포인트 (선택사항).",
+          "awsModelDesc": "Bedrock 비전 모델을 선택합니다.",
+          "vllmBaseUrlDesc": "vLLM 서버 URL.",
+          "vllmApiKeyDesc": "vLLM API 키 (선택사항).",
+          "vllmModelNameDesc": "vLLM 비전 모델명.",
+          "defaultProvider": "기본 VL 프로바이더",
+          "defaultProviderDesc": "기본 VL 프로바이더를 선택합니다."
+        }
+      },
+      "embed": {
+        "title": "임베딩 & 벡터 검색",
+        "description": "임베딩 모델, 리랭커, 벡터 데이터베이스를 설정합니다.",
+        "loading": "임베딩 설정을 불러오는 중...",
+        "loadFailed": "임베딩 설정을 불러오는데 실패했습니다.",
+        "tabs": {
+          "embedding": "임베딩 모델",
+          "reranker": "리랭커",
+          "vectordb": "벡터 데이터베이스"
+        },
+        "embedding": {
+          "title": "임베딩 모델",
+          "description": "텍스트 임베딩 모델을 설정합니다.",
+          "testConnection": "임베딩 테스트"
+        },
+        "reranker": {
+          "title": "리랭커",
+          "description": "리랭커 모델을 설정합니다.",
+          "testConnection": "리랭커 테스트"
+        },
+        "vectordb": {
+          "title": "벡터 데이터베이스",
+          "description": "Qdrant 벡터 데이터베이스 연결을 설정합니다.",
+          "testConnection": "연결 테스트"
+        },
+        "fields": {
+          "provider": "프로바이더",
+          "providerDesc": "임베딩 프로바이더를 선택합니다.",
+          "model": "모델",
+          "modelDesc": "임베딩 모델을 선택합니다.",
+          "apiKey": "API 키",
+          "apiKeyDesc": "프로바이더 API 키.",
+          "customUrl": "사용자 정의 URL",
+          "customUrlDesc": "사용자 정의 임베딩 서버 URL.",
+          "rerankerProvider": "리랭커 프로바이더",
+          "rerankerProviderDesc": "리랭커 프로바이더를 선택합니다.",
+          "rerankerModel": "리랭커 모델",
+          "rerankerModelDesc": "리랭커 모델을 선택합니다.",
+          "rerankerDevice": "디바이스",
+          "rerankerDeviceDesc": "리랭커를 실행할 디바이스.",
+          "rerankerVllmUrl": "vLLM URL",
+          "rerankerVllmUrlDesc": "리랭커용 vLLM 서버 URL.",
+          "rerankerVllmModel": "vLLM 모델",
+          "rerankerVllmModelDesc": "vLLM의 모델명.",
+          "vectorDimension": "벡터 차원",
+          "vectorDimensionDesc": "임베딩 벡터의 차원.",
+          "host": "호스트",
+          "hostDesc": "Qdrant 서버 호스트.",
+          "port": "포트",
+          "portDesc": "Qdrant 서버 포트.",
+          "grpc": "gRPC 사용",
+          "grpcDesc": "gRPC 연결을 활성화합니다.",
+          "grpcPort": "gRPC 포트",
+          "grpcPortDesc": "Qdrant gRPC 포트."
+        }
+      },
+      "audio": {
+        "title": "오디오 모델",
+        "description": "음성 인식 및 음성 합성 모델을 설정합니다.",
+        "loading": "오디오 설정을 불러오는 중...",
+        "loadFailed": "오디오 설정을 불러오는데 실패했습니다.",
+        "tabs": {
+          "stt": "STT (음성 인식)",
+          "tts": "TTS (음성 합성)"
+        },
+        "stt": {
+          "title": "음성 인식",
+          "description": "STT 프로바이더를 설정합니다.",
+          "testConnection": "STT 테스트"
+        },
+        "tts": {
+          "title": "음성 합성",
+          "description": "TTS 프로바이더를 설정합니다.",
+          "testConnection": "TTS 테스트"
+        },
+        "fields": {
+          "provider": "프로바이더",
+          "providerDesc": "오디오 프로바이더를 선택합니다.",
+          "model": "모델",
+          "modelDesc": "모델을 선택합니다.",
+          "device": "디바이스",
+          "deviceDesc": "모델을 실행할 디바이스.",
+          "language": "언어",
+          "languageDesc": "기본 언어 코드.",
+          "speaker": "스피커",
+          "speakerDesc": "기본 스피커 음성."
+        }
+      },
+      "guarder": {
+        "title": "콘텐츠 가더",
+        "description": "콘텐츠 안전 필터 및 PII 보호를 설정합니다.",
+        "loading": "가더 설정을 불러오는 중...",
+        "configLoadFailed": "가더 설정을 불러오는데 실패했습니다.",
+        "modelConfig": {
+          "title": "모델 구성"
+        },
+        "fields": {
+          "enabled": "가더 활성화",
+          "enabledDesc": "콘텐츠 가더를 활성화 또는 비활성화합니다.",
+          "rigorousFilter": "엄격한 필터",
+          "rigorousFilterDesc": "엄격한 콘텐츠 필터링을 활성화합니다.",
+          "provider": "프로바이더",
+          "providerDesc": "가더 프로바이더를 선택합니다.",
+          "modelName": "모델명",
+          "modelNameDesc": "가더 모델명."
+        },
+        "pii": {
+          "title": "PII 보호",
+          "add": "정책 추가",
+          "newPolicy": "새 PII 정책",
+          "policyName": "정책 이름",
+          "regexPattern": "정규식 패턴",
+          "action": "동작",
+          "actions": "작업",
+          "empty": "PII 정책이 설정되지 않았습니다.",
+          "loadFailed": "PII 정책을 불러오는데 실패했습니다.",
+          "createSuccess": "PII 정책이 생성되었습니다.",
+          "createFailed": "PII 정책 생성에 실패했습니다.",
+          "updateSuccess": "PII 정책이 업데이트되었습니다.",
+          "updateFailed": "PII 정책 업데이트에 실패했습니다.",
+          "deleteSuccess": "PII 정책이 삭제되었습니다.",
+          "deleteFailed": "PII 정책 삭제에 실패했습니다.",
+          "validationError": "모든 필수 필드를 입력해주세요."
+        }
+      },
+      "vastai": {
+        "title": "Vast.ai GPU 클라우드",
+        "description": "Vast.ai GPU 클라우드 리소스를 설정합니다.",
+        "loading": "Vast.ai 설정을 불러오는 중...",
+        "configLoadFailed": "Vast.ai 설정을 불러오는데 실패했습니다.",
+        "config": {
+          "title": "API 구성"
+        },
+        "testConnection": "연결 테스트",
+        "fields": {
+          "apiKey": "API 키",
+          "apiKeyDesc": "Vast.ai API 키.",
+          "diskGb": "기본 디스크 (GB)",
+          "diskGbDesc": "기본 디스크 공간 (GB).",
+          "gpuRam": "기본 GPU RAM (GB)",
+          "gpuRamDesc": "기본 GPU 메모리 (GB)."
+        },
+        "gpuManagement": {
+          "title": "GPU 인스턴스 관리",
+          "comingSoon": "고급 GPU 인스턴스 관리 기능을 준비 중입니다."
+        }
+      },
+      "modelServing": {
+        "title": "모델 서빙",
+        "description": "배포된 모델 서빙 인프라를 확인하고 관리합니다.",
+        "loading": "모델 서빙 상태를 불러오는 중...",
+        "loadFailed": "모델 서빙 상태를 불러오는데 실패했습니다.",
+        "retry": "재시도",
+        "refresh": "새로고침",
+        "noData": "모델 서빙 데이터가 없습니다.",
+        "gpuEnvironment": "GPU 환경",
+        "gpu": {
+          "name": "GPU 이름",
+          "memory": "GPU 메모리",
+          "count": "GPU 수"
+        },
+        "loadedModels": "로드된 모델",
+        "model": {
+          "name": "이름",
+          "type": "유형",
+          "status": "상태"
+        },
+        "deployManagement": "배포 & 관리",
+        "comingSoon": "고급 모델 배포 및 관리 기능을 준비 중입니다."
+      },
+      "database": {
+        "title": "데이터베이스 설정",
+        "description": "데이터베이스 연결 설정을 구성합니다.",
+        "loading": "데이터베이스 설정을 불러오는 중...",
+        "loadFailed": "데이터베이스 설정을 불러오는데 실패했습니다.",
+        "testConnection": "연결 테스트",
+        "fields": {
+          "dbType": "데이터베이스 유형",
+          "dbTypeDesc": "데이터베이스 유형을 선택합니다.",
+          "pgHost": "PostgreSQL 호스트",
+          "pgHostDesc": "PostgreSQL 서버 호스트 주소.",
+          "pgPort": "PostgreSQL 포트",
+          "pgPortDesc": "PostgreSQL 서버 포트.",
+          "pgDb": "데이터베이스 이름",
+          "pgDbDesc": "PostgreSQL 데이터베이스 이름.",
+          "pgUser": "사용자명",
+          "pgUserDesc": "PostgreSQL 사용자명.",
+          "pgPassword": "비밀번호",
+          "pgPasswordDesc": "PostgreSQL 비밀번호.",
+          "sqlitePath": "SQLite 파일 경로",
+          "sqlitePathDesc": "SQLite 데이터베이스 파일 경로.",
+          "autoMigration": "자동 마이그레이션",
+          "autoMigrationDesc": "스키마 변경 시 자동으로 데이터베이스 마이그레이션을 실행합니다."
         }
       }
     }

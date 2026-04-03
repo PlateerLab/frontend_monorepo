@@ -7,6 +7,7 @@ import type React from 'react';
 export interface RouteComponentProps {
   params?: Record<string, string>;
   searchParams?: Record<string, string | string[] | undefined>;
+  onNavigate?: (itemId: string) => void;
 }
 
 // ─────────────────────────────────────────────────────────────

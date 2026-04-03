@@ -739,6 +739,165 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
 
+  features/admin-setting-audio:
+    dependencies:
+      '@xgen/admin-setting-shared':
+        specifier: workspace:*
+        version: link:../../packages/admin-setting-shared
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-setting-database:
+    dependencies:
+      '@xgen/admin-setting-shared':
+        specifier: workspace:*
+        version: link:../../packages/admin-setting-shared
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-setting-embed:
+    dependencies:
+      '@xgen/admin-setting-shared':
+        specifier: workspace:*
+        version: link:../../packages/admin-setting-shared
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-setting-guarder:
+    dependencies:
+      '@xgen/admin-setting-shared':
+        specifier: workspace:*
+        version: link:../../packages/admin-setting-shared
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-setting-llm:
+    dependencies:
+      '@xgen/admin-setting-shared':
+        specifier: workspace:*
+        version: link:../../packages/admin-setting-shared
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-setting-model-serving:
+    dependencies:
+      '@xgen/admin-setting-shared':
+        specifier: workspace:*
+        version: link:../../packages/admin-setting-shared
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-setting-vastai:
+    dependencies:
+      '@xgen/admin-setting-shared':
+        specifier: workspace:*
+        version: link:../../packages/admin-setting-shared
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-setting-vl:
+    dependencies:
+      '@xgen/admin-setting-shared':
+        specifier: workspace:*
+        version: link:../../packages/admin-setting-shared
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
   features/admin-storage:
     dependencies:
       '@xgen/api-client':
@@ -831,6 +990,30 @@ importers:
       '@xgen/auth-provider':
         specifier: workspace:*
         version: link:../../packages/auth-provider
+      '@xgen/feature-admin-setting-audio':
+        specifier: workspace:*
+        version: link:../admin-setting-audio
+      '@xgen/feature-admin-setting-database':
+        specifier: workspace:*
+        version: link:../admin-setting-database
+      '@xgen/feature-admin-setting-embed':
+        specifier: workspace:*
+        version: link:../admin-setting-embed
+      '@xgen/feature-admin-setting-guarder':
+        specifier: workspace:*
+        version: link:../admin-setting-guarder
+      '@xgen/feature-admin-setting-llm':
+        specifier: workspace:*
+        version: link:../admin-setting-llm
+      '@xgen/feature-admin-setting-model-serving':
+        specifier: workspace:*
+        version: link:../admin-setting-model-serving
+      '@xgen/feature-admin-setting-vastai':
+        specifier: workspace:*
+        version: link:../admin-setting-vastai
+      '@xgen/feature-admin-setting-vl':
+        specifier: workspace:*
+        version: link:../admin-setting-vl
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
@@ -1926,6 +2109,24 @@ importers:
       react:
         specifier: ^19.1.0
         version: 19.2.4
+
+  packages/admin-setting-shared:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../ui
 
   packages/api-client:
     dependencies:
