@@ -348,6 +348,7 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
   return (
     <ContentArea
       title={t('chatNew.title')}
+      description={t('chatNew.description')}
       headerActions={
         <button
           onClick={loadWorkflows}

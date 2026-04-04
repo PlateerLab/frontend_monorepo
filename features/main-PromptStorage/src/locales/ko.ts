@@ -3,6 +3,7 @@ import type { TranslationData } from '@xgen/i18n';
 export const ko: TranslationData = {
   promptStorage: {
     title: '프롬프트 저장소',
+    description: '프롬프트 템플릿을 관리하고 공유하세요',
     searchPlaceholder: '프롬프트 검색...',
     createNew: '새 프롬프트',
     filter: { all: '전체', system: '시스템', user: '사용자', template: '템플릿' },

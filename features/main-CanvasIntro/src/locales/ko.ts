@@ -3,6 +3,7 @@ import type { TranslationData } from '@xgen/i18n';
 export const ko: TranslationData = {
   canvasIntro: {
     title: '캔버스',
+    description: '시각적으로 AI 워크플로우를 설계하세요',
     hero: {
       title: 'AI 캔버스 에디터',
       description: '시각적으로 AI 워크플로우를 설계하세요',

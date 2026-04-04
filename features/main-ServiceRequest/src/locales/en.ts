@@ -3,6 +3,7 @@ import type { TranslationData } from '@xgen/i18n';
 export const en: TranslationData = {
   serviceRequest: {
     title: 'Service Request',
+    description: 'Create and manage service requests',
     searchPlaceholder: 'Search requests...',
     newRequest: 'New Request',
     tabs: { all: 'All', open: 'Open', inProgress: 'In Progress', resolved: 'Resolved' },

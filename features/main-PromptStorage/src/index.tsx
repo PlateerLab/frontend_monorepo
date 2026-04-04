@@ -175,6 +175,7 @@ const PromptStoragePage: React.FC<PromptStoragePageProps> = () => {
   return (
     <ContentArea
       title={t('promptStorage.title')}
+      description={t('promptStorage.description')}
       headerActions={
         <Button>
           <PlusIcon />

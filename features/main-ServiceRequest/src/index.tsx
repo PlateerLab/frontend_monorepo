@@ -194,6 +194,7 @@ const ServiceRequestPage: React.FC<ServiceRequestPageProps> = () => {
   return (
     <ContentArea
       title={t('serviceRequest.title')}
+      description={t('serviceRequest.description')}
       headerActions={
         <Button variant="primary">
           <PlusIcon />
