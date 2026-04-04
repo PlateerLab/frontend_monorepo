@@ -47,23 +47,14 @@ export async function initializeAdminFeatures(): Promise<void> {
       // 데이터 관리 (admin-data)
       import('@xgen/feature-admin-database'),
       import('@xgen/feature-admin-data-scraper'),
-      import('@xgen/feature-admin-storage'),
-      import('@xgen/feature-admin-backup'),
-      // 보안 & 감사 (admin-security)
-      import('@xgen/feature-admin-security-settings'),
-      import('@xgen/feature-admin-audit-logs'),
-      import('@xgen/feature-admin-error-logs'),
+
       // MCP 관리 (admin-mcp)
       import('@xgen/feature-admin-mcp-market'),
       import('@xgen/feature-admin-mcp-station'),
-      // MLOps (admin-ml)
-      import('@xgen/feature-admin-ml-model-control'),
-      // AI 거버넌스 (admin-governance)
-      import('@xgen/feature-admin-gov-workflow-approval'),
+      // AI 거버넌스 (admin-governance) — xgen-frontend 원본 구조: 4개
       import('@xgen/feature-admin-gov-risk-management'),
       import('@xgen/feature-admin-gov-monitoring'),
       import('@xgen/feature-admin-gov-control-policy'),
-      import('@xgen/feature-admin-gov-operation-history'),
       import('@xgen/feature-admin-gov-audit-tracking'),
     ]);
 

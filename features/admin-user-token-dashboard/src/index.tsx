@@ -7,6 +7,7 @@ import {
   DataTable,
   Button,
   SearchInput,
+  StatCard,
   useToast,
 } from '@xgen/ui';
 import type { DataTableColumn } from '@xgen/ui';
@@ -14,7 +15,6 @@ import { useTranslation } from '@xgen/i18n';
 import { FiRefreshCw } from '@xgen/icons';
 import { getUserTokenUsage } from './api/token-api';
 import type { UserTokenUsage, TokenUsageResponse } from './types';
-import StatCard from './components/stat-card';
 import TokenUsageBar from './components/token-usage-bar';
 import WorkflowDetailModal from './components/workflow-detail-modal';
 
@@ -347,20 +347,24 @@ const AdminUserTokenDashboardPage: React.FC<RouteComponentProps> = () => {
         {/* Summary Stats */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
-            title={t(`${i18nPrefix}.stats.totalTokenUsage`)}
+            label={t(`${i18nPrefix}.stats.totalTokenUsage`)}
             value={formatNumber(stats.totalTokens)}
+            variant="info"
           />
           <StatCard
-            title={t(`${i18nPrefix}.stats.totalInteractions`)}
+            label={t(`${i18nPrefix}.stats.totalInteractions`)}
             value={formatNumber(stats.totalInteractions)}
+            variant="success"
           />
           <StatCard
-            title={t(`${i18nPrefix}.stats.avgTokensPerInteraction`)}
+            label={t(`${i18nPrefix}.stats.avgTokensPerInteraction`)}
             value={formatNumber(stats.avgTokens)}
+            variant="warning"
           />
           <StatCard
-            title={t(`${i18nPrefix}.stats.activeUsers`)}
+            label={t(`${i18nPrefix}.stats.activeUsers`)}
             value={formatNumber(stats.activeUsers)}
+            variant="neutral"
           />
         </div>
 

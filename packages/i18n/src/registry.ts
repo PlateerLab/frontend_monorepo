@@ -84,12 +84,18 @@ export function registerTranslationBundle(
 
 /**
  * 번역 값 조회
+ * @param locale - 언어 코드
+ * @param key - 번역 키 (예: 'admin.pages.systemHealth.title')
+ * @param varsOrFallback - 보간 변수 객체 또는 폴백 문자열
  */
 export function getTranslation(
   locale: Locale,
   key: string,
-  vars?: Record<string, unknown>
+  varsOrFallback?: Record<string, unknown> | string
 ): string {
+  const fallback = typeof varsOrFallback === 'string' ? varsOrFallback : undefined;
+  const vars = typeof varsOrFallback === 'object' && varsOrFallback !== null ? varsOrFallback : undefined;
+
   const keys = key.split('.');
   let value: unknown = translationStore[locale];
 
@@ -97,12 +103,12 @@ export function getTranslation(
     if (value && typeof value === 'object' && k in value) {
       value = (value as Record<string, unknown>)[k];
     } else {
-      // 번역이 없으면 키 반환
-      return key;
+      // 번역이 없으면 폴백 또는 키 반환
+      return fallback ?? key;
     }
   }
 
-  if (typeof value !== 'string') return key;
+  if (typeof value !== 'string') return fallback ?? key;
 
   // 변수 보간: {{varName}} → vars[varName]
   if (vars) {

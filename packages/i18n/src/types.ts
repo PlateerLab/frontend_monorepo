@@ -21,6 +21,6 @@ export interface TranslationBundle {
 export interface LanguageContextType {
   locale: Locale;
   setLocale: (locale: Locale) => void;
-  t: (key: string, vars?: Record<string, unknown>) => string;
+  t: (key: string, varsOrFallback?: Record<string, unknown> | string) => string;
   isHydrated: boolean;
 }

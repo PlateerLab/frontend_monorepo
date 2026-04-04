@@ -53,19 +53,9 @@ const SECTION_ICONS: Record<string, React.ReactNode> = {
       <ellipse cx="12" cy="6" rx="8" ry="3" /><path d="M4 6V18C4 19.66 7.58 21 12 21C16.42 21 20 19.66 20 18V6" /><path d="M4 12C4 13.66 7.58 15 12 15C16.42 15 20 13.66 20 12" />
     </svg>
   ),
-  'admin-security': (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-  ),
   'admin-mcp': (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <rect x="2" y="2" width="20" height="8" rx="2" ry="2" /><rect x="2" y="14" width="20" height="8" rx="2" ry="2" /><line x1="6" y1="6" x2="6.01" y2="6" /><line x1="6" y1="18" x2="6.01" y2="18" />
-    </svg>
-  ),
-  'admin-ml': (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2L22 7V17L12 22L2 17V7L12 2Z" /><path d="M12 12L22 7M12 12L2 7M12 12V22" />
     </svg>
   ),
   'admin-governance': (

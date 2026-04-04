@@ -217,3 +217,238 @@ export {
   updateGroupPermissions,
   deleteGroup,
 } from './admin-groups';
+
+// Admin System API exports
+export {
+  getSystemStatus,
+  getServerStatus,
+  streamSystemStatus,
+  getBackendLogs,
+  formatBytes,
+  formatUptime,
+  getCPUStatus,
+  getMemoryStatus,
+  getDiskStatus,
+  getSecurityPolicies,
+  getIPRules,
+  getTokenPolicies,
+  toggleSecurityPolicy,
+  getSystemAuditLogs,
+  getSystemErrorLogs,
+  resolveErrorLog,
+} from './admin-system';
+export type {
+  SystemData,
+  CPUInfo,
+  MemoryInfo,
+  GPUInfo,
+  NetworkInfo,
+  DiskInfo,
+  ServiceInfo,
+  BackendLog,
+  BackendLogsResponse,
+  ResourceStatus,
+  SecurityPolicy,
+  IPRule,
+  TokenPolicy,
+  AuditEventCategory,
+  AuditEventStatus,
+  AuditEvent,
+  AuditEventsResponse,
+  ErrorLevel,
+  ErrorLogEntry,
+  ErrorLogsResponse,
+} from './admin-system';
+
+// Admin Database API exports
+export {
+  getDatabaseInfo,
+  getTableList,
+  getTableStructure,
+  getTableSampleData,
+  getTableRowCount,
+  executeQuery,
+  getAllTablesInfo,
+} from './admin-database';
+export type {
+  TableInfo,
+  QueryResult,
+  DatabaseInfo,
+  ColumnInfo,
+} from './admin-database';
+
+// Admin Crawler API exports
+export {
+  getCrawlerSessions,
+  getCrawlerSessionDetail,
+  createCrawlerSession,
+  cancelCrawlerSession,
+  deleteCrawlerSessionData,
+  getCrawlerPages,
+  getCrawlerPageDetail,
+  startCrawlerSessionIndexing,
+  integrateCrawlerSessionDocuments,
+  subscribeToCrawlerSessionEvents,
+} from './admin-crawler';
+export type {
+  CrawlerSessionStatus,
+  CrawlerSessionSummary,
+  CrawlerSessionDetail,
+  CreateCrawlerSessionRequest,
+  CrawlerPage,
+  CrawlerPagesResponse,
+  StartIndexingRequest,
+} from './admin-crawler';
+
+// Admin MCP API exports
+export {
+  checkMCPHealth,
+  checkMCPDetailedHealth,
+  listMCPSessions,
+  getMCPSession,
+  createMCPSession,
+  deleteMCPSession,
+  getMCPSessionTools,
+  sendMCPRequest,
+  callMCPTool,
+  listMCPTools,
+  listMCPPrompts,
+  getMCPPrompt,
+  listMCPResources,
+  readMCPResource,
+  getMCPMarketList,
+  authLoginMCPSession,
+  authStatusMCPSession,
+  authLogoutMCPSession,
+  createPythonMCPSession,
+  createNodeMCPSession,
+  transformMCPItemResponse,
+} from './admin-mcp';
+export type {
+  MCPCategory,
+  MCPItem,
+  MCPItemResponse,
+  MCPMarketListResponse,
+  MCPSession,
+  MCPTool,
+  MCPPrompt,
+  MCPResource,
+  MCPHealthResponse,
+  CreateMCPSessionRequest,
+  MCPAuthStatus,
+  MCPSearchFilters,
+} from './admin-mcp';
+
+// Admin Model Management API exports
+export {
+  listGPUs,
+  loadModel,
+  unloadModel,
+  unloadAllModels,
+  listModels,
+  checkModelHealth,
+  getLoadingStatus,
+  getDefaultModelConfig,
+} from './admin-models';
+export type {
+  GPUListItem,
+  GPUListResponse,
+  ModelBackend,
+  LoadModelRequest,
+  ModelInfo,
+  ModelListResponse,
+  ModelHealthStatus,
+  LoadingStatusResponse,
+  DefaultModelConfig,
+} from './admin-models';
+
+// Admin Governance API exports
+export {
+  // Workflow Approval
+  getApprovalRequests,
+  getWorkflowApprovalDetail,
+  reviewGovernanceWorkflow,
+  // Risk Review
+  getWorkflowRiskAssessments,
+  getWorkflowRiskDetail,
+  updateRiskAssessment,
+  submitGovernanceReview,
+  getRiskChangeHistory,
+  // File Management
+  getGovernanceFiles,
+  uploadGovernanceFile,
+  downloadGovernanceFile,
+  deleteGovernanceFile,
+  // Monitoring / Inspections
+  getMonitoringWorkflows,
+  getInspections,
+  getInspectionDetail,
+  createInspection,
+  updateInspection,
+  deleteInspection,
+  getOverdueInspections,
+  // Control Policy - PII
+  getPIIsList,
+  createPII,
+  updatePII,
+  deletePII,
+  // Control Policy - Forbidden Words
+  getForbiddenWordsList,
+  createForbiddenWord,
+  updateForbiddenWord,
+  deleteForbiddenWord,
+  // Control Policy - Risk Policy
+  getActiveRiskPolicy,
+  getRiskPolicyVersions,
+  saveRiskPolicy,
+  clearRiskPolicyHistory,
+  // Legacy aliases
+  getPolicyRules,
+  createPolicyRule,
+  updatePolicyRule,
+  deletePolicyRule,
+  getRiskPolicies,
+  createRiskPolicy,
+  // Operation History
+  getOperationLogs,
+  getOperationStats,
+  // Audit Tracking
+  getAuditLogs,
+  getTrackedWorkflows,
+  getAuditTrackingStats,
+  getWorkflowAuditTimeline,
+} from './admin-governance';
+export type {
+  RiskLevel,
+  GovernanceStatus,
+  ChecklistItem,
+  ChecklistCategory,
+  RiskAssessment,
+  RiskChangeHistory,
+  GovernanceFile,
+  ApprovalStatus,
+  ApprovalRequest,
+  NodeSummary,
+  WorkflowDetail,
+  ReviewHistoryEntry,
+  CombinedHistoryEntry,
+  OverdueItem,
+  WorkflowSummary,
+  InspectionCycle,
+  InspectionType,
+  InspectionResult,
+  InspectionRecord,
+  PolicyRule,
+  RiskPolicy,
+  RiskPolicyCategory,
+  RiskPolicyVersion,
+  ActivityType,
+  OperationResult,
+  OperationLog,
+  OperationStats,
+  AuditAction,
+  AuditLogEntry,
+  TrackedWorkflow,
+  AuditStats,
+  TimelineEntry,
+} from './admin-governance';

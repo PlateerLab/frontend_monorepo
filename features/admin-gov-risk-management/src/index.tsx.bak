@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import type { AdminFeatureModule, RouteComponentProps } from '@xgen/types';
-import { ContentArea, Button, SearchInput, Modal, StatCard } from '@xgen/ui';
+import { ContentArea, Button, SearchInput, Modal } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import {
   getWorkflowRiskAssessments,
@@ -224,7 +224,7 @@ const AdminGovRiskManagementPage: React.FC<RouteComponentProps> = () => {
     setLoading(true);
     try {
       const data = await getWorkflowRiskAssessments();
-      setRecords(Array.isArray(data) ? data : []);
+      setRecords(data || []);
     } catch (error: unknown) {
       console.error('Failed to load risk workflows:', error);
     } finally {
@@ -363,7 +363,7 @@ const AdminGovRiskManagementPage: React.FC<RouteComponentProps> = () => {
     }
     try {
       const files = await getGovernanceFiles(record.workflow_id);
-      setDetailFiles(Array.isArray(files) ? files : []);
+      setDetailFiles(files || []);
     } catch {
       // files load failure is non-critical
     }
@@ -381,7 +381,7 @@ const AdminGovRiskManagementPage: React.FC<RouteComponentProps> = () => {
 
     try {
       const files = await getGovernanceFiles(record.workflow_id);
-      setEditFiles(Array.isArray(files) ? files : []);
+      setEditFiles(files || []);
     } catch {
       // non-critical
     }
@@ -546,23 +546,28 @@ const AdminGovRiskManagementPage: React.FC<RouteComponentProps> = () => {
 
         {/* Summary cards — act as filter */}
         <div className="grid grid-cols-5 gap-4">
-          <StatCard
-            label={t('admin.governance.common.total')}
-            value={loading ? '—' : records.length}
-            variant="info"
-            selected={filterLevel === 'all'}
+          <div
+            className={`rounded-xl border bg-card p-4 cursor-pointer transition-colors ${filterLevel === 'all' ? 'border-primary ring-1 ring-primary/30' : 'border-border hover:border-primary/50'}`}
             onClick={() => setFilterLevel('all')}
-          />
+          >
+            <p className="text-xs text-muted-foreground">{t('common.total')}</p>
+            <p className="text-2xl font-bold mt-1 text-blue-600">{loading ? '—' : records.length}</p>
+          </div>
           {(Object.keys(RISK_LEVEL_CONFIG) as RiskLevel[]).map((level: RiskLevel) => (
-            <StatCard
+            <div
               key={level}
-              label={t(RISK_LEVEL_CONFIG[level].labelKey)}
-              value={loading ? '—' : stats[level]}
-              accentColor={RISK_LEVEL_CONFIG[level].color}
-              subtitle={`/ ${records.length} ${t('admin.governance.riskManagement.totalCount')}`}
-              selected={filterLevel === level}
+              className={`rounded-xl border bg-card p-4 cursor-pointer transition-colors ${filterLevel === level ? 'border-primary ring-1 ring-primary/30' : 'border-border hover:border-primary/50'}`}
+              style={{ borderLeft: `4px solid ${RISK_LEVEL_CONFIG[level].color}` }}
               onClick={() => setFilterLevel(level)}
-            />
+            >
+              <p className="text-xs text-muted-foreground" style={{ color: RISK_LEVEL_CONFIG[level].color }}>
+                {t(RISK_LEVEL_CONFIG[level].labelKey)}
+              </p>
+              <p className="text-2xl font-bold mt-1" style={{ color: RISK_LEVEL_CONFIG[level].color }}>
+                {loading ? '—' : stats[level]}
+              </p>
+              <p className="text-xs text-muted-foreground">/ {records.length} {t('admin.governance.riskManagement.totalCount')}</p>
+            </div>
           ))}
         </div>
 

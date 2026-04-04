@@ -72,6 +72,10 @@ export type {
 export { StatusBadge } from './data-display/status-badge';
 export type { StatusBadgeProps, StatusBadgeVariant } from './data-display/status-badge';
 
+// StatCard - 대시보드 통계 카드 (좌측 accent border)
+export { StatCard } from './data-display/stat-card';
+export type { StatCardProps, StatCardVariant } from './data-display/stat-card';
+
 // Input Components
 export { Button, buttonVariants as inputButtonVariants } from './inputs/button';
 export type { ButtonProps, ButtonVariant, ButtonSize, ButtonPadding } from './inputs/button';

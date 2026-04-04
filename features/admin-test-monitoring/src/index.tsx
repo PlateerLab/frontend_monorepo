@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import type { AdminFeatureModule, RouteComponentProps } from '@xgen/types';
-import { ContentArea, Button, useToast } from '@xgen/ui';
+import { ContentArea, Button, StatCard, useToast } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
 import {
@@ -17,7 +17,6 @@ import {
   deleteBatch,
 } from './api/batch-api';
 import type { SessionWithResults, ActiveSession, BatchSession } from './types';
-import StatCard from './components/stat-card';
 import ActiveBatchBanner from './components/active-batch-banner';
 import SessionCard from './components/session-card';
 
@@ -331,22 +330,25 @@ const AdminTestMonitoringPage: React.FC<RouteComponentProps> = () => {
             icon={<FiFileText className="h-6 w-6" />}
             label={t(`${TM}.totalSessions`)}
             value={sessions.length}
+            variant="info"
           />
           <StatCard
             icon={<FiPlay className="h-6 w-6" />}
             label={t(`${TM}.running`)}
             value={activeSession?.is_running ? 1 : 0}
-            iconClassName={activeSession?.is_running ? 'bg-success/15 text-success animate-pulse' : undefined}
+            variant={activeSession?.is_running ? 'success' : 'neutral'}
           />
           <StatCard
             icon={<FiCheckCircle className="h-6 w-6" />}
             label={t(`${TM}.completed`)}
             value={sessions.filter((s) => s.status === 'completed').length}
+            variant="success"
           />
           <StatCard
             icon={<FiClock className="h-6 w-6" />}
             label={t(`${TM}.lastUpdate`)}
             value={lastUpdated ? formatRelativeDate(lastUpdated.toISOString(), t) : '-'}
+            variant="neutral"
           />
         </div>
 

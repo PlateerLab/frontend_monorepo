@@ -58,7 +58,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   }, []);
 
   return (
-    <div className={cn('relative flex items-center rounded-md border border-border bg-background focus-within:ring-2 focus-within:ring-ring focus-within:border-primary', sizeClasses[size], className)}>
+    <div className={cn('relative flex items-center rounded-lg border border-border bg-background transition-colors focus-within:ring-2 focus-within:ring-ring/40 focus-within:border-primary', sizeClasses[size], className)}>
       <span className="pl-3 text-muted-foreground shrink-0">
         {icon || (
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">

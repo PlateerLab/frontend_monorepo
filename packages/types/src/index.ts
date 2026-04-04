@@ -193,9 +193,7 @@ export type AdminSidebarSectionId =
   | 'admin-setting'
   | 'admin-system'
   | 'admin-data'
-  | 'admin-security'
   | 'admin-mcp'
-  | 'admin-ml'
   | 'admin-governance'
   | string;
 

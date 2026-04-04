@@ -74,21 +74,9 @@ export const adminSidebarConfig: AdminSidebarSectionConfig[] = [
     items: [
       { id: 'admin-database', titleKey: 'admin.sidebar.data.database.title', descriptionKey: 'admin.sidebar.data.database.description' },
       { id: 'admin-data-scraper', titleKey: 'admin.sidebar.data.dataScraper.title', descriptionKey: 'admin.sidebar.data.dataScraper.description' },
-      { id: 'admin-storage', titleKey: 'admin.sidebar.data.storage.title', descriptionKey: 'admin.sidebar.data.storage.description' },
-      { id: 'admin-backup', titleKey: 'admin.sidebar.data.backup.title', descriptionKey: 'admin.sidebar.data.backup.description' },
     ],
   },
-  // ── 6. 보안 & 감사 ──
-  {
-    id: 'admin-security',
-    titleKey: 'admin.sidebar.sections.security',
-    items: [
-      { id: 'admin-security-settings', titleKey: 'admin.sidebar.security.securitySettings.title', descriptionKey: 'admin.sidebar.security.securitySettings.description' },
-      { id: 'admin-audit-logs', titleKey: 'admin.sidebar.security.auditLogs.title', descriptionKey: 'admin.sidebar.security.auditLogs.description' },
-      { id: 'admin-error-logs', titleKey: 'admin.sidebar.security.errorLogs.title', descriptionKey: 'admin.sidebar.security.errorLogs.description' },
-    ],
-  },
-  // ── 7. MCP 관리 ──
+  // ── 6. MCP 관리 ──
   {
     id: 'admin-mcp',
     titleKey: 'admin.sidebar.sections.mcp',
@@ -97,24 +85,14 @@ export const adminSidebarConfig: AdminSidebarSectionConfig[] = [
       { id: 'admin-mcp-station', titleKey: 'admin.sidebar.mcp.mcpStation.title', descriptionKey: 'admin.sidebar.mcp.mcpStation.description' },
     ],
   },
-  // ── 8. MLOps ──
-  {
-    id: 'admin-ml',
-    titleKey: 'admin.sidebar.sections.ml',
-    items: [
-      { id: 'admin-ml-model-control', titleKey: 'admin.sidebar.ml.mlModelControl.title', descriptionKey: 'admin.sidebar.ml.mlModelControl.description' },
-    ],
-  },
-  // ── 9. AI 거버넌스 ──
+  // ── 8. AI 거버넌스 (xgen-frontend 원본 구조: 4개 항목) ──
   {
     id: 'admin-governance',
     titleKey: 'admin.sidebar.sections.governance',
     items: [
-      { id: 'admin-gov-workflow-approval', titleKey: 'admin.sidebar.governance.workflowApproval.title', descriptionKey: 'admin.sidebar.governance.workflowApproval.description' },
-      { id: 'admin-gov-risk-management', titleKey: 'admin.sidebar.governance.riskManagement.title', descriptionKey: 'admin.sidebar.governance.riskManagement.description' },
+      { id: 'admin-gov-risk-management', titleKey: 'admin.sidebar.governance.riskReview.title', descriptionKey: 'admin.sidebar.governance.riskReview.description' },
       { id: 'admin-gov-monitoring', titleKey: 'admin.sidebar.governance.monitoring.title', descriptionKey: 'admin.sidebar.governance.monitoring.description' },
       { id: 'admin-gov-control-policy', titleKey: 'admin.sidebar.governance.controlPolicy.title', descriptionKey: 'admin.sidebar.governance.controlPolicy.description' },
-      { id: 'admin-gov-operation-history', titleKey: 'admin.sidebar.governance.operationHistory.title', descriptionKey: 'admin.sidebar.governance.operationHistory.description' },
       { id: 'admin-gov-audit-tracking', titleKey: 'admin.sidebar.governance.auditTracking.title', descriptionKey: 'admin.sidebar.governance.auditTracking.description' },
     ],
   },

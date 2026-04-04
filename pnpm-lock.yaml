@@ -35,15 +35,9 @@ importers:
       '@xgen/feature-admin-agent-traces':
         specifier: workspace:*
         version: link:../../features/admin-agent-traces
-      '@xgen/feature-admin-audit-logs':
-        specifier: workspace:*
-        version: link:../../features/admin-audit-logs
       '@xgen/feature-admin-backend-logs':
         specifier: workspace:*
         version: link:../../features/admin-backend-logs
-      '@xgen/feature-admin-backup':
-        specifier: workspace:*
-        version: link:../../features/admin-backup
       '@xgen/feature-admin-chat-monitoring':
         specifier: workspace:*
         version: link:../../features/admin-chat-monitoring
@@ -53,9 +47,6 @@ importers:
       '@xgen/feature-admin-database':
         specifier: workspace:*
         version: link:../../features/admin-database
-      '@xgen/feature-admin-error-logs':
-        specifier: workspace:*
-        version: link:../../features/admin-error-logs
       '@xgen/feature-admin-gov-audit-tracking':
         specifier: workspace:*
         version: link:../../features/admin-gov-audit-tracking
@@ -83,21 +74,12 @@ importers:
       '@xgen/feature-admin-mcp-station':
         specifier: workspace:*
         version: link:../../features/admin-mcp-station
-      '@xgen/feature-admin-ml-model-control':
-        specifier: workspace:*
-        version: link:../../features/admin-ml-model-control
       '@xgen/feature-admin-node-management':
         specifier: workspace:*
         version: link:../../features/admin-node-management
       '@xgen/feature-admin-prompt-store':
         specifier: workspace:*
         version: link:../../features/admin-prompt-store
-      '@xgen/feature-admin-security-settings':
-        specifier: workspace:*
-        version: link:../../features/admin-security-settings
-      '@xgen/feature-admin-storage':
-        specifier: workspace:*
-        version: link:../../features/admin-storage
       '@xgen/feature-admin-system-config':
         specifier: workspace:*
         version: link:../../features/admin-system-config
