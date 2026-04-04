@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { DocumentTabPlugin, DocumentTabPluginProps } from '@xgen/types';
-import { Button, EmptyState, SearchInput } from '@xgen/ui';
+import { Button, EmptyState, SearchInput, Modal, Input, Label, Switch } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import './locales';
 
@@ -125,6 +125,16 @@ export const DocumentRepository: React.FC<DocumentRepositoryProps> = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [repositories, setRepositories] = useState<RepositoryItem[]>([]);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newRepoCollection, setNewRepoCollection] = useState('');
+  const [newRepoName, setNewRepoName] = useState('');
+  const [newRepoUrl, setNewRepoUrl] = useState('');
+  const [newRepoToken, setNewRepoToken] = useState('');
+  const [newRepoBranch, setNewRepoBranch] = useState('main');
+  const [newRepoCron, setNewRepoCron] = useState('');
+  const [newRepoAnnotation, setNewRepoAnnotation] = useState(false);
+  const [newRepoApiExtract, setNewRepoApiExtract] = useState(false);
+  const [creating, setCreating] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -141,6 +151,41 @@ export const DocumentRepository: React.FC<DocumentRepositoryProps> = () => {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  const handleCreateRepository = useCallback(async () => {
+    if (!newRepoCollection.trim() || !newRepoUrl.trim()) return;
+    setCreating(true);
+    try {
+      // TODO: API call to create repository
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setIsCreateModalOpen(false);
+      setNewRepoCollection('');
+      setNewRepoName('');
+      setNewRepoUrl('');
+      setNewRepoToken('');
+      setNewRepoBranch('main');
+      setNewRepoCron('');
+      setNewRepoAnnotation(false);
+      setNewRepoApiExtract(false);
+      await loadData();
+    } catch (error) {
+      console.error('Failed to create repository:', error);
+    } finally {
+      setCreating(false);
+    }
+  }, [newRepoCollection, newRepoUrl, loadData]);
+
+  const handleCloseCreateModal = useCallback(() => {
+    setIsCreateModalOpen(false);
+    setNewRepoCollection('');
+    setNewRepoName('');
+    setNewRepoUrl('');
+    setNewRepoToken('');
+    setNewRepoBranch('main');
+    setNewRepoCron('');
+    setNewRepoAnnotation(false);
+    setNewRepoApiExtract(false);
+  }, []);
 
   const filteredRepositories = useMemo(() => {
     if (!search) return repositories;
@@ -159,7 +204,7 @@ export const DocumentRepository: React.FC<DocumentRepositoryProps> = () => {
             placeholder={t('documents.repository.searchPlaceholder')}
             size="sm"
           />
-          <Button onClick={() => {}}>
+          <Button onClick={() => setIsCreateModalOpen(true)}>
             <PlusIcon />
             {t('documents.repository.buttons.newRepository')}
           </Button>
@@ -216,6 +261,98 @@ export const DocumentRepository: React.FC<DocumentRepositoryProps> = () => {
           </div>
         )}
       </div>
+
+      {/* Create Repository Modal */}
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={handleCloseCreateModal}
+        title={t('documents.repository.createModal.title')}
+        size="lg"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCloseCreateModal}>
+              {t('documents.repository.createModal.cancel')}
+            </Button>
+            <Button onClick={handleCreateRepository} disabled={creating || !newRepoCollection.trim() || !newRepoUrl.trim()}>
+              {creating ? t('documents.repository.createModal.creating') : t('documents.repository.createModal.create')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>{t('documents.repository.createModal.collectionName')}</Label>
+            <Input
+              value={newRepoCollection}
+              onChange={(e) => setNewRepoCollection(e.target.value)}
+              placeholder={t('documents.repository.createModal.collectionNamePlaceholder')}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('documents.repository.createModal.repoName')}</Label>
+            <Input
+              value={newRepoName}
+              onChange={(e) => setNewRepoName(e.target.value)}
+              placeholder={t('documents.repository.createModal.repoNamePlaceholder')}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('documents.repository.createModal.gitlabUrl')}</Label>
+            <Input
+              value={newRepoUrl}
+              onChange={(e) => setNewRepoUrl(e.target.value)}
+              placeholder={t('documents.repository.createModal.gitlabUrlPlaceholder')}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('documents.repository.createModal.accessToken')}</Label>
+            <Input
+              type="password"
+              value={newRepoToken}
+              onChange={(e) => setNewRepoToken(e.target.value)}
+              placeholder={t('documents.repository.createModal.accessTokenPlaceholder')}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('documents.repository.createModal.branch')}</Label>
+            <Input
+              value={newRepoBranch}
+              onChange={(e) => setNewRepoBranch(e.target.value)}
+              placeholder="main"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('documents.repository.createModal.cronSchedule')}</Label>
+            <Input
+              value={newRepoCron}
+              onChange={(e) => setNewRepoCron(e.target.value)}
+              placeholder={t('documents.repository.createModal.cronPlaceholder')}
+            />
+            <p className="text-xs text-muted-foreground">{t('documents.repository.createModal.cronHint')}</p>
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <Label>{t('documents.repository.createModal.annotation')}</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('documents.repository.createModal.annotationDesc')}</p>
+            </div>
+            <Switch checked={newRepoAnnotation} onCheckedChange={setNewRepoAnnotation} />
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <Label>{t('documents.repository.createModal.apiExtract')}</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('documents.repository.createModal.apiExtractDesc')}</p>
+            </div>
+            <Switch checked={newRepoApiExtract} onCheckedChange={setNewRepoApiExtract} />
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

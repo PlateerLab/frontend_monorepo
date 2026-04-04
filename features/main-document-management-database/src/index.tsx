@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { DocumentTabPlugin, DocumentTabPluginProps } from '@xgen/types';
-import { Button, EmptyState, SearchInput } from '@xgen/ui';
+import { Button, EmptyState, SearchInput, Modal, Input, Label, Switch, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import './locales';
 
@@ -114,6 +114,17 @@ export const DocumentDatabase: React.FC<DocumentDatabaseProps> = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [dbConnections, setDbConnections] = useState<DBConnectionItem[]>([]);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newDbName, setNewDbName] = useState('');
+  const [newDbType, setNewDbType] = useState<DBConnectionItem['dbType']>('postgresql');
+  const [newDbHost, setNewDbHost] = useState('');
+  const [newDbPort, setNewDbPort] = useState('5432');
+  const [newDbDatabase, setNewDbDatabase] = useState('');
+  const [newDbUsername, setNewDbUsername] = useState('');
+  const [newDbPassword, setNewDbPassword] = useState('');
+  const [newDbSsl, setNewDbSsl] = useState(false);
+  const [newDbReadOnly, setNewDbReadOnly] = useState(true);
+  const [creating, setCreating] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -130,6 +141,38 @@ export const DocumentDatabase: React.FC<DocumentDatabaseProps> = () => {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  const DB_TYPE_PORTS: Record<string, string> = { postgresql: '5432', mysql: '3306', mssql: '1433', oracle: '1521' };
+
+  const handleDbTypeChange = useCallback((type: string) => {
+    setNewDbType(type as DBConnectionItem['dbType']);
+    setNewDbPort(DB_TYPE_PORTS[type] || '5432');
+  }, []);
+
+  const handleCreateConnection = useCallback(async () => {
+    if (!newDbName.trim() || !newDbHost.trim() || !newDbDatabase.trim()) return;
+    setCreating(true);
+    try {
+      // TODO: API call to create DB connection
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setIsCreateModalOpen(false);
+      setNewDbName(''); setNewDbType('postgresql'); setNewDbHost('');
+      setNewDbPort('5432'); setNewDbDatabase(''); setNewDbUsername('');
+      setNewDbPassword(''); setNewDbSsl(false); setNewDbReadOnly(true);
+      await loadData();
+    } catch (error) {
+      console.error('Failed to create DB connection:', error);
+    } finally {
+      setCreating(false);
+    }
+  }, [newDbName, newDbHost, newDbDatabase, loadData]);
+
+  const handleCloseCreateModal = useCallback(() => {
+    setIsCreateModalOpen(false);
+    setNewDbName(''); setNewDbType('postgresql'); setNewDbHost('');
+    setNewDbPort('5432'); setNewDbDatabase(''); setNewDbUsername('');
+    setNewDbPassword(''); setNewDbSsl(false); setNewDbReadOnly(true);
+  }, []);
 
   const filteredDbConnections = useMemo(() => {
     if (!search) return dbConnections;
@@ -148,7 +191,7 @@ export const DocumentDatabase: React.FC<DocumentDatabaseProps> = () => {
             placeholder={t('documents.database.searchPlaceholder')}
             size="sm"
           />
-          <Button onClick={() => {}}>
+          <Button onClick={() => setIsCreateModalOpen(true)}>
             <PlusIcon />
             {t('documents.database.buttons.newConnection')}
           </Button>
@@ -196,6 +239,114 @@ export const DocumentDatabase: React.FC<DocumentDatabaseProps> = () => {
           </div>
         )}
       </div>
+
+      {/* Create DB Connection Modal */}
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={handleCloseCreateModal}
+        title={t('documents.database.createModal.title')}
+        size="lg"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCloseCreateModal}>
+              {t('documents.database.createModal.cancel')}
+            </Button>
+            <Button onClick={handleCreateConnection} disabled={creating || !newDbName.trim() || !newDbHost.trim() || !newDbDatabase.trim()}>
+              {creating ? t('documents.database.createModal.creating') : t('documents.database.createModal.create')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>{t('documents.database.createModal.connectionName')}</Label>
+            <Input
+              value={newDbName}
+              onChange={(e) => setNewDbName(e.target.value)}
+              placeholder={t('documents.database.createModal.connectionNamePlaceholder')}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('documents.database.createModal.dbType')}</Label>
+            <Select value={newDbType} onValueChange={handleDbTypeChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="postgresql">PostgreSQL</SelectItem>
+                <SelectItem value="mysql">MySQL</SelectItem>
+                <SelectItem value="mssql">MSSQL</SelectItem>
+                <SelectItem value="oracle">Oracle</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-[1fr_120px] gap-3">
+            <div className="space-y-2">
+              <Label>{t('documents.database.createModal.host')}</Label>
+              <Input
+                value={newDbHost}
+                onChange={(e) => setNewDbHost(e.target.value)}
+                placeholder={t('documents.database.createModal.hostPlaceholder')}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>{t('documents.database.createModal.port')}</Label>
+              <Input
+                value={newDbPort}
+                onChange={(e) => setNewDbPort(e.target.value)}
+                placeholder={DB_TYPE_PORTS[newDbType]}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('documents.database.createModal.database')}</Label>
+            <Input
+              value={newDbDatabase}
+              onChange={(e) => setNewDbDatabase(e.target.value)}
+              placeholder={t('documents.database.createModal.databasePlaceholder')}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label>{t('documents.database.createModal.username')}</Label>
+              <Input
+                value={newDbUsername}
+                onChange={(e) => setNewDbUsername(e.target.value)}
+                placeholder={t('documents.database.createModal.usernamePlaceholder')}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>{t('documents.database.createModal.password')}</Label>
+              <Input
+                type="password"
+                value={newDbPassword}
+                onChange={(e) => setNewDbPassword(e.target.value)}
+                placeholder={t('documents.database.createModal.passwordPlaceholder')}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <Label>{t('documents.database.createModal.ssl')}</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('documents.database.createModal.sslDesc')}</p>
+            </div>
+            <Switch checked={newDbSsl} onCheckedChange={setNewDbSsl} />
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <Label>{t('documents.database.createModal.readOnly')}</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('documents.database.createModal.readOnlyDesc')}</p>
+            </div>
+            <Switch checked={newDbReadOnly} onCheckedChange={setNewDbReadOnly} />
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

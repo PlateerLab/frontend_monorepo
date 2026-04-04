@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import type { WorkflowStoreItem, CardBadge, WorkflowTabPlugin, WorkflowTabPluginProps } from '@xgen/types';
-import { Button, ResourceCardGrid, EmptyState, FilterTabs } from '@xgen/ui';
+import { Button, ResourceCardGrid, EmptyState, FilterTabs, Modal, Input, Label, Textarea } from '@xgen/ui';
 import { FiFolder, FiDownload, FiSearch, FiRefreshCw, FiUpload, FiStar, FiUser, FiCalendar, FiBox } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
@@ -50,6 +50,10 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh, 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMode, setFilterMode] = useState<StoreFilterMode>('all');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [uploadTitle, setUploadTitle] = useState('');
+  const [uploadDescription, setUploadDescription] = useState('');
+  const [uploadTags, setUploadTags] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   // Load workflows
   const fetchWorkflows = useCallback(async () => {
@@ -116,6 +120,31 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh, 
 
   const handleUploadClick = useCallback(() => {
     setIsUploadModalOpen(true);
+  }, []);
+
+  const handleUploadSubmit = useCallback(async () => {
+    if (!uploadTitle.trim()) return;
+    setUploading(true);
+    try {
+      // TODO: API call to upload workflow to store
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setIsUploadModalOpen(false);
+      setUploadTitle('');
+      setUploadDescription('');
+      setUploadTags('');
+      await fetchWorkflows();
+    } catch (err) {
+      console.error('Failed to upload workflow:', err);
+    } finally {
+      setUploading(false);
+    }
+  }, [uploadTitle, fetchWorkflows]);
+
+  const handleCloseUploadModal = useCallback(() => {
+    setIsUploadModalOpen(false);
+    setUploadTitle('');
+    setUploadDescription('');
+    setUploadTags('');
   }, []);
 
   // Build card items
@@ -264,18 +293,56 @@ export const WorkflowStore: React.FC<WorkflowStoreProps> = ({ onStorageRefresh, 
         )}
       </div>
 
-      {/* TODO: Upload Modal */}
-      {isUploadModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]" onClick={() => setIsUploadModalOpen(false)}>
-          <div className="bg-white rounded-xl p-8 max-w-[500px] w-[90%] text-center [&_h3]:m-0 [&_h3]:mb-4 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-foreground [&_p]:m-0 [&_p]:mb-6 [&_p]:text-sm [&_p]:text-muted-foreground" onClick={(e) => e.stopPropagation()}>
-            <h3>{t('workflows.store.uploadModal.title')}</h3>
-            <p>{t('workflows.store.uploadModal.description')}</p>
-            <Button variant="primary" onClick={() => setIsUploadModalOpen(false)}>
-              {t('common.close')}
+      {/* Upload Modal */}
+      <Modal
+        isOpen={isUploadModalOpen}
+        onClose={handleCloseUploadModal}
+        title={t('workflows.store.uploadModal.title')}
+        size="md"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCloseUploadModal}>
+              {t('workflows.store.uploadModal.cancel')}
+            </Button>
+            <Button onClick={handleUploadSubmit} disabled={uploading || !uploadTitle.trim()}>
+              {uploading ? t('workflows.store.uploadModal.uploading') : t('workflows.store.uploadModal.upload')}
             </Button>
           </div>
+        }
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">{t('workflows.store.uploadModal.description')}</p>
+
+          <div className="space-y-2">
+            <Label>{t('workflows.store.uploadModal.uploadTitle')}</Label>
+            <Input
+              value={uploadTitle}
+              onChange={(e) => setUploadTitle(e.target.value)}
+              placeholder={t('workflows.store.uploadModal.uploadTitlePlaceholder')}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('workflows.store.uploadModal.uploadDescription')}</Label>
+            <Textarea
+              value={uploadDescription}
+              onChange={(e) => setUploadDescription(e.target.value)}
+              placeholder={t('workflows.store.uploadModal.uploadDescriptionPlaceholder')}
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('workflows.store.uploadModal.tags')}</Label>
+            <Input
+              value={uploadTags}
+              onChange={(e) => setUploadTags(e.target.value)}
+              placeholder={t('workflows.store.uploadModal.tagsPlaceholder')}
+            />
+            <p className="text-xs text-muted-foreground">{t('workflows.store.uploadModal.tagsHint')}</p>
+          </div>
         </div>
-      )}
+      </Modal>
     </div>
   );
 };

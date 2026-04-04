@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import type { WorkflowDetail, CardBadge, WorkflowStatusFilter, WorkflowOwnerFilter, WorkflowTabPlugin, WorkflowTabPluginProps } from '@xgen/types';
-import { Button, EmptyState, ResourceCardGrid, FilterTabs } from '@xgen/ui';
+import { Button, EmptyState, ResourceCardGrid, FilterTabs, Modal, Label, Switch } from '@xgen/ui';
 import { FiFolder, FiPlay, FiEdit2, FiCopy, FiTrash2, FiSettings, FiFileText, FiServer, FiGitBranch, FiUser, FiClock, FiCheckSquare, FiRefreshCw, FiPlus } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
@@ -68,6 +68,8 @@ export const WorkflowStorage: React.FC<WorkflowStorageProps> = ({ onNavigate, on
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [deployStatus, setDeployStatus] = useState<Record<string, string>>({});
+  const [activeModal, setActiveModal] = useState<'logs' | 'settings' | 'deploy-info' | 'deploy-settings' | 'versions' | null>(null);
+  const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowDetail | null>(null);
 
   // Load workflows
   const fetchWorkflows = useCallback(async () => {
@@ -207,6 +209,16 @@ export const WorkflowStorage: React.FC<WorkflowStorageProps> = ({ onNavigate, on
     }
   }, [selectedIds, workflows, isOwner, fetchWorkflows, t]);
 
+  const openWorkflowModal = useCallback((workflow: WorkflowDetail, modal: typeof activeModal) => {
+    setSelectedWorkflow(workflow);
+    setActiveModal(modal);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setActiveModal(null);
+    setSelectedWorkflow(null);
+  }, []);
+
   const handleCreateNew = useCallback(() => {
     onNavigate?.('canvas-intro');
   }, [onNavigate]);
@@ -275,16 +287,16 @@ export const WorkflowStorage: React.FC<WorkflowStorageProps> = ({ onNavigate, on
 
       const dropdownActions = isOwner(workflow.userId)
         ? [
-            { id: 'logs', icon: <FiFileText />, label: t('workflows.actions.logs'), onClick: () => {} },
-            { id: 'settings', icon: <FiSettings />, label: t('workflows.actions.settings'), onClick: () => {} },
-            { id: 'deploy-info', icon: <FiServer />, label: t('workflows.actions.deployInfo'), onClick: () => {} },
-            { id: 'deploy-settings', icon: <FiSettings />, label: t('workflows.actions.deploySettings'), onClick: () => {} },
-            { id: 'versions', icon: <FiGitBranch />, label: t('workflows.actions.versions'), onClick: () => {} },
+            { id: 'logs', icon: <FiFileText />, label: t('workflows.actions.logs'), onClick: () => openWorkflowModal(workflow, 'logs') },
+            { id: 'settings', icon: <FiSettings />, label: t('workflows.actions.settings'), onClick: () => openWorkflowModal(workflow, 'settings') },
+            { id: 'deploy-info', icon: <FiServer />, label: t('workflows.actions.deployInfo'), onClick: () => openWorkflowModal(workflow, 'deploy-info') },
+            { id: 'deploy-settings', icon: <FiSettings />, label: t('workflows.actions.deploySettings'), onClick: () => openWorkflowModal(workflow, 'deploy-settings') },
+            { id: 'versions', icon: <FiGitBranch />, label: t('workflows.actions.versions'), onClick: () => openWorkflowModal(workflow, 'versions') },
             { id: 'delete', icon: <FiTrash2 />, label: t('workflows.actions.delete'), onClick: () => handleDelete(workflow), danger: true, dividerBefore: true },
           ]
         : [
-            { id: 'logs', icon: <FiFileText />, label: t('workflows.actions.logs'), onClick: () => {} },
-            { id: 'versions', icon: <FiGitBranch />, label: t('workflows.actions.versions'), onClick: () => {} },
+            { id: 'logs', icon: <FiFileText />, label: t('workflows.actions.logs'), onClick: () => openWorkflowModal(workflow, 'logs') },
+            { id: 'versions', icon: <FiGitBranch />, label: t('workflows.actions.versions'), onClick: () => openWorkflowModal(workflow, 'versions') },
           ];
 
       return {
@@ -420,6 +432,127 @@ export const WorkflowStorage: React.FC<WorkflowStorageProps> = ({ onNavigate, on
           />
         )}
       </div>
+
+      {/* Logs Modal */}
+      <Modal
+        isOpen={activeModal === 'logs'}
+        onClose={handleCloseModal}
+        title={`${t('workflows.actions.logs')} — ${selectedWorkflow?.name || ''}`}
+        size="lg"
+      >
+        <div className="space-y-3">
+          <div className="bg-muted/50 rounded-lg p-4 font-mono text-xs text-muted-foreground max-h-[400px] overflow-y-auto">
+            <p>[2025-01-28 10:32:15] Workflow started</p>
+            <p>[2025-01-28 10:32:16] Node "Input" executed (0.12s)</p>
+            <p>[2025-01-28 10:32:18] Node "Process" executed (1.84s)</p>
+            <p>[2025-01-28 10:32:19] Node "Output" executed (0.45s)</p>
+            <p>[2025-01-28 10:32:19] Workflow completed successfully</p>
+          </div>
+          <p className="text-xs text-muted-foreground">{t('workflows.storage.logsModal.placeholder')}</p>
+        </div>
+      </Modal>
+
+      {/* Settings Modal */}
+      <Modal
+        isOpen={activeModal === 'settings'}
+        onClose={handleCloseModal}
+        title={`${t('workflows.actions.settings')} — ${selectedWorkflow?.name || ''}`}
+        size="md"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <Label>{t('workflows.storage.settingsModal.share')}</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('workflows.storage.settingsModal.shareDesc')}</p>
+            </div>
+            <Switch checked={selectedWorkflow?.isShared ?? false} onCheckedChange={() => {}} />
+          </div>
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <Label>{t('workflows.storage.settingsModal.active')}</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('workflows.storage.settingsModal.activeDesc')}</p>
+            </div>
+            <Switch checked={selectedWorkflow?.status === 'active'} onCheckedChange={() => {}} />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Deploy Info Modal */}
+      <Modal
+        isOpen={activeModal === 'deploy-info'}
+        onClose={handleCloseModal}
+        title={`${t('workflows.actions.deployInfo')} — ${selectedWorkflow?.name || ''}`}
+        size="md"
+      >
+        <div className="space-y-3">
+          <div className="grid grid-cols-[120px_1fr] gap-2 text-sm">
+            <span className="text-muted-foreground">{t('workflows.storage.deployInfoModal.status')}</span>
+            <span className="font-medium">{selectedWorkflow ? (deployStatus[selectedWorkflow.name] || 'not_deployed') : '-'}</span>
+            <span className="text-muted-foreground">{t('workflows.storage.deployInfoModal.owner')}</span>
+            <span>{selectedWorkflow?.author || '-'}</span>
+            <span className="text-muted-foreground">{t('workflows.storage.deployInfoModal.nodes')}</span>
+            <span>{selectedWorkflow?.nodeCount || 0}</span>
+            <span className="text-muted-foreground">{t('workflows.storage.deployInfoModal.lastModified')}</span>
+            <span>{selectedWorkflow?.lastModified ? formatDate(selectedWorkflow.lastModified) : '-'}</span>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Deploy Settings Modal */}
+      <Modal
+        isOpen={activeModal === 'deploy-settings'}
+        onClose={handleCloseModal}
+        title={`${t('workflows.actions.deploySettings')} — ${selectedWorkflow?.name || ''}`}
+        size="md"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCloseModal}>
+              {t('workflows.storage.deploySettingsModal.cancel')}
+            </Button>
+            <Button onClick={handleCloseModal}>
+              {t('workflows.storage.deploySettingsModal.save')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <Label>{t('workflows.storage.deploySettingsModal.deploy')}</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('workflows.storage.deploySettingsModal.deployDesc')}</p>
+            </div>
+            <Switch checked={selectedWorkflow?.isDeployed ?? false} onCheckedChange={() => {}} />
+          </div>
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <Label>{t('workflows.storage.deploySettingsModal.approval')}</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('workflows.storage.deploySettingsModal.approvalDesc')}</p>
+            </div>
+            <Switch checked={false} onCheckedChange={() => {}} />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Versions Modal */}
+      <Modal
+        isOpen={activeModal === 'versions'}
+        onClose={handleCloseModal}
+        title={`${t('workflows.actions.versions')} — ${selectedWorkflow?.name || ''}`}
+        size="lg"
+      >
+        <div className="space-y-3">
+          <div className="border border-border rounded-lg divide-y divide-border">
+            <div className="flex items-center justify-between px-4 py-3">
+              <div className="flex items-center gap-3">
+                <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs font-medium rounded">v1</span>
+                <span className="text-sm">{t('workflows.storage.versionsModal.current')}</span>
+              </div>
+              <span className="text-xs text-muted-foreground">{selectedWorkflow?.lastModified ? formatDate(selectedWorkflow.lastModified) : '-'}</span>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">{t('workflows.storage.versionsModal.placeholder')}</p>
+        </div>
+      </Modal>
     </div>
   );
 };

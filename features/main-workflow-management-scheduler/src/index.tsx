@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import type { WorkflowSchedule, ScheduleStatus, CardBadge, WorkflowTabPlugin, WorkflowTabPluginProps } from '@xgen/types';
-import { Button, ResourceCardGrid, EmptyState, FilterTabs } from '@xgen/ui';
+import { Button, ResourceCardGrid, EmptyState, FilterTabs, Modal, Input, Label, Textarea, Switch, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@xgen/ui';
 import { FiFolder, FiPlay, FiPause, FiTrash2, FiRefreshCw, FiPlus, FiClock, FiCalendar, FiCheckSquare, FiAlertCircle } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
@@ -54,6 +54,12 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className,
   const [error, setError] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<ScheduleFilterStatus>('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newScheduleName, setNewScheduleName] = useState('');
+  const [newScheduleDesc, setNewScheduleDesc] = useState('');
+  const [newScheduleType, setNewScheduleType] = useState('daily');
+  const [newScheduleCron, setNewScheduleCron] = useState('');
+  const [newScheduleAutoStart, setNewScheduleAutoStart] = useState(true);
+  const [creating, setCreating] = useState(false);
 
   // Load schedules
   const fetchSchedules = useCallback(async () => {
@@ -112,6 +118,35 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className,
 
   const handleCreateClick = useCallback(() => {
     setIsCreateModalOpen(true);
+  }, []);
+
+  const handleCreateSubmit = useCallback(async () => {
+    if (!newScheduleName.trim()) return;
+    setCreating(true);
+    try {
+      // TODO: API call to create schedule
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setIsCreateModalOpen(false);
+      setNewScheduleName('');
+      setNewScheduleDesc('');
+      setNewScheduleType('daily');
+      setNewScheduleCron('');
+      setNewScheduleAutoStart(true);
+      await fetchSchedules();
+    } catch (err) {
+      console.error('Failed to create schedule:', err);
+    } finally {
+      setCreating(false);
+    }
+  }, [newScheduleName, fetchSchedules]);
+
+  const handleCloseCreateModal = useCallback(() => {
+    setIsCreateModalOpen(false);
+    setNewScheduleName('');
+    setNewScheduleDesc('');
+    setNewScheduleType('daily');
+    setNewScheduleCron('');
+    setNewScheduleAutoStart(true);
   }, []);
 
   // Build card items
@@ -263,18 +298,83 @@ export const WorkflowScheduler: React.FC<WorkflowSchedulerProps> = ({ className,
         )}
       </div>
 
-      {/* TODO: Create Schedule Modal */}
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]" onClick={() => setIsCreateModalOpen(false)}>
-          <div className="bg-white rounded-xl p-8 max-w-[600px] w-[90%] text-center [&_h3]:m-0 [&_h3]:mb-4 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-foreground [&_p]:m-0 [&_p]:mb-6 [&_p]:text-sm [&_p]:text-muted-foreground" onClick={(e) => e.stopPropagation()}>
-            <h3>{t('workflows.scheduler.createModal.title')}</h3>
-            <p>{t('workflows.scheduler.createModal.description')}</p>
-            <Button variant="primary" onClick={() => setIsCreateModalOpen(false)}>
-              {t('common.close')}
+      {/* Create Schedule Modal */}
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={handleCloseCreateModal}
+        title={t('workflows.scheduler.createModal.title')}
+        size="md"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCloseCreateModal}>
+              {t('workflows.scheduler.createModal.cancel')}
+            </Button>
+            <Button onClick={handleCreateSubmit} disabled={creating || !newScheduleName.trim()}>
+              {creating ? t('workflows.scheduler.createModal.creating') : t('workflows.scheduler.createModal.create')}
             </Button>
           </div>
+        }
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">{t('workflows.scheduler.createModal.description')}</p>
+
+          <div className="space-y-2">
+            <Label>{t('workflows.scheduler.createModal.name')}</Label>
+            <Input
+              value={newScheduleName}
+              onChange={(e) => setNewScheduleName(e.target.value)}
+              placeholder={t('workflows.scheduler.createModal.namePlaceholder')}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('workflows.scheduler.createModal.scheduleDescription')}</Label>
+            <Textarea
+              value={newScheduleDesc}
+              onChange={(e) => setNewScheduleDesc(e.target.value)}
+              placeholder={t('workflows.scheduler.createModal.scheduleDescriptionPlaceholder')}
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('workflows.scheduler.createModal.scheduleType')}</Label>
+            <Select value={newScheduleType} onValueChange={setNewScheduleType}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="once">{t('workflows.scheduler.frequency.once')}</SelectItem>
+                <SelectItem value="hourly">{t('workflows.scheduler.frequency.hourly')}</SelectItem>
+                <SelectItem value="daily">{t('workflows.scheduler.frequency.daily')}</SelectItem>
+                <SelectItem value="weekly">{t('workflows.scheduler.frequency.weekly')}</SelectItem>
+                <SelectItem value="monthly">{t('workflows.scheduler.frequency.monthly')}</SelectItem>
+                <SelectItem value="cron">{t('workflows.scheduler.frequency.cron')}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {newScheduleType === 'cron' && (
+            <div className="space-y-2">
+              <Label>{t('workflows.scheduler.createModal.cronExpression')}</Label>
+              <Input
+                value={newScheduleCron}
+                onChange={(e) => setNewScheduleCron(e.target.value)}
+                placeholder={t('workflows.scheduler.createModal.cronExpressionPlaceholder')}
+              />
+              <p className="text-xs text-muted-foreground">{t('workflows.scheduler.createModal.cronHint')}</p>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <Label>{t('workflows.scheduler.createModal.autoStart')}</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('workflows.scheduler.createModal.autoStartDesc')}</p>
+            </div>
+            <Switch checked={newScheduleAutoStart} onCheckedChange={setNewScheduleAutoStart} />
+          </div>
         </div>
-      )}
+      </Modal>
     </div>
   );
 };
