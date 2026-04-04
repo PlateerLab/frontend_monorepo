@@ -193,25 +193,20 @@ const AdminSettingVlPage: React.FC<RouteComponentProps> = () => {
   const tabConfig = allFields[activeTab];
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-4 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">{t(`${SS}.title`)}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{t(`${SS}.description`)}</p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={loadConfigs}
-            leftIcon={<FiRefreshCw className="h-3.5 w-3.5" />}
-          >
-            {t(`${SS}.refresh`)}
-          </Button>
-        </div>
-
-        {/* Tabs */}
+    <ContentArea
+      title={t(`${SS}.title`)}
+      description={t(`${SS}.description`)}
+      headerActions={
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={loadConfigs}
+          leftIcon={<FiRefreshCw className="h-3.5 w-3.5" />}
+        >
+          {t(`${SS}.refresh`)}
+        </Button>
+      }
+      toolbar={
         <div className="flex gap-1 overflow-x-auto rounded-lg border border-border bg-muted/50 p-1">
           {TABS.map((tab) => (
             <button
@@ -228,22 +223,21 @@ const AdminSettingVlPage: React.FC<RouteComponentProps> = () => {
             </button>
           ))}
         </div>
-
-        {/* Content */}
-        {loading ? (
-          <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-            {t(`${SS}.loading`)}
-          </div>
-        ) : (
-          <BaseConfigPanel
-            configData={configData}
-            fieldConfigs={tabConfig.fields}
-            filterPrefix={tabConfig.filterPrefix}
-            onConfigChange={loadConfigs}
-            showTestConnection={activeTab !== 'default'}
-          />
-        )}
-      </div>
+      }
+    >
+      {loading ? (
+        <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
+          {t(`${SS}.loading`)}
+        </div>
+      ) : (
+        <BaseConfigPanel
+          configData={configData}
+          fieldConfigs={tabConfig.fields}
+          filterPrefix={tabConfig.filterPrefix}
+          onConfigChange={loadConfigs}
+          showTestConnection={activeTab !== 'default'}
+        />
+      )}
     </ContentArea>
   );
 };

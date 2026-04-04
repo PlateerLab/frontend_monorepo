@@ -291,40 +291,33 @@ const AdminTestMonitoringPage: React.FC<RouteComponentProps> = () => {
 
   // ── Render ──
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b-2 border-border pb-4">
-          <div className="flex items-center gap-3">
-            <FiActivity className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-xl font-bold text-foreground">{t(`${TM}.title`)}</h1>
-              <p className="text-sm text-muted-foreground">{t(`${TM}.subtitle`)}</p>
-            </div>
+    <ContentArea
+      title={t(`${TM}.title`)}
+      description={t(`${TM}.subtitle`)}
+      headerActions={
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 rounded-md bg-muted px-2 py-1">
+            <span
+              className={`h-2 w-2 rounded-full ${isHealthy ? 'bg-success shadow-[0_0_8px_rgba(46,177,70,0.5)]' : 'bg-destructive shadow-[0_0_8px_rgba(224,49,49,0.5)]'}`}
+            />
+            <span className="text-xs font-medium text-muted-foreground">
+              {isHealthy ? t(`${TM}.apiConnected`) : t(`${TM}.apiDisconnected`)}
+            </span>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 rounded-md bg-muted px-2 py-1">
-              <span
-                className={`h-2 w-2 rounded-full ${isHealthy ? 'bg-success shadow-[0_0_8px_rgba(46,177,70,0.5)]' : 'bg-destructive shadow-[0_0_8px_rgba(224,49,49,0.5)]'}`}
-              />
-              <span className="text-xs font-medium text-muted-foreground">
-                {isHealthy ? t(`${TM}.apiConnected`) : t(`${TM}.apiDisconnected`)}
-              </span>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={!isHealthy}
-              loading={isLoadingSessions}
-              onClick={loadSessions}
-            >
-              <FiRefreshCw className="mr-1 h-4 w-4" />
-              {t(`${TM}.refreshSessions`)}
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!isHealthy}
+            loading={isLoadingSessions}
+            onClick={loadSessions}
+          >
+            <FiRefreshCw className="mr-1 h-4 w-4" />
+            {t(`${TM}.refreshSessions`)}
+          </Button>
         </div>
-
-        {/* Stats */}
+      }
+    >
+      {/* Stats */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label={t(`${TM}.totalSessions`)}
@@ -385,7 +378,6 @@ const AdminTestMonitoringPage: React.FC<RouteComponentProps> = () => {
             </div>
           )}
         </div>
-      </div>
     </ContentArea>
   );
 };

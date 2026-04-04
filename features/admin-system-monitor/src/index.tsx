@@ -99,25 +99,18 @@ const AdminSystemMonitorPage: React.FC<RouteComponentProps> = () => {
   }, [startStream]);
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
-              {t('admin.pages.systemMonitor.title', 'System Monitor')}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t('admin.pages.systemMonitor.description', 'Real-time system resource monitoring')}
-            </p>
-          </div>
-          <ConnectionStatus
-            state={connectionState}
-            isStreaming={isStreaming}
-            onToggle={toggleStream}
-          />
-        </div>
-
-        {!data ? (
+    <ContentArea
+      title={t('admin.pages.systemMonitor.title', 'System Monitor')}
+      description={t('admin.pages.systemMonitor.description', 'Real-time system resource monitoring')}
+      headerActions={
+        <ConnectionStatus
+          state={connectionState}
+          isStreaming={isStreaming}
+          onToggle={toggleStream}
+        />
+      }
+    >
+      {!data ? (
           <div className="flex items-center justify-center h-64">
             <div className="flex flex-col items-center gap-3">
               <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -154,7 +147,6 @@ const AdminSystemMonitorPage: React.FC<RouteComponentProps> = () => {
             {data.network.length > 0 && <NetworkTable networks={data.network} />}
           </>
         )}
-      </div>
     </ContentArea>
   );
 };

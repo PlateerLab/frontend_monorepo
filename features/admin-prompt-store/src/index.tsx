@@ -158,7 +158,10 @@ const AdminPromptStorePage: React.FC<RouteComponentProps> = () => {
   // ── Error state ──
   if (error && prompts.length === 0) {
     return (
-      <ContentArea>
+      <ContentArea
+        title={t(`${PS}.title`)}
+        description={t(`${PS}.subtitle`)}
+      >
         <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
           <h3 className="text-base font-semibold text-destructive">
             {t(`${PS}.error`)}
@@ -174,21 +177,11 @@ const AdminPromptStorePage: React.FC<RouteComponentProps> = () => {
 
   // ── Render ──
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-4 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
-              {t(`${PS}.title`)}
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t(`${PS}.subtitle`)}
-            </p>
-          </div>
-        </div>
-
-        {/* Controls bar */}
+    <ContentArea
+      title={t(`${PS}.title`)}
+      description={t(`${PS}.subtitle`)}
+    >
+      {/* Controls bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/50 px-4 py-3">
           {/* Language filter tabs */}
           <div className="flex items-center gap-1">
@@ -329,8 +322,6 @@ const AdminPromptStorePage: React.FC<RouteComponentProps> = () => {
             ))}
           </div>
         )}
-      </div>
-
       {/* Create Modal */}
       <PromptCreateModal
         isOpen={createModalOpen}

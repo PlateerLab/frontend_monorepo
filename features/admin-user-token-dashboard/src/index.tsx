@@ -307,7 +307,10 @@ const AdminUserTokenDashboardPage: React.FC<RouteComponentProps> = () => {
   // ── Error state ──
   if (error && !data) {
     return (
-      <ContentArea>
+      <ContentArea
+        title={t(`${i18nPrefix}.title`)}
+        description={t(`${i18nPrefix}.subtitle`)}
+      >
         <div className="flex flex-col items-center justify-center gap-4 p-16">
           <p className="text-sm text-destructive">
             {t(`${i18nPrefix}.errorOccurred`)}: {error}
@@ -321,30 +324,22 @@ const AdminUserTokenDashboardPage: React.FC<RouteComponentProps> = () => {
   }
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
-              {t(`${i18nPrefix}.title`)}
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t(`${i18nPrefix}.subtitle`)}
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<FiRefreshCw className="h-4 w-4" />}
-            onClick={handleRefresh}
-            loading={loading}
-          >
-            {t(`${i18nPrefix}.refresh`)}
-          </Button>
-        </div>
-
-        {/* Summary Stats */}
+    <ContentArea
+      title={t(`${i18nPrefix}.title`)}
+      description={t(`${i18nPrefix}.subtitle`)}
+      headerActions={
+        <Button
+          variant="outline"
+          size="sm"
+          leftIcon={<FiRefreshCw className="h-4 w-4" />}
+          onClick={handleRefresh}
+          loading={loading}
+        >
+          {t(`${i18nPrefix}.refresh`)}
+        </Button>
+      }
+    >
+      {/* Summary Stats */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label={t(`${i18nPrefix}.stats.totalTokenUsage`)}
@@ -474,8 +469,6 @@ const AdminUserTokenDashboardPage: React.FC<RouteComponentProps> = () => {
             </div>
           </div>
         )}
-      </div>
-
       {/* Workflow Detail Modal */}
       {modalUser && modalUser.workflow_usage && (
         <WorkflowDetailModal

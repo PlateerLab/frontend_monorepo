@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { RouteComponentProps, MainFeatureModule, WorkflowOption } from '@xgen/types';
-import { ContentArea, SearchInput, EmptyState, FilterTabs } from '@xgen/ui';
+import { SearchInput, EmptyState, FilterTabs, ContentArea } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import './locales';
-import { createApiClient } from '@xgen/api-client';
+import { listWorkflowsDetail } from '@xgen/api-client';
+import type { WorkflowListItem } from '@xgen/api-client';
 
-import type { ChatNewPageProps, WorkflowDetailFromAPI, WorkflowFilter, WorkflowOwnerFilter } from './types';
+import type { ChatNewPageProps, WorkflowOwnerFilter } from './types';
 
 // ─────────────────────────────────────────────────────────────
 // Constants
@@ -21,41 +22,35 @@ const STORAGE_KEY_FAVORITES = 'xgen_workflow_favorites';
 // ─────────────────────────────────────────────────────────────
 
 const WorkflowIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
-    <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
-    <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
-    <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
-    <path d="M10 6.5H14M17.5 10V14M10 17.5H14M6.5 10V14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+  <svg className={className} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2.5" y="2.5" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+    <rect x="11.5" y="2.5" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+    <rect x="2.5" y="11.5" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+    <rect x="11.5" y="11.5" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+    <path d="M8.5 5.5H11.5M14.5 8.5V11.5M8.5 14.5H11.5M5.5 8.5V11.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
   </svg>
 );
 
 const StarIcon: React.FC<{ filled?: boolean; className?: string }> = ({ filled, className }) => (
-  <svg className={className} width="16" height="16" viewBox="0 0 16 16" fill={filled ? 'currentColor' : 'none'} xmlns="http://www.w3.org/2000/svg">
+  <svg className={className} width="14" height="14" viewBox="0 0 16 16" fill={filled ? 'currentColor' : 'none'} xmlns="http://www.w3.org/2000/svg">
     <path d="M8 1L10.163 5.279L15 5.919L11.5 9.321L12.326 14L8 11.779L3.674 14L4.5 9.321L1 5.919L5.837 5.279L8 1Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
-const PlayIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M4 3L13 8L4 13V3Z" fill="currentColor"/>
-  </svg>
-);
-
 const UserIcon: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="13" height="13" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M11.667 12.25V11.083C11.667 10.4645 11.4214 9.87141 10.9838 9.43382C10.5462 8.99624 9.95311 8.75 9.33467 8.75H4.66801C4.04956 8.75 3.45647 8.99624 3.01889 9.43382C2.58131 9.87141 2.33301 10.4645 2.33301 11.083V12.25M9.33301 4.08333C9.33301 5.37196 8.28831 6.41667 6.99967 6.41667C5.71101 6.41667 4.66634 5.37196 4.66634 4.08333C4.66634 2.79467 5.71101 1.75 6.99967 1.75C8.28831 1.75 9.33301 2.79467 9.33301 4.08333Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
 const UsersIcon: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="13" height="13" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M10 12.25V11.083C10 10.4645 9.7544 9.87141 9.31682 9.43382C8.87924 8.99624 8.28616 8.75 7.66772 8.75H3C2.38156 8.75 1.78847 8.99624 1.35089 9.43382C0.91331 9.87141 0.667 10.4645 0.667 11.083V12.25M13.333 12.25V11.083C13.3326 10.5731 13.1571 10.0785 12.8345 9.68123C12.5119 9.28398 12.0613 9.00785 11.558 8.90083M9.225 1.81749C9.73005 1.92336 10.1825 2.19952 10.5065 2.59769C10.8305 2.99586 11.0067 3.4919 11.0067 4.00332C11.0067 4.51475 10.8305 5.01079 10.5065 5.40896C10.1825 5.80713 9.73005 6.08329 9.225 6.18916M7.667 4C7.667 5.28866 6.6223 6.33333 5.33364 6.33333C4.04498 6.33333 3.00031 5.28866 3.00031 4C3.00031 2.71134 4.04498 1.66667 5.33364 1.66667C6.6223 1.66667 7.667 2.71134 7.667 4Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
 const NodesIcon: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="13" height="13" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="3" cy="3" r="1.5" stroke="currentColor" strokeWidth="1.2"/>
     <circle cx="11" cy="3" r="1.5" stroke="currentColor" strokeWidth="1.2"/>
     <circle cx="7" cy="11" r="1.5" stroke="currentColor" strokeWidth="1.2"/>
@@ -64,7 +59,7 @@ const NodesIcon: React.FC = () => (
 );
 
 const ArrowRightIcon: React.FC = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M3.333 8H12.667M12.667 8L8 3.333M12.667 8L8 12.667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
@@ -152,7 +147,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   onToggleFavorite,
 }) => {
   const { t } = useTranslation();
-  const isActive = workflow.status === 'active';
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -161,18 +155,26 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
 
   return (
     <article
-      className={`group relative flex flex-col p-4 bg-white border border-border rounded-2xl cursor-pointer transition-all hover:border-primary hover:shadow-[0_4px_12px_rgba(37,99,235,0.1)] focus:outline-2 focus:outline-primary focus:outline-offset-2 ${!isActive ? 'opacity-70 cursor-not-allowed hover:border-border hover:shadow-none' : ''}`}
-      onClick={isActive ? onSelect : undefined}
+      className="group flex flex-col p-4 bg-white border border-border rounded-lg cursor-pointer transition-all duration-150 hover:border-primary/40 hover:shadow-sm"
+      onClick={onSelect}
       role="button"
-      tabIndex={isActive ? 0 : -1}
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && onSelect()}
       aria-label={workflow.name}
     >
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-primary/10 to-primary/20 rounded-xl text-primary">
+      {/* Top row: Icon + Name + Favorite */}
+      <div className="flex items-start gap-3 mb-2">
+        <div className="flex items-center justify-center w-9 h-9 bg-primary/8 rounded-lg text-primary shrink-0">
           <WorkflowIcon />
         </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="m-0 text-sm font-semibold text-foreground truncate">{workflow.name}</h3>
+          {workflow.description && (
+            <p className="m-0 mt-0.5 text-xs text-muted-foreground leading-relaxed line-clamp-2">{workflow.description}</p>
+          )}
+        </div>
         <button
-          className={`flex items-center justify-center w-7 h-7 p-0 bg-transparent border-none rounded-lg cursor-pointer transition-all hover:text-yellow-500 hover:bg-yellow-500/10 ${isFavorite ? 'text-yellow-500' : 'text-muted-foreground'}`}
+          className={`flex items-center justify-center w-7 h-7 p-0 bg-transparent border-none rounded-md cursor-pointer transition-colors shrink-0 ${isFavorite ? 'text-yellow-500' : 'text-muted-foreground/30 hover:text-yellow-400'}`}
           onClick={handleFavoriteClick}
           aria-label={isFavorite ? t('chatNew.removeFavorite') : t('chatNew.addFavorite')}
         >
@@ -180,52 +182,32 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         </button>
       </div>
 
-      <div className="flex-1 flex flex-col gap-2 mb-4">
-        <h3 className="m-0 text-base font-semibold text-foreground overflow-hidden text-ellipsis whitespace-nowrap">{workflow.name}</h3>
-        {workflow.description && (
-          <p className="m-0 text-sm text-muted-foreground leading-normal overflow-hidden line-clamp-2">{workflow.description}</p>
-        )}
-      </div>
-
-      <div className="flex justify-between items-center pt-3 border-t border-muted">
+      {/* Footer: Meta info + Action hint */}
+      <div className="flex items-center justify-between mt-auto pt-3 border-t border-border/50">
         <div className="flex items-center gap-3">
           {workflow.isShared ? (
-            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground [&_svg]:shrink-0 [&_svg]:w-3.5 [&_svg]:h-3.5" title={t('chatNew.shared')}>
+            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
               <UsersIcon />
               {workflow.username || t('chatNew.shared')}
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground [&_svg]:shrink-0 [&_svg]:w-3.5 [&_svg]:h-3.5" title={t('chatNew.personal')}>
+            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
               <UserIcon />
               {t('chatNew.personal')}
             </span>
           )}
           {workflow.nodeCount !== undefined && (
-            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground [&_svg]:shrink-0 [&_svg]:w-3.5 [&_svg]:h-3.5">
+            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
               <NodesIcon />
               {workflow.nodeCount}
             </span>
           )}
         </div>
-
-        <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
-          workflow.status === 'active' ? 'text-green-600 bg-green-500/10' :
-          workflow.status === 'draft' ? 'text-yellow-600 bg-yellow-500/10' :
-          'text-muted-foreground bg-muted'
-        }`}>
-          {t(`chatNew.status.${workflow.status}`)}
+        <span className="inline-flex items-center gap-1 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+          {t('chatNew.startChat')}
+          <ArrowRightIcon />
         </span>
       </div>
-
-      {isActive && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/95 rounded-2xl opacity-0 transition-opacity group-hover:opacity-100">
-          <button className="inline-flex items-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-primary border-none rounded-xl cursor-pointer transition-all shadow-[0_4px_12px_rgba(37,99,235,0.3)] hover:bg-primary/90 hover:-translate-y-px hover:shadow-[0_6px_16px_rgba(37,99,235,0.4)] active:translate-y-0 [&_svg]:w-4 [&_svg]:h-4">
-            <PlayIcon />
-            <span>{t('chatNew.startChat')}</span>
-            <ArrowRightIcon />
-          </button>
-        </div>
-      )}
     </article>
   );
 };
@@ -239,18 +221,16 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
   onSelectWorkflow,
 }) => {
   const { t } = useTranslation();
-  const api = createApiClient();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [workflows, setWorkflows] = useState<WorkflowOption[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<WorkflowFilter>('active');
   const [ownerFilter, setOwnerFilter] = useState<WorkflowOwnerFilter>('all');
 
   // ─────────────────────────────────────────────────────────────
-  // API 호출
+  // API
   // ─────────────────────────────────────────────────────────────
 
   const loadWorkflows = useCallback(async () => {
@@ -258,31 +238,21 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
     setError(null);
 
     try {
-      const result = await api.get<WorkflowDetailFromAPI[]>('/api/workflow/detail/list');
-      const workflowList = result?.data || [];
+      const workflowList = await listWorkflowsDetail();
 
-      // API 응답을 WorkflowOption 형태로 변환
       const transformed: WorkflowOption[] = workflowList
-        .filter((detail) => detail.is_accepted !== false)
-        .map((detail) => {
-          // 상태 결정
-          let status: 'active' | 'draft' | 'archived' = 'active';
-          if (!detail.has_startnode || !detail.has_endnode || detail.node_count < 3) {
-            status = 'draft';
-          }
-
-          return {
-            id: detail.workflow_id,
-            name: detail.workflow_name.replace('.json', '') || detail.workflow_id,
-            description: detail.metadata?.description as string | undefined,
-            status,
-            nodeCount: detail.node_count,
-            isShared: detail.is_shared,
-            userId: detail.user_id,
-            username: detail.username || detail.full_name,
-            lastModified: detail.updated_at,
-          };
-        });
+        .filter((detail: WorkflowListItem) => detail.is_accepted !== false)
+        .map((detail: WorkflowListItem) => ({
+          id: detail.workflow_id,
+          name: detail.workflow_name.replace('.json', '') || detail.workflow_id,
+          description: detail.metadata?.description as string | undefined,
+          status: 'active' as const,
+          nodeCount: detail.node_count,
+          isShared: detail.is_shared,
+          userId: detail.user_id,
+          username: detail.username || detail.full_name,
+          lastModified: detail.updated_at,
+        }));
 
       setWorkflows(transformed);
       setFavorites(getFavorites());
@@ -292,19 +262,18 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [api, t]);
+  }, [t]);
 
   useEffect(() => {
     loadWorkflows();
   }, [loadWorkflows]);
 
   // ─────────────────────────────────────────────────────────────
-  // 필터링
+  // Filtering
   // ─────────────────────────────────────────────────────────────
 
   const filteredWorkflows = useMemo(() => {
     return workflows.filter((workflow) => {
-      // 검색 필터
       if (search) {
         const searchLower = search.toLowerCase();
         const matchName = workflow.name.toLowerCase().includes(searchLower);
@@ -312,50 +281,31 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
         if (!matchName && !matchDesc) return false;
       }
 
-      // 상태 필터
-      if (statusFilter !== 'all' && workflow.status !== statusFilter) {
-        return false;
-      }
-
-      // 소유자 필터
-      if (ownerFilter === 'personal' && workflow.isShared) {
-        return false;
-      }
-      if (ownerFilter === 'shared' && !workflow.isShared) {
-        return false;
-      }
+      if (ownerFilter === 'personal' && workflow.isShared) return false;
+      if (ownerFilter === 'shared' && !workflow.isShared) return false;
 
       return true;
     });
-  }, [workflows, search, statusFilter, ownerFilter]);
+  }, [workflows, search, ownerFilter]);
 
-  // 즐겨찾기 워크플로우
   const favoriteWorkflows = useMemo(() => {
     return filteredWorkflows.filter((w) => favorites.includes(w.id));
   }, [filteredWorkflows, favorites]);
 
-  // 일반 워크플로우 (즐겨찾기 제외)
   const regularWorkflows = useMemo(() => {
     return filteredWorkflows.filter((w) => !favorites.includes(w.id));
   }, [filteredWorkflows, favorites]);
 
-  // 카운트 계산
-  const counts = {
+  const ownerCounts = useMemo(() => ({
     all: workflows.length,
-    active: workflows.filter((w) => w.status === 'active').length,
-    draft: workflows.filter((w) => w.status === 'draft').length,
-  };
-
-  const statusTabs = [
-    { key: 'all', label: t('chatNew.filter.all'), count: counts.all },
-    { key: 'active', label: t('chatNew.filter.active'), count: counts.active },
-    { key: 'draft', label: t('chatNew.filter.draft'), count: counts.draft },
-  ];
+    personal: workflows.filter((w) => !w.isShared).length,
+    shared: workflows.filter((w) => w.isShared).length,
+  }), [workflows]);
 
   const ownerTabs = [
-    { key: 'all', label: t('chatNew.owner.all') },
-    { key: 'personal', label: t('chatNew.owner.personal') },
-    { key: 'shared', label: t('chatNew.owner.shared') },
+    { key: 'all', label: t('chatNew.owner.all'), count: ownerCounts.all },
+    { key: 'personal', label: t('chatNew.owner.personal'), count: ownerCounts.personal },
+    { key: 'shared', label: t('chatNew.owner.shared'), count: ownerCounts.shared },
   ];
 
   // ─────────────────────────────────────────────────────────────
@@ -363,15 +313,8 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
   // ─────────────────────────────────────────────────────────────
 
   const handleSelectWorkflow = (workflow: WorkflowOption) => {
-    if (workflow.status !== 'active') {
-      alert(t('chatNew.error.draftWorkflow'));
-      return;
-    }
-
-    // 새 interaction_id 생성
     const interactionId = generateInteractionId();
 
-    // 현재 채팅 데이터 저장
     const saved = saveCurrentChatData({
       workflowId: workflow.id,
       workflowName: workflow.name,
@@ -384,14 +327,12 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
       return;
     }
 
-    // 콜백 호출
     onSelectWorkflow?.({
       workflowId: workflow.id,
       workflowName: workflow.name,
       userId: workflow.userId,
     });
 
-    // 현재 채팅 페이지로 이동
     onNavigate?.('current-chat');
   };
 
@@ -417,52 +358,42 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
           <RefreshIcon />
         </button>
       }
-    >
-      <div className="flex flex-col gap-6 p-4 max-w-[1400px] mx-auto w-full">
-        {/* Header */}
-        <div className="flex justify-between items-start gap-4 pb-4 border-b border-border">
-          <div className="flex flex-col gap-1">
-            <h1 className="m-0 text-2xl font-semibold text-foreground">{t('chatNew.header.title')}</h1>
-            <p className="m-0 text-sm text-muted-foreground">{t('chatNew.header.subtitle')}</p>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="flex flex-col gap-3">
-          <div className="flex justify-between items-center gap-4 flex-wrap">
-            <FilterTabs
-              tabs={statusTabs}
-              activeKey={statusFilter}
-              onChange={(key) => setStatusFilter(key as WorkflowFilter)}
-              variant="underline"
-            />
-            <FilterTabs
-              tabs={ownerTabs}
-              activeKey={ownerFilter}
-              onChange={(key) => setOwnerFilter(key as WorkflowOwnerFilter)}
-              variant="underline"
-            />
-          </div>
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder={t('chatNew.searchPlaceholder')}
-            size="md"
+      toolbar={
+        <div className="flex items-center justify-between gap-4">
+          <FilterTabs
+            tabs={ownerTabs}
+            activeKey={ownerFilter}
+            onChange={(key) => setOwnerFilter(key as WorkflowOwnerFilter)}
+            variant="underline"
           />
+          <div className="w-72">
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder={t('chatNew.searchPlaceholder')}
+              size="sm"
+            />
+          </div>
         </div>
-
-        {/* Error State */}
+      }
+    >
+        {/* Error */}
         {error && (
-          <div className="flex justify-between items-center gap-3 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm [&_button]:px-3 [&_button]:py-1 [&_button]:text-xs [&_button]:font-medium [&_button]:text-red-600 [&_button]:bg-white [&_button]:border [&_button]:border-red-600 [&_button]:rounded-lg [&_button]:cursor-pointer [&_button]:transition-all hover:[&_button]:bg-red-600 hover:[&_button]:text-white">
+          <div className="flex items-center justify-between gap-3 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
             <span>{error}</span>
-            <button onClick={loadWorkflows}>{t('common.retry')}</button>
+            <button
+              onClick={loadWorkflows}
+              className="px-3 py-1 text-xs font-medium text-red-600 bg-white border border-red-300 rounded-md cursor-pointer transition-colors hover:bg-red-600 hover:text-white hover:border-red-600"
+            >
+              {t('common.retry')}
+            </button>
           </div>
         )}
 
         {/* Content */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center gap-3 p-12 text-muted-foreground">
-            <div className="w-8 h-8 border-3 border-border border-t-primary rounded-full animate-spin" />
+          <div className="flex flex-col items-center justify-center gap-3 py-20 text-muted-foreground">
+            <div className="w-8 h-8 border-[3px] border-border border-t-primary rounded-full animate-spin" />
             <p className="m-0 text-sm">{t('common.loading')}</p>
           </div>
         ) : filteredWorkflows.length === 0 ? (
@@ -473,15 +404,15 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
           />
         ) : (
           <div className="flex flex-col gap-6">
-            {/* Favorites Section */}
+            {/* Favorites */}
             {favoriteWorkflows.length > 0 && (
-              <section className="flex flex-col gap-4">
-                <h2 className="flex items-center gap-2 m-0 text-base font-semibold text-foreground [&_svg]:w-[18px] [&_svg]:h-[18px] [&_svg]:text-muted-foreground">
-                  <StarIcon filled />
+              <section className="flex flex-col gap-3">
+                <h2 className="flex items-center gap-2 m-0 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  <StarIcon filled className="text-yellow-500" />
                   {t('chatNew.sections.favorites')}
-                  <span className="inline-flex items-center justify-center min-w-5 h-5 px-1 text-xs font-medium text-muted-foreground bg-muted rounded-full">{favoriteWorkflows.length}</span>
+                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-semibold text-muted-foreground bg-muted rounded-full">{favoriteWorkflows.length}</span>
                 </h2>
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3">
                   {favoriteWorkflows.map((workflow) => (
                     <WorkflowCard
                       key={workflow.id}
@@ -495,14 +426,15 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
               </section>
             )}
 
-            {/* All Workflows Section */}
-            <section className="flex flex-col gap-4">
-              <h2 className="flex items-center gap-2 m-0 text-base font-semibold text-foreground [&_svg]:w-[18px] [&_svg]:h-[18px] [&_svg]:text-muted-foreground">
-                <WorkflowIcon />
-                {t('chatNew.sections.all')}
-                <span className="inline-flex items-center justify-center min-w-5 h-5 px-1 text-xs font-medium text-muted-foreground bg-muted rounded-full">{regularWorkflows.length}</span>
-              </h2>
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+            {/* All Workflows */}
+            <section className="flex flex-col gap-3">
+              {favoriteWorkflows.length > 0 && (
+                <h2 className="flex items-center gap-2 m-0 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  {t('chatNew.sections.all')}
+                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-semibold text-muted-foreground bg-muted rounded-full">{regularWorkflows.length}</span>
+                </h2>
+              )}
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3">
                 {regularWorkflows.map((workflow) => (
                   <WorkflowCard
                     key={workflow.id}
@@ -516,7 +448,6 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
             </section>
           </div>
         )}
-      </div>
     </ContentArea>
   );
 };

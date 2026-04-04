@@ -33,7 +33,6 @@ export interface WorkflowDetailFromAPI {
 // Component Types
 // ─────────────────────────────────────────────────────────────
 
-export type WorkflowFilter = 'all' | 'active' | 'draft';
 export type WorkflowOwnerFilter = 'all' | 'personal' | 'shared';
 
 export interface ChatNewPageProps {

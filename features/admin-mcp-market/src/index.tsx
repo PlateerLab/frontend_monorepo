@@ -114,7 +114,10 @@ const AdminMcpMarketPage: React.FC<RouteComponentProps> = () => {
   // 상세 뷰가 선택된 경우 상세 섹션 렌더링
   if (selectedItem) {
     return (
-      <ContentArea>
+      <ContentArea
+        title={t('admin.pages.mcpMarket.title', 'MCP Market')}
+        description={t('admin.pages.mcpMarket.description', 'Browse and install MCP tool servers')}
+      >
         <MCPDetailSection item={selectedItem} onBack={() => setSelectedItem(null)} />
       </ContentArea>
     );
@@ -123,7 +126,10 @@ const AdminMcpMarketPage: React.FC<RouteComponentProps> = () => {
   // 로딩 상태
   if (loading) {
     return (
-      <ContentArea>
+      <ContentArea
+        title={t('admin.pages.mcpMarket.title', 'MCP Market')}
+        description={t('admin.pages.mcpMarket.description', 'Browse and install MCP tool servers')}
+      >
         <div className="flex items-center justify-center h-64">
           <div className="flex flex-col items-center gap-3">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -137,7 +143,10 @@ const AdminMcpMarketPage: React.FC<RouteComponentProps> = () => {
   // 에러 상태
   if (error) {
     return (
-      <ContentArea>
+      <ContentArea
+        title={t('admin.pages.mcpMarket.title', 'MCP Market')}
+        description={t('admin.pages.mcpMarket.description', 'Browse and install MCP tool servers')}
+      >
         <div className="flex items-center justify-center h-64">
           <div className="flex flex-col items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-xl text-red-600">!</div>
@@ -153,19 +162,11 @@ const AdminMcpMarketPage: React.FC<RouteComponentProps> = () => {
   }
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-xl font-bold text-foreground">
-            {t('admin.pages.mcpMarket.title', 'MCP Market')}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t('admin.pages.mcpMarket.description', 'Browse and install MCP tool servers')}
-          </p>
-        </div>
-
-        {/* Search bar */}
+    <ContentArea
+      title={t('admin.pages.mcpMarket.title', 'MCP Market')}
+      description={t('admin.pages.mcpMarket.description', 'Browse and install MCP tool servers')}
+    >
+      {/* Search bar */}
         <div className="flex items-center gap-3">
           <div className="w-80">
             <SearchInput
@@ -264,7 +265,6 @@ const AdminMcpMarketPage: React.FC<RouteComponentProps> = () => {
             ))}
           </div>
         )}
-      </div>
     </ContentArea>
   );
 };

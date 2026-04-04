@@ -536,15 +536,11 @@ const AdminGovRiskManagementPage: React.FC<RouteComponentProps> = () => {
 
   /* ── Render ──────────────────────── */
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Title */}
-        <div>
-          <h1 className="text-xl font-bold text-foreground">{t('admin.pages.govRiskManagement.title')}</h1>
-          <p className="text-sm text-muted-foreground mt-1">{t('admin.pages.govRiskManagement.description')}</p>
-        </div>
-
-        {/* Summary cards — act as filter */}
+    <ContentArea
+      title={t('admin.pages.govRiskManagement.title')}
+      description={t('admin.pages.govRiskManagement.description')}
+    >
+      {/* Summary cards — act as filter */}
         <div className="grid grid-cols-5 gap-4">
           <StatCard
             label={t('admin.governance.common.total')}
@@ -1033,7 +1029,6 @@ const AdminGovRiskManagementPage: React.FC<RouteComponentProps> = () => {
             </div>
           </Modal>
         )}
-      </div>
     </ContentArea>
   );
 };

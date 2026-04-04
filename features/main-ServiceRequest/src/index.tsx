@@ -192,16 +192,16 @@ const ServiceRequestPage: React.FC<ServiceRequestPageProps> = () => {
   const urgentCount = mockRequests.filter(r => r.priority === 'urgent' || r.priority === 'high').length;
 
   return (
-    <ContentArea title={t('serviceRequest.title')}>
+    <ContentArea
+      title={t('serviceRequest.title')}
+      headerActions={
+        <Button variant="primary">
+          <PlusIcon />
+          {t('serviceRequest.newRequest')}
+        </Button>
+      }
+    >
       <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-foreground">{t('serviceRequest.title')}</h1>
-          <Button variant="primary">
-            <PlusIcon />
-            {t('serviceRequest.newRequest')}
-          </Button>
-        </div>
-
         {/* Summary */}
         <div className="grid grid-cols-4 gap-4 mb-6">
           {[

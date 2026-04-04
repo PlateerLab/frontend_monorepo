@@ -74,27 +74,23 @@ const AdminSettingModelServingPage: React.FC<RouteComponentProps> = () => {
   };
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">{t(`${SS}.title`)}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{t(`${SS}.description`)}</p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRetry}
-            disabled={loading}
-            leftIcon={<FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />}
-          >
-            {t(`${SS}.refresh`)}
-          </Button>
-        </div>
-
-        {/* Loading State */}
-        {loading && !data && (
+    <ContentArea
+      title={t(`${SS}.title`)}
+      description={t(`${SS}.description`)}
+      headerActions={
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRetry}
+          disabled={loading}
+          leftIcon={<FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />}
+        >
+          {t(`${SS}.refresh`)}
+        </Button>
+      }
+    >
+      {/* Loading State */}
+      {loading && !data && (
           <div className="flex items-center justify-center rounded-lg border border-border bg-card p-12">
             <span className="text-sm text-muted-foreground">{t(`${SS}.loading`)}</span>
           </div>
@@ -192,12 +188,11 @@ const AdminSettingModelServingPage: React.FC<RouteComponentProps> = () => {
         )}
 
         {/* No data, no error */}
-        {!data && !loading && !error && (
-          <div className="flex items-center justify-center rounded-lg border border-border bg-card p-8">
-            <span className="text-sm text-muted-foreground">{t(`${SS}.noData`)}</span>
-          </div>
-        )}
-      </div>
+      {!data && !loading && !error && (
+        <div className="flex items-center justify-center rounded-lg border border-border bg-card p-8">
+          <span className="text-sm text-muted-foreground">{t(`${SS}.noData`)}</span>
+        </div>
+      )}
     </ContentArea>
   );
 };

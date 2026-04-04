@@ -235,27 +235,19 @@ const AdminUsersPage: React.FC<RouteComponentProps> = () => {
   );
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
-              {t('admin.pages.users.title')}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t('admin.userManagement.userList.statsLoadTotal')} {filteredUsers.length}{t('admin.userManagement.userList.unitPeople')}
-            </p>
-          </div>
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder={t('admin.userManagement.userList.searchPlaceholder')}
-            className="w-72"
-          />
-        </div>
-
-        {/* Table */}
+    <ContentArea
+      title={t('admin.pages.users.title')}
+      description={`${t('admin.userManagement.userList.statsLoadTotal')} ${filteredUsers.length}${t('admin.userManagement.userList.unitPeople')}`}
+      headerActions={
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder={t('admin.userManagement.userList.searchPlaceholder')}
+          className="w-72"
+        />
+      }
+    >
+      {/* Table */}
         <DataTable
           data={filteredUsers}
           columns={columns}
@@ -290,7 +282,6 @@ const AdminUsersPage: React.FC<RouteComponentProps> = () => {
             </Button>
           </div>
         )}
-      </div>
 
       {/* Edit Modal */}
       <UserEditModal

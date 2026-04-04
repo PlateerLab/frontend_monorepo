@@ -152,19 +152,11 @@ const AdminErrorLogsPage: React.FC<RouteComponentProps> = () => {
   };
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-xl font-bold text-foreground">
-            {t('admin.pages.errorLogs.title', 'Error Logs')}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t('admin.pages.errorLogs.description', 'Application error tracking and resolution')}
-          </p>
-        </div>
-
-        {/* Stats */}
+    <ContentArea
+      title={t('admin.pages.errorLogs.title', 'Error Logs')}
+      description={t('admin.pages.errorLogs.description', 'Application error tracking and resolution')}
+    >
+      {/* Stats */}
         <div className="grid grid-cols-4 gap-4">
           {[
             { label: t('admin.errors.unresolvedErrors', 'Unresolved Errors'), value: stats.total, color: 'text-blue-600' },
@@ -333,7 +325,6 @@ const AdminErrorLogsPage: React.FC<RouteComponentProps> = () => {
             </div>
           </Modal>
         )}
-      </div>
     </ContentArea>
   );
 };

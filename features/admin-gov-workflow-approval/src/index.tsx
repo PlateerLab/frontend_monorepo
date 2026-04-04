@@ -190,19 +190,11 @@ const AdminGovWorkflowApprovalPage: React.FC<RouteComponentProps> = () => {
   }, [sortField, sortDir]);
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-xl font-bold text-foreground">
-            {t('admin.governance.workflowApproval.title')}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t('admin.governance.workflowApproval.description')}
-          </p>
-        </div>
-
-        {/* Summary cards — clickable as filters */}
+    <ContentArea
+      title={t('admin.governance.workflowApproval.title')}
+      description={t('admin.governance.workflowApproval.description')}
+    >
+      {/* Summary cards — clickable as filters */}
         <div className="grid grid-cols-4 gap-4">
           {([
             { key: 'all' as const, variant: 'info' as const, label: t('admin.governance.common.allStatus'), value: summary.total },
@@ -641,8 +633,7 @@ const AdminGovWorkflowApprovalPage: React.FC<RouteComponentProps> = () => {
               </div>
             </div>
           </Modal>
-        )}
-      </div>
+      )}
     </ContentArea>
   );
 };

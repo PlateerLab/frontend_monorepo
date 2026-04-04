@@ -200,19 +200,11 @@ const AdminSecuritySettingsPage: React.FC<RouteComponentProps> = () => {
   const disabledCount = policies.length - enabledCount;
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-xl font-bold text-foreground">
-            {t('admin.pages.securitySettings.title', 'Security Settings')}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t('admin.pages.securitySettings.description', 'Configure security policies, IP rules, and token management')}
-          </p>
-        </div>
-
-        {/* Stats */}
+    <ContentArea
+      title={t('admin.pages.securitySettings.title', 'Security Settings')}
+      description={t('admin.pages.securitySettings.description', 'Configure security policies, IP rules, and token management')}
+    >
+      {/* Stats */}
         <div className="grid grid-cols-4 gap-4">
           {[
             { label: t('admin.security.totalPolicies', 'Total Policies'), value: policies.length, color: 'text-blue-600' },
@@ -452,7 +444,6 @@ const AdminSecuritySettingsPage: React.FC<RouteComponentProps> = () => {
             </div>
           </Modal>
         )}
-      </div>
     </ContentArea>
   );
 };

@@ -881,9 +881,8 @@ const AdminGovMonitoringPage: React.FC<RouteComponentProps> = () => {
 
   /* ── Main render ── */
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Tab group */}
+    <ContentArea showHeader={false}>
+      {/* Tab group */}
         <div className="flex items-center gap-1 border-b border-border">
           <button
             className={`pb-2 px-3 text-sm font-medium border-b-2 transition-colors ${
@@ -920,9 +919,8 @@ const AdminGovMonitoringPage: React.FC<RouteComponentProps> = () => {
         {activeTab === 'overdue' && renderOverdueTab()}
 
         {/* Modals */}
-        {renderDetailModal()}
-        {renderFormModal()}
-      </div>
+      {renderDetailModal()}
+      {renderFormModal()}
     </ContentArea>
   );
 };

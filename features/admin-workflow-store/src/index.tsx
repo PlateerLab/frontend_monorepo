@@ -164,7 +164,10 @@ const AdminWorkflowStorePage: React.FC<RouteComponentProps> = () => {
   // ── Error state ──
   if (error && workflows.length === 0) {
     return (
-      <ContentArea>
+      <ContentArea
+        title={t(`${NS}.title`)}
+        description={t(`${NS}.subtitle`)}
+      >
         <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
           <h3 className="text-base font-semibold text-destructive">
             {t(`${NS}.error`)}
@@ -180,31 +183,23 @@ const AdminWorkflowStorePage: React.FC<RouteComponentProps> = () => {
   }
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
-              {t(`${NS}.title`)}
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t(`${NS}.subtitle`)}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={fetchWorkflows}>
-              <FiRefreshCw className="mr-1.5 h-3.5 w-3.5" />
-              {t(`${NS}.refresh`)}
-            </Button>
-            <Button variant="primary" size="sm" onClick={handleUpload}>
-              <FiUpload className="mr-1.5 h-3.5 w-3.5" />
-              {t(`${NS}.upload`)}
-            </Button>
-          </div>
+    <ContentArea
+      title={t(`${NS}.title`)}
+      description={t(`${NS}.subtitle`)}
+      headerActions={
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={fetchWorkflows}>
+            <FiRefreshCw className="mr-1.5 h-3.5 w-3.5" />
+            {t(`${NS}.refresh`)}
+          </Button>
+          <Button variant="primary" size="sm" onClick={handleUpload}>
+            <FiUpload className="mr-1.5 h-3.5 w-3.5" />
+            {t(`${NS}.upload`)}
+          </Button>
         </div>
-
-        {/* Controls */}
+      }
+    >
+      {/* Controls */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <FilterTabs
             tabs={filterTabs}
@@ -256,8 +251,6 @@ const AdminWorkflowStorePage: React.FC<RouteComponentProps> = () => {
             ))}
           </div>
         )}
-      </div>
-
       {/* Detail Modal (simple info view) */}
       {selectedWorkflow && (
         <Modal

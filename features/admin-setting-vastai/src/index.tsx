@@ -75,16 +75,12 @@ const AdminSettingVastaiPage: React.FC<RouteComponentProps> = () => {
   }, [loadConfigs]);
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-xl font-bold text-foreground">{t(`${SS}.title`)}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t(`${SS}.description`)}</p>
-        </div>
-
-        {/* Config Section */}
-        <section>
+    <ContentArea
+      title={t(`${SS}.title`)}
+      description={t(`${SS}.description`)}
+    >
+      {/* Config Section */}
+      <section>
           <h2 className="mb-3 text-base font-semibold text-foreground">{t(`${SS}.config.title`)}</h2>
           {loading ? (
             <div className="flex items-center justify-center rounded-lg border border-border bg-card p-8">
@@ -115,8 +111,7 @@ const AdminSettingVastaiPage: React.FC<RouteComponentProps> = () => {
               Advanced GPU instance management features are being prepared.
             </p>
           </div>
-        </section>
-      </div>
+      </section>
     </ContentArea>
   );
 };

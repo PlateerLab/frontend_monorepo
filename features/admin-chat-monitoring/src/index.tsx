@@ -326,7 +326,7 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
       <ContentArea
         title={t('admin.workflowManagement.chatMonitoring.title')}
         description={t('admin.workflowManagement.chatMonitoring.subtitle')}
-        variant="page"
+        contentClassName="max-w-7xl mx-auto"
       >
         <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
           <p className="text-sm text-muted-foreground">
@@ -344,7 +344,7 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
     <ContentArea
       title={t('admin.workflowManagement.chatMonitoring.title')}
       description={t('admin.workflowManagement.chatMonitoring.subtitle')}
-      variant="page"
+      contentClassName="max-w-7xl mx-auto"
       headerActions={
         <div className="flex items-center gap-2">
           <DownloadDropdown />

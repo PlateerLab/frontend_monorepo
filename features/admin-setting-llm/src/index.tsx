@@ -233,25 +233,20 @@ const AdminSettingLlmPage: React.FC<RouteComponentProps> = () => {
   const tabConfig = allFields[activeTab];
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-4 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">{t(`${SS}.title`)}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{t(`${SS}.description`)}</p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => { loadConfigs(); loadLlmStatus(); }}
-            leftIcon={<FiRefreshCw className="h-3.5 w-3.5" />}
-          >
-            {t(`${SS}.refresh`)}
-          </Button>
-        </div>
-
-        {/* Tabs */}
+    <ContentArea
+      title={t(`${SS}.title`)}
+      description={t(`${SS}.description`)}
+      headerActions={
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => { loadConfigs(); loadLlmStatus(); }}
+          leftIcon={<FiRefreshCw className="h-3.5 w-3.5" />}
+        >
+          {t(`${SS}.refresh`)}
+        </Button>
+      }
+      toolbar={
         <div className="flex gap-1 overflow-x-auto rounded-lg border border-border bg-muted/50 p-1">
           {TABS.map((tab) => (
             <button
@@ -268,79 +263,78 @@ const AdminSettingLlmPage: React.FC<RouteComponentProps> = () => {
             </button>
           ))}
         </div>
-
-        {/* Content */}
-        {loading ? (
-          <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-            {t(`${SS}.loading`)}
-          </div>
-        ) : activeTab === 'default' ? (
-          <div className="flex flex-col gap-4">
-            <BaseConfigPanel
-              configData={configData}
-              fieldConfigs={tabConfig.fields}
-              filterPrefix={tabConfig.filterPrefix}
-              onConfigChange={loadConfigs}
-              showTestConnection={false}
-            />
-
-            {/* Provider cards */}
-            <div>
-              <h2 className="mb-3 text-sm font-semibold text-foreground">{t(`${SS}.providerGrid`)}</h2>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {PROVIDER_CARDS.map((provider) => {
-                  const isDefault = currentDefault === provider.name;
-                  const status = llmStatus[provider.name] as { available?: boolean } | undefined;
-                  const isAvailable = status?.available;
-
-                  return (
-                    <button
-                      key={provider.name}
-                      onClick={() => handleSetDefault(provider.name)}
-                      className={`group flex items-center gap-3 rounded-lg border p-4 text-left transition-all hover:shadow-sm ${
-                        isDefault
-                          ? 'border-primary bg-primary/5'
-                          : 'border-border bg-card hover:border-primary/40'
-                      }`}
-                    >
-                      <div
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
-                        style={{ color: provider.color, backgroundColor: `${provider.color}15` }}
-                      >
-                        {provider.icon}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-sm font-semibold text-foreground">{t(provider.labelKey)}</span>
-                          {isDefault && (
-                            <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
-                              {t(`${SS}.default`)}
-                            </span>
-                          )}
-                        </div>
-                        <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                          {isAvailable !== undefined && (
-                            isAvailable
-                              ? <><FiCheck className="h-3 w-3 text-emerald-500" />{t(`${SS}.available`)}</>
-                              : <><FiAlertCircle className="h-3 w-3 text-amber-500" />{t(`${SS}.unavailable`)}</>
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        ) : (
+      }
+    >
+      {loading ? (
+        <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
+          {t(`${SS}.loading`)}
+        </div>
+      ) : activeTab === 'default' ? (
+        <div className="flex flex-col gap-4">
           <BaseConfigPanel
             configData={configData}
             fieldConfigs={tabConfig.fields}
             filterPrefix={tabConfig.filterPrefix}
             onConfigChange={loadConfigs}
+            showTestConnection={false}
           />
-        )}
-      </div>
+
+          {/* Provider cards */}
+          <div>
+            <h2 className="mb-3 text-sm font-semibold text-foreground">{t(`${SS}.providerGrid`)}</h2>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {PROVIDER_CARDS.map((provider) => {
+                const isDefault = currentDefault === provider.name;
+                const status = llmStatus[provider.name] as { available?: boolean } | undefined;
+                const isAvailable = status?.available;
+
+                return (
+                  <button
+                    key={provider.name}
+                    onClick={() => handleSetDefault(provider.name)}
+                    className={`group flex items-center gap-3 rounded-lg border p-4 text-left transition-all hover:shadow-sm ${
+                      isDefault
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border bg-card hover:border-primary/40'
+                    }`}
+                  >
+                    <div
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
+                      style={{ color: provider.color, backgroundColor: `${provider.color}15` }}
+                    >
+                      {provider.icon}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-semibold text-foreground">{t(provider.labelKey)}</span>
+                        {isDefault && (
+                          <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                            {t(`${SS}.default`)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                        {isAvailable !== undefined && (
+                          isAvailable
+                            ? <><FiCheck className="h-3 w-3 text-emerald-500" />{t(`${SS}.available`)}</>
+                            : <><FiAlertCircle className="h-3 w-3 text-amber-500" />{t(`${SS}.unavailable`)}</>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <BaseConfigPanel
+          configData={configData}
+          fieldConfigs={tabConfig.fields}
+          filterPrefix={tabConfig.filterPrefix}
+          onConfigChange={loadConfigs}
+        />
+      )}
     </ContentArea>
   );
 };

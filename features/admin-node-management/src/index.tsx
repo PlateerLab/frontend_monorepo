@@ -168,7 +168,10 @@ const AdminNodeManagementPage: React.FC<RouteComponentProps> = () => {
   // Loading state
   if (loading) {
     return (
-      <ContentArea>
+      <ContentArea
+        title={t(`${prefix}.title`)}
+        description={t(`${prefix}.subtitle`)}
+      >
         <div className="flex items-center justify-center p-16">
           <div className="flex flex-col items-center gap-3">
             <FiRefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -184,7 +187,10 @@ const AdminNodeManagementPage: React.FC<RouteComponentProps> = () => {
   // Error state
   if (error) {
     return (
-      <ContentArea>
+      <ContentArea
+        title={t(`${prefix}.title`)}
+        description={t(`${prefix}.subtitle`)}
+      >
         <div className="flex items-center justify-center p-16">
           <div className="flex flex-col items-center gap-4">
             <p className="text-sm text-red-500">{error}</p>
@@ -198,19 +204,11 @@ const AdminNodeManagementPage: React.FC<RouteComponentProps> = () => {
   }
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-8">
-        {/* Header */}
-        <div>
-          <h1 className="text-xl font-bold text-foreground">
-            {t(`${prefix}.title`)}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t(`${prefix}.subtitle`)}
-          </p>
-        </div>
-
-        {/* Toolbar */}
+    <ContentArea
+      title={t(`${prefix}.title`)}
+      description={t(`${prefix}.subtitle`)}
+    >
+      {/* Toolbar */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             {/* View mode toggle */}
@@ -299,7 +297,6 @@ const AdminNodeManagementPage: React.FC<RouteComponentProps> = () => {
             </p>
           </div>
         )}
-      </div>
     </ContentArea>
   );
 };

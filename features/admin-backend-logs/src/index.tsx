@@ -91,30 +91,22 @@ const AdminBackendLogsPage: React.FC<RouteComponentProps> = () => {
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
-              {t('admin.pages.backendLogs.title', 'Backend Logs')}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t('admin.pages.backendLogs.description', 'View and filter backend application logs')}
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={fetchLogs}
-            disabled={loading}
-            leftIcon={<FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />}
-          >
-            {t('common.refresh', 'Refresh')}
-          </Button>
-        </div>
-
-        {/* Filters */}
+    <ContentArea
+      title={t('admin.pages.backendLogs.title', 'Backend Logs')}
+      description={t('admin.pages.backendLogs.description', 'View and filter backend application logs')}
+      headerActions={
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={fetchLogs}
+          disabled={loading}
+          leftIcon={<FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />}
+        >
+          {t('common.refresh', 'Refresh')}
+        </Button>
+      }
+    >
+      {/* Filters */}
         <div className="flex items-center gap-3 flex-wrap">
           <input
             type="text"
@@ -239,7 +231,6 @@ const AdminBackendLogsPage: React.FC<RouteComponentProps> = () => {
         {selectedLog && (
           <LogDetailModal log={selectedLog} onClose={() => setSelectedLog(null)} />
         )}
-      </div>
     </ContentArea>
   );
 };

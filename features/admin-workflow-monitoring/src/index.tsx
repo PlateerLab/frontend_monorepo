@@ -200,26 +200,19 @@ const AdminWorkflowMonitoringPage: React.FC<RouteComponentProps> = () => {
   // ─────────────────────────────────────────────────────────────
   if (!selectedWorkflow) {
     return (
-      <ContentArea>
-        <div className="flex flex-col gap-6 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-bold text-foreground">
-                {t('admin.pages.workflowMonitoring.title')}
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                {t('admin.workflowManagement.monitoring.selectWorkflowHint')}
-              </p>
-            </div>
-            <SearchInput
-              value={wfSearch}
-              onChange={setWfSearch}
-              placeholder={t('admin.workflowManagement.monitoring.searchPlaceholder')}
-              className="w-72"
-            />
-          </div>
-
-          {/* Workflow list */}
+      <ContentArea
+        title={t('admin.pages.workflowMonitoring.title')}
+        description={t('admin.workflowManagement.monitoring.selectWorkflowHint')}
+        headerActions={
+          <SearchInput
+            value={wfSearch}
+            onChange={setWfSearch}
+            placeholder={t('admin.workflowManagement.monitoring.searchPlaceholder')}
+            className="w-72"
+          />
+        }
+      >
+        {/* Workflow list */}
           {wfLoading ? (
             <p className="text-sm text-muted-foreground">{t('admin.workflowManagement.monitoring.loading')}</p>
           ) : filteredWorkflows.length === 0 ? (
@@ -246,7 +239,6 @@ const AdminWorkflowMonitoringPage: React.FC<RouteComponentProps> = () => {
               ))}
             </div>
           )}
-        </div>
       </ContentArea>
     );
   }
@@ -255,24 +247,16 @@ const AdminWorkflowMonitoringPage: React.FC<RouteComponentProps> = () => {
   // Render: Monitoring view (workflow selected)
   // ─────────────────────────────────────────────────────────────
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" onClick={handleBack}>
-            {t('admin.workflowManagement.monitoring.back')}
-          </Button>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
-              {selectedWorkflow.workflow_name}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {selectedWorkflow.username} &middot; {new Date(selectedWorkflow.updated_at).toLocaleString('ko-KR')}
-            </p>
-          </div>
-        </div>
-
-        {/* Tabs */}
+    <ContentArea
+      title={selectedWorkflow.workflow_name}
+      description={`${selectedWorkflow.username} \u00b7 ${new Date(selectedWorkflow.updated_at).toLocaleString('ko-KR')}`}
+      headerActions={
+        <Button variant="outline" size="sm" onClick={handleBack}>
+          {t('admin.workflowManagement.monitoring.back')}
+        </Button>
+      }
+    >
+      {/* Tabs */}
         <FilterTabs
           tabs={monitorTabs}
           activeKey={activeTab}
@@ -368,7 +352,6 @@ const AdminWorkflowMonitoringPage: React.FC<RouteComponentProps> = () => {
             )}
           </div>
         )}
-      </div>
     </ContentArea>
   );
 };

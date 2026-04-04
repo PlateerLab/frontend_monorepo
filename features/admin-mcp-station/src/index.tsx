@@ -289,44 +289,35 @@ const AdminMcpStationPage: React.FC<RouteComponentProps> = () => {
   };
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
-              {t('admin.pages.mcpStation.title', 'MCP Station')}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t('admin.pages.mcpStation.subtitle', 'Manage MCP server sessions and monitor tools')}
-            </p>
+    <ContentArea
+      title={t('admin.pages.mcpStation.title', 'MCP Station')}
+      description={t('admin.pages.mcpStation.subtitle', 'Manage MCP server sessions and monitor tools')}
+      headerActions={
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <span className={`w-2.5 h-2.5 rounded-full ${mcpHealthy ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+            <span className={`text-xs font-medium ${mcpHealthy ? 'text-green-600' : 'text-red-600'}`}>
+              {mcpHealthy
+                ? t('admin.pages.mcpStation.status.connected', 'Connected')
+                : t('admin.pages.mcpStation.status.disconnected', 'Disconnected')}
+            </span>
           </div>
-          <div className="flex items-center gap-3">
-            {/* Connection status */}
-            <div className="flex items-center gap-2">
-              <span className={`w-2.5 h-2.5 rounded-full ${mcpHealthy ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-              <span className={`text-xs font-medium ${mcpHealthy ? 'text-green-600' : 'text-red-600'}`}>
-                {mcpHealthy
-                  ? t('admin.pages.mcpStation.status.connected', 'Connected')
-                  : t('admin.pages.mcpStation.status.disconnected', 'Disconnected')}
-              </span>
-            </div>
-            <Button variant="outline" size="sm" onClick={loadSessions} disabled={loading}>
-              {t('common.refresh', 'Refresh')}
+          <Button variant="outline" size="sm" onClick={loadSessions} disabled={loading}>
+            {t('common.refresh', 'Refresh')}
+          </Button>
+          {viewMode === 'dashboard' ? (
+            <Button size="sm" onClick={() => setViewMode('create')}>
+              {t('admin.mcp.newSession', '+ New Session')}
             </Button>
-            {viewMode === 'dashboard' ? (
-              <Button size="sm" onClick={() => setViewMode('create')}>
-                {t('admin.mcp.newSession', '+ New Session')}
-              </Button>
-            ) : (
-              <Button variant="outline" size="sm" onClick={() => setViewMode('dashboard')}>
-                {t('common.back', 'Back')}
-              </Button>
-            )}
-          </div>
+          ) : (
+            <Button variant="outline" size="sm" onClick={() => setViewMode('dashboard')}>
+              {t('common.back', 'Back')}
+            </Button>
+          )}
         </div>
-
-        {/* Stats */}
+      }
+    >
+      {/* Stats */}
         <div className="grid grid-cols-4 gap-4">
           <StatCard
             label={t('admin.pages.mcpStation.stats.totalSessions', 'Total Sessions')}
@@ -580,7 +571,6 @@ const AdminMcpStationPage: React.FC<RouteComponentProps> = () => {
             </div>
           </Modal>
         )}
-      </div>
     </ContentArea>
   );
 };

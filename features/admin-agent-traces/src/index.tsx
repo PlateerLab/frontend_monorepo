@@ -179,7 +179,10 @@ const AdminAgentTracesPage: React.FC<RouteComponentProps> = () => {
   // ── Error state ──
   if (error && traces.length === 0) {
     return (
-      <ContentArea>
+      <ContentArea
+        title={t(`${AT}.title`)}
+        description={t(`${AT}.subtitle`)}
+      >
         <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
           <h3 className="text-base font-semibold text-destructive">
             {t(`${AT}.errorOccurred`)}
@@ -195,17 +198,11 @@ const AdminAgentTracesPage: React.FC<RouteComponentProps> = () => {
 
   // ── Render ──
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-4 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">{t(`${AT}.title`)}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{t(`${AT}.subtitle`)}</p>
-          </div>
-        </div>
-
-        {/* Controls */}
+    <ContentArea
+      title={t(`${AT}.title`)}
+      description={t(`${AT}.subtitle`)}
+    >
+      {/* Controls */}
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/50 px-4 py-3">
           {/* Filter */}
           <select
@@ -262,7 +259,6 @@ const AdminAgentTracesPage: React.FC<RouteComponentProps> = () => {
           onRowClick={(row) => setSelectedTraceId(row.trace_id)}
           className="border rounded-lg"
         />
-      </div>
 
       {/* Detail Modal */}
       {selectedTraceId && (

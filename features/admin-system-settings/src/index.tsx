@@ -101,14 +101,11 @@ const AdminSystemSettingsPage: React.FC<RouteComponentProps> = () => {
 
   // ── Hub view (card grid) ──
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-4 p-6">
-        <div>
-          <h1 className="text-xl font-bold text-foreground">{t(`${SS}.title`)}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t(`${SS}.description`)}</p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <ContentArea
+      title={t(`${SS}.title`)}
+      description={t(`${SS}.description`)}
+    >
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {SETTING_LINKS.map((link) => (
             <button
               key={link.id}
@@ -128,7 +125,6 @@ const AdminSystemSettingsPage: React.FC<RouteComponentProps> = () => {
               <FiChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
             </button>
           ))}
-        </div>
       </div>
     </ContentArea>
   );

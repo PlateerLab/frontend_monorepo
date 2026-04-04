@@ -156,34 +156,26 @@ const AdminMlModelControlPage: React.FC<RouteComponentProps> = () => {
   };
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
-              {t('admin.pages.mlModelControl.title', 'ML Model Control')}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t('admin.pages.mlModelControl.description', 'GPU management and model serving control')}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={refreshData}>
-              {t('common.refresh', 'Refresh')}
+    <ContentArea
+      title={t('admin.pages.mlModelControl.title', 'ML Model Control')}
+      description={t('admin.pages.mlModelControl.description', 'GPU management and model serving control')}
+      headerActions={
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={refreshData}>
+            {t('common.refresh', 'Refresh')}
+          </Button>
+          {models.length > 0 && (
+            <Button variant="danger" size="sm" onClick={handleUnloadAll}>
+              {t('admin.ml.unloadAll', 'Unload All')}
             </Button>
-            {models.length > 0 && (
-              <Button variant="danger" size="sm" onClick={handleUnloadAll}>
-                {t('admin.ml.unloadAll', 'Unload All')}
-              </Button>
-            )}
-            <Button size="sm" onClick={() => setShowForm(v => !v)}>
-              {showForm ? t('common.cancel', 'Cancel') : t('admin.ml.loadModel', '+ Load Model')}
-            </Button>
-          </div>
+          )}
+          <Button size="sm" onClick={() => setShowForm(v => !v)}>
+            {showForm ? t('common.cancel', 'Cancel') : t('admin.ml.loadModel', '+ Load Model')}
+          </Button>
         </div>
-
-        {/* Error Banner */}
+      }
+    >
+      {/* Error Banner */}
         {error && (
           <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 flex items-center justify-between">
             <span>{error}</span>
@@ -409,7 +401,6 @@ const AdminMlModelControlPage: React.FC<RouteComponentProps> = () => {
             </div>
           )}
         </div>
-      </div>
     </ContentArea>
   );
 };

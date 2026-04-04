@@ -260,28 +260,19 @@ const AdminWorkflowManagementPage: React.FC<RouteComponentProps> = () => {
   ], [t, handleDelete, handleDeployApprove, handleDeployReject]);
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
-              {t('admin.pages.workflowManagement.title')}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t('admin.workflowManagement.workflowControl.total')} {filteredWorkflows.length}
-              {t('admin.workflowManagement.workflowControl.unit')}
-            </p>
-          </div>
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder={t('admin.workflowManagement.workflowControl.searchPlaceholder')}
-            className="w-72"
-          />
-        </div>
-
-        {/* Filter tabs */}
+    <ContentArea
+      title={t('admin.pages.workflowManagement.title')}
+      description={`${t('admin.workflowManagement.workflowControl.total')} ${filteredWorkflows.length}${t('admin.workflowManagement.workflowControl.unit')}`}
+      headerActions={
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder={t('admin.workflowManagement.workflowControl.searchPlaceholder')}
+          className="w-72"
+        />
+      }
+    >
+      {/* Filter tabs */}
         <FilterTabs
           tabs={filterTabs}
           activeKey={filter}
@@ -302,8 +293,6 @@ const AdminWorkflowManagementPage: React.FC<RouteComponentProps> = () => {
           onRowClick={(row) => setEditingWorkflow(row)}
           className="border rounded-lg"
         />
-      </div>
-
       {/* Edit Modal */}
       {editingWorkflow && (
         <WorkflowEditModal

@@ -1290,9 +1290,8 @@ const AdminGovControlPolicyPage: React.FC<RouteComponentProps> = () => {
   /*  Main Render                                                      */
   /* ================================================================ */
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Top summary cards */}
+    <ContentArea showHeader={false}>
+      {/* Top summary cards */}
         <div className="grid grid-cols-5 gap-3">
           <StatCard
             label={t('admin.settings.guarder.piis.totalPolicies')}
@@ -1360,7 +1359,6 @@ const AdminGovControlPolicyPage: React.FC<RouteComponentProps> = () => {
         ) : (
           renderForm()
         )}
-      </div>
 
       {/* Delete confirmation modal */}
       {deleteTarget && (

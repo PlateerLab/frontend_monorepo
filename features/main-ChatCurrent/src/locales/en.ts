@@ -2,7 +2,7 @@ import type { TranslationData } from '@xgen/i18n';
 
 export const en: TranslationData = {
   chat: {
-    inputPlaceholder: 'Type a message...',
+    inputPlaceholder: 'Enter your message...',
     send: 'Send',
     sendError: 'Failed to send message',
     retry: 'Retry',
@@ -16,6 +16,15 @@ export const en: TranslationData = {
     stop: 'Stop',
     cancelled: 'Cancelled',
     sessionStarted: '{{workflowName}} workflow has started',
+    emptyState: {
+      title: 'Start your first conversation!',
+      ready: 'workflow is ready'
+    },
+    suggestions: {
+      hello: 'Hello!',
+      help: 'I need help',
+      features: 'What features are available?'
+    },
     error: {
       noSession: 'No active chat session',
       executionFailed: 'An error occurred during execution'

@@ -22,7 +22,8 @@
   --color-success-50: #a6d3a6;
   --color-success-100: #59ac59;
   --color-bg-50: var(--color-muted);
-  --line-50: rgba(0, 0, 0, 0.08);
+  --color-line-50: rgba(0, 0, 0);
+  --line-50: var(--color-line-50);
   --radius-1: var(--radius-md);
   --shadow-basic-50: var(--shadow-md);
 }

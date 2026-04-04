@@ -47,28 +47,21 @@ const AdminSystemHealthPage: React.FC<RouteComponentProps> = () => {
   }, [services]);
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
-              {t('admin.pages.systemHealth.title', 'System Health')}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t('admin.pages.systemHealth.description', 'Service health and version compatibility')}
-            </p>
-          </div>
-          <button
-            onClick={fetchData}
-            disabled={loading}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm border border-border rounded-md hover:bg-muted transition-colors disabled:opacity-50"
-          >
-            <FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            {t('common.refresh', 'Refresh')}
-          </button>
-        </div>
-
-        {loading && services.length === 0 ? (
+    <ContentArea
+      title={t('admin.pages.systemHealth.title', 'System Health')}
+      description={t('admin.pages.systemHealth.description', 'Service health and version compatibility')}
+      headerActions={
+        <button
+          onClick={fetchData}
+          disabled={loading}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm border border-border rounded-md hover:bg-muted transition-colors disabled:opacity-50"
+        >
+          <FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          {t('common.refresh', 'Refresh')}
+        </button>
+      }
+    >
+      {loading && services.length === 0 ? (
           <div className="flex items-center justify-center h-64">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
@@ -87,7 +80,6 @@ const AdminSystemHealthPage: React.FC<RouteComponentProps> = () => {
             />
           </>
         )}
-      </div>
     </ContentArea>
   );
 };

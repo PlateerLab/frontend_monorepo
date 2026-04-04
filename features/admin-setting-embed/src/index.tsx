@@ -222,7 +222,10 @@ const AdminSettingEmbedPage: React.FC<RouteComponentProps> = () => {
 
   if (loading && configData.length === 0) {
     return (
-      <ContentArea>
+      <ContentArea
+        title={t(`${SS}.title`)}
+        description={t(`${SS}.description`)}
+      >
         <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted-foreground">
           <FiRefreshCw className="h-8 w-8 animate-spin" />
           <p className="text-sm">{t(`${SS}.loading`)}</p>
@@ -232,15 +235,10 @@ const AdminSettingEmbedPage: React.FC<RouteComponentProps> = () => {
   }
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-4 p-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-xl font-bold text-foreground">{t(`${SS}.title`)}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t(`${SS}.description`)}</p>
-        </div>
-
-        {/* Tabs */}
+    <ContentArea
+      title={t(`${SS}.title`)}
+      description={t(`${SS}.description`)}
+      toolbar={
         <div className="flex gap-1 border-b border-border">
           {TABS.map((tab) => (
             <button
@@ -256,16 +254,15 @@ const AdminSettingEmbedPage: React.FC<RouteComponentProps> = () => {
             </button>
           ))}
         </div>
-
-        {/* Panel */}
-        <BaseConfigPanel
-          configData={configData}
-          fieldConfigs={currentConfig.fields}
-          filterPrefix={currentConfig.filterPrefix}
-          onConfigChange={loadConfigs}
-          showTestConnection={false}
-        />
-      </div>
+      }
+    >
+      <BaseConfigPanel
+        configData={configData}
+        fieldConfigs={currentConfig.fields}
+        filterPrefix={currentConfig.filterPrefix}
+        onConfigChange={loadConfigs}
+        showTestConnection={false}
+      />
     </ContentArea>
   );
 };

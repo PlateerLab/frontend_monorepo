@@ -283,19 +283,11 @@ const AdminGovOperationHistoryPage: React.FC<RouteComponentProps> = () => {
   /* ── Render ── */
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-xl font-bold text-foreground">
-            {t('admin.pages.govOperationHistory.title', '운영 이력')}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t('admin.pages.govOperationHistory.description', 'AI 거버넌스 운영 로그 및 활동 추적')}
-          </p>
-        </div>
-
-        {/* Stats cards */}
+    <ContentArea
+      title={t('admin.pages.govOperationHistory.title', '운영 이력')}
+      description={t('admin.pages.govOperationHistory.description', 'AI 거버넌스 운영 로그 및 활동 추적')}
+    >
+      {/* Stats cards */}
         <div className="grid grid-cols-4 gap-4">
           {statCards.map((s) => (
             <StatCard
@@ -484,7 +476,6 @@ const AdminGovOperationHistoryPage: React.FC<RouteComponentProps> = () => {
             </div>
           </div>
         )}
-      </div>
 
       {/* Detail modal */}
       <Modal

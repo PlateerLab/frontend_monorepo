@@ -605,18 +605,11 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
   /* -- Render -- */
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        <div>
-          <h1 className="text-xl font-bold text-foreground">
-            {t('admin.pages.govAuditTracking.title', 'Audit Tracking')}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t('admin.pages.govAuditTracking.description', 'Comprehensive audit trail and workflow tracking for AI governance')}
-          </p>
-        </div>
-
-        {selectedWorkflow ? (
+    <ContentArea
+      title={t('admin.pages.govAuditTracking.title', 'Audit Tracking')}
+      description={t('admin.pages.govAuditTracking.description', 'Comprehensive audit trail and workflow tracking for AI governance')}
+    >
+      {selectedWorkflow ? (
           <WorkflowDetailView selected={selectedWorkflow} onBack={handleBack} />
         ) : (
           <>
@@ -738,8 +731,7 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
               </table>
             </div>
           </>
-        )}
-      </div>
+      )}
     </ContentArea>
   );
 };

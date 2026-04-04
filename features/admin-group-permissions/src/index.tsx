@@ -336,13 +336,10 @@ const AdminGroupPermissionsPage: React.FC<RouteComponentProps> = () => {
   );
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        <h1 className="text-xl font-bold text-foreground">
-          {t('admin.pages.groupPermissions.title')}
-        </h1>
-
-        {!selectedGroup ? (
+    <ContentArea
+      title={t('admin.pages.groupPermissions.title')}
+    >
+      {!selectedGroup ? (
           /* ─── Groups List View ─── */
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -412,8 +409,6 @@ const AdminGroupPermissionsPage: React.FC<RouteComponentProps> = () => {
             />
           </div>
         )}
-      </div>
-
       {/* Modals */}
       <GroupCreateModal
         isOpen={showCreateModal}

@@ -94,39 +94,31 @@ const AdminDataScraperPage: React.FC<RouteComponentProps> = () => {
   ];
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
-              {t('admin.pages.dataScraper.title', 'Data Scraper')}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t('admin.pages.dataScraper.description', 'Manage web scraping sessions')}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setShowCreate(true)}
-              leftIcon={<FiPlus className="w-4 h-4" />}
-            >
-              New Session
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={fetchSessions}
-              disabled={loading}
-            >
-              <FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            </Button>
-          </div>
+    <ContentArea
+      title={t('admin.pages.dataScraper.title', 'Data Scraper')}
+      description={t('admin.pages.dataScraper.description', 'Manage web scraping sessions')}
+      headerActions={
+        <div className="flex items-center gap-2">
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setShowCreate(true)}
+            leftIcon={<FiPlus className="w-4 h-4" />}
+          >
+            New Session
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={fetchSessions}
+            disabled={loading}
+          >
+            <FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </Button>
         </div>
-
-        {/* Stats */}
+      }
+    >
+      {/* Stats */}
         <div className="grid grid-cols-5 gap-4 max-lg:grid-cols-3 max-sm:grid-cols-2">
           {statCards.map(({ label, value }, idx) => (
             <StatCard
@@ -233,7 +225,6 @@ const AdminDataScraperPage: React.FC<RouteComponentProps> = () => {
             </tbody>
           </table>
         </div>
-      </div>
     </ContentArea>
   );
 };

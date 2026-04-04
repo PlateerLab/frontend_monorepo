@@ -176,27 +176,19 @@ const AdminUserCreatePage: React.FC<RouteComponentProps> = () => {
   );
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
-              {t('admin.pages.userCreate.title')}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t('admin.pages.userCreate.description')}
-            </p>
-          </div>
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder={t('admin.userManagement.userList.searchPlaceholder')}
-            className="w-72"
-          />
-        </div>
-
-        {/* Pending count */}
+    <ContentArea
+      title={t('admin.pages.userCreate.title')}
+      description={t('admin.pages.userCreate.description')}
+      headerActions={
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder={t('admin.userManagement.userList.searchPlaceholder')}
+          className="w-72"
+        />
+      }
+    >
+      {/* Pending count */}
         <div className="flex items-center gap-2">
           <StatusBadge variant="warning">
             {t('admin.userManagement.userCreate.totalPending', {
@@ -214,7 +206,6 @@ const AdminUserCreatePage: React.FC<RouteComponentProps> = () => {
           emptyMessage={t('admin.userManagement.userCreate.noPendingUsers')}
           className="border rounded-lg"
         />
-      </div>
     </ContentArea>
   );
 };

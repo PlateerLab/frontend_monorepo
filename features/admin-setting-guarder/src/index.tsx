@@ -192,16 +192,12 @@ const AdminSettingGuarderPage: React.FC<RouteComponentProps> = () => {
   const selectCls = inputCls;
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-xl font-bold text-foreground">{t(`${SS}.title`)}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t(`${SS}.description`)}</p>
-        </div>
-
-        {/* Section 1: Model Config */}
-        <section>
+    <ContentArea
+      title={t(`${SS}.title`)}
+      description={t(`${SS}.description`)}
+    >
+      {/* Section 1: Model Config */}
+      <section>
           <h2 className="mb-3 text-base font-semibold text-foreground">{t(`${SS}.modelConfig.title`)}</h2>
           {configLoading ? (
             <div className="flex items-center justify-center rounded-lg border border-border bg-card p-8">
@@ -398,8 +394,7 @@ const AdminSettingGuarderPage: React.FC<RouteComponentProps> = () => {
               </table>
             </div>
           )}
-        </section>
-      </div>
+      </section>
     </ContentArea>
   );
 };

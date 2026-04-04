@@ -12,9 +12,36 @@
 // ─── Utilities ───
 export { cn } from './lib/utils';
 
+// Chat Components — 공유 채팅 인터페이스
+export {
+  ChatPanel,
+  ChatMessageList,
+  ChatMessageItem,
+  ChatInput,
+  ChatEmptyState,
+  ChatTypingIndicator,
+  ChatUserIcon,
+  ChatBotIcon,
+  ChatSendIcon,
+  ChatBubbleIcon,
+} from './chat';
+export type {
+  ChatPanelProps,
+  ChatPanelMessage,
+  ChatPanelSender,
+  ChatPanelMessageStatus,
+  ChatPanelAttachment,
+  ChatPanelVariant,
+  ChatMessageItemProps,
+  ChatMessageListProps,
+  ChatInputProps,
+  ChatEmptyStateProps as ChatPanelEmptyStateProps,
+  ChatTypingIndicatorProps,
+} from './chat';
+
 // Layout Components
 export { ContentArea } from './layout/content-area';
-export type { ContentAreaProps, ContentAreaVariant } from './layout/content-area';
+export type { ContentAreaProps } from './layout/content-area';
 
 export { ResizablePanel } from './layout/resizable-panel';
 export type { ResizablePanelProps } from './layout/resizable-panel';

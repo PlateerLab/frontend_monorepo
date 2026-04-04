@@ -1,21 +1,17 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import type { RouteComponentProps, MainFeatureModule, ChatMessage, ChatMessageSender, CurrentChatData } from '@xgen/types';
-import { ContentArea } from '@xgen/ui';
+import type { RouteComponentProps, MainFeatureModule, ChatMessage, ChatMessageSender } from '@xgen/types';
+import { ChatPanel, ChatEmptyState, ChatBubbleIcon, ContentArea } from '@xgen/ui';
+import type { ChatPanelMessage } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import './locales';
-import { createApiClient } from '@xgen/api-client';
+import { getWorkflowIOLogs, executeWorkflowStream as executeWorkflowStreamApi } from '@xgen/api-client';
 
 import type {
   ChatCurrentPageProps,
   StoredChatData,
   IOLog,
-  IOLogsResponse,
-  WorkflowExecutionRequest,
-  SSEEventData,
-  NodeStatusEvent,
-  ToolEvent,
 } from './types';
 
 // ─────────────────────────────────────────────────────────────
@@ -23,56 +19,18 @@ import type {
 // ─────────────────────────────────────────────────────────────
 
 const STORAGE_KEY_CURRENT_CHAT = 'xgen_current_chat';
-const API_STREAMING_ENDPOINT = '/api/workflow/execute/based_id/stream';
 
 // ─────────────────────────────────────────────────────────────
-// Icons
+// Page-level Icons (header, workflow info — NOT shared)
 // ─────────────────────────────────────────────────────────────
 
-const WorkflowIcon: React.FC = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+const WorkflowIcon: React.FC<{ size?: number }> = ({ size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="2" y="2" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
     <rect x="12" y="2" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
     <rect x="2" y="12" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
     <rect x="12" y="12" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
     <path d="M8 5H12M15 8V12M8 15H12M5 8V12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-  </svg>
-);
-
-const UserIcon: React.FC = () => (
-  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M15 15.75V14.25C15 13.4544 14.6839 12.6913 14.1213 12.1287C13.5587 11.5661 12.7956 11.25 12 11.25H6C5.20435 11.25 4.44129 11.5661 3.87868 12.1287C3.31607 12.6913 3 13.4544 3 14.25V15.75M12 5.25C12 6.90685 10.6569 8.25 9 8.25C7.34315 8.25 6 6.90685 6 5.25C6 3.59315 7.34315 2.25 9 2.25C10.6569 2.25 12 3.59315 12 5.25Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const BotIcon: React.FC = () => (
-  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M9 1.5V3M6 6.75H6.0075M12 6.75H12.0075M5.25 10.5C5.25 10.5 6.375 12 9 12C11.625 12 12.75 10.5 12.75 10.5M13.5 13.5H4.5C3.67157 13.5 3 12.8284 3 12V6C3 5.17157 3.67157 4.5 4.5 4.5H13.5C14.3284 4.5 15 5.17157 15 6V12C15 12.8284 14.3284 13.5 13.5 13.5ZM6.75 16.5H11.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const SendIcon: React.FC = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M18.333 1.667L9.167 10.833M18.333 1.667L12.5 18.333L9.167 10.833M18.333 1.667L1.667 7.5L9.167 10.833" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const PaperclipIcon: React.FC = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M17.158 9.342L9.575 16.925C8.66352 17.8365 7.43328 18.3469 6.15 18.3469C4.86672 18.3469 3.63648 17.8365 2.725 16.925C1.81352 16.0135 1.30313 14.7833 1.30313 13.5C1.30313 12.2167 1.81352 10.9865 2.725 10.075L10.308 2.492C10.9178 1.88216 11.7443 1.54004 12.604 1.54004C13.4637 1.54004 14.2902 1.88216 14.9 2.492C15.5098 3.10184 15.852 3.92826 15.852 4.788C15.852 5.64774 15.5098 6.47416 14.9 7.084L7.317 14.667C7.01208 14.9719 6.59887 15.143 6.169 15.143C5.73913 15.143 5.32592 14.9719 5.021 14.667C4.71608 14.3621 4.54502 13.9489 4.54502 13.519C4.54502 13.0891 4.71608 12.6759 5.021 12.371L12.017 5.375" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const CloseIcon: React.FC = () => (
-  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M9 3L3 9M3 3L9 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const FileIcon: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M8.167 1.167H3.5C3.19058 1.167 2.89383 1.28992 2.67504 1.50871C2.45625 1.7275 2.333 2.02425 2.333 2.333V11.667C2.333 11.976 2.45625 12.273 2.67504 12.492C2.89383 12.711 3.19058 12.833 3.5 12.833H10.5C10.809 12.833 11.106 12.711 11.325 12.492C11.544 12.273 11.667 11.976 11.667 11.667V4.667L8.167 1.167Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M8.167 1.167V4.667H11.667" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
@@ -82,21 +40,25 @@ const HistoryIcon: React.FC = () => (
   </svg>
 );
 
-const AlertIcon: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M7 4.667V7M7 9.333H7.006M12.833 7C12.833 10.222 10.222 12.833 7 12.833C3.778 12.833 1.167 10.222 1.167 7C1.167 3.778 3.778 1.167 7 1.167C10.222 1.167 12.833 3.778 12.833 7Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const StopIcon: React.FC = () => (
-  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="3" y="3" width="12" height="12" rx="2" fill="currentColor"/>
-  </svg>
-);
-
 const NewChatIcon: React.FC = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M9 3.75V14.25M3.75 9H14.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const SettingsIcon: React.FC = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2"/>
+    <path d="M11.667 7C11.667 6.728 11.646 6.461 11.605 6.2L13.019 5.078L11.852 3.047L10.171 3.655C9.748 3.307 9.27 3.028 8.75 2.833L8.417 1H6.083L5.75 2.833C5.23 3.028 4.752 3.307 4.329 3.655L2.648 3.047L1.481 5.078L2.895 6.2C2.854 6.461 2.833 6.728 2.833 7C2.833 7.272 2.854 7.539 2.895 7.8L1.481 8.922L2.648 10.953L4.329 10.345C4.752 10.693 5.23 10.972 5.75 11.167L6.083 13H8.417L8.75 11.167C9.27 10.972 9.748 10.693 10.171 10.345L11.852 10.953L13.019 8.922L11.605 7.8C11.646 7.539 11.667 7.272 11.667 7Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const ChevronIcon: React.FC<{ expanded?: boolean }> = ({ expanded }) => (
+  <svg
+    width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"
+    className={`transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+  >
+    <path d="M3.5 5.25L7 8.75L10.5 5.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
@@ -104,7 +66,6 @@ const NewChatIcon: React.FC = () => (
 // Utilities
 // ─────────────────────────────────────────────────────────────
 
-/** 현재 채팅 데이터 불러오기 */
 const loadCurrentChatData = (): StoredChatData | null => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY_CURRENT_CHAT);
@@ -114,7 +75,6 @@ const loadCurrentChatData = (): StoredChatData | null => {
   }
 };
 
-/** 현재 채팅 데이터 삭제 */
 const clearCurrentChatData = (): void => {
   try {
     localStorage.removeItem(STORAGE_KEY_CURRENT_CHAT);
@@ -123,103 +83,55 @@ const clearCurrentChatData = (): void => {
   }
 };
 
-/** 고유 메시지 ID 생성 */
 const generateMessageId = (): string => {
   return `msg_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 };
 
-/** 시간 포맷팅 */
-const formatTime = (dateString: string): string => {
-  const date = new Date(dateString);
-  return date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-};
-
 // ─────────────────────────────────────────────────────────────
-// Message Component
+// Workflow Info Panel (collapsible) — page-specific
 // ─────────────────────────────────────────────────────────────
 
-interface MessageItemProps {
-  message: ChatMessage;
-  onRetry?: () => void;
+interface WorkflowInfoPanelProps {
+  workflowName: string;
+  interactionId: string;
 }
 
-const MessageItem: React.FC<MessageItemProps> = ({ message, onRetry }) => {
-  const { t } = useTranslation();
-
-  if (message.sender === 'system') {
-    return (
-      <div className="flex gap-4 max-w-[90%] self-center">
-        <div className="flex flex-col gap-1">
-          <div className="bg-muted text-muted-foreground text-xs text-center px-4 py-2 rounded-xl">
-            {message.content}
-          </div>
-        </div>
-      </div>
-    );
-  }
+const WorkflowInfoPanel: React.FC<WorkflowInfoPanelProps> = ({ workflowName, interactionId }) => {
+  const [expanded, setExpanded] = useState(true);
 
   return (
-    <div className={`flex gap-4 max-w-[80%] ${message.sender === 'user' ? 'self-end flex-row-reverse' : 'self-start'}`}>
-      <div className={`w-9 h-9 rounded-full shrink-0 flex items-center justify-center [&_svg]:w-[18px] [&_svg]:h-[18px] ${message.sender === 'user' ? 'bg-primary text-white' : 'bg-gradient-to-br from-secondary to-primary text-white'}`}>
-        {message.sender === 'user' ? <UserIcon /> : <BotIcon />}
-      </div>
-      <div className="flex flex-col gap-1">
-        <div
-          className={`px-6 py-4 rounded-xl leading-relaxed text-sm ${
-            message.sender === 'user'
-              ? 'bg-primary text-white rounded-br-sm'
-              : 'bg-white border border-border text-foreground rounded-bl-sm'
-          } ${message.status === 'error' ? 'bg-red-500/10 border-red-500' : ''} ${message.status === 'streaming' ? 'after:content-["▋"] after:animate-pulse after:text-primary' : ''}`}
-        >
-          {message.content}
-          {message.status === 'streaming' && <span className="inline-block ml-0.5 animate-pulse text-primary">▊</span>}
+    <div className="border-b border-border bg-muted/30 shrink-0">
+      <button
+        className="flex items-center justify-between w-full px-6 py-2 text-left bg-transparent border-none cursor-pointer hover:bg-muted/50 transition-colors"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="font-medium">{workflowName}</span>
+          <span className="text-muted-foreground/50">·</span>
+          <span className="text-muted-foreground/50">1 agents</span>
         </div>
-        {message.attachments && message.attachments.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-2">
-            {message.attachments.map((attachment) => (
-              <div key={attachment.id} className="flex items-center gap-1 px-2 py-1 bg-muted rounded text-xs text-muted-foreground [&_svg]:w-3.5 [&_svg]:h-3.5">
-                <FileIcon />
-                <span>{attachment.name}</span>
-              </div>
-            ))}
+        <ChevronIcon expanded={expanded} />
+      </button>
+      {expanded && (
+        <div className="px-6 pb-2.5">
+          <div className="flex items-center justify-between px-3 py-2 bg-white rounded-lg border border-border/50">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-xs font-medium text-foreground">Agent Xgen</span>
+              <span className="text-[10px] text-muted-foreground/50 font-mono truncate">{interactionId}</span>
+            </div>
+            <div className="flex items-center justify-center w-6 h-6 text-muted-foreground/40 cursor-pointer hover:text-muted-foreground transition-colors [&_svg]:w-3.5 [&_svg]:h-3.5">
+              <SettingsIcon />
+            </div>
           </div>
-        )}
-        <span className={`text-xs text-muted-foreground/60 ${message.sender === 'user' ? 'text-right' : ''}`}>{formatTime(message.createdAt)}</span>
-        {message.status === 'error' && (
-          <div className="flex items-center gap-1 text-xs text-red-500 mt-1 [&_svg]:w-3.5 [&_svg]:h-3.5">
-            <AlertIcon />
-            <span>{message.metadata?.error || t('chat.sendError')}</span>
-            {onRetry && (
-              <button className="px-2 py-0.5 bg-transparent border border-red-500 rounded text-red-500 text-xs cursor-pointer transition-all hover:bg-red-500/10" onClick={onRetry}>
-                {t('chat.retry')}
-              </button>
-            )}
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
 
 // ─────────────────────────────────────────────────────────────
-// Typing Indicator
-// ─────────────────────────────────────────────────────────────
-
-const TypingIndicator: React.FC = () => (
-  <div className="flex gap-4 max-w-[80%] self-start">
-    <div className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center bg-gradient-to-br from-secondary to-primary text-white [&_svg]:w-[18px] [&_svg]:h-[18px]">
-      <BotIcon />
-    </div>
-    <div className="flex items-center gap-1 px-6 py-4 bg-white border border-border rounded-xl rounded-bl-sm">
-      <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:0s]" />
-      <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:0.2s]" />
-      <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:0.4s]" />
-    </div>
-  </div>
-);
-
-// ─────────────────────────────────────────────────────────────
-// Chat Current Page Component
+// Chat Current Page — page-level orchestrator
 // ─────────────────────────────────────────────────────────────
 
 const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
@@ -227,44 +139,50 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
   onChatEnd,
 }) => {
   const { t } = useTranslation();
-  const api = createApiClient();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // ─────────────────────────────────────────────────────────────
   // State
-  // ─────────────────────────────────────────────────────────────
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [chatData, setChatData] = useState<StoredChatData | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [inputContent, setInputContent] = useState('');
   const [attachments, setAttachments] = useState<File[]>([]);
-  const [isComposing, setIsComposing] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
 
-  // ─────────────────────────────────────────────────────────────
-  // Initialize: Load chat data and history
-  // ─────────────────────────────────────────────────────────────
+  // Convert ChatMessage[] → ChatPanelMessage[]
+  const panelMessages: ChatPanelMessage[] = useMemo(
+    () =>
+      messages.map((m) => ({
+        id: m.id,
+        sender: m.sender,
+        content: m.content,
+        createdAt: m.createdAt,
+        status: m.status,
+        attachments: m.attachments?.map((a) => ({
+          id: a.id,
+          name: a.name,
+          type: a.type,
+          size: a.size,
+        })),
+        errorMessage: m.errorMessage,
+      })),
+    [messages],
+  );
+
+  // ── Initialize ────────────────────────────────────────────
 
   const loadChatHistory = useCallback(async (data: StoredChatData) => {
     try {
-      // Load IO logs for this interaction
-      const result = await api.get<IOLogsResponse>(
-        `/api/workflow/io-logs?interaction_id=${data.interactionId}&limit=50`
+      const result = await getWorkflowIOLogs(
+        data.workflowName,
+        data.workflowId,
+        data.interactionId,
       );
 
-      const logs = result?.data?.logs || [];
-
-      // Convert IO logs to messages
+      const logs = result?.logs || [];
       const loadedMessages: ChatMessage[] = [];
 
-      // Add system message for session start
       loadedMessages.push({
         id: generateMessageId(),
         sender: 'system' as ChatMessageSender,
@@ -273,9 +191,7 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
         status: 'sent',
       });
 
-      // Convert logs to messages
       logs.forEach((log: IOLog) => {
-        // User message
         if (log.input_data) {
           loadedMessages.push({
             id: `io_${log.io_id}_input`,
@@ -285,8 +201,6 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
             status: 'sent',
           });
         }
-
-        // Assistant message
         if (log.output_data) {
           loadedMessages.push({
             id: `io_${log.io_id}_output`,
@@ -302,66 +216,38 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
       setMessages(loadedMessages);
     } catch (err) {
       console.error('Failed to load chat history:', err);
-      // Still show the session but without history
-      setMessages([
-        {
-          id: generateMessageId(),
-          sender: 'system',
-          content: t('chat.sessionStarted', { workflowName: data.workflowName }),
-          createdAt: data.startedAt,
-          status: 'sent',
-        },
-      ]);
+      setMessages([{
+        id: generateMessageId(),
+        sender: 'system',
+        content: t('chat.sessionStarted', { workflowName: data.workflowName }),
+        createdAt: data.startedAt,
+        status: 'sent',
+      }]);
     }
-  }, [api, t]);
+  }, [t]);
 
   useEffect(() => {
     const data = loadCurrentChatData();
-
     if (!data) {
       setError(t('chat.error.noSession'));
       setLoading(false);
       return;
     }
-
     setChatData(data);
     loadChatHistory(data).finally(() => setLoading(false));
   }, [loadChatHistory, t]);
 
-  // ─────────────────────────────────────────────────────────────
-  // Auto-scroll to bottom
-  // ─────────────────────────────────────────────────────────────
+  // ── Workflow Execution (Streaming) ────────────────────────
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isExecuting]);
-
-  // ─────────────────────────────────────────────────────────────
-  // Auto-resize textarea
-  // ─────────────────────────────────────────────────────────────
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
-    }
-  }, [inputContent]);
-
-  // ─────────────────────────────────────────────────────────────
-  // Workflow Execution (Streaming)
-  // ─────────────────────────────────────────────────────────────
-
-  const executeWorkflowStream = useCallback(
+  const executeWorkflow = useCallback(
     async (message: string) => {
       if (!chatData) return;
 
       setIsExecuting(true);
       setIsStreaming(true);
 
-      // Create user message
-      const userMessageId = generateMessageId();
       const userMessage: ChatMessage = {
-        id: userMessageId,
+        id: generateMessageId(),
         sender: 'user',
         content: message,
         createdAt: new Date().toISOString(),
@@ -374,7 +260,6 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
         })),
       };
 
-      // Create streaming assistant message placeholder
       const assistantMessageId = generateMessageId();
       const assistantMessage: ChatMessage = {
         id: assistantMessageId,
@@ -385,180 +270,95 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
       };
 
       setMessages((prev) => [...prev, userMessage, assistantMessage]);
-      setStreamingMessageId(assistantMessageId);
       setAttachments([]);
 
-      // Prepare request
-      const requestBody: WorkflowExecutionRequest = {
-        workflow_id: chatData.workflowId,
-        workflow_name: chatData.workflowName,
-        input_data: message,
-        interaction_id: chatData.interactionId,
-        user_id: chatData.userId,
-      };
-
-      // Create abort controller
       abortControllerRef.current = new AbortController();
+      let accumulatedContent = '';
 
       try {
-        const response = await api.post(API_STREAMING_ENDPOINT, requestBody, {
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'text/event-stream',
-          },
+        await executeWorkflowStreamApi({
+          workflowName: chatData.workflowName,
+          workflowId: chatData.workflowId,
+          inputData: message,
+          interactionId: chatData.interactionId,
+          user_id: chatData.userId,
           signal: abortControllerRef.current.signal,
-          responseType: 'stream',
+          onData: (content) => {
+            const text = typeof content === 'string' ? content : JSON.stringify(content);
+            accumulatedContent += text;
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === assistantMessageId ? { ...msg, content: accumulatedContent } : msg
+              )
+            );
+          },
+          onEnd: () => {
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === assistantMessageId ? { ...msg, status: 'sent' as const } : msg
+              )
+            );
+          },
+          onError: (err) => {
+            console.error('Workflow execution failed:', err);
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === assistantMessageId
+                  ? { ...msg, status: 'error' as const, content: t('chat.error.executionFailed'), errorMessage: (err as Error).message }
+                  : msg
+              )
+            );
+          },
         });
 
-        // Handle streaming response
-        const reader = (response.data as ReadableStream).getReader();
-        const decoder = new TextDecoder('utf-8');
-        let buffer = '';
-        let accumulatedContent = '';
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value, { stream: true });
-          buffer += chunk;
-
-          // Parse SSE events
-          const blocks = buffer.split('\n\n');
-          buffer = blocks.pop() || '';
-
-          for (const block of blocks) {
-            const lines = block.split('\n');
-            let eventType = 'message';
-            let data: string | null = null;
-
-            for (const line of lines) {
-              if (line.startsWith('event: ')) {
-                eventType = line.substring(7).trim();
-              } else if (line.startsWith('data: ')) {
-                data = line.substring(6).trim();
-              }
-            }
-
-            if (data) {
-              try {
-                const parsedData: SSEEventData = JSON.parse(data);
-
-                if (parsedData.type === 'data' && parsedData.content) {
-                  accumulatedContent += parsedData.content;
-                  setMessages((prev) =>
-                    prev.map((msg) =>
-                      msg.id === assistantMessageId
-                        ? { ...msg, content: accumulatedContent }
-                        : msg
-                    )
-                  );
-                } else if (parsedData.type === 'summary' && parsedData.data?.outputs) {
-                  // Non-streaming response
-                  const output = parsedData.data.outputs[0];
-                  accumulatedContent = typeof output === 'string' ? output : JSON.stringify(output);
-                  setMessages((prev) =>
-                    prev.map((msg) =>
-                      msg.id === assistantMessageId
-                        ? { ...msg, content: accumulatedContent }
-                        : msg
-                    )
-                  );
-                } else if (parsedData.type === 'error') {
-                  throw new Error(parsedData.error || 'Unknown error');
-                }
-              } catch (parseError) {
-                console.error('Failed to parse SSE data:', parseError);
-              }
-            }
-          }
+        if (abortControllerRef.current?.signal.aborted) {
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMessageId
+                ? { ...msg, content: msg.content || t('chat.cancelled'), status: 'sent' as const }
+                : msg
+            )
+          );
         }
-
-        // Mark message as sent
+      } catch (err: unknown) {
+        console.error('Workflow execution failed:', err);
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === assistantMessageId
-              ? { ...msg, status: 'sent' as const }
+              ? { ...msg, status: 'error' as const, content: t('chat.error.executionFailed'), errorMessage: (err as Error).message }
               : msg
           )
         );
-      } catch (err: unknown) {
-        if ((err as Error).name === 'AbortError') {
-          // User cancelled
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === assistantMessageId
-                ? {
-                    ...msg,
-                    content: msg.content || t('chat.cancelled'),
-                    status: 'sent' as const,
-                  }
-                : msg
-            )
-          );
-        } else {
-          console.error('Workflow execution failed:', err);
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === assistantMessageId
-                ? {
-                    ...msg,
-                    status: 'error' as const,
-                    content: t('chat.error.executionFailed'),
-                    metadata: { error: (err as Error).message },
-                  }
-                : msg
-            )
-          );
-        }
       } finally {
         setIsExecuting(false);
         setIsStreaming(false);
-        setStreamingMessageId(null);
         abortControllerRef.current = null;
       }
     },
-    [chatData, attachments, api, t]
+    [chatData, attachments, t],
   );
 
-  // ─────────────────────────────────────────────────────────────
-  // Event Handlers
-  // ─────────────────────────────────────────────────────────────
+  // ── Event Handlers ────────────────────────────────────────
 
-  const handleSend = useCallback(() => {
-    if (!inputContent.trim() || isExecuting) return;
-
-    const message = inputContent.trim();
-    setInputContent('');
-    executeWorkflowStream(message);
-  }, [inputContent, isExecuting, executeWorkflowStream]);
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
+  const handleSend = useCallback(
+    (text: string) => { executeWorkflow(text); },
+    [executeWorkflow],
+  );
 
   const handleStop = useCallback(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
+    abortControllerRef.current?.abort();
   }, []);
 
-  const handleAttach = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setAttachments((prev) => [...prev, ...files]);
-    e.target.value = '';
-  };
-
-  const handleRemoveAttachment = (index: number) => {
-    setAttachments((prev) => prev.filter((_, i) => i !== index));
-  };
+  const handleRetry = useCallback(
+    (messageId: string) => {
+      const msg = messages.find((m) => m.id === messageId);
+      if (msg && msg.sender === 'user') {
+        setMessages((prev) => prev.filter((m) => m.id !== messageId));
+        executeWorkflow(msg.content);
+      }
+    },
+    [messages, executeWorkflow],
+  );
 
   const handleNewChat = useCallback(() => {
     clearCurrentChatData();
@@ -569,175 +369,121 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
     onNavigate?.('chat-history');
   }, [onNavigate]);
 
-  const handleRetry = useCallback(
-    (messageId: string) => {
-      const message = messages.find((m) => m.id === messageId);
-      if (message && message.sender === 'user') {
-        // Remove the failed response and retry
-        setMessages((prev) => prev.filter((m) => m.id !== messageId));
-        executeWorkflowStream(message.content);
-      }
-    },
-    [messages, executeWorkflowStream]
-  );
-
-  // ─────────────────────────────────────────────────────────────
-  // Render
-  // ─────────────────────────────────────────────────────────────
+  // ── Render: Loading ───────────────────────────────────────
 
   if (loading) {
     return (
-      <ContentArea title={t('chat.currentChat')}>
-        <div className="flex flex-col h-full bg-muted">
-          <div className="flex flex-col items-center justify-center gap-4 h-full text-muted-foreground/60 [&_p]:m-0 [&_p]:text-sm">
-            <div className="w-10 h-10 border-3 border-border border-t-primary rounded-full animate-spin" />
-            <p>{t('common.loading')}</p>
-          </div>
-        </div>
+      <ContentArea showHeader={false} contentPadding={false} contentClassName="flex flex-col items-center justify-center gap-3 text-muted-foreground/60">
+        <div className="w-8 h-8 border-[3px] border-border border-t-primary rounded-full animate-spin" />
+        <p className="m-0 text-sm">{t('common.loading')}</p>
       </ContentArea>
     );
   }
+
+  // ── Render: Error / No session ────────────────────────────
 
   if (error || !chatData) {
     return (
-      <ContentArea title={t('chat.currentChat')}>
-        <div className="flex flex-col h-full bg-muted">
-          <div className="flex flex-col items-center justify-center gap-4 h-full p-12 text-center [&_svg]:w-12 [&_svg]:h-12 [&_svg]:text-muted-foreground/60 [&_p]:m-0 [&_p]:text-base [&_p]:text-muted-foreground [&_button]:px-6 [&_button]:py-2 [&_button]:text-sm [&_button]:font-medium [&_button]:text-white [&_button]:bg-primary [&_button]:border-none [&_button]:rounded-lg [&_button]:cursor-pointer [&_button]:transition-colors hover:[&_button]:bg-primary/90">
-            <AlertIcon />
-            <p>{error || t('chat.error.noSession')}</p>
-            <button onClick={() => onNavigate?.('new-chat')}>
-              {t('chat.startNewChat')}
-            </button>
-          </div>
+      <ContentArea showHeader={false} contentPadding={false} contentClassName="flex flex-col items-center justify-center gap-4 text-center px-8">
+        <div className="text-muted-foreground/30 [&_svg]:w-12 [&_svg]:h-12">
+          <ChatBubbleIcon />
         </div>
+        <p className="m-0 text-base text-muted-foreground">{error || t('chat.error.noSession')}</p>
+        <button
+          className="px-6 py-2.5 text-sm font-medium text-white bg-primary border-none rounded-lg cursor-pointer transition-colors hover:bg-primary/90"
+          onClick={() => onNavigate?.('new-chat')}
+        >
+          {t('chat.startNewChat')}
+        </button>
       </ContentArea>
     );
   }
 
+  // ── Empty state for ChatPanel ─────────────────────────────
+
+  const emptyChatState = (
+    <ChatEmptyState
+      variant="full"
+      icon={<ChatBubbleIcon />}
+      title={t('chat.emptyState.title')}
+      description={`"${chatData.workflowName}" ${t('chat.emptyState.ready')}`}
+      suggestions={[
+        { key: 'hello', label: t('chat.suggestions.hello') },
+        { key: 'help', label: t('chat.suggestions.help') },
+        { key: 'features', label: t('chat.suggestions.features') },
+      ]}
+      onSuggestionClick={(label) => !isExecuting && executeWorkflow(label)}
+    />
+  );
+
+  // ── Render: Main Chat Interface ───────────────────────────
+
   return (
-    <ContentArea title={t('chat.currentChat')}>
-      <div className="flex flex-col h-full bg-muted">
-        {/* Header */}
-        <header className="flex items-center justify-between px-8 py-4 bg-white border-b border-border shrink-0">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center shrink-0 [&_svg]:w-5 [&_svg]:h-5 [&_svg]:text-white">
+    <ContentArea
+      headerContent={
+        <>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center shrink-0 text-white [&_svg]:w-5 [&_svg]:h-5">
               <WorkflowIcon />
             </div>
-            <div className="flex flex-col gap-0.5">
-              <h1 className="text-base font-semibold text-foreground m-0">{chatData.workflowName}</h1>
+            <div className="flex flex-col">
+              <h1 className="text-sm font-bold text-foreground m-0 leading-tight">{chatData.workflowName}</h1>
               <p className="text-xs text-muted-foreground/60 m-0">
-                {t('chat.interactionCount', {
-                  count: messages.filter((m) => m.sender !== 'system').length,
-                })}
+                {messages.filter((m) => m.sender !== 'system').length > 0
+                  ? `${messages.filter((m) => m.sender !== 'system').length} ${t('chat.interactionCount')}`
+                  : t('chat.newChat')
+                }
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
-              className="flex items-center justify-center w-9 h-9 p-0 bg-transparent border border-border rounded-lg cursor-pointer text-muted-foreground transition-all hover:border-primary hover:text-primary hover:bg-primary/5 [&_svg]:w-[18px] [&_svg]:h-[18px]"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-muted-foreground bg-white border border-border rounded-lg cursor-pointer transition-all hover:border-primary hover:text-primary hover:bg-primary/5 [&_svg]:w-4 [&_svg]:h-4"
               onClick={handleNewChat}
               title={t('chat.newChat')}
             >
               <NewChatIcon />
+              <span className="hidden sm:inline">{t('chat.newChat')}</span>
             </button>
             <button
-              className="flex items-center justify-center w-9 h-9 p-0 bg-transparent border border-border rounded-lg cursor-pointer text-muted-foreground transition-all hover:border-primary hover:text-primary hover:bg-primary/5 [&_svg]:w-[18px] [&_svg]:h-[18px]"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-muted-foreground bg-white border border-border rounded-lg cursor-pointer transition-all hover:border-primary hover:text-primary hover:bg-primary/5 [&_svg]:w-4 [&_svg]:h-4"
               onClick={handleViewHistory}
               title={t('chat.viewHistory')}
             >
               <HistoryIcon />
+              <span className="hidden sm:inline">{t('chat.viewHistory')}</span>
             </button>
           </div>
-        </header>
+        </>
+      }
+      contentPadding={false}
+    >
+      {/* ── Workflow Info Panel ── */}
+      <WorkflowInfoPanel
+        workflowName={chatData.workflowName}
+        interactionId={chatData.interactionId}
+      />
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-6">
-          {messages.map((message) => (
-            <MessageItem
-              key={message.id}
-              message={message}
-              onRetry={
-                message.status === 'error'
-                  ? () => handleRetry(message.id)
-                  : undefined
-              }
-            />
-          ))}
-          {isExecuting && !isStreaming && <TypingIndicator />}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input Area */}
-        <div className="px-8 py-6 bg-white border-t border-border shrink-0">
-          {attachments.length > 0 && (
-            <div className="flex flex-wrap gap-2 py-2">
-              {attachments.map((file, index) => (
-                <div key={index} className="flex items-center gap-1 px-2 py-1 bg-muted border border-border rounded text-xs text-muted-foreground [&_svg]:w-3.5 [&_svg]:h-3.5">
-                  <FileIcon />
-                  <span>{file.name}</span>
-                  <button
-                    className="flex items-center justify-center w-4 h-4 p-0 bg-transparent border-none rounded-full cursor-pointer text-muted-foreground/60 transition-colors hover:text-red-500 [&_svg]:w-3 [&_svg]:h-3"
-                    onClick={() => handleRemoveAttachment(index)}
-                  >
-                    <CloseIcon />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-          <div className={`flex items-end gap-4 bg-muted border border-border rounded-xl p-2 transition-colors focus-within:border-primary ${isExecuting ? 'opacity-60 pointer-events-none' : ''}`}>
-            <div className="flex-1 relative">
-              <textarea
-                ref={textareaRef}
-                className="w-full min-h-6 max-h-[150px] p-2 border-none bg-transparent text-base leading-relaxed text-foreground resize-none overflow-y-auto placeholder:text-muted-foreground/60 focus:outline-none"
-                value={inputContent}
-                onChange={(e) => setInputContent(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onCompositionStart={() => setIsComposing(true)}
-                onCompositionEnd={() => setIsComposing(false)}
-                placeholder={t('chat.inputPlaceholder')}
-                disabled={isExecuting}
-                rows={1}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                className="flex items-center justify-center w-9 h-9 p-0 bg-transparent border-none rounded-lg cursor-pointer text-muted-foreground/60 transition-colors hover:text-primary [&_svg]:w-5 [&_svg]:h-5"
-                onClick={handleAttach}
-                disabled={isExecuting}
-                title={t('chat.attach')}
-              >
-                <PaperclipIcon />
-              </button>
-              {isExecuting ? (
-                <button
-                  className="flex items-center justify-center w-10 h-10 p-0 bg-red-500 border-none rounded-lg cursor-pointer text-white transition-all hover:bg-red-600 [&_svg]:w-5 [&_svg]:h-5"
-                  onClick={handleStop}
-                  title={t('chat.stop')}
-                >
-                  <StopIcon />
-                </button>
-              ) : (
-                <button
-                  className="flex items-center justify-center w-10 h-10 p-0 bg-primary border-none rounded-lg cursor-pointer text-white transition-all hover:bg-primary/90 disabled:bg-muted-foreground/40 disabled:cursor-not-allowed [&_svg]:w-5 [&_svg]:h-5"
-                  onClick={handleSend}
-                  disabled={!inputContent.trim()}
-                  title={t('chat.send')}
-                >
-                  <SendIcon />
-                </button>
-              )}
-            </div>
-          </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
-          />
-        </div>
-      </div>
+      {/* ── Shared ChatPanel ── */}
+      <ChatPanel
+        messages={panelMessages}
+        onSend={handleSend}
+        onStop={handleStop}
+        isExecuting={isExecuting}
+        isStreaming={isStreaming}
+        variant="full"
+        placeholder={t('chat.inputPlaceholder')}
+        emptyState={emptyChatState}
+        showAttachments
+        onAttach={(files) => setAttachments((prev) => [...prev, ...files])}
+        attachments={attachments}
+        onRemoveAttachment={(index) => setAttachments((prev) => prev.filter((_, i) => i !== index))}
+        onRetry={handleRetry}
+        sendLabel={t('chat.send')}
+        stopLabel={t('chat.stop')}
+        retryLabel={t('chat.retry')}
+        errorLabel={t('chat.sendError')}
+      />
     </ContentArea>
   );
 };

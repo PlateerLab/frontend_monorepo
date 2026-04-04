@@ -235,7 +235,10 @@ const AdminSystemConfigPage: React.FC<RouteComponentProps> = () => {
   // ── Loading / Error ──
   if (loading && configs.length === 0) {
     return (
-      <ContentArea>
+      <ContentArea
+        title={t(`${CV}.title`)}
+        description={t(`${CV}.subtitle`)}
+      >
         <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted-foreground">
           <FiRefreshCw className="h-8 w-8 animate-spin" />
           <p className="text-sm">{t(`${CV}.loading`)}</p>
@@ -246,7 +249,10 @@ const AdminSystemConfigPage: React.FC<RouteComponentProps> = () => {
 
   if (error && configs.length === 0) {
     return (
-      <ContentArea>
+      <ContentArea
+        title={t(`${CV}.title`)}
+        description={t(`${CV}.subtitle`)}
+      >
         <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
           <p className="text-sm text-destructive">{error}</p>
           <Button variant="primary" onClick={loadConfigs}>{t(`${CV}.retry`)}</Button>
@@ -256,21 +262,17 @@ const AdminSystemConfigPage: React.FC<RouteComponentProps> = () => {
   }
 
   return (
-    <ContentArea>
-      <div className="flex flex-col gap-4 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">{t(`${CV}.title`)}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{t(`${CV}.subtitle`)}</p>
-          </div>
-          <Button variant="outline" size="sm" onClick={loadConfigs}>
-            <FiRefreshCw className="mr-1 h-4 w-4" />
-            {t(`${CV}.refresh`)}
-          </Button>
-        </div>
-
-        {/* Stats */}
+    <ContentArea
+      title={t(`${CV}.title`)}
+      description={t(`${CV}.subtitle`)}
+      headerActions={
+        <Button variant="outline" size="sm" onClick={loadConfigs}>
+          <FiRefreshCw className="mr-1 h-4 w-4" />
+          {t(`${CV}.refresh`)}
+        </Button>
+      }
+    >
+      {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
           {[
             { label: t(`${CV}.totalSettings`), value: stats.total },
@@ -432,7 +434,6 @@ const AdminSystemConfigPage: React.FC<RouteComponentProps> = () => {
             </div>
           )}
         </div>
-      </div>
     </ContentArea>
   );
 };
