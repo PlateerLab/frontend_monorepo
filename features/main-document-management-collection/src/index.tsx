@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { DocumentTabPlugin, DocumentTabPluginProps } from '@xgen/types';
-import { Button, EmptyState, FilterTabs, SearchInput } from '@xgen/ui';
+import { Button, EmptyState, FilterTabs, SearchInput, Modal, Input, Label, Switch, Textarea } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import './locales';
 
@@ -112,6 +112,13 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = () => {
   const [search, setSearch] = useState('');
   const [ownerFilter, setOwnerFilter] = useState<OwnerFilter>('all');
   const [collections, setCollections] = useState<CollectionItem[]>([]);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newCollectionName, setNewCollectionName] = useState('');
+  const [newCollectionDesc, setNewCollectionDesc] = useState('');
+  const [newCollectionSparse, setNewCollectionSparse] = useState(false);
+  const [newCollectionFullText, setNewCollectionFullText] = useState(false);
+  const [newCollectionEncrypt, setNewCollectionEncrypt] = useState(false);
+  const [creating, setCreating] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -134,6 +141,35 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = () => {
     { key: 'personal', label: t('documents.collection.filters.personal') },
     { key: 'shared', label: t('documents.collection.filters.shared') },
   ], [t]);
+
+  const handleCreateCollection = useCallback(async () => {
+    if (!newCollectionName.trim()) return;
+    setCreating(true);
+    try {
+      // TODO: API call to create collection
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setIsCreateModalOpen(false);
+      setNewCollectionName('');
+      setNewCollectionDesc('');
+      setNewCollectionSparse(false);
+      setNewCollectionFullText(false);
+      setNewCollectionEncrypt(false);
+      await loadData();
+    } catch (error) {
+      console.error('Failed to create collection:', error);
+    } finally {
+      setCreating(false);
+    }
+  }, [newCollectionName, loadData]);
+
+  const handleCloseCreateModal = useCallback(() => {
+    setIsCreateModalOpen(false);
+    setNewCollectionName('');
+    setNewCollectionDesc('');
+    setNewCollectionSparse(false);
+    setNewCollectionFullText(false);
+    setNewCollectionEncrypt(false);
+  }, []);
 
   const filteredCollections = useMemo(() => {
     return collections.filter(c => {
@@ -161,7 +197,7 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = () => {
             placeholder={t('documents.collection.searchPlaceholder')}
             size="sm"
           />
-          <Button onClick={() => {}}>
+          <Button onClick={() => setIsCreateModalOpen(true)}>
             <PlusIcon />
             {t('documents.collection.buttons.newCollection')}
           </Button>
@@ -204,6 +240,69 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = () => {
           </div>
         )}
       </div>
+
+      {/* Create Collection Modal */}
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={handleCloseCreateModal}
+        title={t('documents.collection.createModal.title')}
+        size="md"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCloseCreateModal}>
+              {t('documents.collection.createModal.cancel')}
+            </Button>
+            <Button onClick={handleCreateCollection} disabled={creating || !newCollectionName.trim()}>
+              {creating ? t('documents.collection.createModal.creating') : t('documents.collection.createModal.create')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>{t('documents.collection.createModal.name')}</Label>
+            <Input
+              value={newCollectionName}
+              onChange={(e) => setNewCollectionName(e.target.value)}
+              placeholder={t('documents.collection.createModal.namePlaceholder')}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('documents.collection.createModal.description')}</Label>
+            <Textarea
+              value={newCollectionDesc}
+              onChange={(e) => setNewCollectionDesc(e.target.value)}
+              placeholder={t('documents.collection.createModal.descriptionPlaceholder')}
+              rows={3}
+            />
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <Label>{t('documents.collection.createModal.sparseVector')}</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('documents.collection.createModal.sparseVectorDesc')}</p>
+            </div>
+            <Switch checked={newCollectionSparse} onCheckedChange={setNewCollectionSparse} />
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <Label>{t('documents.collection.createModal.fullText')}</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('documents.collection.createModal.fullTextDesc')}</p>
+            </div>
+            <Switch checked={newCollectionFullText} onCheckedChange={setNewCollectionFullText} />
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <Label>{t('documents.collection.createModal.encrypt')}</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('documents.collection.createModal.encryptDesc')}</p>
+            </div>
+            <Switch checked={newCollectionEncrypt} onCheckedChange={setNewCollectionEncrypt} />
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

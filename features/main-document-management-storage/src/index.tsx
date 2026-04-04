@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { DocumentTabPlugin, DocumentTabPluginProps } from '@xgen/types';
-import { Button, EmptyState, FilterTabs, SearchInput } from '@xgen/ui';
+import { Button, EmptyState, FilterTabs, SearchInput, Modal, Input, Label, Switch, Textarea } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import './locales';
 
@@ -110,6 +110,11 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = () => {
   const [search, setSearch] = useState('');
   const [ownerFilter, setOwnerFilter] = useState<OwnerFilter>('all');
   const [fileStorages, setFileStorages] = useState<FileStorageItem[]>([]);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newStorageName, setNewStorageName] = useState('');
+  const [newStorageDesc, setNewStorageDesc] = useState('');
+  const [newStorageEncrypt, setNewStorageEncrypt] = useState(false);
+  const [creating, setCreating] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -132,6 +137,31 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = () => {
     { key: 'personal', label: t('documents.storage.filters.personal') },
     { key: 'shared', label: t('documents.storage.filters.shared') },
   ], [t]);
+
+  const handleCreateStorage = useCallback(async () => {
+    if (!newStorageName.trim()) return;
+    setCreating(true);
+    try {
+      // TODO: API call to create file storage
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setIsCreateModalOpen(false);
+      setNewStorageName('');
+      setNewStorageDesc('');
+      setNewStorageEncrypt(false);
+      await loadData();
+    } catch (error) {
+      console.error('Failed to create file storage:', error);
+    } finally {
+      setCreating(false);
+    }
+  }, [newStorageName, loadData]);
+
+  const handleCloseCreateModal = useCallback(() => {
+    setIsCreateModalOpen(false);
+    setNewStorageName('');
+    setNewStorageDesc('');
+    setNewStorageEncrypt(false);
+  }, []);
 
   const filteredFileStorages = useMemo(() => {
     return fileStorages.filter(fs => {
@@ -159,7 +189,7 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = () => {
             placeholder={t('documents.storage.searchPlaceholder')}
             size="sm"
           />
-          <Button onClick={() => {}}>
+          <Button onClick={() => setIsCreateModalOpen(true)}>
             <PlusIcon />
             {t('documents.storage.buttons.newStorage')}
           </Button>
@@ -202,6 +232,53 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = () => {
           </div>
         )}
       </div>
+
+      {/* Create Storage Modal */}
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={handleCloseCreateModal}
+        title={t('documents.storage.createModal.title')}
+        size="md"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCloseCreateModal}>
+              {t('documents.storage.createModal.cancel')}
+            </Button>
+            <Button onClick={handleCreateStorage} disabled={creating || !newStorageName.trim()}>
+              {creating ? t('documents.storage.createModal.creating') : t('documents.storage.createModal.create')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>{t('documents.storage.createModal.name')}</Label>
+            <Input
+              value={newStorageName}
+              onChange={(e) => setNewStorageName(e.target.value)}
+              placeholder={t('documents.storage.createModal.namePlaceholder')}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('documents.storage.createModal.description')}</Label>
+            <Textarea
+              value={newStorageDesc}
+              onChange={(e) => setNewStorageDesc(e.target.value)}
+              placeholder={t('documents.storage.createModal.descriptionPlaceholder')}
+              rows={3}
+            />
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <Label>{t('documents.storage.createModal.encrypt')}</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('documents.storage.createModal.encryptDesc')}</p>
+            </div>
+            <Switch checked={newStorageEncrypt} onCheckedChange={setNewStorageEncrypt} />
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
