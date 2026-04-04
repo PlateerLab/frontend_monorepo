@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useTranslation } from '@xgen/i18n';
-import type { SidebarConfig, SidebarSection } from '@xgen/types';
+import type { SidebarConfig, SidebarSection, SidebarLabelOverrides } from '@xgen/types';
 
 export interface MainSidebarSection {
   id: string;
@@ -25,6 +25,8 @@ interface UseMainSidebarConfigOptions {
   onToggle: () => void;
   onLogout: () => void;
   onAdminClick?: () => void;
+  /** 섹션/아이템 타이틀 오버라이드 (앱 레벨 커스텀) */
+  labelOverrides?: SidebarLabelOverrides;
 }
 
 /**
@@ -41,22 +43,28 @@ export function useMainSidebarConfig({
   onToggle,
   onLogout,
   onAdminClick,
+  labelOverrides,
 }: UseMainSidebarConfigOptions): SidebarConfig {
   const { t } = useTranslation();
 
   const sidebarSections: SidebarSection[] = useMemo(
     () =>
-      sections.map((section) => ({
-        id: section.id,
-        titleKey: section.titleKey,
-        items: section.items.map((item) => ({
-          id: item.id,
-          titleKey: item.titleKey,
-          descriptionKey: item.descriptionKey,
-          icon: item.iconComponent,
-        })),
-      })),
-    [sections],
+      sections.map((section) => {
+        const sectionOverride = labelOverrides?.[section.id];
+        return {
+          id: section.id,
+          titleKey: section.titleKey,
+          title: sectionOverride?.title,
+          items: section.items.map((item) => ({
+            id: item.id,
+            titleKey: item.titleKey,
+            title: sectionOverride?.items?.[item.id]?.title,
+            descriptionKey: item.descriptionKey,
+            icon: item.iconComponent,
+          })),
+        };
+      }),
+    [sections, labelOverrides],
   );
 
   return useMemo(

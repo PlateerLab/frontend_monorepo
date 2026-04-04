@@ -152,9 +152,6 @@ importers:
       '@xgen/feature-main-ChatHistory':
         specifier: workspace:*
         version: link:../../features/main-ChatHistory
-      '@xgen/feature-main-ChatIntro':
-        specifier: workspace:*
-        version: link:../../features/main-ChatIntro
       '@xgen/feature-main-Dashboard':
         specifier: workspace:*
         version: link:../../features/main-Dashboard
@@ -209,9 +206,6 @@ importers:
       '@xgen/main-tool-storage':
         specifier: workspace:*
         version: link:../../features/main-ToolStorage
-      '@xgen/main-workflow-intro':
-        specifier: workspace:*
-        version: link:../../features/main-WorkflowIntro
       '@xgen/main-workflow-management-orchestrator':
         specifier: workspace:*
         version: link:../../features/main-workflow-management-orchestrator
@@ -1523,24 +1517,6 @@ importers:
         specifier: ^19.0.0
         version: 19.2.4
 
-  features/main-ChatIntro:
-    dependencies:
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-
   features/main-ChatNew:
     dependencies:
       '@xgen/api-client':
@@ -1689,28 +1665,6 @@ importers:
       '@xgen/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      react:
-        specifier: ^18.0.0
-        version: 18.3.1
-    devDependencies:
-      '@types/react':
-        specifier: ^18.0.0
-        version: 18.3.28
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-
-  features/main-WorkflowIntro:
-    dependencies:
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n

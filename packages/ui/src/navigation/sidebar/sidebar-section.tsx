@@ -63,7 +63,7 @@ export const SidebarSection: React.FC<SidebarSectionProps> = ({
       >
         {renderIcon()}
         <span className={cn('flex-1 text-left truncate', isSidebarCollapsed && 'sr-only')}>
-          {t(section.titleKey)}
+          {section.title || t(section.titleKey)}
         </span>
         {!isSidebarCollapsed && (
           <span className={cn('w-4 h-4 transition-transform duration-200', isExpanded && 'rotate-180')}>
@@ -88,11 +88,11 @@ export const SidebarSection: React.FC<SidebarSectionProps> = ({
                 className={cn(
                   'w-full flex items-center justify-between px-3 py-1.5 rounded-md text-sm transition-colors',
                   'hover:bg-gray-50 text-muted-foreground',
-                  activeItemId === item.id && 'text-primary font-medium bg-primary/5',
+                  activeItemId === item.id && 'text-primary font-medium bg-primary/10',
                   item.disabled && 'opacity-50 cursor-not-allowed',
                 )}
               >
-                <span className="truncate">{t(item.titleKey)}</span>
+                <span className="truncate">{item.title || t(item.titleKey)}</span>
                 {item.badge && (
                   <span className="ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary">
                     {item.badge}

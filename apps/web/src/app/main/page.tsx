@@ -4,12 +4,28 @@ import React, { useState, useEffect, useCallback, useMemo, Suspense } from 'reac
 import { useRouter, useSearchParams } from 'next/navigation';
 import { MainSidebar } from '@xgen/sidebar-main';
 import type { MainSidebarSection } from '@xgen/sidebar-main';
+import type { SidebarLabelOverrides } from '@xgen/types';
 import { useTranslation } from '@xgen/i18n';
 import { AuthGuard, useAuth } from '@xgen/auth-provider';
 import { featureRegistry, initializeFeatures } from '@/features';
 import { getRoutePath, DEFAULT_ROUTE } from '@/features/routeConfig';
 import type { SidebarSection as FeatureSidebarSection } from '@/features';
 import styles from './MainPage.module.scss';
+
+// ─────────────────────────────────────────────────────────────
+// Sidebar Label Overrides (앱 레벨 커스텀)
+// feature 모듈의 기본 i18n 라벨을 이 앱에서 재정의합니다.
+// ─────────────────────────────────────────────────────────────
+
+const SIDEBAR_LABEL_OVERRIDES: SidebarLabelOverrides = {
+  // 예시: 섹션/아이템 타이틀 오버라이드
+  // workflow: {
+  //   title: 'My Workflows',
+  //   items: {
+  //     'tool-storage': { title: 'My API Tools' },
+  //   },
+  // },
+};
 
 // ─────────────────────────────────────────────────────────────
 // Loading Component
@@ -116,6 +132,7 @@ function MainPageContent() {
         onToggle={handleSidebarToggle}
         onLogout={() => logout()}
         onAdminClick={user?.is_admin ? () => router.push('/admin') : undefined}
+        labelOverrides={SIDEBAR_LABEL_OVERRIDES}
       />
 
       <main className={`${styles.content} ${sidebarCollapsed ? styles.sidebarCollapsed : ''}`}>

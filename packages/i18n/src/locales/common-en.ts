@@ -66,12 +66,12 @@ export const commonEn: TranslationData = {
       current: { title: 'Current Chat' },
     },
     workflow: {
-      title: 'Workflow Management',
+      title: 'Workflow',
       intro: { title: 'Workflow Introduction' },
       canvas: { title: 'Canvas' },
       workflows: { title: 'Workflows' },
-      tools: { title: 'Tool Storage' },
-      prompts: { title: 'Prompt Storage' },
+      tools: { title: 'API Tool' },
+      prompts: { title: 'Prompt' },
       authProfile: { title: 'Auth Profile', description: 'Manage API authentication' },
     },
     knowledge: {

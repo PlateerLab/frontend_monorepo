@@ -195,7 +195,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ config }) => {
             return (
               <React.Fragment key={section.id}>
                 <SidebarSectionToggle
-                  title={t(section.titleKey)}
+                  title={section.title || t(section.titleKey)}
                   icon={getDefaultIcon(section.id)}
                   isExpanded={isExpanded}
                   isActive={isActive}
@@ -208,7 +208,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ config }) => {
                       <SidebarNavItem
                         key={item.id}
                         id={item.id}
-                        title={t(item.titleKey)}
+                        title={item.title || t(item.titleKey)}
                         isActive={activeItemId === item.id}
                         disabled={item.disabled}
                         badge={item.badge}

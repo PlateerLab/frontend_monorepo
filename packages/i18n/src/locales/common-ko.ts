@@ -70,8 +70,8 @@ export const commonKo: TranslationData = {
       intro: { title: '워크플로우 소개' },
       canvas: { title: '캔버스' },
       workflows: { title: '워크플로우 목록' },
-      tools: { title: '도구 저장소' },
-      prompts: { title: '프롬프트 저장소' },
+      tools: { title: 'API Tool' },
+      prompts: { title: '프롬프트' },
       authProfile: { title: '인증 프로필', description: 'API 인증 정보 관리' },
     },
     knowledge: {

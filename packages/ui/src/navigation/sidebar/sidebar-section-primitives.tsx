@@ -170,7 +170,7 @@ export const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
         'bg-transparent border-none cursor-pointer',
         'text-[var(--color-gray-800)] text-[var(--subtitle1-font-size,14px)] leading-[var(--subtitle1-line-height,20px)]',
         'transition-all duration-200 hover:bg-[var(--color-bg-50)]',
-        isActive && 'bg-[var(--color-gray-100)] text-[var(--color-secondary-200)]',
+        isActive && 'bg-primary/10 text-primary font-medium',
         disabled && 'opacity-50 cursor-not-allowed',
         className,
       )}
