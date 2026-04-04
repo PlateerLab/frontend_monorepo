@@ -16,7 +16,7 @@ export interface ContentAreaProps {
 }
 
 const variantClasses: Record<ContentAreaVariant, string> = {
-  card: 'bg-card rounded-xl border border-border p-6',
+  card: 'bg-card border-b border-border p-6',
   page: 'bg-background p-6 max-w-7xl mx-auto',
   fullWidth: 'bg-background p-6',
   toolStorage: 'bg-background p-6 max-w-7xl mx-auto',

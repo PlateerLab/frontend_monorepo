@@ -33,23 +33,23 @@ export interface StatCardProps {
   onClick?: () => void;
   /** 로딩 상태 — 값 대신 placeholder 표시 */
   loading?: boolean;
-  /** 아이콘 */
+  /** 아이콘 (deprecated — 무시됨) */
   icon?: React.ReactNode;
   className?: string;
 }
 
 /* ------------------------------------------------------------------ */
-/*  Variant → colour mapping                                           */
+/*  Variant → value colour mapping                                     */
 /* ------------------------------------------------------------------ */
 
-const VARIANT_ACCENT: Record<StatCardVariant, string> = {
-  default:  'var(--color-info, #305eeb)',
-  info:     'var(--color-info, #305eeb)',
-  success:  'var(--color-success, #2eb146)',
-  warning:  'var(--color-warning, #f59f00)',
-  error:    'var(--color-error, #e03131)',
-  critical: '#dc2626',
-  neutral:  'var(--color-gray-400, #abb1ba)',
+const VARIANT_VALUE_CLASS: Record<StatCardVariant, string> = {
+  default:  'text-foreground',
+  info:     'text-foreground',
+  success:  'text-foreground',
+  warning:  'text-foreground',
+  error:    'text-foreground',
+  critical: 'text-foreground',
+  neutral:  'text-foreground',
 };
 
 /* ------------------------------------------------------------------ */
@@ -60,64 +60,36 @@ export const StatCard: React.FC<StatCardProps> = ({
   label,
   value,
   variant = 'default',
-  accentColor,
   subtitle,
   selected = false,
   onClick,
   loading = false,
-  icon,
   className,
 }) => {
-  const color = accentColor || VARIANT_ACCENT[variant];
-  const isNeutral = variant === 'neutral' && !accentColor;
   const isClickable = !!onClick;
 
   return (
     <div
       className={cn(
-        'relative rounded-xl border bg-card p-4 transition-all duration-200',
-        selected
-          ? 'border-primary ring-1 ring-primary/30'
-          : 'border-border',
-        isClickable && 'cursor-pointer hover:shadow-md hover:border-primary/40',
+        'rounded-xl border border-gray-300 bg-card px-5 py-4 transition-all duration-150',
+        selected && 'border-primary/60 shadow-sm',
+        isClickable && 'cursor-pointer hover:shadow-sm hover:border-gray-400',
         className,
       )}
-      style={{ borderLeftWidth: 4, borderLeftColor: color }}
       onClick={onClick}
       role={isClickable ? 'button' : undefined}
       tabIndex={isClickable ? 0 : undefined}
       onKeyDown={isClickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.(); } } : undefined}
     >
-      <div className="flex items-start gap-3">
-        {icon && (
-          <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
-            style={{ backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`, color }}
-          >
-            {icon}
-          </div>
-        )}
-        <div className="flex flex-col gap-0.5 min-w-0">
-          <p
-            className="text-xs font-medium truncate"
-            style={{ color: isNeutral ? undefined : color }}
-          >
-            {label}
-          </p>
-          <p
-            className={cn(
-              'text-2xl font-bold leading-tight',
-              isNeutral && 'text-foreground',
-            )}
-            style={isNeutral ? undefined : { color }}
-          >
-            {loading ? '—' : value}
-          </p>
-          {subtitle && (
-            <p className="text-xs text-muted-foreground">{subtitle}</p>
-          )}
-        </div>
-      </div>
+      <p className="text-xs font-medium text-muted-foreground truncate">
+        {label}
+      </p>
+      <p className={cn('text-2xl font-bold mt-1 leading-tight', VARIANT_VALUE_CLASS[variant])}>
+        {loading ? '—' : value}
+      </p>
+      {subtitle && (
+        <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+      )}
     </div>
   );
 };

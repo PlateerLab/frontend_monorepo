@@ -6,7 +6,7 @@ import { ContentArea, Button, StatCard, useToast } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
 import {
-  FiActivity, FiFileText, FiPlay, FiCheckCircle, FiClock, FiRefreshCw,
+  FiActivity, FiFileText, FiRefreshCw,
 } from '@xgen/icons';
 
 import {
@@ -327,28 +327,20 @@ const AdminTestMonitoringPage: React.FC<RouteComponentProps> = () => {
         {/* Stats */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
-            icon={<FiFileText className="h-6 w-6" />}
             label={t(`${TM}.totalSessions`)}
             value={sessions.length}
-            variant="info"
           />
           <StatCard
-            icon={<FiPlay className="h-6 w-6" />}
             label={t(`${TM}.running`)}
             value={activeSession?.is_running ? 1 : 0}
-            variant={activeSession?.is_running ? 'success' : 'neutral'}
           />
           <StatCard
-            icon={<FiCheckCircle className="h-6 w-6" />}
             label={t(`${TM}.completed`)}
             value={sessions.filter((s) => s.status === 'completed').length}
-            variant="success"
           />
           <StatCard
-            icon={<FiClock className="h-6 w-6" />}
             label={t(`${TM}.lastUpdate`)}
             value={lastUpdated ? formatRelativeDate(lastUpdated.toISOString(), t) : '-'}
-            variant="neutral"
           />
         </div>
 

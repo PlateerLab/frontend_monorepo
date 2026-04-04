@@ -1319,16 +1319,14 @@ const AdminGovControlPolicyPage: React.FC<RouteComponentProps> = () => {
             value={combinedStats.activeAll}
             variant="success"
           />
-          <div className="relative rounded-xl border bg-card p-4 transition-all duration-200 border-border" style={{ borderLeftWidth: 4, borderLeftColor: 'var(--color-gray-400, #abb1ba)' }}>
-            <div className="flex flex-col gap-0.5 min-w-0">
-              <p className="text-xs font-medium text-muted-foreground">{t('admin.settings.guarder.piis.riskGrades')}</p>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-2xl font-bold text-foreground">{riskSummary.gradeCount}</span>
-                <div className="flex gap-0.5 h-4">
-                  {riskColors.map((color: string, idx: number) => (
-                    <div key={idx} className="w-3 rounded-sm" style={{ backgroundColor: color }} />
-                  ))}
-                </div>
+          <div className="rounded-xl border border-border bg-card px-5 py-4">
+            <p className="text-xs font-medium text-muted-foreground">{t('admin.settings.guarder.piis.riskGrades')}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-2xl font-bold leading-tight text-foreground">{riskSummary.gradeCount}</span>
+              <div className="flex gap-0.5 h-4">
+                {riskColors.map((color: string, idx: number) => (
+                  <div key={idx} className="w-3 rounded-sm" style={{ backgroundColor: color }} />
+                ))}
               </div>
             </div>
           </div>
