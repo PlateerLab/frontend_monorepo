@@ -294,6 +294,7 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
   return (
     <ContentArea
       title={t('chatHistory.title')}
+      description={t('chatHistory.description')}
       headerActions={
         <button
           onClick={loadChatHistory}

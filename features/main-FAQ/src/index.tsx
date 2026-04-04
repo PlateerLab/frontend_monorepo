@@ -156,7 +156,7 @@ const FAQPage: React.FC<FAQPageProps> = ({ onNavigate }) => {
   };
 
   return (
-    <ContentArea title={t('faq.title')}>
+    <ContentArea title={t('faq.title')} description={t('faq.description')}>
       <div className="p-6 max-w-[900px] mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-[32px] font-bold text-foreground mb-3">{t('faq.title')}</h1>

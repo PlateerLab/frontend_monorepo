@@ -3,6 +3,7 @@ import type { TranslationData } from '@xgen/i18n';
 export const ko: TranslationData = {
   chatHistory: {
     title: '채팅 기록',
+    description: '이전 채팅 내역을 확인하고 관리하세요',
     searchPlaceholder: '채팅 검색...',
     filter: { all: '전체', active: '활성', deleted: '삭제됨', deploy: '배포' },
     interactions: '대화',

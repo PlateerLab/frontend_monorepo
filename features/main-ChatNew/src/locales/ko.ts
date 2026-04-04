@@ -3,6 +3,7 @@ import type { TranslationData } from '@xgen/i18n';
 export const ko: TranslationData = {
   chatNew: {
     title: '새 채팅',
+    description: '워크플로우를 선택하여 새 채팅을 시작하세요',
     searchPlaceholder: '워크플로우 검색...',
     sections: { favorites: '즐겨찾기', all: '전체 워크플로우' },
     owner: { all: '전체', personal: '개인', shared: '공유' },

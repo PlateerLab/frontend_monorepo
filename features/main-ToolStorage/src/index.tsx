@@ -174,6 +174,7 @@ const ToolStoragePage: React.FC<ToolStoragePageProps> = () => {
   return (
     <ContentArea
       title={t('toolStorage.title')}
+      description={t('toolStorage.description')}
       headerActions={
         <Button>
           <PlusIcon />

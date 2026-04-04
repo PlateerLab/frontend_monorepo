@@ -3,6 +3,7 @@ import type { TranslationData } from '@xgen/i18n';
 export const ko: TranslationData = {
   faq: {
     title: 'FAQ',
+    description: '자주 묻는 질문과 답변을 확인하세요',
     subtitle: '자주 묻는 질문',
     searchPlaceholder: '질문 검색...',
     tabs: { all: '전체', gettingStarted: '시작하기', models: '모델', data: '데이터', api: 'API' },

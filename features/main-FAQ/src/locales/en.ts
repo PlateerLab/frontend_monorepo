@@ -3,6 +3,7 @@ import type { TranslationData } from '@xgen/i18n';
 export const en: TranslationData = {
   faq: {
     title: 'FAQ',
+    description: 'Find answers to frequently asked questions',
     subtitle: 'Frequently Asked Questions',
     searchPlaceholder: 'Search questions...',
     tabs: { all: 'All', gettingStarted: 'Getting Started', models: 'Models', data: 'Data', api: 'API' },

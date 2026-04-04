@@ -475,6 +475,7 @@ const AuthProfilePage: React.FC<AuthProfilePageProps> = ({
 
   if (activeTab === 'store') {
     return (
+      <ContentArea title={t('authProfile.title')} description={t('authProfile.description')}>
       <div className="p-8 max-w-[1400px] mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
@@ -594,6 +595,7 @@ const AuthProfilePage: React.FC<AuthProfilePageProps> = ({
           </div>
         )}
       </div>
+      </ContentArea>
     );
   }
 
@@ -602,6 +604,7 @@ const AuthProfilePage: React.FC<AuthProfilePageProps> = ({
   // ─────────────────────────────────────────────────────────
 
   return (
+    <ContentArea title={t('authProfile.title')} description={t('authProfile.description')}>
     <div className="p-8 max-w-[1400px] mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
@@ -655,6 +658,7 @@ const AuthProfilePage: React.FC<AuthProfilePageProps> = ({
         )}
       </div>
     </div>
+    </ContentArea>
   );
 };
 

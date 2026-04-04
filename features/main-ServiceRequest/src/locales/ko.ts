@@ -3,6 +3,7 @@ import type { TranslationData } from '@xgen/i18n';
 export const ko: TranslationData = {
   serviceRequest: {
     title: '서비스 요청',
+    description: '서비스 요청을 생성하고 관리하세요',
     searchPlaceholder: '요청 검색...',
     newRequest: '새 요청',
     tabs: { all: '전체', open: '열림', inProgress: '진행중', resolved: '해결됨' },

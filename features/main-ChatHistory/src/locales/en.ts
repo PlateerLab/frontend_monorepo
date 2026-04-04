@@ -3,6 +3,7 @@ import type { TranslationData } from '@xgen/i18n';
 export const en: TranslationData = {
   chatHistory: {
     title: 'Chat History',
+    description: 'View and manage your previous chat sessions',
     searchPlaceholder: 'Search chats...',
     filter: { all: 'All', active: 'Active', deleted: 'Deleted', deploy: 'Deployed' },
     interactions: 'Interactions',

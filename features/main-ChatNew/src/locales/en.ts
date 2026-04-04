@@ -3,6 +3,7 @@ import type { TranslationData } from '@xgen/i18n';
 export const en: TranslationData = {
   chatNew: {
     title: 'New Chat',
+    description: 'Select a workflow to start a new chat',
     searchPlaceholder: 'Search workflows...',
     sections: { favorites: 'Favorites', all: 'All Workflows' },
     owner: { all: 'All', personal: 'Personal', shared: 'Shared' },

@@ -118,7 +118,7 @@ const CanvasIntroPage: React.FC<CanvasIntroPageProps> = ({ onNavigate, onCreateC
   };
 
   return (
-    <ContentArea title={t('canvasIntro.title')}>
+    <ContentArea title={t('canvasIntro.title')} description={t('canvasIntro.description')}>
       <div className="p-6 max-w-[1200px] mx-auto">
         {/* Hero */}
         <section className="text-center py-12 mb-12 bg-gradient-to-br from-primary/5 to-indigo-500/5 rounded-2xl">
