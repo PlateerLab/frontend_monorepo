@@ -28,7 +28,20 @@ export interface WorkflowListItem {
     workflow_id: string;
     updated_at?: string;
     created_at?: string;
-    user_id?: string;
+    user_id?: number;
+    username?: string;
+    full_name?: string;
+    node_count?: number;
+    edge_count?: number;
+    has_startnode?: boolean;
+    has_endnode?: boolean;
+    is_completed?: boolean;
+    is_shared?: boolean;
+    share_group?: string | null;
+    share_permissions?: string;
+    metadata?: Record<string, unknown>;
+    error?: string;
+    is_accepted?: boolean;
 }
 
 export interface WorkflowLoadResult {
@@ -46,7 +59,7 @@ export interface WorkflowExistence {
 export interface ExecuteWorkflowOptions {
     workflowName: string;
     workflowId: string;
-    inputData?: Record<string, unknown>;
+    inputData?: string | Record<string, unknown>;
     interactionId?: string;
     selectedCollections?: string[];
     selectedFiles?: string[];
@@ -495,6 +508,39 @@ export async function generateEmbedJs(params: {
     const client = getClient();
     const response = await client.post<{ url: string }>('/api/workflow/generate-embed', params);
     return response.data;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Interaction API
+// ─────────────────────────────────────────────────────────────
+
+export interface InteractionListFilters {
+    interaction_id?: string;
+    workflow_id?: string;
+    limit?: number;
+}
+
+export interface ExecutionMeta {
+    id: string;
+    interaction_id: string;
+    workflow_id: string;
+    workflow_name: string;
+    interaction_count: number;
+    metadata: Record<string, unknown>;
+    created_at: string;
+    updated_at: string;
+}
+
+export async function listInteractions(
+    filters: InteractionListFilters = {},
+): Promise<ExecutionMeta[]> {
+    const client = getClient();
+    const params = new URLSearchParams();
+    if (filters.interaction_id) params.append('interaction_id', filters.interaction_id);
+    if (filters.workflow_id) params.append('workflow_id', filters.workflow_id);
+    params.append('limit', String(filters.limit ?? 1000));
+    const response = await client.get<{ execution_meta_list: ExecutionMeta[] }>(`/api/interaction/list?${params}`);
+    return response.data.execution_meta_list || [];
 }
 
 // ─────────────────────────────────────────────────────────────

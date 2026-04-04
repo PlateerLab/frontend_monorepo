@@ -5,9 +5,10 @@ import type { RouteComponentProps, MainFeatureModule, ChatHistoryItem, ChatHisto
 import { ContentArea, FilterTabs, SearchInput, EmptyState } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import './locales';
-import { createApiClient } from '@xgen/api-client';
+import { listInteractions, listWorkflowsDetail, deleteWorkflowIOLogs } from '@xgen/api-client';
+import type { WorkflowListItem } from '@xgen/api-client';
 
-import type { ChatHistoryPageProps, ExecutionMeta, WorkflowDetail } from './types';
+import type { ChatHistoryPageProps, ExecutionMeta } from './types';
 
 // ─────────────────────────────────────────────────────────────
 // Constants
@@ -88,7 +89,6 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
   onSelectChat,
 }) => {
   const { t } = useTranslation();
-  const api = createApiClient();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,15 +106,10 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
 
     try {
       // 채팅 기록과 워크플로우 목록을 병렬로 가져오기
-      const [interactionsResult, workflowsResult] = await Promise.all([
-        api.get<{ execution_meta_list: ExecutionMeta[] }>('/api/interaction/list', {
-          params: { limit: 1000 },
-        }),
-        api.get<WorkflowDetail[]>('/api/workflow/detail/list'),
+      const [chatList, workflows] = await Promise.all([
+        listInteractions({ limit: 1000 }),
+        listWorkflowsDetail(),
       ]);
-
-      const chatList = interactionsResult?.data?.execution_meta_list || [];
-      const workflows = workflowsResult?.data || [];
 
       // 각 채팅 기록에 대해 해당 워크플로우가 존재하는지 확인
       const enrichedChatList: ChatHistoryItem[] = chatList.map((chat: ExecutionMeta) => {
@@ -136,7 +131,7 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
 
         // 해당 워크플로우 찾기
         const matchingWorkflow = workflows.find(
-          (workflow: WorkflowDetail) => workflow.workflow_id === chat.workflow_id
+          (workflow: WorkflowListItem) => workflow.workflow_id === chat.workflow_id
         );
 
         return {
@@ -160,7 +155,7 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [api, t]);
+  }, [t]);
 
   useEffect(() => {
     loadChatHistory();
@@ -251,13 +246,11 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
     if (!confirmed) return;
 
     try {
-      await api.delete('/api/workflow/io-logs', {
-        params: {
-          workflow_name: chat.workflowName,
-          workflow_id: chat.workflowId,
-          interaction_id: chat.interactionId,
-        },
-      });
+      await deleteWorkflowIOLogs(
+        chat.workflowName,
+        chat.workflowId,
+        chat.interactionId,
+      );
 
       // 목록에서 제거
       setChats((prev) => prev.filter((c) => c.id !== chat.id));

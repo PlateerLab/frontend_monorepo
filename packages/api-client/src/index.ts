@@ -150,6 +150,7 @@ export {
   deleteWorkflowIOLogs,
   getDeployStatus,
   generateEmbedJs,
+  listInteractions,
   // Admin workflow APIs
   getAllWorkflowMetaAdmin,
   deleteWorkflowAdmin,
@@ -167,6 +168,8 @@ export type {
   WorkflowExistence,
   ExecuteWorkflowOptions,
   DeployStatus,
+  InteractionListFilters,
+  ExecutionMeta,
   AdminWorkflowMeta,
   AdminIOLog,
   AdminPerformanceData,

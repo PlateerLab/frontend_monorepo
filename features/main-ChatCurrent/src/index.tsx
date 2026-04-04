@@ -5,17 +5,12 @@ import type { RouteComponentProps, MainFeatureModule, ChatMessage, ChatMessageSe
 import { ContentArea } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import './locales';
-import { createApiClient } from '@xgen/api-client';
+import { getWorkflowIOLogs, executeWorkflowStream as executeWorkflowStreamApi } from '@xgen/api-client';
 
 import type {
   ChatCurrentPageProps,
   StoredChatData,
   IOLog,
-  IOLogsResponse,
-  WorkflowExecutionRequest,
-  SSEEventData,
-  NodeStatusEvent,
-  ToolEvent,
 } from './types';
 
 // ─────────────────────────────────────────────────────────────
@@ -23,7 +18,6 @@ import type {
 // ─────────────────────────────────────────────────────────────
 
 const STORAGE_KEY_CURRENT_CHAT = 'xgen_current_chat';
-const API_STREAMING_ENDPOINT = '/api/workflow/execute/based_id/stream';
 
 // ─────────────────────────────────────────────────────────────
 // Icons
@@ -227,7 +221,6 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
   onChatEnd,
 }) => {
   const { t } = useTranslation();
-  const api = createApiClient();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -255,11 +248,13 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
   const loadChatHistory = useCallback(async (data: StoredChatData) => {
     try {
       // Load IO logs for this interaction
-      const result = await api.get<IOLogsResponse>(
-        `/api/workflow/io-logs?interaction_id=${data.interactionId}&limit=50`
+      const result = await getWorkflowIOLogs(
+        data.workflowName,
+        data.workflowId,
+        data.interactionId,
       );
 
-      const logs = result?.data?.logs || [];
+      const logs = result?.logs || [];
 
       // Convert IO logs to messages
       const loadedMessages: ChatMessage[] = [];
@@ -313,7 +308,7 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
         },
       ]);
     }
-  }, [api, t]);
+  }, [t]);
 
   useEffect(() => {
     const data = loadCurrentChatData();
@@ -388,103 +383,59 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
       setStreamingMessageId(assistantMessageId);
       setAttachments([]);
 
-      // Prepare request
-      const requestBody: WorkflowExecutionRequest = {
-        workflow_id: chatData.workflowId,
-        workflow_name: chatData.workflowName,
-        input_data: message,
-        interaction_id: chatData.interactionId,
-        user_id: chatData.userId,
-      };
-
       // Create abort controller
       abortControllerRef.current = new AbortController();
 
+      let accumulatedContent = '';
+
       try {
-        const response = await api.post(API_STREAMING_ENDPOINT, requestBody, {
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'text/event-stream',
-          },
+        await executeWorkflowStreamApi({
+          workflowName: chatData.workflowName,
+          workflowId: chatData.workflowId,
+          inputData: message,
+          interactionId: chatData.interactionId,
+          user_id: chatData.userId,
           signal: abortControllerRef.current.signal,
-          responseType: 'stream',
+          onData: (content) => {
+            const text = typeof content === 'string' ? content : JSON.stringify(content);
+            accumulatedContent += text;
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === assistantMessageId
+                  ? { ...msg, content: accumulatedContent }
+                  : msg
+              )
+            );
+          },
+          onEnd: () => {
+            // Mark message as sent
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === assistantMessageId
+                  ? { ...msg, status: 'sent' as const }
+                  : msg
+              )
+            );
+          },
+          onError: (err) => {
+            console.error('Workflow execution failed:', err);
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === assistantMessageId
+                  ? {
+                      ...msg,
+                      status: 'error' as const,
+                      content: t('chat.error.executionFailed'),
+                      metadata: { error: (err as Error).message },
+                    }
+                  : msg
+              )
+            );
+          },
         });
 
-        // Handle streaming response
-        const reader = (response.data as ReadableStream).getReader();
-        const decoder = new TextDecoder('utf-8');
-        let buffer = '';
-        let accumulatedContent = '';
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value, { stream: true });
-          buffer += chunk;
-
-          // Parse SSE events
-          const blocks = buffer.split('\n\n');
-          buffer = blocks.pop() || '';
-
-          for (const block of blocks) {
-            const lines = block.split('\n');
-            let eventType = 'message';
-            let data: string | null = null;
-
-            for (const line of lines) {
-              if (line.startsWith('event: ')) {
-                eventType = line.substring(7).trim();
-              } else if (line.startsWith('data: ')) {
-                data = line.substring(6).trim();
-              }
-            }
-
-            if (data) {
-              try {
-                const parsedData: SSEEventData = JSON.parse(data);
-
-                if (parsedData.type === 'data' && parsedData.content) {
-                  accumulatedContent += parsedData.content;
-                  setMessages((prev) =>
-                    prev.map((msg) =>
-                      msg.id === assistantMessageId
-                        ? { ...msg, content: accumulatedContent }
-                        : msg
-                    )
-                  );
-                } else if (parsedData.type === 'summary' && parsedData.data?.outputs) {
-                  // Non-streaming response
-                  const output = parsedData.data.outputs[0];
-                  accumulatedContent = typeof output === 'string' ? output : JSON.stringify(output);
-                  setMessages((prev) =>
-                    prev.map((msg) =>
-                      msg.id === assistantMessageId
-                        ? { ...msg, content: accumulatedContent }
-                        : msg
-                    )
-                  );
-                } else if (parsedData.type === 'error') {
-                  throw new Error(parsedData.error || 'Unknown error');
-                }
-              } catch (parseError) {
-                console.error('Failed to parse SSE data:', parseError);
-              }
-            }
-          }
-        }
-
-        // Mark message as sent
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === assistantMessageId
-              ? { ...msg, status: 'sent' as const }
-              : msg
-          )
-        );
-      } catch (err: unknown) {
-        if ((err as Error).name === 'AbortError') {
-          // User cancelled
+        // If aborted, show cancelled message
+        if (abortControllerRef.current?.signal.aborted) {
           setMessages((prev) =>
             prev.map((msg) =>
               msg.id === assistantMessageId
@@ -496,21 +447,21 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
                 : msg
             )
           );
-        } else {
-          console.error('Workflow execution failed:', err);
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === assistantMessageId
-                ? {
-                    ...msg,
-                    status: 'error' as const,
-                    content: t('chat.error.executionFailed'),
-                    metadata: { error: (err as Error).message },
-                  }
-                : msg
-            )
-          );
         }
+      } catch (err: unknown) {
+        console.error('Workflow execution failed:', err);
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === assistantMessageId
+              ? {
+                  ...msg,
+                  status: 'error' as const,
+                  content: t('chat.error.executionFailed'),
+                  metadata: { error: (err as Error).message },
+                }
+              : msg
+          )
+        );
       } finally {
         setIsExecuting(false);
         setIsStreaming(false);
@@ -518,7 +469,7 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
         abortControllerRef.current = null;
       }
     },
-    [chatData, attachments, api, t]
+    [chatData, attachments, t]
   );
 
   // ─────────────────────────────────────────────────────────────

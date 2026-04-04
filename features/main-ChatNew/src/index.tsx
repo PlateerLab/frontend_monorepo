@@ -5,9 +5,10 @@ import type { RouteComponentProps, MainFeatureModule, WorkflowOption } from '@xg
 import { ContentArea, SearchInput, EmptyState, FilterTabs } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import './locales';
-import { createApiClient } from '@xgen/api-client';
+import { listWorkflowsDetail } from '@xgen/api-client';
+import type { WorkflowListItem } from '@xgen/api-client';
 
-import type { ChatNewPageProps, WorkflowDetailFromAPI, WorkflowFilter, WorkflowOwnerFilter } from './types';
+import type { ChatNewPageProps, WorkflowFilter, WorkflowOwnerFilter } from './types';
 
 // ─────────────────────────────────────────────────────────────
 // Constants
@@ -239,7 +240,6 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
   onSelectWorkflow,
 }) => {
   const { t } = useTranslation();
-  const api = createApiClient();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -258,16 +258,15 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
     setError(null);
 
     try {
-      const result = await api.get<WorkflowDetailFromAPI[]>('/api/workflow/detail/list');
-      const workflowList = result?.data || [];
+      const workflowList = await listWorkflowsDetail();
 
       // API 응답을 WorkflowOption 형태로 변환
       const transformed: WorkflowOption[] = workflowList
-        .filter((detail) => detail.is_accepted !== false)
-        .map((detail) => {
+        .filter((detail: WorkflowListItem) => detail.is_accepted !== false)
+        .map((detail: WorkflowListItem) => {
           // 상태 결정
           let status: 'active' | 'draft' | 'archived' = 'active';
-          if (!detail.has_startnode || !detail.has_endnode || detail.node_count < 3) {
+          if (!detail.has_startnode || !detail.has_endnode || (detail.node_count ?? 0) < 3) {
             status = 'draft';
           }
 
@@ -292,7 +291,7 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [api, t]);
+  }, [t]);
 
   useEffect(() => {
     loadWorkflows();
