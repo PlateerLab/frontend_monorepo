@@ -179,7 +179,7 @@ const AdminUserCreatePage: React.FC<RouteComponentProps> = () => {
     <ContentArea
       title={t('admin.pages.userCreate.title')}
       description={t('admin.pages.userCreate.description')}
-      headerActions={
+      toolbar={
         <SearchInput
           value={search}
           onChange={setSearch}

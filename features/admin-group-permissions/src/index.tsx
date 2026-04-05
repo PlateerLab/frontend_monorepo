@@ -337,77 +337,74 @@ const AdminGroupPermissionsPage: React.FC<RouteComponentProps> = () => {
 
   return (
     <ContentArea
-      title={t('admin.pages.groupPermissions.title')}
-    >
-      {!selectedGroup ? (
-          /* ─── Groups List View ─── */
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <SearchInput
-                value={groupSearch}
-                onChange={setGroupSearch}
-                placeholder={t('admin.userManagement.groupPermissions.groupNamePlaceholder')}
-                className="w-72"
-              />
-              <Button onClick={() => setShowCreateModal(true)}>
-                {t('admin.userManagement.groupPermissions.createGroup')}
-              </Button>
-            </div>
-
-            <DataTable
-              data={filteredGroups}
-              columns={groupColumns}
-              rowKey={(row) => row.group_name}
-              loading={groupLoading}
-              emptyMessage={t('admin.userManagement.groupPermissions.noGroups')}
-              onRowClick={(row) => setSelectedGroup(row.group_name)}
-              className="border rounded-lg"
-            />
-          </div>
-        ) : (
-          /* ─── Members View (drill-down) ─── */
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedGroup(null);
-                    setUserSearch('');
-                  }}
-                >
-                  ← {t('admin.userManagement.groupPermissions.backToGroups')}
-                </Button>
-                <h2 className="text-lg font-semibold text-foreground">
-                  {t('admin.userManagement.groupPermissions.membersTab', {
-                    groupName: selectedGroup,
-                  })}
-                </h2>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button onClick={() => setShowAddMember(true)}>
-                  {t('admin.userManagement.groupPermissions.addMember')}
-                </Button>
-              </div>
-            </div>
-
+      title={
+        selectedGroup
+          ? t('admin.userManagement.groupPermissions.membersTab', { groupName: selectedGroup })
+          : t('admin.pages.groupPermissions.title')
+      }
+      headerActions={
+        selectedGroup ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setSelectedGroup(null);
+              setUserSearch('');
+            }}
+          >
+            ← {t('admin.userManagement.groupPermissions.backToGroups')}
+          </Button>
+        ) : undefined
+      }
+      toolbar={
+        selectedGroup ? (
+          <div className="flex items-center justify-between w-full">
             <SearchInput
               value={userSearch}
               onChange={setUserSearch}
               placeholder={t('admin.userManagement.userList.searchPlaceholder')}
               className="w-72"
             />
-
-            <DataTable
-              data={filteredUsers}
-              columns={userColumns}
-              rowKey={(row) => row.id}
-              loading={usersLoading}
-              emptyMessage={t('admin.userManagement.groupPermissions.noUsersInGroup')}
-              className="border rounded-lg"
-            />
+            <Button onClick={() => setShowAddMember(true)}>
+              {t('admin.userManagement.groupPermissions.addMember')}
+            </Button>
           </div>
+        ) : (
+          <div className="flex items-center justify-between w-full">
+            <SearchInput
+              value={groupSearch}
+              onChange={setGroupSearch}
+              placeholder={t('admin.userManagement.groupPermissions.groupNamePlaceholder')}
+              className="w-72"
+            />
+            <Button onClick={() => setShowCreateModal(true)}>
+              {t('admin.userManagement.groupPermissions.createGroup')}
+            </Button>
+          </div>
+        )
+      }
+    >
+      {!selectedGroup ? (
+          /* ─── Groups List View ─── */
+          <DataTable
+            data={filteredGroups}
+            columns={groupColumns}
+            rowKey={(row) => row.group_name}
+            loading={groupLoading}
+            emptyMessage={t('admin.userManagement.groupPermissions.noGroups')}
+            onRowClick={(row) => setSelectedGroup(row.group_name)}
+            className="border rounded-lg"
+          />
+        ) : (
+          /* ─── Members View (drill-down) ─── */
+          <DataTable
+            data={filteredUsers}
+            columns={userColumns}
+            rowKey={(row) => row.id}
+            loading={usersLoading}
+            emptyMessage={t('admin.userManagement.groupPermissions.noUsersInGroup')}
+            className="border rounded-lg"
+          />
         )}
       {/* Modals */}
       <GroupCreateModal

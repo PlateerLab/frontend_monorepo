@@ -238,7 +238,7 @@ const AdminUsersPage: React.FC<RouteComponentProps> = () => {
     <ContentArea
       title={t('admin.pages.users.title')}
       description={`${t('admin.userManagement.userList.statsLoadTotal')} ${filteredUsers.length}${t('admin.userManagement.userList.unitPeople')}`}
-      headerActions={
+      toolbar={
         <SearchInput
           value={search}
           onChange={setSearch}
