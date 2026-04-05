@@ -3,9 +3,11 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { DocumentTabPlugin, DocumentTabPluginProps, CardBadge } from '@xgen/types';
 import { Button, FilterTabs, SearchInput, Modal, Input, Label, Switch, Textarea, ResourceCardGrid } from '@xgen/ui';
-import { FiFolder, FiFileText, FiClock, FiTrash2 } from '@xgen/icons';
+import { FiFolder, FiFileText, FiClock, FiTrash2, FiLock } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
-import { listCollections, createCollection, deleteCollection, type CollectionItem } from './api';
+import { listCollections, createCollection, deleteCollection, verifyCollectionPassword, storeCollectionSessionToken, getCollectionSessionToken, type CollectionItem, type DocumentItem } from './api';
+import { CollectionDocuments } from './components/CollectionDocuments';
+import { DocumentDetail } from './components/DocumentDetail';
 import './locales';
 
 // ─────────────────────────────────────────────────────────────
@@ -13,6 +15,7 @@ import './locales';
 // ─────────────────────────────────────────────────────────────
 
 export type OwnerFilter = 'all' | 'personal' | 'shared';
+type ViewMode = 'list' | 'documents' | 'document-detail';
 
 // ─────────────────────────────────────────────────────────────
 // Icons (for plus button in toolbar)
@@ -44,6 +47,12 @@ export interface DocumentCollectionProps extends DocumentTabPluginProps {}
 export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToolbarChange }) => {
   const { t } = useTranslation();
 
+  // ── View Mode ──
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [selectedCollection, setSelectedCollection] = useState<CollectionItem | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null);
+
+  // ── List View State ──
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -55,7 +64,16 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
   const [newCollectionSparse, setNewCollectionSparse] = useState(false);
   const [newCollectionFullText, setNewCollectionFullText] = useState(false);
   const [newCollectionEncrypt, setNewCollectionEncrypt] = useState(false);
+  const [newCollectionPassword, setNewCollectionPassword] = useState('');
+  const [newCollectionPasswordConfirm, setNewCollectionPasswordConfirm] = useState('');
   const [creating, setCreating] = useState(false);
+
+  // Password verification modal state
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [pendingCollection, setPendingCollection] = useState<CollectionItem | null>(null);
+  const [verifyPassword, setVerifyPassword] = useState('');
+  const [verifyError, setVerifyError] = useState<string | null>(null);
+  const [verifying, setVerifying] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -81,6 +99,46 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
     { key: 'shared', label: t('documents.collection.filters.shared') },
   ], [t]);
 
+  // ── View Transitions ──
+  const handleSelectCollection = useCallback((col: CollectionItem) => {
+    if (col.isSecured) {
+      // Check if we already have a valid session token
+      const token = getCollectionSessionToken(col.name);
+      if (token) {
+        setSelectedCollection(col);
+        setSelectedDocument(null);
+        setViewMode('documents');
+      } else {
+        setPendingCollection(col);
+        setVerifyPassword('');
+        setVerifyError(null);
+        setIsPasswordModalOpen(true);
+      }
+    } else {
+      setSelectedCollection(col);
+      setSelectedDocument(null);
+      setViewMode('documents');
+    }
+  }, []);
+
+  const handleSelectDocument = useCallback((doc: DocumentItem) => {
+    setSelectedDocument(doc);
+    setViewMode('document-detail');
+  }, []);
+
+  const handleBackToList = useCallback(() => {
+    setViewMode('list');
+    setSelectedCollection(null);
+    setSelectedDocument(null);
+    loadData();
+  }, [loadData]);
+
+  const handleBackToDocuments = useCallback(() => {
+    setViewMode('documents');
+    setSelectedDocument(null);
+  }, []);
+
+  // ── CRUD ──
   const handleCreateCollection = useCallback(async () => {
     if (!newCollectionName.trim()) return;
     setCreating(true);
@@ -91,6 +149,7 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
         enable_sparse_vector: newCollectionSparse,
         enable_full_text: newCollectionFullText,
         is_secured: newCollectionEncrypt,
+        password: newCollectionEncrypt ? newCollectionPassword : undefined,
       });
       setIsCreateModalOpen(false);
       setNewCollectionName('');
@@ -98,13 +157,15 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
       setNewCollectionSparse(false);
       setNewCollectionFullText(false);
       setNewCollectionEncrypt(false);
+      setNewCollectionPassword('');
+      setNewCollectionPasswordConfirm('');
       await loadData();
     } catch (err) {
       console.error('Failed to create collection:', err);
     } finally {
       setCreating(false);
     }
-  }, [newCollectionName, newCollectionDesc, newCollectionSparse, newCollectionFullText, newCollectionEncrypt, loadData]);
+  }, [newCollectionName, newCollectionDesc, newCollectionSparse, newCollectionFullText, newCollectionEncrypt, newCollectionPassword, loadData]);
 
   const handleDeleteCollection = useCallback(async (col: CollectionItem) => {
     try {
@@ -122,6 +183,43 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
     setNewCollectionSparse(false);
     setNewCollectionFullText(false);
     setNewCollectionEncrypt(false);
+    setNewCollectionPassword('');
+    setNewCollectionPasswordConfirm('');
+  }, []);
+
+  const handleVerifyCollectionPassword = useCallback(async () => {
+    if (!pendingCollection || !verifyPassword) {
+      setVerifyError(t('documents.collection.passwordModal.passwordRequired'));
+      return;
+    }
+    setVerifying(true);
+    setVerifyError(null);
+    try {
+      const result = await verifyCollectionPassword(pendingCollection.name, verifyPassword);
+      const sessionToken = result.session_token;
+      if (result.valid && sessionToken) {
+        storeCollectionSessionToken(pendingCollection.name, sessionToken);
+        setIsPasswordModalOpen(false);
+        setSelectedCollection(pendingCollection);
+        setSelectedDocument(null);
+        setViewMode('documents');
+        setPendingCollection(null);
+        setVerifyPassword('');
+      } else {
+        setVerifyError(t('documents.collection.passwordModal.passwordIncorrect'));
+      }
+    } catch {
+      setVerifyError(t('documents.collection.passwordModal.passwordIncorrect'));
+    } finally {
+      setVerifying(false);
+    }
+  }, [pendingCollection, verifyPassword, t]);
+
+  const handleClosePasswordModal = useCallback(() => {
+    setIsPasswordModalOpen(false);
+    setPendingCollection(null);
+    setVerifyPassword('');
+    setVerifyError(null);
   }, []);
 
   const filteredCollections = useMemo(() => {
@@ -170,13 +268,17 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
             onClick: () => handleDeleteCollection(col),
           },
         ],
-        onClick: () => {},
+        onClick: () => handleSelectCollection(col),
       };
     });
-  }, [filteredCollections, handleDeleteCollection, t]);
+  }, [filteredCollections, handleDeleteCollection, handleSelectCollection, t]);
 
-  // Push subToolbar content to orchestrator
+  // ── SubToolbar ──
   useEffect(() => {
+    if (viewMode !== 'list') {
+      onSubToolbarChange?.(null);
+      return;
+    }
     onSubToolbarChange?.(
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <FilterTabs
@@ -199,13 +301,37 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
         </div>
       </div>
     );
-  }, [onSubToolbarChange, ownerFilterTabs, ownerFilter, search, t]);
+  }, [onSubToolbarChange, ownerFilterTabs, ownerFilter, search, t, viewMode]);
 
-  // Cleanup subToolbar on unmount
   useEffect(() => {
     return () => { onSubToolbarChange?.(null); };
   }, [onSubToolbarChange]);
 
+  // ── Render ──
+
+  // Document Detail View
+  if (viewMode === 'document-detail' && selectedCollection && selectedDocument) {
+    return (
+      <DocumentDetail
+        collection={selectedCollection}
+        document={selectedDocument}
+        onBack={handleBackToDocuments}
+      />
+    );
+  }
+
+  // Documents View (inside collection)
+  if (viewMode === 'documents' && selectedCollection) {
+    return (
+      <CollectionDocuments
+        collection={selectedCollection}
+        onBack={handleBackToList}
+        onSelectDocument={handleSelectDocument}
+      />
+    );
+  }
+
+  // List View (default)
   return (
     <div className="flex flex-col flex-1 min-h-0 p-6">
       <div className="flex-1 min-h-0 overflow-y-auto">
@@ -279,6 +405,70 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
               <p className="text-xs text-muted-foreground mt-0.5">{t('documents.collection.createModal.encryptDesc')}</p>
             </div>
             <Switch checked={newCollectionEncrypt} onCheckedChange={setNewCollectionEncrypt} />
+          </div>
+          {newCollectionEncrypt && (
+            <>
+              <div className="space-y-2">
+                <Label>{t('documents.collection.createModal.password')}</Label>
+                <Input
+                  type="password"
+                  value={newCollectionPassword}
+                  onChange={(e) => setNewCollectionPassword(e.target.value)}
+                  placeholder={t('documents.collection.createModal.passwordPlaceholder')}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>{t('documents.collection.createModal.passwordConfirm')}</Label>
+                <Input
+                  type="password"
+                  value={newCollectionPasswordConfirm}
+                  onChange={(e) => setNewCollectionPasswordConfirm(e.target.value)}
+                  placeholder={t('documents.collection.createModal.passwordConfirmPlaceholder')}
+                />
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
+
+      {/* Password Verification Modal */}
+      <Modal
+        isOpen={isPasswordModalOpen}
+        onClose={handleClosePasswordModal}
+        title={t('documents.collection.passwordModal.title')}
+        size="sm"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleClosePasswordModal}>
+              {t('documents.collection.createModal.cancel')}
+            </Button>
+            <Button onClick={handleVerifyCollectionPassword} disabled={verifying || !verifyPassword}>
+              {verifying ? t('documents.collection.passwordModal.verifying') : t('documents.collection.passwordModal.verify')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="flex flex-col items-center gap-2 py-2">
+            <FiLock className="w-10 h-10 text-muted-foreground" />
+            <p className="text-sm font-medium">{pendingCollection?.displayName}</p>
+            <p className="text-xs text-muted-foreground text-center">
+              {t('documents.collection.passwordModal.description')}
+            </p>
+          </div>
+          {verifyError && (
+            <p className="text-sm text-destructive text-center">{verifyError}</p>
+          )}
+          <div className="space-y-2">
+            <Label>{t('documents.collection.passwordModal.passwordLabel')}</Label>
+            <Input
+              type="password"
+              value={verifyPassword}
+              onChange={(e) => setVerifyPassword(e.target.value)}
+              placeholder={t('documents.collection.passwordModal.passwordPlaceholder')}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !verifying) handleVerifyCollectionPassword(); }}
+              autoFocus
+            />
           </div>
         </div>
       </Modal>
