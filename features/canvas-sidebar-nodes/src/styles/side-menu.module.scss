@@ -109,25 +109,6 @@
     margin-left: auto;
 }
 
-.closeButton {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #7a7f89;
-    transition: all 0.2s ease;
-
-    &:hover {
-        background-color: rgba(0, 0, 0, 0.06);
-        color: #40444d;
-    }
-}
-
 .headerText {
     display: flex;
     flex-direction: column;
@@ -172,35 +153,6 @@
     }
 }
 
-.refreshButton {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 6px;
-    display: flex;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-
-    &:hover {
-        background-color: rgba(48, 94, 235, 0.06);
-    }
-
-    &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    &.loading {
-        animation: spin 1s linear infinite;
-    }
-}
-
-.refreshIcon {
-    width: 24px;
-    height: 24px;
-    display: block;
-    color: #40444d;
-}
 
 @keyframes spin {
     from {
