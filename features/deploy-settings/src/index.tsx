@@ -93,11 +93,57 @@ export const DeploySettings: React.FC<DeploySettingsProps> = ({ workflow, onBack
   const [isEmbedCollapsed, setIsEmbedCollapsed] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
   const interactionIdRef = useRef('');
+  const embedContainerRef = useRef<HTMLDivElement>(null);
+  const [embedScale, setEmbedScale] = useState(1);
 
   const baseUrl = useMemo(() => {
     if (typeof window !== 'undefined') return window.location.origin;
     return '';
   }, []);
+
+  // ── Compute embed scale to fit container ────────────────
+
+  useEffect(() => {
+    if (testerTab !== 'embed' || isEmbedCollapsed) return;
+    const container = embedContainerRef.current;
+    if (!container) return;
+
+    const computeScale = () => {
+      const rect = container.getBoundingClientRect();
+      // Leave space for helper bar (52px) + padding
+      const availW = rect.width - 40;
+      const availH = rect.height - 80;
+      const iframeW = parseInt(embedWidth) || 400;
+      const iframeH = parseInt(embedHeight) || 600;
+      const scaleX = availW / iframeW;
+      const scaleY = availH / iframeH;
+      setEmbedScale(Math.min(scaleX, scaleY, 1));
+    };
+
+    computeScale();
+    const observer = new ResizeObserver(computeScale);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [testerTab, isEmbedCollapsed, embedWidth, embedHeight]);
+
+  // ── Build welcome messages for tester ───────────────────
+
+  const welcomeMessages: ChatMsg[] = useMemo(() => {
+    const msgs: ChatMsg[] = [];
+    if (welcomeMsg) {
+      msgs.push({
+        id: 'welcome_msg', sender: 'assistant', content: welcomeMsg,
+        createdAt: new Date().toISOString(), status: 'sent',
+      });
+    }
+    return msgs;
+  }, [welcomeMsg]);
+
+  // Whether user has sent any messages (to control suggestion visibility)
+  const hasUserChatMessages = useMemo(
+    () => chatMessages.some((m: ChatMsg) => m.sender === 'user'),
+    [chatMessages],
+  );
 
   // ── Load deploy settings ────────────────────────────────
 
@@ -360,13 +406,13 @@ export const DeploySettings: React.FC<DeploySettingsProps> = ({ workflow, onBack
     }
   }, [toast, t]);
 
-  // Convert for ChatPanel
+  // Convert for ChatPanel (prepend welcome messages)
   const panelMessages: ChatPanelMessage[] = useMemo(
-    () => chatMessages.map((m: ChatMsg) => ({
+    () => [...welcomeMessages, ...chatMessages].map((m: ChatMsg) => ({
       id: m.id, sender: m.sender, content: m.content,
       createdAt: m.createdAt, status: m.status, errorMessage: m.errorMessage,
     })),
-    [chatMessages],
+    [welcomeMessages, chatMessages],
   );
 
   // Cleanup blob URLs
@@ -834,8 +880,9 @@ export const DeploySettings: React.FC<DeploySettingsProps> = ({ workflow, onBack
         </div>
 
         {/* ─── Right Panel: Bot Tester ─── */}
-        <div className={`flex flex-col flex-[3] min-w-0 bg-white rounded-lg border border-gray-200 p-5 ${theme === 'dark' ? 'bg-[#1a1a1a]' : ''}`}>
-          <div className="flex items-center justify-between mb-3 shrink-0">
+        <div className="flex flex-col flex-[3] min-w-0 bg-white rounded-lg border border-gray-200 overflow-hidden">
+          {/* Tester Header */}
+          <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 shrink-0">
             <h2 className="text-lg font-semibold text-gray-800">{t('deploySettings.tester.title')}</h2>
             <div className="flex items-center gap-1">
               <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
@@ -871,11 +918,43 @@ export const DeploySettings: React.FC<DeploySettingsProps> = ({ workflow, onBack
             </div>
           </div>
 
-          <div className={`flex-1 flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200 p-3 overflow-hidden relative ${theme === 'dark' ? 'bg-[#1a1a1a]' : ''}`}>
-            {testerTab === 'chat' ? (
-              <div className="w-full h-full rounded-lg bg-white shadow-md overflow-hidden" key={`chat_${chatKey}`}>
+          {/* Tester Content */}
+          {testerTab === 'chat' ? (
+            /* ─── Chat Tab: Full chatbot preview ─── */
+            <div
+              className="flex flex-col flex-1 min-h-0"
+              style={{
+                backgroundColor: theme === 'dark' ? '#1a1a2e' : '#ffffff',
+              }}
+              key={`chat_${chatKey}`}
+            >
+              {/* Chat Header (mimics deployed chatbot) */}
+              <div
+                className="flex items-center gap-3 px-5 py-3 border-b shrink-0"
+                style={{ borderColor: theme === 'dark' ? '#333' : '#e5e7eb' }}
+              >
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  {profileImage ? (
+                    <img src={profileImage} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    botName.charAt(0).toUpperCase()
+                  )}
+                </div>
+                <span
+                  className="font-semibold text-sm"
+                  style={{ color: theme === 'dark' ? '#e5e7eb' : '#1f2937' }}
+                >
+                  {botName}
+                </span>
+              </div>
+
+              {/* ChatPanel — variant="full" for proper avatars, timestamps, bubbles */}
+              <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                 <ChatPanel
-                  variant="compact"
+                  variant="full"
                   messages={panelMessages}
                   onSend={handleSend}
                   onStop={handleStop}
@@ -885,44 +964,116 @@ export const DeploySettings: React.FC<DeploySettingsProps> = ({ workflow, onBack
                   placeholder="Type your message..."
                   emptyState={
                     <ChatEmptyState
-                      variant="compact"
+                      variant="full"
                       title={botName}
                       description={welcomeMsg || 'How can I help you?'}
+                      suggestions={suggestedReplies
+                        .filter((r: string) => r.trim())
+                        .map((r: string) => ({ key: r, label: r }))}
+                      onSuggestionClick={handleSend}
                     />
                   }
                 />
-              </div>
-            ) : (
-              <div className="w-full h-full min-h-[500px] relative">
-                {/* Embed helper bar */}
-                <div className="absolute top-3 left-3 right-3 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg z-10 flex items-center justify-between gap-3">
-                  <p className="text-sm text-blue-600 leading-relaxed">{t('deploySettings.tester.embedHelper')}</p>
-                  <button
-                    onClick={() => setChatKey((k: number) => k + 1)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-[13px] font-medium rounded-md hover:bg-blue-700 transition-all whitespace-nowrap shrink-0"
+                {/* Suggested replies — shown after welcome message, before user sends */}
+                {!hasUserChatMessages && welcomeMsg && suggestedReplies.some((r: string) => r.trim()) && (
+                  <div
+                    className="flex flex-wrap gap-2 px-6 pb-2 -mt-1"
+                    style={{ justifyContent: suggestedRepliesAlignment === 'center' ? 'center' : suggestedRepliesAlignment === 'right' ? 'flex-end' : 'flex-start' }}
                   >
-                    <FiRefreshCw className="w-3.5 h-3.5" />
-                    {t('deploySettings.tester.refresh')}
-                  </button>
-                </div>
-
-                {/* Embed iframe */}
-                <div className="relative w-full h-full min-h-[600px] bg-gray-100 rounded-lg mt-12">
-                  <iframe
-                    key={`embed_${chatKey}_${embedWidth}_${embedHeight}`}
-                    src={`${baseUrl}/chatbot/${workflow.id}?userId=${user?.id || ''}`}
-                    title="Embed Preview"
-                    className="absolute bottom-5 right-5 border-none rounded-xl shadow-lg transition-all duration-300 overflow-hidden"
-                    style={{
-                      width: isEmbedCollapsed ? '60px' : `${embedWidth}px`,
-                      height: isEmbedCollapsed ? '60px' : `${embedHeight}px`,
-                      borderRadius: isEmbedCollapsed ? '50%' : '12px',
-                    }}
-                  />
-                </div>
+                    {suggestedReplies.filter((r: string) => r.trim()).map((r: string, i: number) => (
+                      <button
+                        key={i}
+                        className="px-4 py-2 text-sm font-medium border rounded-full cursor-pointer transition-all hover:shadow-sm"
+                        style={{
+                          color: primaryColor,
+                          borderColor: `${primaryColor}4d`,
+                          backgroundColor: 'white',
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.target as HTMLButtonElement).style.backgroundColor = primaryColor;
+                          (e.target as HTMLButtonElement).style.color = 'white';
+                          (e.target as HTMLButtonElement).style.borderColor = primaryColor;
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.target as HTMLButtonElement).style.backgroundColor = 'white';
+                          (e.target as HTMLButtonElement).style.color = primaryColor;
+                          (e.target as HTMLButtonElement).style.borderColor = `${primaryColor}4d`;
+                        }}
+                        onClick={() => handleSend(r)}
+                      >
+                        {r}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            /* ─── Embed Tab: Scaled iframe preview ─── */
+            <div
+              ref={embedContainerRef}
+              className="flex-1 min-h-0 relative bg-gray-100 overflow-hidden"
+            >
+              {/* Helper bar */}
+              <div className="absolute top-3 left-3 right-3 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg z-10 flex items-center justify-between gap-3">
+                <p className="text-sm text-blue-600 leading-relaxed">{t('deploySettings.tester.embedHelper')}</p>
+                <button
+                  onClick={() => { setChatKey((k: number) => k + 1); setIsEmbedCollapsed(!defaultExpanded); }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-[13px] font-medium rounded-md hover:bg-blue-700 transition-all whitespace-nowrap shrink-0"
+                >
+                  <FiRefreshCw className="w-3.5 h-3.5" />
+                  {t('deploySettings.tester.refresh')}
+                </button>
+              </div>
+
+              {/* Embed simulation area */}
+              <div className="absolute inset-0 top-14 flex items-center justify-center p-5">
+                {isEmbedCollapsed ? (
+                  /* Collapsed bubble */
+                  <div className="absolute bottom-5 right-5">
+                    <button
+                      onClick={() => setIsEmbedCollapsed(false)}
+                      className="w-[60px] h-[60px] rounded-full shadow-lg flex items-center justify-center text-white text-xl font-bold hover:scale-110 transition-transform"
+                      style={{ backgroundColor: primaryColor }}
+                    >
+                      {profileImage ? (
+                        <img src={profileImage} alt="" className="w-full h-full object-cover rounded-full" />
+                      ) : (
+                        botName.charAt(0).toUpperCase()
+                      )}
+                    </button>
+                  </div>
+                ) : (
+                  /* Expanded embed — scaled iframe */
+                  <div className="absolute bottom-5 right-5 origin-bottom-right" style={{
+                    transform: `scale(${embedScale})`,
+                  }}>
+                    <div
+                      className="relative rounded-xl shadow-2xl overflow-hidden border border-gray-200"
+                      style={{
+                        width: `${parseInt(embedWidth) || 400}px`,
+                        height: `${parseInt(embedHeight) || 600}px`,
+                      }}
+                    >
+                      {/* Close button overlay */}
+                      <button
+                        onClick={() => setIsEmbedCollapsed(true)}
+                        className="absolute top-2 right-2 z-20 w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 text-xs transition-colors"
+                      >
+                        ✕
+                      </button>
+                      <iframe
+                        key={`embed_${chatKey}_${embedWidth}_${embedHeight}`}
+                        src={`${baseUrl}/chatbot/${workflow.id}?userId=${user?.id || ''}`}
+                        title="Embed Preview"
+                        className="w-full h-full border-none"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
