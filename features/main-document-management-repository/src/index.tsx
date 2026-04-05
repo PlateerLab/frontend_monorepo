@@ -119,7 +119,7 @@ const MOCK_REPOSITORIES: RepositoryItem[] = [
 
 export interface DocumentRepositoryProps extends DocumentTabPluginProps {}
 
-export const DocumentRepository: React.FC<DocumentRepositoryProps> = () => {
+export const DocumentRepository: React.FC<DocumentRepositoryProps> = ({ onSubToolbarChange }) => {
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
@@ -192,9 +192,9 @@ export const DocumentRepository: React.FC<DocumentRepositoryProps> = () => {
     return repositories.filter(r => r.repositoryName.toLowerCase().includes(search.toLowerCase()));
   }, [repositories, search]);
 
-  return (
-    <div className="flex flex-col h-full gap-6">
-      {/* Header */}
+  // Push subToolbar content to orchestrator
+  useEffect(() => {
+    onSubToolbarChange?.(
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div />
         <div className="flex items-center gap-3">
@@ -210,7 +210,16 @@ export const DocumentRepository: React.FC<DocumentRepositoryProps> = () => {
           </Button>
         </div>
       </div>
+    );
+  }, [onSubToolbarChange, search, t]);
 
+  // Cleanup subToolbar on unmount
+  useEffect(() => {
+    return () => { onSubToolbarChange?.(null); };
+  }, [onSubToolbarChange]);
+
+  return (
+    <div className="flex flex-col flex-1 min-h-0 p-6">
       {/* Content */}
       <div className="flex-1 min-h-0 overflow-y-auto">
         {loading ? (

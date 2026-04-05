@@ -103,7 +103,7 @@ const MOCK_FILE_STORAGES: FileStorageItem[] = [
 
 export interface DocumentStorageProps extends DocumentTabPluginProps {}
 
-export const DocumentStorage: React.FC<DocumentStorageProps> = () => {
+export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarChange }) => {
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
@@ -172,14 +172,14 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = () => {
     });
   }, [fileStorages, search, ownerFilter]);
 
-  return (
-    <div className="flex flex-col h-full gap-6">
-      {/* Header */}
+  // Push subToolbar content to orchestrator
+  useEffect(() => {
+    onSubToolbarChange?.(
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <FilterTabs
           tabs={ownerFilterTabs}
           activeKey={ownerFilter}
-          onChange={(key) => setOwnerFilter(key as OwnerFilter)}
+          onChange={(key: string) => setOwnerFilter(key as OwnerFilter)}
           variant="underline"
         />
         <div className="flex items-center gap-3">
@@ -195,7 +195,16 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = () => {
           </Button>
         </div>
       </div>
+    );
+  }, [onSubToolbarChange, ownerFilterTabs, ownerFilter, search, t]);
 
+  // Cleanup subToolbar on unmount
+  useEffect(() => {
+    return () => { onSubToolbarChange?.(null); };
+  }, [onSubToolbarChange]);
+
+  return (
+    <div className="flex flex-col flex-1 min-h-0 p-6">
       {/* Content */}
       <div className="flex-1 min-h-0 overflow-y-auto">
         {loading ? (

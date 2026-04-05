@@ -108,7 +108,7 @@ const MOCK_DB_CONNECTIONS: DBConnectionItem[] = [
 
 export interface DocumentDatabaseProps extends DocumentTabPluginProps {}
 
-export const DocumentDatabase: React.FC<DocumentDatabaseProps> = () => {
+export const DocumentDatabase: React.FC<DocumentDatabaseProps> = ({ onSubToolbarChange }) => {
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
@@ -179,9 +179,9 @@ export const DocumentDatabase: React.FC<DocumentDatabaseProps> = () => {
     return dbConnections.filter(db => db.connectionName.toLowerCase().includes(search.toLowerCase()));
   }, [dbConnections, search]);
 
-  return (
-    <div className="flex flex-col h-full gap-6">
-      {/* Header */}
+  // Push subToolbar content to orchestrator
+  useEffect(() => {
+    onSubToolbarChange?.(
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div />
         <div className="flex items-center gap-3">
@@ -197,7 +197,16 @@ export const DocumentDatabase: React.FC<DocumentDatabaseProps> = () => {
           </Button>
         </div>
       </div>
+    );
+  }, [onSubToolbarChange, search, t]);
 
+  // Cleanup subToolbar on unmount
+  useEffect(() => {
+    return () => { onSubToolbarChange?.(null); };
+  }, [onSubToolbarChange]);
+
+  return (
+    <div className="flex flex-col flex-1 min-h-0 p-6">
       {/* Content */}
       <div className="flex-1 min-h-0 overflow-y-auto">
         {loading ? (

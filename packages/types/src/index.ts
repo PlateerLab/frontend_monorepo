@@ -1124,6 +1124,8 @@ export interface DocumentTabPlugin {
 export interface DocumentTabPluginProps {
   /** 다른 섹션으로 이동 */
   onNavigate?: (sectionId: string) => void;
+  /** 서브 툴바 콘텐츠를 상위로 전달 */
+  onSubToolbarChange?: (content: React.ReactNode) => void;
 }
 
 // ─────────────────────────────────────────────────────────────
