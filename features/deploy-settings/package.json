@@ -1,24 +1,24 @@
 {
-  "name": "@xgen/main-workflow-management-storage",
+  "name": "@xgen/feature-deploy-settings",
   "version": "0.0.0",
   "private": true,
   "main": "src/index.tsx",
   "types": "src/index.tsx",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
   "dependencies": {
     "@xgen/types": "workspace:*",
-    "@xgen/ui": "workspace:*",
     "@xgen/i18n": "workspace:*",
     "@xgen/icons": "workspace:*",
-    "@xgen/auth-provider": "workspace:*",
+    "@xgen/ui": "workspace:*",
     "@xgen/api-client": "workspace:*",
-    "@xgen/feature-canvas-deploy": "workspace:*",
-    "@xgen/feature-deploy-settings": "workspace:*",
-    "next": "^15.1.0",
+    "@xgen/auth-provider": "workspace:*",
+    "@xgen/config": "workspace:*",
     "react": "^19.0.0"
   },
   "devDependencies": {
     "@types/react": "^19",
-    "sass": "^1.89.2",
     "typescript": "^5"
   }
 }

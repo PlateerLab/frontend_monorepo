@@ -87,6 +87,8 @@ export const en: TranslationData = {
       approvalDesc: 'Require admin approval before deployment',
       cancel: 'Cancel',
       save: 'Save',
+      saving: 'Saving...',
+      pendingApproval: 'This workflow is currently pending admin approval for deployment.',
     },
     versionsModal: {
       current: 'Current Version',

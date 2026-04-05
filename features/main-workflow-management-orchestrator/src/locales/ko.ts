@@ -88,6 +88,8 @@ export const ko: TranslationData = {
       approvalDesc: '배포 전 관리자 승인이 필요합니다',
       cancel: '취소',
       save: '저장',
+      saving: '저장 중...',
+      pendingApproval: '이 워크플로우는 현재 관리자 배포 승인 대기 중입니다.',
     },
     versionsModal: {
       current: '현재 버전',

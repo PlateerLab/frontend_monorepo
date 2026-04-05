@@ -149,6 +149,9 @@ importers:
       '@xgen/feature-canvas-sidebar-workflows':
         specifier: workspace:*
         version: link:../../features/canvas-sidebar-workflows
+      '@xgen/feature-deploy-settings':
+        specifier: workspace:*
+        version: link:../../features/deploy-settings
       '@xgen/feature-main-ChatHistory':
         specifier: workspace:*
         version: link:../../features/main-ChatHistory
@@ -1436,6 +1439,40 @@ importers:
         specifier: ^19.0.0
         version: 19.2.4
 
+  features/deploy-settings:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
   features/main-AuthProfile:
     dependencies:
       '@xgen/api-client':
@@ -1995,6 +2032,12 @@ importers:
       '@xgen/auth-provider':
         specifier: workspace:*
         version: link:../../packages/auth-provider
+      '@xgen/feature-canvas-deploy':
+        specifier: workspace:*
+        version: link:../canvas-deploy
+      '@xgen/feature-deploy-settings':
+        specifier: workspace:*
+        version: link:../deploy-settings
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n

@@ -496,6 +496,19 @@ export async function getDeployStatus(workflowId: string, userId: string | numbe
     return response.data;
 }
 
+/** Public version of getDeployStatus that skips authentication (for chatbot page). */
+export async function getDeployStatusPublic(workflowId: string, userId: string | number): Promise<DeployStatus> {
+    const client = createApiClient({
+        getAccessToken: () => null,
+        onUnauthorized: () => {},
+    });
+    const response = await client.post<DeployStatus>(
+        `/api/workflow/deploy/status/${encodeURIComponent(workflowId)}`,
+        { user_id: String(userId) },
+    );
+    return response.data;
+}
+
 export async function generateEmbedJs(params: {
     workflowId: string;
     userId: string;
@@ -507,6 +520,104 @@ export async function generateEmbedJs(params: {
 }): Promise<{ url: string }> {
     const client = getClient();
     const response = await client.post<{ url: string }>('/api/workflow/generate-embed', params);
+    return response.data;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Deploy Settings API
+// ─────────────────────────────────────────────────────────────
+
+export interface DeployUpdateData {
+    deploy_name?: string;
+    deploy_start_msg?: string;
+    deploy_msg_selection?: string[];
+    deploy_img?: string;
+    deploy_style?: {
+        theme?: 'light' | 'dark';
+        primaryColor?: string;
+        botMessageColor?: string;
+        embedWidth?: string;
+        embedHeight?: string;
+        defaultExpanded?: boolean;
+        enableAudio?: boolean;
+        enableFile?: boolean;
+        enableToolList?: boolean;
+        enableAgentList?: boolean;
+        suggestedRepliesAlignment?: 'left' | 'center' | 'right';
+    };
+    deploy_error_msg?: Record<string, string>;
+}
+
+export async function updateDeploySettings(
+    workflowId: string,
+    updateData: DeployUpdateData,
+): Promise<{ message: string; workflow_id: string }> {
+    const client = getClient();
+    const response = await client.post<{ message: string; workflow_id: string }>(
+        `/api/workflow/deploy/update/${encodeURIComponent(workflowId)}`,
+        updateData,
+    );
+    return response.data;
+}
+
+export async function uploadDeployImage(
+    workflowId: string,
+    file: File | null,
+    userId?: number | string,
+    defaultImage?: boolean,
+): Promise<{ message: string; workflow_id: string; deploy_img: string; object_name: string; file_size: number }> {
+    // FormData upload requires raw fetch (not JSON)
+    const client = getClient();
+    const baseUrl = (client as any).baseUrl || '';
+    const formData = new FormData();
+    if (file) formData.append('file', file);
+    if (userId) formData.append('user_id_form', String(userId));
+    if (defaultImage) formData.append('default_image', 'true');
+
+    const token = typeof document !== 'undefined'
+        ? document.cookie.match(/xgen_access_token=([^;]+)/)?.[1] ?? null
+        : null;
+    const headers: Record<string, string> = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const response = await fetch(
+        `${baseUrl}/api/workflow/deploy/update/image/${encodeURIComponent(workflowId)}`,
+        { method: 'POST', headers, body: formData },
+    );
+    if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
+    return response.json();
+}
+
+export async function getDeployImage(workflowId: string, bustCache = true): Promise<string> {
+    const client = getClient();
+    const baseUrl = (client as any).baseUrl || '';
+    const timestamp = bustCache ? `?t=${Date.now()}` : '';
+
+    const token = typeof document !== 'undefined'
+        ? document.cookie.match(/xgen_access_token=([^;]+)/)?.[1] ?? null
+        : null;
+    const headers: Record<string, string> = {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+    };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const response = await fetch(
+        `${baseUrl}/api/workflow/deploy/image/${encodeURIComponent(workflowId)}${timestamp}`,
+        { method: 'GET', headers },
+    );
+    if (!response.ok) throw new Error(`Get image failed: ${response.status}`);
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
+}
+
+export async function deleteDeployChat(
+    interactionId: string,
+): Promise<{ success: boolean; message?: string }> {
+    const client = getClient();
+    const response = await client.delete<{ success: boolean; message?: string }>(
+        `/api/workflow/deploy/logs/${encodeURIComponent(interactionId)}`,
+    );
     return response.data;
 }
 

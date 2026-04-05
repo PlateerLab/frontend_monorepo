@@ -62,6 +62,8 @@ const nextConfig: NextConfig = {
         '@xgen/feature-canvas-ai-generator',
         '@xgen/feature-canvas-node-detail',
         '@xgen/feature-canvas-document-drop',
+        '@xgen/feature-canvas-deploy',
+        '@xgen/feature-deploy-settings',
         '@xgen/sidebar-main',
         '@xgen/sidebar-admin',
         // admin features (33 individual per-sidebar-item packages)
