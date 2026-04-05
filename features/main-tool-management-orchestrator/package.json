@@ -1,5 +1,5 @@
 {
-  "name": "@xgen/main-prompt-storage",
+  "name": "@xgen/main-tool-management-orchestrator",
   "version": "0.1.0",
   "private": true,
   "main": "./src/index.tsx",
@@ -14,13 +14,11 @@
     "@xgen/ui": "workspace:*",
     "@xgen/i18n": "workspace:*",
     "@xgen/api-client": "workspace:*",
-    "react": "^18.0.0"
+    "next": "^15.1.0",
+    "react": "^19.0.0"
   },
   "devDependencies": {
-    "@types/react": "^18.0.0",
-    "typescript": "^5.0.0"
-  },
-  "peerDependencies": {
-    "react": "^18.0.0"
+    "@types/react": "^19",
+    "typescript": "^5"
   }
 }

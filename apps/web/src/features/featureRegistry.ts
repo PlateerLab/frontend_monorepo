@@ -182,8 +182,8 @@ export async function initializeFeatures(): Promise<void> {
     // Workflow Section
     import('@xgen/main-canvas-intro'),
     import('@xgen/main-workflow-management-orchestrator'),
-    import('@xgen/main-tool-storage'),
-    import('@xgen/main-prompt-storage'),
+    import('@xgen/main-tool-management-orchestrator'),
+    import('@xgen/main-prompt-management-orchestrator'),
     import('@xgen/main-auth-profile'),
 
     // Knowledge Section
@@ -245,6 +245,18 @@ export async function initializeFeatures(): Promise<void> {
 
   CoreRegistry.registerToolTabPlugin(toolStorageMod.toolStoragePlugin);
   CoreRegistry.registerToolTabPlugin(toolLibraryMod.toolLibraryPlugin);
+
+  // Register Prompt Tab Plugins (순서 = 탭 순서)
+  const [
+    promptStorageMod,
+    promptLibraryMod,
+  ] = await Promise.all([
+    import('@xgen/main-prompt-management-storage'),
+    import('@xgen/main-prompt-management-library'),
+  ]);
+
+  CoreRegistry.registerPromptTabPlugin(promptStorageMod.promptStoragePlugin);
+  CoreRegistry.registerPromptTabPlugin(promptLibraryMod.promptLibraryPlugin);
 
   // Register Canvas Page Plugins
   registerCanvasPlugins();

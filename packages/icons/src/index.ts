@@ -98,6 +98,7 @@ export {
 
   // Misc
   FiZap,
+  FiHash,
   FiTool,
   FiTrendingUp,
   FiGithub,
