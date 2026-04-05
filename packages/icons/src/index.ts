@@ -98,6 +98,7 @@ export {
 
   // Misc
   FiZap,
+  FiTool,
   FiTrendingUp,
   FiGithub,
 } from 'react-icons/fi';

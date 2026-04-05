@@ -234,6 +234,18 @@ export async function initializeFeatures(): Promise<void> {
   CoreRegistry.registerDocumentTabPlugin(docRepositoryMod.documentRepositoryPlugin);
   CoreRegistry.registerDocumentTabPlugin(docDatabaseMod.documentDatabasePlugin);
 
+  // Register Tool Tab Plugins (순서 = 탭 순서)
+  const [
+    toolStorageMod,
+    toolLibraryMod,
+  ] = await Promise.all([
+    import('@xgen/main-tool-management-storage'),
+    import('@xgen/main-tool-management-library'),
+  ]);
+
+  CoreRegistry.registerToolTabPlugin(toolStorageMod.toolStoragePlugin);
+  CoreRegistry.registerToolTabPlugin(toolLibraryMod.toolLibraryPlugin);
+
   // Register Canvas Page Plugins
   registerCanvasPlugins();
 

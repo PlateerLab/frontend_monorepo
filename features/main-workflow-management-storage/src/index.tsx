@@ -132,18 +132,29 @@ export const WorkflowStorage: React.FC<WorkflowStorageProps> = ({ onNavigate, on
   // Handlers
   const handleExecute = useCallback(
     (workflow: WorkflowDetail) => {
-      router.push(
-        `/main?view=new-chat&workflowName=${encodeURIComponent(workflow.name)}&workflowId=${encodeURIComponent(workflow.id)}&user_id=${workflow.userId}`
-      );
+      const interactionId = `chat_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+      try {
+        localStorage.setItem('xgen_current_chat', JSON.stringify({
+          workflowId: workflow.id,
+          workflowName: workflow.name,
+          interactionId,
+          userId: workflow.userId,
+          startedAt: new Date().toISOString(),
+        }));
+      } catch (err) {
+        console.error('Failed to save current chat data:', err);
+        return;
+      }
+      onNavigate?.('current-chat');
     },
-    [router]
+    [onNavigate]
   );
 
   const handleEdit = useCallback(
     (workflow: WorkflowDetail) => {
       localStorage.setItem(
         'canvas-previous-page',
-        JSON.stringify({ path: '/main?view=workflows', timestamp: Date.now() })
+        JSON.stringify({ path: '/main?section=workflows', timestamp: Date.now() })
       );
       router.push(`/canvas?load=${encodeURIComponent(workflow.id)}&user_id=${workflow.userId}`);
     },

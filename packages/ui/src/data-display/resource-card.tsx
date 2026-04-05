@@ -1,6 +1,7 @@
 ﻿'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
+import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import type {
   ResourceCardProps,
   CardBadge,
@@ -33,6 +34,7 @@ const badgeVariantClasses: Record<string, string> = {
   default: 'bg-gray-100 text-gray-600',
   secondary: 'bg-gray-100 text-gray-500',
   primary: 'bg-primary/10 text-primary',
+  purple: 'bg-purple-100 text-purple-600',
 };
 
 export function ResourceCard<T = unknown>({
@@ -55,21 +57,8 @@ export function ResourceCard<T = unknown>({
   inactiveMessage,
   className,
 }: ResourceCardProps<T>): React.ReactElement {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setMenuOpen(false);
-      }
-    };
-    if (menuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [menuOpen]);
-
+  // ── Card-level click ──
   const handleCardClick = useCallback(
     (e: React.MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -80,9 +69,10 @@ export function ResourceCard<T = unknown>({
         onClick(data);
       }
     },
-    [id, data, selectable, selected, onClick, onSelect]
+    [id, data, selectable, selected, onClick, onSelect],
   );
 
+  // ── Card-level double-click ──
   const handleCardDoubleClick = useCallback(
     (e: React.MouseEvent) => {
       if (inactive || selectable) return;
@@ -94,21 +84,18 @@ export function ResourceCard<T = unknown>({
         onDoubleClick(data);
       }
     },
-    [data, inactive, selectable, onDoubleClick]
+    [data, inactive, selectable, onDoubleClick],
   );
 
-  const handleActionClick = useCallback((action: CardActionButton, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!action.disabled) action.onClick();
-  }, []);
-
-  const handleDropdownItemClick = useCallback((item: CardDropdownItem, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!item.disabled) {
-      item.onClick();
-      setMenuOpen(false);
-    }
-  }, []);
+  // ── Action button click ──
+  const handleActionClick = useCallback(
+    (action: CardActionButton, e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!action.disabled) action.onClick();
+    },
+    [],
+  );
 
   const renderThumbnail = () => {
     if (!thumbnail) {
@@ -173,7 +160,7 @@ export function ResourceCard<T = unknown>({
   const renderActions = () => {
     if (inactive) {
       return (
-        <div data-card-actions className="pt-2 border-t border-border mt-2">
+        <div data-card-actions className="pt-2 border-t border-[var(--color-line-50)] mt-2">
           <div className="text-xs text-muted-foreground italic">{inactiveMessage || '비활성 상태'}</div>
         </div>
       );
@@ -184,11 +171,12 @@ export function ResourceCard<T = unknown>({
     if (!hasPrimary && !hasDropdown) return null;
 
     return (
-      <div data-card-actions className="flex items-center justify-between pt-2 border-t border-border mt-2">
+      <div data-card-actions className="flex items-center justify-between pt-2 border-t border-[var(--color-line-50)] mt-2">
         <div className="flex items-center gap-1">
           {primaryActions?.map((action) => (
             <button
               key={action.id}
+              type="button"
               className={cn(
                 'p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors',
                 action.disabled && 'opacity-40 cursor-not-allowed',
@@ -204,40 +192,52 @@ export function ResourceCard<T = unknown>({
 
         <div className="flex items-center">
           {hasDropdown && (
-            <div ref={dropdownRef} className="relative">
-              <button
-                className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors"
-                title="더보기"
-                onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
-              >
-                <MoreIcon />
-              </button>
+            <DropdownMenuPrimitive.Root>
+              <DropdownMenuPrimitive.Trigger asChild>
+                <button
+                  type="button"
+                  className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors"
+                  title="더보기"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreIcon />
+                </button>
+              </DropdownMenuPrimitive.Trigger>
 
-              {menuOpen && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); setMenuOpen(false); }} />
-                  <div className="absolute right-0 bottom-full mb-1 z-50 min-w-[160px] rounded-md border border-border bg-popover shadow-lg py-1">
-                    {dropdownActions!.map((item, index) => (
-                      <React.Fragment key={item.id}>
-                        {item.dividerBefore && index > 0 && <div className="h-px bg-border my-1" />}
-                        <button
-                          className={cn(
-                            'w-full flex items-center gap-2 px-3 py-1.5 text-sm text-left transition-colors',
-                            item.danger ? 'text-error hover:bg-error/5' : 'text-foreground hover:bg-gray-50',
-                            item.disabled && 'opacity-50 cursor-not-allowed',
-                          )}
-                          disabled={item.disabled}
-                          onClick={(e) => handleDropdownItemClick(item, e)}
-                        >
-                          {item.icon}
-                          <span>{item.label}</span>
-                        </button>
-                      </React.Fragment>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
+              <DropdownMenuPrimitive.Portal>
+                <DropdownMenuPrimitive.Content
+                  side="top"
+                  align="end"
+                  sideOffset={4}
+                  className="z-50 min-w-[160px] rounded-md border border-[var(--color-line-50)] bg-white shadow-lg py-1 animate-in fade-in-0 zoom-in-95"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {dropdownActions!.map((item, index) => (
+                    <React.Fragment key={item.id}>
+                      {item.dividerBefore && index > 0 && (
+                        <DropdownMenuPrimitive.Separator className="h-px bg-border my-1" />
+                      )}
+                      <DropdownMenuPrimitive.Item
+                        disabled={item.disabled}
+                        onSelect={() => {
+                          if (!item.disabled) item.onClick();
+                        }}
+                        className={cn(
+                          'flex items-center gap-2 px-3 py-1.5 text-sm outline-none cursor-pointer transition-colors',
+                          item.danger
+                            ? 'text-error focus:bg-error/5'
+                            : 'text-foreground focus:bg-gray-50',
+                          item.disabled && 'opacity-50 cursor-not-allowed',
+                        )}
+                      >
+                        {item.icon && <span className="w-4 h-4 shrink-0">{item.icon}</span>}
+                        <span>{item.label}</span>
+                      </DropdownMenuPrimitive.Item>
+                    </React.Fragment>
+                  ))}
+                </DropdownMenuPrimitive.Content>
+              </DropdownMenuPrimitive.Portal>
+            </DropdownMenuPrimitive.Root>
           )}
         </div>
       </div>
@@ -249,11 +249,10 @@ export function ResourceCard<T = unknown>({
   return (
     <div
       className={cn(
-        'relative rounded-lg border border-border bg-card p-4 transition-all',
+        'relative rounded-lg border border-[var(--color-line-50)] bg-card p-4 transition-all',
         selected && 'ring-2 ring-primary border-primary',
         isClickable && 'cursor-pointer hover:shadow-md',
         inactive && 'opacity-60',
-        menuOpen && 'z-10',
         className,
       )}
       onClick={handleCardClick}
