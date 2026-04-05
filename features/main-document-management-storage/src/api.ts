@@ -63,6 +63,17 @@ function transformStorage(raw: StorageAPIResponse): FileStorageItem {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────
+
+async function sha256(text: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ─────────────────────────────────────────────────────────────
 // API Functions
 // ─────────────────────────────────────────────────────────────
 
@@ -93,13 +104,6 @@ export async function createStorage(data: {
     payload.password_hash = await sha256(data.password);
   }
   await api.post('/api/storage/storages', payload);
-}
-
-async function sha256(text: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(text);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 export interface VerifyPasswordResponse {

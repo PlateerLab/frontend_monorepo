@@ -149,7 +149,7 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
         enable_sparse_vector: newCollectionSparse,
         enable_full_text: newCollectionFullText,
         is_secured: newCollectionEncrypt,
-        password_hash: newCollectionEncrypt ? newCollectionPassword : undefined,
+        password: newCollectionEncrypt ? newCollectionPassword : undefined,
       });
       setIsCreateModalOpen(false);
       setNewCollectionName('');
