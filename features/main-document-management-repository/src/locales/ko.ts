@@ -28,6 +28,9 @@ export const ko: TranslationData = {
       creating: '연결 중...',
       cancel: '취소',
     },
+    error: {
+      loadFailed: '레포지토리를 불러오지 못했습니다',
+    },
     empty: {
       title: '레포지토리가 없습니다',
       description: '새 레포지토리를 추가하세요',

@@ -28,10 +28,14 @@ export const en: TranslationData = {
       creating: 'Connecting...',
       cancel: 'Cancel',
     },
+    error: {
+      loadFailed: 'Failed to load DB connections',
+    },
     empty: {
       title: 'No database connections',
       description: 'Add a new connection',
     },
+    shared: 'Shared',
     testConnection: 'Test Connection',
     connected: 'Connected',
     failed: 'Failed',

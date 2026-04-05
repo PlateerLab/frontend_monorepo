@@ -28,6 +28,9 @@ export const en: TranslationData = {
       creating: 'Connecting...',
       cancel: 'Cancel',
     },
+    error: {
+      loadFailed: 'Failed to load repositories',
+    },
     empty: {
       title: 'No repositories',
       description: 'Add a new repository',

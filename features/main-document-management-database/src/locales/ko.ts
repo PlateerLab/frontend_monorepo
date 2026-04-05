@@ -28,10 +28,14 @@ export const ko: TranslationData = {
       creating: '연결 중...',
       cancel: '취소',
     },
+    error: {
+      loadFailed: 'DB 연결 목록을 불러오지 못했습니다',
+    },
     empty: {
       title: '데이터베이스 연결이 없습니다',
       description: '새 연결을 추가하세요',
     },
+    shared: '공유',
     testConnection: '연결 테스트',
     connected: '연결됨',
     failed: '연결 실패',

@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import type { DocumentTabPlugin, DocumentTabPluginProps } from '@xgen/types';
-import { Button, EmptyState, FilterTabs, SearchInput, Modal, Input, Label, Switch, Textarea } from '@xgen/ui';
+import type { DocumentTabPlugin, DocumentTabPluginProps, CardBadge } from '@xgen/types';
+import { Button, FilterTabs, SearchInput, Modal, Input, Label, Switch, Textarea, ResourceCardGrid } from '@xgen/ui';
+import { FiFolder, FiFileText, FiClock, FiTrash2 } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
+import { listCollections, createCollection, deleteCollection, type CollectionItem } from './api';
 import './locales';
 
 // ─────────────────────────────────────────────────────────────
@@ -12,32 +14,9 @@ import './locales';
 
 export type OwnerFilter = 'all' | 'personal' | 'shared';
 
-export interface CollectionItem {
-  id: string;
-  name: string;
-  displayName: string;
-  documentCount: number;
-  isShared: boolean;
-  embedding: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 // ─────────────────────────────────────────────────────────────
-// Icons
+// Icons (for plus button in toolbar)
 // ─────────────────────────────────────────────────────────────
-
-const FolderIcon: React.FC = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M17.5 15.833c0 .442-.176.866-.488 1.179a1.667 1.667 0 01-1.179.488H4.167c-.442 0-.866-.176-1.179-.488A1.667 1.667 0 012.5 15.833V4.167c0-.442.176-.866.488-1.179A1.667 1.667 0 014.167 2.5h4.166L10 5h6.333c.442 0 .866.176 1.179.488.312.313.488.737.488 1.179v9.166z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const SharedIcon: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10.5 4.667a1.75 1.75 0 100-3.5 1.75 1.75 0 000 3.5zM3.5 8.75a1.75 1.75 0 100-3.5 1.75 1.75 0 000 3.5zM10.5 12.833a1.75 1.75 0 100-3.5 1.75 1.75 0 000 3.5zM5.075 7.928l3.858 2.227M5.075 5.845l3.858-2.228" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
 
 const PlusIcon: React.FC = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -45,62 +24,19 @@ const PlusIcon: React.FC = () => (
   </svg>
 );
 
-const CollectionEmptyIcon: React.FC = () => (
-  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M28 6H14C12.939 6 11.922 6.421 11.172 7.172C10.421 7.922 10 8.939 10 10V38C10 39.061 10.421 40.078 11.172 40.828C11.922 41.579 12.939 42 14 42H34C35.061 42 36.078 41.579 36.828 40.828C37.579 40.078 38 39.061 38 38V16L28 6Z" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M28 6V16H38M32 26H16M32 34H16M20 18H16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
 // ─────────────────────────────────────────────────────────────
-// Mock Data
+// Helpers
 // ─────────────────────────────────────────────────────────────
 
-const MOCK_COLLECTIONS: CollectionItem[] = [
-  {
-    id: 'col-001',
-    name: 'ecommerce_law',
-    displayName: '전자상거래법 가이드',
-    documentCount: 24,
-    isShared: false,
-    embedding: 'text-embedding-ada-002',
-    createdAt: '2025-01-10T10:00:00Z',
-    updatedAt: '2025-01-25T14:00:00Z',
-  },
-  {
-    id: 'col-002',
-    name: 'customer_faq',
-    displayName: '고객문의 FAQ',
-    documentCount: 56,
-    isShared: true,
-    embedding: 'text-embedding-ada-002',
-    createdAt: '2025-01-12T11:00:00Z',
-    updatedAt: '2025-01-26T10:00:00Z',
-  },
-  {
-    id: 'col-003',
-    name: 'hr_policy',
-    displayName: 'HR 규정집',
-    documentCount: 12,
-    isShared: true,
-    embedding: 'text-embedding-3-small',
-    createdAt: '2025-01-08T09:00:00Z',
-    updatedAt: '2025-01-28T08:00:00Z',
-  },
-  {
-    id: 'col-004',
-    name: 'tech_docs',
-    displayName: '기술 문서',
-    documentCount: 34,
-    isShared: false,
-    embedding: 'text-embedding-ada-002',
-    createdAt: '2025-01-15T16:00:00Z',
-    updatedAt: '2025-01-27T12:00:00Z',
-  },
-];
+function formatDate(dateStr: string): string {
+  if (!dateStr) return '';
+  try {
+    return new Date(dateStr).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  } catch { return dateStr; }
+}
 
 // ─────────────────────────────────────────────────────────────
-// DocumentCollection Component (컬렉션 탭)
+// DocumentCollection Component
 // ─────────────────────────────────────────────────────────────
 
 export interface DocumentCollectionProps extends DocumentTabPluginProps {}
@@ -109,6 +45,7 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [ownerFilter, setOwnerFilter] = useState<OwnerFilter>('all');
   const [collections, setCollections] = useState<CollectionItem[]>([]);
@@ -122,15 +59,17 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
 
   const loadData = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      await new Promise(resolve => setTimeout(resolve, 400));
-      setCollections(MOCK_COLLECTIONS);
-    } catch (error) {
-      console.error('Failed to load collections:', error);
+      const data = await listCollections();
+      setCollections(data);
+    } catch (err) {
+      console.error('Failed to load collections:', err);
+      setError(t('documents.collection.error.loadFailed'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadData();
@@ -146,8 +85,13 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
     if (!newCollectionName.trim()) return;
     setCreating(true);
     try {
-      // TODO: API call to create collection
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await createCollection({
+        collection_make_name: newCollectionName.trim(),
+        description: newCollectionDesc.trim() || undefined,
+        enable_sparse_vector: newCollectionSparse,
+        enable_full_text: newCollectionFullText,
+        is_secured: newCollectionEncrypt,
+      });
       setIsCreateModalOpen(false);
       setNewCollectionName('');
       setNewCollectionDesc('');
@@ -155,12 +99,21 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
       setNewCollectionFullText(false);
       setNewCollectionEncrypt(false);
       await loadData();
-    } catch (error) {
-      console.error('Failed to create collection:', error);
+    } catch (err) {
+      console.error('Failed to create collection:', err);
     } finally {
       setCreating(false);
     }
-  }, [newCollectionName, loadData]);
+  }, [newCollectionName, newCollectionDesc, newCollectionSparse, newCollectionFullText, newCollectionEncrypt, loadData]);
+
+  const handleDeleteCollection = useCallback(async (col: CollectionItem) => {
+    try {
+      await deleteCollection(col.name);
+      await loadData();
+    } catch (err) {
+      console.error('Failed to delete collection:', err);
+    }
+  }, [loadData]);
 
   const handleCloseCreateModal = useCallback(() => {
     setIsCreateModalOpen(false);
@@ -179,6 +132,48 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
       return true;
     });
   }, [collections, search, ownerFilter]);
+
+  // ── Card Items ──
+  const cardItems = useMemo(() => {
+    return filteredCollections.map((col) => {
+      const badges: CardBadge[] = [];
+      badges.push({
+        text: col.isShared ? t('documents.collection.filters.shared') : t('documents.collection.filters.personal'),
+        variant: col.isShared ? 'primary' : 'secondary',
+      });
+      if (col.isSecured) {
+        badges.push({ text: t('documents.collection.createModal.encrypt'), variant: 'purple' });
+      }
+
+      return {
+        id: col.id,
+        data: col,
+        title: col.displayName,
+        description: col.description || undefined,
+        thumbnail: {
+          icon: <FiFolder />,
+          backgroundColor: 'rgba(48, 94, 235, 0.1)',
+          iconColor: '#305eeb',
+        },
+        badges,
+        metadata: [
+          { icon: <FiFileText />, value: `${col.documentCount} ${t('documents.collection.documents')}` },
+          ...(col.embedding ? [{ value: col.embedding }] : []),
+          ...(col.updatedAt ? [{ icon: <FiClock />, value: formatDate(col.updatedAt) }] : []),
+        ],
+        dropdownActions: [
+          {
+            id: 'delete',
+            icon: <FiTrash2 />,
+            label: t('common.delete'),
+            danger: true,
+            onClick: () => handleDeleteCollection(col),
+          },
+        ],
+        onClick: () => {},
+      };
+    });
+  }, [filteredCollections, handleDeleteCollection, t]);
 
   // Push subToolbar content to orchestrator
   useEffect(() => {
@@ -213,41 +208,20 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
 
   return (
     <div className="flex flex-col flex-1 min-h-0 p-6">
-      {/* Content */}
       <div className="flex-1 min-h-0 overflow-y-auto">
-        {loading ? (
-          <div className="flex items-center justify-center min-h-[300px]">
-            <div className="w-10 h-10 border-3 border-border border-t-primary rounded-full animate-spin" />
-          </div>
-        ) : filteredCollections.length === 0 ? (
-          <EmptyState
-            icon={<CollectionEmptyIcon />}
-            title={t('documents.collection.empty.title')}
-            description={t('documents.collection.empty.description')}
-          />
-        ) : (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
-            {filteredCollections.map(col => (
-              <div key={col.id} className="flex items-center gap-4 p-4 bg-card border border-border rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 text-primary">
-                  <FolderIcon />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="text-sm font-semibold text-foreground truncate">{col.displayName}</h3>
-                    {col.isShared && (
-                      <span className="text-muted-foreground shrink-0"><SharedIcon /></span>
-                    )}
-                  </div>
-                  <div className="text-xs text-muted-foreground flex gap-3">
-                    <span>{col.documentCount} {t('documents.collection.documents')}</span>
-                    <span>{col.embedding}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <ResourceCardGrid
+          items={cardItems}
+          loading={loading}
+          showEmptyState
+          emptyStateProps={{
+            icon: <FiFolder />,
+            title: error || t('documents.collection.empty.title'),
+            description: error ? undefined : t('documents.collection.empty.description'),
+            action: error
+              ? { label: t('common.retry'), onClick: loadData }
+              : { label: t('documents.collection.buttons.newCollection'), onClick: () => setIsCreateModalOpen(true) },
+          }}
+        />
       </div>
 
       {/* Create Collection Modal */}
@@ -276,7 +250,6 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
               placeholder={t('documents.collection.createModal.namePlaceholder')}
             />
           </div>
-
           <div className="space-y-2">
             <Label>{t('documents.collection.createModal.description')}</Label>
             <Textarea
@@ -286,7 +259,6 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
               rows={3}
             />
           </div>
-
           <div className="flex items-center justify-between py-2">
             <div>
               <Label>{t('documents.collection.createModal.sparseVector')}</Label>
@@ -294,7 +266,6 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
             </div>
             <Switch checked={newCollectionSparse} onCheckedChange={setNewCollectionSparse} />
           </div>
-
           <div className="flex items-center justify-between py-2">
             <div>
               <Label>{t('documents.collection.createModal.fullText')}</Label>
@@ -302,7 +273,6 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
             </div>
             <Switch checked={newCollectionFullText} onCheckedChange={setNewCollectionFullText} />
           </div>
-
           <div className="flex items-center justify-between py-2">
             <div>
               <Label>{t('documents.collection.createModal.encrypt')}</Label>

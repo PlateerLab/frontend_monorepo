@@ -1,43 +1,16 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import type { DocumentTabPlugin, DocumentTabPluginProps } from '@xgen/types';
-import { Button, EmptyState, SearchInput, Modal, Input, Label, Switch, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@xgen/ui';
+import type { DocumentTabPlugin, DocumentTabPluginProps, CardBadge } from '@xgen/types';
+import { Button, SearchInput, Modal, Input, Label, Switch, Select, SelectTrigger, SelectContent, SelectItem, SelectValue, ResourceCardGrid } from '@xgen/ui';
+import { FiDatabase, FiClock, FiTrash2 } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
+import { listDBConnections, createDBConnection, deleteDBConnection, type DBConnectionItem } from './api';
 import './locales';
-
-// ─────────────────────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────────────────────
-
-export interface DBConnectionItem {
-  id: string;
-  connectionName: string;
-  dbType: 'postgresql' | 'mysql' | 'mssql' | 'oracle';
-  host: string;
-  port: number;
-  databaseName: string;
-  isShared: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
 
 // ─────────────────────────────────────────────────────────────
 // Icons
 // ─────────────────────────────────────────────────────────────
-
-const DatabaseIcon: React.FC = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="10" cy="4.167" rx="7.5" ry="2.5" stroke="currentColor" strokeWidth="1.5"/>
-    <path d="M17.5 10c0 1.38-3.358 2.5-7.5 2.5S2.5 11.38 2.5 10M17.5 4.167v11.666c0 1.381-3.358 2.5-7.5 2.5s-7.5-1.119-7.5-2.5V4.167" stroke="currentColor" strokeWidth="1.5"/>
-  </svg>
-);
-
-const SharedIcon: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10.5 4.667a1.75 1.75 0 100-3.5 1.75 1.75 0 000 3.5zM3.5 8.75a1.75 1.75 0 100-3.5 1.75 1.75 0 000 3.5zM10.5 12.833a1.75 1.75 0 100-3.5 1.75 1.75 0 000 3.5zM5.075 7.928l3.858 2.227M5.075 5.845l3.858-2.228" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
 
 const PlusIcon: React.FC = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -45,65 +18,19 @@ const PlusIcon: React.FC = () => (
   </svg>
 );
 
-const EmptyIcon: React.FC = () => (
-  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M28 6H14C12.939 6 11.922 6.421 11.172 7.172C10.421 7.922 10 8.939 10 10V38C10 39.061 10.421 40.078 11.172 40.828C11.922 41.579 12.939 42 14 42H34C35.061 42 36.078 41.579 36.828 40.828C37.579 40.078 38 39.061 38 38V16L28 6Z" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M28 6V16H38M32 26H16M32 34H16M20 18H16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
 // ─────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────
 
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-  });
-};
+function formatDate(dateStr: string): string {
+  if (!dateStr) return '';
+  try {
+    return new Date(dateStr).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  } catch { return dateStr; }
+}
 
 // ─────────────────────────────────────────────────────────────
-// Mock Data
-// ─────────────────────────────────────────────────────────────
-
-const MOCK_DB_CONNECTIONS: DBConnectionItem[] = [
-  {
-    id: 'db-001',
-    connectionName: '운영 DB',
-    dbType: 'postgresql',
-    host: 'prod-db.example.com',
-    port: 5432,
-    databaseName: 'xgen_prod',
-    isShared: true,
-    createdAt: '2025-01-03T10:00:00Z',
-    updatedAt: '2025-01-25T14:00:00Z',
-  },
-  {
-    id: 'db-002',
-    connectionName: '개발 DB',
-    dbType: 'postgresql',
-    host: 'dev-db.example.com',
-    port: 5432,
-    databaseName: 'xgen_dev',
-    isShared: false,
-    createdAt: '2025-01-05T09:00:00Z',
-    updatedAt: '2025-01-26T10:00:00Z',
-  },
-  {
-    id: 'db-003',
-    connectionName: '분석 DB',
-    dbType: 'mysql',
-    host: 'analytics.example.com',
-    port: 3306,
-    databaseName: 'analytics',
-    isShared: true,
-    createdAt: '2025-01-10T11:00:00Z',
-    updatedAt: '2025-01-27T16:00:00Z',
-  },
-];
-
-// ─────────────────────────────────────────────────────────────
-// DocumentDatabase Component (데이터베이스 탭)
+// DocumentDatabase Component
 // ─────────────────────────────────────────────────────────────
 
 export interface DocumentDatabaseProps extends DocumentTabPluginProps {}
@@ -112,11 +39,12 @@ export const DocumentDatabase: React.FC<DocumentDatabaseProps> = ({ onSubToolbar
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [dbConnections, setDbConnections] = useState<DBConnectionItem[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newDbName, setNewDbName] = useState('');
-  const [newDbType, setNewDbType] = useState<DBConnectionItem['dbType']>('postgresql');
+  const [newDbType, setNewDbType] = useState('postgresql');
   const [newDbHost, setNewDbHost] = useState('');
   const [newDbPort, setNewDbPort] = useState('5432');
   const [newDbDatabase, setNewDbDatabase] = useState('');
@@ -128,15 +56,17 @@ export const DocumentDatabase: React.FC<DocumentDatabaseProps> = ({ onSubToolbar
 
   const loadData = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      await new Promise(resolve => setTimeout(resolve, 400));
-      setDbConnections(MOCK_DB_CONNECTIONS);
-    } catch (error) {
-      console.error('Failed to load DB connections:', error);
+      const data = await listDBConnections();
+      setDbConnections(data);
+    } catch (err) {
+      console.error('Failed to load DB connections:', err);
+      setError(t('documents.database.error.loadFailed'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadData();
@@ -145,7 +75,7 @@ export const DocumentDatabase: React.FC<DocumentDatabaseProps> = ({ onSubToolbar
   const DB_TYPE_PORTS: Record<string, string> = { postgresql: '5432', mysql: '3306', mssql: '1433', oracle: '1521' };
 
   const handleDbTypeChange = useCallback((type: string) => {
-    setNewDbType(type as DBConnectionItem['dbType']);
+    setNewDbType(type);
     setNewDbPort(DB_TYPE_PORTS[type] || '5432');
   }, []);
 
@@ -153,19 +83,37 @@ export const DocumentDatabase: React.FC<DocumentDatabaseProps> = ({ onSubToolbar
     if (!newDbName.trim() || !newDbHost.trim() || !newDbDatabase.trim()) return;
     setCreating(true);
     try {
-      // TODO: API call to create DB connection
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await createDBConnection({
+        connection_name: newDbName.trim(),
+        db_type: newDbType,
+        db_host: newDbHost.trim(),
+        db_port: parseInt(newDbPort, 10) || 5432,
+        db_name: newDbDatabase.trim(),
+        db_username: newDbUsername.trim() || undefined,
+        db_password: newDbPassword || undefined,
+        use_ssl: newDbSsl,
+        read_only: newDbReadOnly,
+      });
       setIsCreateModalOpen(false);
       setNewDbName(''); setNewDbType('postgresql'); setNewDbHost('');
       setNewDbPort('5432'); setNewDbDatabase(''); setNewDbUsername('');
       setNewDbPassword(''); setNewDbSsl(false); setNewDbReadOnly(true);
       await loadData();
-    } catch (error) {
-      console.error('Failed to create DB connection:', error);
+    } catch (err) {
+      console.error('Failed to create DB connection:', err);
     } finally {
       setCreating(false);
     }
-  }, [newDbName, newDbHost, newDbDatabase, loadData]);
+  }, [newDbName, newDbType, newDbHost, newDbPort, newDbDatabase, newDbUsername, newDbPassword, newDbSsl, newDbReadOnly, loadData]);
+
+  const handleDeleteConnection = useCallback(async (db: DBConnectionItem) => {
+    try {
+      await deleteDBConnection(db.numericId);
+      await loadData();
+    } catch (err) {
+      console.error('Failed to delete DB connection:', err);
+    }
+  }, [loadData]);
 
   const handleCloseCreateModal = useCallback(() => {
     setIsCreateModalOpen(false);
@@ -178,6 +126,50 @@ export const DocumentDatabase: React.FC<DocumentDatabaseProps> = ({ onSubToolbar
     if (!search) return dbConnections;
     return dbConnections.filter(db => db.connectionName.toLowerCase().includes(search.toLowerCase()));
   }, [dbConnections, search]);
+
+  // ── Card Items ──
+  const cardItems = useMemo(() => {
+    return filteredDbConnections.map((db) => {
+      const badges: CardBadge[] = [];
+      badges.push({
+        text: db.dbType.toUpperCase(),
+        variant: 'outline' as any,
+      });
+      if (db.isShared) {
+        badges.push({
+          text: t('documents.database.shared'),
+          variant: 'primary',
+        });
+      }
+
+      return {
+        id: db.id,
+        data: db,
+        title: db.connectionName,
+        description: `${db.host}:${db.port}/${db.databaseName}`,
+        thumbnail: {
+          icon: <FiDatabase />,
+          backgroundColor: 'rgba(139, 92, 246, 0.1)',
+          iconColor: '#8b5cf6',
+        },
+        badges,
+        metadata: [
+          { value: `${db.host}:${db.port}` },
+          ...(db.updatedAt ? [{ icon: <FiClock />, value: formatDate(db.updatedAt) }] : []),
+        ],
+        dropdownActions: [
+          {
+            id: 'delete',
+            icon: <FiTrash2 />,
+            label: t('common.delete'),
+            danger: true,
+            onClick: () => handleDeleteConnection(db),
+          },
+        ],
+        onClick: () => {},
+      };
+    });
+  }, [filteredDbConnections, handleDeleteConnection, t]);
 
   // Push subToolbar content to orchestrator
   useEffect(() => {
@@ -207,46 +199,20 @@ export const DocumentDatabase: React.FC<DocumentDatabaseProps> = ({ onSubToolbar
 
   return (
     <div className="flex flex-col flex-1 min-h-0 p-6">
-      {/* Content */}
       <div className="flex-1 min-h-0 overflow-y-auto">
-        {loading ? (
-          <div className="flex items-center justify-center min-h-[300px]">
-            <div className="w-10 h-10 border-3 border-border border-t-primary rounded-full animate-spin" />
-          </div>
-        ) : filteredDbConnections.length === 0 ? (
-          <EmptyState
-            icon={<EmptyIcon />}
-            title={t('documents.database.empty.title')}
-            description={t('documents.database.empty.description')}
-          />
-        ) : (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4">
-            {filteredDbConnections.map(db => (
-              <div key={db.id} className="flex flex-col p-5 bg-card border border-border rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md">
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center shrink-0 text-violet-500">
-                    <DatabaseIcon />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-sm font-semibold text-foreground">{db.connectionName}</h3>
-                      {db.isShared && (
-                        <span className="text-muted-foreground shrink-0"><SharedIcon /></span>
-                      )}
-                    </div>
-                    <span className="text-[11px] text-muted-foreground uppercase tracking-wider">{db.dbType}</span>
-                  </div>
-                </div>
-                <div className="text-[12px] text-muted-foreground mb-3 font-mono truncate">
-                  {db.host}:{db.port}/{db.databaseName}
-                </div>
-                <div className="text-xs text-muted-foreground/60 mt-auto">
-                  {formatDate(db.createdAt)}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <ResourceCardGrid
+          items={cardItems}
+          loading={loading}
+          showEmptyState
+          emptyStateProps={{
+            icon: <FiDatabase />,
+            title: error || t('documents.database.empty.title'),
+            description: error ? undefined : t('documents.database.empty.description'),
+            action: error
+              ? { label: t('common.retry'), onClick: loadData }
+              : { label: t('documents.database.buttons.newConnection'), onClick: () => setIsCreateModalOpen(true) },
+          }}
+        />
       </div>
 
       {/* Create DB Connection Modal */}
