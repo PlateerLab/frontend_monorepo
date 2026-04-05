@@ -3,9 +3,10 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { DocumentTabPlugin, DocumentTabPluginProps, CardBadge } from '@xgen/types';
 import { Button, FilterTabs, SearchInput, Modal, Input, Label, Switch, Textarea, ResourceCardGrid } from '@xgen/ui';
-import { FiServer, FiFile, FiDatabase, FiClock, FiTrash2 } from '@xgen/icons';
+import { FiServer, FiFile, FiDatabase, FiClock, FiTrash2, FiLock } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
-import { listStorages, createStorage, deleteStorage, type FileStorageItem } from './api';
+import { listStorages, createStorage, deleteStorage, verifyStoragePassword, storeStorageSessionToken, getStorageSessionToken, type FileStorageItem } from './api';
+import { StorageFiles } from './components/StorageFiles';
 import './locales';
 
 // ─────────────────────────────────────────────────────────────
@@ -13,6 +14,7 @@ import './locales';
 // ─────────────────────────────────────────────────────────────
 
 export type OwnerFilter = 'all' | 'personal' | 'shared';
+type ViewMode = 'list' | 'files';
 
 // ─────────────────────────────────────────────────────────────
 // Icons
@@ -51,6 +53,11 @@ export interface DocumentStorageProps extends DocumentTabPluginProps {}
 export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarChange }) => {
   const { t } = useTranslation();
 
+  // ── View Mode ──
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [selectedStorage, setSelectedStorage] = useState<FileStorageItem | null>(null);
+
+  // ── List View State ──
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -60,7 +67,16 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
   const [newStorageName, setNewStorageName] = useState('');
   const [newStorageDesc, setNewStorageDesc] = useState('');
   const [newStorageEncrypt, setNewStorageEncrypt] = useState(false);
+  const [newStoragePassword, setNewStoragePassword] = useState('');
+  const [newStoragePasswordConfirm, setNewStoragePasswordConfirm] = useState('');
   const [creating, setCreating] = useState(false);
+
+  // Password verification modal state
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [pendingStorage, setPendingStorage] = useState<FileStorageItem | null>(null);
+  const [verifyPassword, setVerifyPassword] = useState('');
+  const [verifyError, setVerifyError] = useState<string | null>(null);
+  const [verifying, setVerifying] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -86,6 +102,32 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
     { key: 'shared', label: t('documents.storage.filters.shared') },
   ], [t]);
 
+  // ── View Transitions ──
+  const handleSelectStorage = useCallback((storage: FileStorageItem) => {
+    if (storage.isSecured) {
+      const token = getStorageSessionToken(storage.storageId);
+      if (token) {
+        setSelectedStorage(storage);
+        setViewMode('files');
+      } else {
+        setPendingStorage(storage);
+        setVerifyPassword('');
+        setVerifyError(null);
+        setIsPasswordModalOpen(true);
+      }
+    } else {
+      setSelectedStorage(storage);
+      setViewMode('files');
+    }
+  }, []);
+
+  const handleBackToList = useCallback(() => {
+    setViewMode('list');
+    setSelectedStorage(null);
+    loadData();
+  }, [loadData]);
+
+  // ── CRUD ──
   const handleCreateStorage = useCallback(async () => {
     if (!newStorageName.trim()) return;
     setCreating(true);
@@ -94,18 +136,21 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
         storage_name: newStorageName.trim(),
         description: newStorageDesc.trim() || undefined,
         is_secured: newStorageEncrypt,
+        password: newStorageEncrypt ? newStoragePassword : undefined,
       });
       setIsCreateModalOpen(false);
       setNewStorageName('');
       setNewStorageDesc('');
       setNewStorageEncrypt(false);
+      setNewStoragePassword('');
+      setNewStoragePasswordConfirm('');
       await loadData();
     } catch (err) {
       console.error('Failed to create file storage:', err);
     } finally {
       setCreating(false);
     }
-  }, [newStorageName, newStorageDesc, newStorageEncrypt, loadData]);
+  }, [newStorageName, newStorageDesc, newStorageEncrypt, newStoragePassword, loadData]);
 
   const handleDeleteStorage = useCallback(async (item: FileStorageItem) => {
     try {
@@ -121,6 +166,42 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
     setNewStorageName('');
     setNewStorageDesc('');
     setNewStorageEncrypt(false);
+    setNewStoragePassword('');
+    setNewStoragePasswordConfirm('');
+  }, []);
+
+  const handleVerifyStoragePassword = useCallback(async () => {
+    if (!pendingStorage || !verifyPassword) {
+      setVerifyError(t('documents.storage.passwordModal.passwordRequired'));
+      return;
+    }
+    setVerifying(true);
+    setVerifyError(null);
+    try {
+      const result = await verifyStoragePassword(pendingStorage.storageId, verifyPassword);
+      const sessionToken = result.session_token;
+      if (result.valid && sessionToken) {
+        storeStorageSessionToken(pendingStorage.storageId, sessionToken);
+        setIsPasswordModalOpen(false);
+        setSelectedStorage(pendingStorage);
+        setViewMode('files');
+        setPendingStorage(null);
+        setVerifyPassword('');
+      } else {
+        setVerifyError(t('documents.storage.passwordModal.passwordIncorrect'));
+      }
+    } catch {
+      setVerifyError(t('documents.storage.passwordModal.passwordIncorrect'));
+    } finally {
+      setVerifying(false);
+    }
+  }, [pendingStorage, verifyPassword, t]);
+
+  const handleClosePasswordModal = useCallback(() => {
+    setIsPasswordModalOpen(false);
+    setPendingStorage(null);
+    setVerifyPassword('');
+    setVerifyError(null);
   }, []);
 
   const filteredFileStorages = useMemo(() => {
@@ -169,13 +250,17 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
             onClick: () => handleDeleteStorage(fs),
           },
         ],
-        onClick: () => {},
+        onClick: () => handleSelectStorage(fs),
       };
     });
-  }, [filteredFileStorages, handleDeleteStorage, t]);
+  }, [filteredFileStorages, handleDeleteStorage, handleSelectStorage, t]);
 
-  // Push subToolbar
+  // ── SubToolbar ──
   useEffect(() => {
+    if (viewMode !== 'list') {
+      onSubToolbarChange?.(null);
+      return;
+    }
     onSubToolbarChange?.(
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <FilterTabs
@@ -198,12 +283,25 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
         </div>
       </div>
     );
-  }, [onSubToolbarChange, ownerFilterTabs, ownerFilter, search, t]);
+  }, [onSubToolbarChange, ownerFilterTabs, ownerFilter, search, t, viewMode]);
 
   useEffect(() => {
     return () => { onSubToolbarChange?.(null); };
   }, [onSubToolbarChange]);
 
+  // ── Render ──
+
+  // Files View (inside storage)
+  if (viewMode === 'files' && selectedStorage) {
+    return (
+      <StorageFiles
+        storage={selectedStorage}
+        onBack={handleBackToList}
+      />
+    );
+  }
+
+  // List View (default)
   return (
     <div className="flex flex-col flex-1 min-h-0 p-6">
       <div className="flex-1 min-h-0 overflow-y-auto">
@@ -263,6 +361,70 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
               <p className="text-xs text-muted-foreground mt-0.5">{t('documents.storage.createModal.encryptDesc')}</p>
             </div>
             <Switch checked={newStorageEncrypt} onCheckedChange={setNewStorageEncrypt} />
+          </div>
+          {newStorageEncrypt && (
+            <>
+              <div className="space-y-2">
+                <Label>{t('documents.storage.createModal.password')}</Label>
+                <Input
+                  type="password"
+                  value={newStoragePassword}
+                  onChange={(e) => setNewStoragePassword(e.target.value)}
+                  placeholder={t('documents.storage.createModal.passwordPlaceholder')}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>{t('documents.storage.createModal.passwordConfirm')}</Label>
+                <Input
+                  type="password"
+                  value={newStoragePasswordConfirm}
+                  onChange={(e) => setNewStoragePasswordConfirm(e.target.value)}
+                  placeholder={t('documents.storage.createModal.passwordConfirmPlaceholder')}
+                />
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
+
+      {/* Password Verification Modal */}
+      <Modal
+        isOpen={isPasswordModalOpen}
+        onClose={handleClosePasswordModal}
+        title={t('documents.storage.passwordModal.title')}
+        size="sm"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleClosePasswordModal}>
+              {t('documents.storage.createModal.cancel')}
+            </Button>
+            <Button onClick={handleVerifyStoragePassword} disabled={verifying || !verifyPassword}>
+              {verifying ? t('documents.storage.passwordModal.verifying') : t('documents.storage.passwordModal.verify')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="flex flex-col items-center gap-2 py-2">
+            <FiLock className="w-10 h-10 text-muted-foreground" />
+            <p className="text-sm font-medium">{pendingStorage?.name}</p>
+            <p className="text-xs text-muted-foreground text-center">
+              {t('documents.storage.passwordModal.description')}
+            </p>
+          </div>
+          {verifyError && (
+            <p className="text-sm text-destructive text-center">{verifyError}</p>
+          )}
+          <div className="space-y-2">
+            <Label>{t('documents.storage.passwordModal.passwordLabel')}</Label>
+            <Input
+              type="password"
+              value={verifyPassword}
+              onChange={(e) => setVerifyPassword(e.target.value)}
+              placeholder={t('documents.storage.passwordModal.passwordPlaceholder')}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !verifying) handleVerifyStoragePassword(); }}
+              autoFocus
+            />
           </div>
         </div>
       </Modal>

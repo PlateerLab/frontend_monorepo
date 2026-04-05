@@ -83,6 +83,7 @@ export {
   FiImage,
   FiLink,
   FiMic,
+  FiLock,
   FiShield,
 
   // Communication

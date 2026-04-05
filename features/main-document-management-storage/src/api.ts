@@ -80,13 +80,279 @@ export async function createStorage(data: {
   description?: string;
   is_shared?: boolean;
   is_secured?: boolean;
-  password_hash?: string;
+  password?: string;
 }): Promise<void> {
   const api = createApiClient();
-  await api.post('/api/storage/storages', data);
+  const payload: Record<string, any> = {
+    storage_name: data.storage_name,
+    description: data.description,
+    is_shared: data.is_shared,
+    is_secured: data.is_secured,
+  };
+  if (data.password) {
+    payload.password_hash = await sha256(data.password);
+  }
+  await api.post('/api/storage/storages', payload);
+}
+
+async function sha256(text: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+export interface VerifyPasswordResponse {
+  valid: boolean;
+  session_token?: string;
+  message?: string;
+}
+
+export async function verifyStoragePassword(
+  storageId: number,
+  password: string
+): Promise<VerifyPasswordResponse> {
+  const api = createApiClient();
+  const passwordHash = await sha256(password);
+  const response = await api.post<VerifyPasswordResponse>(
+    `/api/storage/storages/${storageId}/verify-password`,
+    { password_hash: passwordHash }
+  );
+  return response.data;
+}
+
+export function storeStorageSessionToken(storageId: number, token: string): void {
+  const tokens = JSON.parse(sessionStorage.getItem('securedStorageTokens') || '{}');
+  tokens[String(storageId)] = { token, expiresAt: Date.now() + 30 * 60 * 1000 };
+  sessionStorage.setItem('securedStorageTokens', JSON.stringify(tokens));
+}
+
+export function getStorageSessionToken(storageId: number): string | null {
+  const tokens = JSON.parse(sessionStorage.getItem('securedStorageTokens') || '{}');
+  const entry = tokens[String(storageId)];
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) {
+    delete tokens[String(storageId)];
+    sessionStorage.setItem('securedStorageTokens', JSON.stringify(tokens));
+    return null;
+  }
+  return entry.token;
 }
 
 export async function deleteStorage(storageId: number): Promise<void> {
   const api = createApiClient();
   await api.delete('/api/storage/storages', { storage_id: storageId } as any);
+}
+
+// ─────────────────────────────────────────────────────────────
+// File / Folder Types (snake_case — matches backend)
+// ─────────────────────────────────────────────────────────────
+
+export interface StorageFileAPIResponse {
+  id: string;
+  file_name: string;
+  file_path?: string;
+  file_size?: number;
+  file_type?: string;
+  mime_type?: string;
+  folder_id?: number | null;
+  storage_id?: number;
+  uploaded_at?: string;
+  created_at?: string;
+  updated_at?: string;
+  metadata?: {
+    original_file_name?: string;
+    directory_full_path?: string;
+    folder_id?: number | null;
+    [key: string]: any;
+  };
+}
+
+export interface StorageFolderAPIResponse {
+  id: number;
+  name: string;
+  full_path: string;
+  parent_folder_id: number | null;
+  is_root: boolean;
+  order_index: number;
+  storage_id: number;
+}
+
+// ─────────────────────────────────────────────────────────────
+// File / Folder Frontend Types (camelCase)
+// ─────────────────────────────────────────────────────────────
+
+export interface StorageFileItem {
+  id: string;
+  fileName: string;
+  filePath: string;
+  fileSize: number;
+  fileType: string;
+  mimeType: string;
+  folderId: number | null;
+  storageId: number;
+  uploadedAt: string;
+}
+
+export interface StorageFolderItem {
+  id: number;
+  name: string;
+  fullPath: string;
+  parentFolderId: number | null;
+  isRoot: boolean;
+  orderIndex: number;
+  storageId: number;
+}
+
+export interface PaginationInfo {
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  totalDocuments: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+// ─────────────────────────────────────────────────────────────
+// File / Folder Transforms
+// ─────────────────────────────────────────────────────────────
+
+function transformStorageFile(raw: StorageFileAPIResponse): StorageFileItem {
+  return {
+    id: String(raw.id),
+    fileName: raw.file_name,
+    filePath: raw.file_path || '',
+    fileSize: raw.file_size || 0,
+    fileType: raw.file_type || '',
+    mimeType: raw.mime_type || '',
+    folderId: raw.folder_id ?? raw.metadata?.folder_id ?? null,
+    storageId: raw.storage_id || 0,
+    uploadedAt: raw.uploaded_at || raw.created_at || '',
+  };
+}
+
+function transformStorageFolder(raw: StorageFolderAPIResponse): StorageFolderItem {
+  return {
+    id: raw.id,
+    name: raw.name,
+    fullPath: raw.full_path,
+    parentFolderId: raw.parent_folder_id,
+    isRoot: raw.is_root,
+    orderIndex: raw.order_index,
+    storageId: raw.storage_id,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
+// File / Folder API Functions
+// ─────────────────────────────────────────────────────────────
+
+export interface StorageFilesResponse {
+  files: StorageFileItem[];
+  folders: StorageFolderItem[];
+  pagination: PaginationInfo | null;
+}
+
+export async function listStorageFiles(
+  storageId: number,
+  page: number = 1,
+  pageSize: number = 50,
+  folderId?: number | null
+): Promise<StorageFilesResponse> {
+  const api = createApiClient();
+  let url = `/api/storage/storages/${storageId}/files?page=${page}&page_size=${pageSize}`;
+  if (folderId != null) url += `&folder_id=${folderId}`;
+  const response = await api.get<any>(url);
+  const data = response.data;
+  const rawFiles: StorageFileAPIResponse[] = data.files || data.documents || [];
+  const rawFolders: StorageFolderAPIResponse[] = data.directory_info || [];
+  const rawPagination = data.pagination;
+  return {
+    files: rawFiles.map(transformStorageFile),
+    folders: rawFolders.map(transformStorageFolder),
+    pagination: rawPagination ? {
+      page: rawPagination.page,
+      pageSize: rawPagination.page_size,
+      totalPages: rawPagination.total_pages,
+      totalDocuments: rawPagination.total_documents,
+      hasNext: rawPagination.has_next,
+      hasPrev: rawPagination.has_prev,
+    } : null,
+  };
+}
+
+export async function getStorageFolderTree(storageId: number): Promise<StorageFolderItem[]> {
+  const api = createApiClient();
+  const response = await api.get<StorageFolderAPIResponse[] | { folders: StorageFolderAPIResponse[] }>(
+    `/api/storage/folder/tree/${storageId}`
+  );
+  const raw = Array.isArray(response.data)
+    ? response.data
+    : (response.data as any).folders || [];
+  return raw.map(transformStorageFolder);
+}
+
+export async function deleteStorageFile(fileId: number): Promise<void> {
+  const api = createApiClient();
+  await api.delete('/api/storage/file/delete', { file_id: fileId } as any);
+}
+
+export async function createStorageFolder(data: {
+  folder_name: string;
+  storage_id: number;
+  parent_folder_id?: number | null;
+}): Promise<void> {
+  const api = createApiClient();
+  await api.post('/api/storage/folder/create', data);
+}
+
+export async function deleteStorageFolder(folderId: number, recursive: boolean = true): Promise<void> {
+  const api = createApiClient();
+  await api.delete('/api/storage/folder/delete', { folder_id: folderId, recursive } as any);
+}
+
+export async function uploadStorageFile(data: {
+  file: File;
+  storage_id: number;
+  folder_id?: number | null;
+}): Promise<void> {
+  const api = createApiClient();
+  const formData = new FormData();
+  formData.append('file', data.file);
+  formData.append('storage_id', String(data.storage_id));
+  if (data.folder_id != null) {
+    formData.append('folder_id', String(data.folder_id));
+  }
+  await api.post('/api/storage/file/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 300000,
+  } as any);
+}
+
+export async function uploadStorageFolder(data: {
+  files: File[];
+  storage_id: number;
+  folder_id?: number | null;
+  folder_name: string;
+}): Promise<void> {
+  const api = createApiClient();
+  const formData = new FormData();
+  data.files.forEach(file => formData.append('files', file));
+  formData.append('storage_id', String(data.storage_id));
+  formData.append('folder_name', data.folder_name);
+  if (data.folder_id != null) {
+    formData.append('folder_id', String(data.folder_id));
+  }
+  await api.post('/api/storage/folder/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 300000,
+  } as any);
+}
+
+export async function downloadStorageFile(fileId: number): Promise<Blob> {
+  const api = createApiClient();
+  const response = await api.get<Blob>(`/api/storage/file/download/${fileId}`, {
+    responseType: 'blob',
+  } as any);
+  return response.data;
 }
