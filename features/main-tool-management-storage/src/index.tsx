@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import type { CardBadge, ToolTabPlugin, ToolTabPluginProps } from '@xgen/types';
-import { Button, EmptyState, ResourceCardGrid, FilterTabs } from '@xgen/ui';
-import { FiPlay, FiEdit2, FiCopy, FiTrash2, FiSettings, FiDownload, FiUser, FiClock, FiCheckSquare, FiRefreshCw, FiTool } from '@xgen/icons';
+import { Button, EmptyState, ResourceCardGrid, FilterTabs, Modal, Label, Textarea, useToast } from '@xgen/ui';
+import { FiPlay, FiEdit2, FiCopy, FiTrash2, FiSettings, FiDownload, FiUser, FiClock, FiCheckSquare, FiRefreshCw, FiTool, FiPlus, FiFile, FiClipboard } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
-import { listToolsDetail, deleteTool, testTool } from './api';
-import type { ToolDetail } from './api';
+import { listToolsDetail, deleteTool, testTool, saveTool } from './api';
+import type { ToolDetail, ToolSaveData } from './api';
+import { ToolStorageUpload } from './tool-upload';
 import './locales';
 
 // ─────────────────────────────────────────────────────────────
@@ -16,6 +17,7 @@ import './locales';
 
 type StatusFilter = 'all' | 'active' | 'inactive' | 'archived';
 type OwnerFilter = 'all' | 'personal' | 'shared';
+type ViewMode = 'storage' | 'upload' | 'edit';
 
 const STATUS_BADGE_VARIANT: Record<string, CardBadge['variant']> = {
   active: 'success',
@@ -61,6 +63,7 @@ export interface ToolStorageProps extends ToolTabPluginProps {}
 export const ToolStorage: React.FC<ToolStorageProps> = ({ onNavigate, onSubToolbarChange }) => {
   const { t } = useTranslation();
   const { user, isInitialized } = useAuth();
+  const { toast } = useToast();
 
   // State
   const [tools, setTools] = useState<ToolDetail[]>([]);
@@ -71,6 +74,18 @@ export const ToolStorage: React.FC<ToolStorageProps> = ({ onNavigate, onSubToolb
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [deployStatus, setDeployStatus] = useState<Record<string, string>>({});
+  const [testingToolId, setTestingToolId] = useState<string | null>(null);
+
+  // View mode: storage (list) / upload (create) / edit
+  const [viewMode, setViewMode] = useState<ViewMode>('storage');
+  const [editingTool, setEditingTool] = useState<ToolDetail | null>(null);
+  const [importedToolData, setImportedToolData] = useState<ToolSaveData | null>(null);
+
+  // JSON Import modal
+  const [isJsonModalOpen, setIsJsonModalOpen] = useState(false);
+  const [jsonInputText, setJsonInputText] = useState('');
+  const [jsonInputError, setJsonInputError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load tools
   const fetchTools = useCallback(async () => {
@@ -130,31 +145,143 @@ export const ToolStorage: React.FC<ToolStorageProps> = ({ onNavigate, onSubToolb
     });
   }, [tools, statusFilter, ownerFilter]);
 
+  // ─────────────────────────────────────────────────────────────
   // Handlers
+  // ─────────────────────────────────────────────────────────────
+
+  // 1. Test saved tool
   const handleTest = useCallback(
     async (tool: ToolDetail) => {
+      setTestingToolId(tool.id);
       try {
-        await testTool(tool.keyValue, tool.id);
+        const result = await testTool(tool.keyValue, tool.id);
+        if (result.success) {
+          toast.success(t('toolManagementStorage.messages.testSuccess'));
+        } else {
+          toast.error(t('toolManagementStorage.messages.testFailed'));
+        }
+        await fetchTools();
       } catch (err) {
         console.error('Failed to test tool:', err);
+        toast.error(t('toolManagementStorage.messages.testFailed'));
+      } finally {
+        setTestingToolId(null);
       }
     },
-    [],
+    [fetchTools, t, toast],
   );
 
+  // 2. Edit tool
+  const handleEdit = useCallback((tool: ToolDetail) => {
+    setEditingTool(tool);
+    setViewMode('edit');
+  }, []);
+
+  // 3. Copy/duplicate tool
+  const handleCopy = useCallback(
+    async (tool: ToolDetail) => {
+      try {
+        const copyData: ToolSaveData = {
+          function_name: `${tool.name}_copy`,
+          function_id: '',
+          description: tool.description,
+          api_url: tool.apiUrl,
+          api_method: tool.apiMethod,
+          api_timeout: tool.apiTimeout,
+          body_type: tool.bodyType || 'application/json',
+          is_query_string: tool.isQueryString || false,
+          response_filter: tool.responseFilter,
+          html_parser: tool.htmlParser || false,
+          response_filter_path: tool.responseFilterPath,
+          response_filter_field: tool.responseFilterField,
+          api_header: (typeof tool.apiHeader === 'object' && tool.apiHeader !== null ? tool.apiHeader : {}) as Record<string, string>,
+          api_body: tool.apiBody || {},
+          static_body: (typeof tool.staticBody === 'object' && tool.staticBody !== null ? tool.staticBody : {}) as Record<string, string>,
+          metadata: tool.metadata || {},
+          status: 'active',
+        };
+        await saveTool(copyData.function_name, copyData);
+        toast.success(t('toolManagementStorage.messages.copySuccess', { name: tool.name }));
+        await fetchTools();
+      } catch (err) {
+        console.error('Failed to copy tool:', err);
+        toast.error(t('toolManagementStorage.messages.copyFailed'));
+      }
+    },
+    [fetchTools, t, toast],
+  );
+
+  // 4. JSON Download
+  const handleDownload = useCallback(
+    (tool: ToolDetail) => {
+      const toolExport = {
+        _format: 'plateerag_tool_v1',
+        _exportedAt: new Date().toISOString(),
+        function_name: tool.name,
+        function_id: tool.id,
+        description: tool.description,
+        api_url: tool.apiUrl,
+        api_method: tool.apiMethod,
+        api_timeout: tool.apiTimeout,
+        body_type: tool.bodyType || 'application/json',
+        is_query_string: tool.isQueryString || false,
+        response_filter: tool.responseFilter,
+        html_parser: tool.htmlParser || false,
+        response_filter_path: tool.responseFilterPath,
+        response_filter_field: tool.responseFilterField,
+        api_header: tool.apiHeader || {},
+        api_body: tool.apiBody || {},
+        static_body: tool.staticBody || {},
+        metadata: tool.metadata || {},
+      };
+
+      const jsonString = JSON.stringify(toolExport, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${tool.name || 'tool'}_export.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success(t('toolManagementStorage.messages.downloadSuccess', { name: tool.name }));
+    },
+    [t, toast],
+  );
+
+  // 5. Settings — open in edit mode
+  const handleSettings = useCallback((tool: ToolDetail) => {
+    setEditingTool(tool);
+    setViewMode('edit');
+  }, []);
+
+  // 6. Delete with Toast confirm
   const handleDelete = useCallback(
     async (tool: ToolDetail) => {
-      if (!confirm(t('toolManagementStorage.confirm.delete', { name: tool.name }))) return;
+      const ok = await toast.confirm({
+        title: t('toolManagementStorage.confirm.deleteTitle'),
+        message: t('toolManagementStorage.confirm.delete', { name: tool.name }),
+        variant: 'danger',
+        confirmText: t('toolManagementStorage.confirm.confirmDelete'),
+        cancelText: t('toolManagementStorage.confirm.cancel'),
+      });
+      if (!ok) return;
+
       try {
         await deleteTool(tool.id);
+        toast.success(t('toolManagementStorage.messages.deleteSuccess', { name: tool.name }));
         await fetchTools();
       } catch (err) {
         console.error('Failed to delete tool:', err);
+        toast.error(t('toolManagementStorage.messages.deleteFailed', { name: tool.name }));
       }
     },
-    [fetchTools, t],
+    [fetchTools, t, toast],
   );
 
+  // Multi-select
   const handleToggleMultiSelect = useCallback(() => {
     setIsMultiSelectMode((prev) => {
       if (prev) setSelectedIds([]);
@@ -170,37 +297,172 @@ export const ToolStorage: React.FC<ToolStorageProps> = ({ onNavigate, onSubToolb
     );
 
     if (toDelete.length === 0) {
-      alert(t('toolManagementStorage.error.noDeletePermission'));
+      toast.error(t('toolManagementStorage.error.noDeletePermission'));
       return;
     }
 
-    if (!confirm(t('toolManagementStorage.confirm.bulkDelete', { count: toDelete.length }))) return;
+    const ok = await toast.confirm({
+      title: t('toolManagementStorage.confirm.deleteTitle'),
+      message: t('toolManagementStorage.confirm.bulkDelete', { count: toDelete.length }),
+      variant: 'danger',
+      confirmText: t('toolManagementStorage.confirm.confirmDelete'),
+      cancelText: t('toolManagementStorage.confirm.cancel'),
+    });
+    if (!ok) return;
 
     try {
       for (const tool of toDelete) {
         await deleteTool(tool.id);
       }
+      toast.success(t('toolManagementStorage.messages.bulkDeleteSuccess', { count: toDelete.length }));
       setSelectedIds([]);
       setIsMultiSelectMode(false);
       await fetchTools();
     } catch (err) {
       console.error('Failed to bulk delete:', err);
+      toast.error(t('toolManagementStorage.messages.bulkDeleteFailed'));
     }
-  }, [selectedIds, tools, isOwner, fetchTools, t]);
+  }, [selectedIds, tools, isOwner, fetchTools, t, toast]);
+
+  // Create new tool
+  const handleCreateNew = useCallback(() => {
+    setImportedToolData(null);
+    setEditingTool(null);
+    setViewMode('upload');
+  }, []);
+
+  // Back to storage from upload/edit
+  const handleBackToStorage = useCallback(() => {
+    setViewMode('storage');
+    setEditingTool(null);
+    setImportedToolData(null);
+    fetchTools();
+  }, [fetchTools]);
+
+  // ─────────────────────────────────────────────────────────────
+  // Import: From File
+  // ─────────────────────────────────────────────────────────────
+
+  const handleImportFromFile = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileUpload = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      if (!file.name.endsWith('.json')) {
+        toast.error(t('toolManagementStorage.messages.jsonFileOnly'));
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const content = event.target?.result as string;
+          const parsedData = JSON.parse(content);
+
+          if (parsedData._format !== 'plateerag_tool_v1') {
+            toast.error(t('toolManagementStorage.messages.invalidFormat'));
+            if (fileInputRef.current) fileInputRef.current.value = '';
+            return;
+          }
+
+          if (!parsedData.function_name || !parsedData.api_url) {
+            toast.error(t('toolManagementStorage.messages.missingFields'));
+            if (fileInputRef.current) fileInputRef.current.value = '';
+            return;
+          }
+
+          const importData = {
+            ...parsedData,
+            function_id: '',
+            function_name: parsedData.function_name + '_imported',
+          };
+          delete importData._format;
+          delete importData._exportedAt;
+
+          setImportedToolData(importData as ToolSaveData);
+          setViewMode('upload');
+          toast.success(t('toolManagementStorage.messages.importSuccess'));
+        } catch {
+          toast.error(t('toolManagementStorage.messages.jsonParseError'));
+        }
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      };
+      reader.onerror = () => {
+        toast.error(t('toolManagementStorage.messages.fileReadError'));
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      };
+      reader.readAsText(file);
+    },
+    [t, toast],
+  );
+
+  // ─────────────────────────────────────────────────────────────
+  // Import: From JSON Text
+  // ─────────────────────────────────────────────────────────────
+
+  const handleOpenJsonModal = useCallback(() => {
+    setJsonInputText('');
+    setJsonInputError(null);
+    setIsJsonModalOpen(true);
+  }, []);
+
+  const handleJsonSubmit = useCallback(() => {
+    if (!jsonInputText.trim()) {
+      setJsonInputError(t('toolManagementStorage.messages.jsonRequired'));
+      return;
+    }
+    try {
+      const parsedData = JSON.parse(jsonInputText);
+      if (parsedData._format !== 'plateerag_tool_v1') {
+        setJsonInputError(t('toolManagementStorage.messages.invalidFormat'));
+        return;
+      }
+      if (!parsedData.function_name || !parsedData.api_url) {
+        setJsonInputError(t('toolManagementStorage.messages.missingFields'));
+        return;
+      }
+
+      const importData = {
+        ...parsedData,
+        function_id: '',
+        function_name: parsedData.function_name + '_imported',
+      };
+      delete importData._format;
+      delete importData._exportedAt;
+
+      setImportedToolData(importData as ToolSaveData);
+      setIsJsonModalOpen(false);
+      setViewMode('upload');
+      toast.success(t('toolManagementStorage.messages.importSuccess'));
+    } catch {
+      setJsonInputError(t('toolManagementStorage.messages.jsonParseError'));
+    }
+  }, [jsonInputText, t, toast]);
 
   // Filter tabs
-  const statusTabs = [
-    { key: 'all', label: t('toolManagementStorage.filter.all') },
-    { key: 'active', label: t('toolManagementStorage.filter.active') },
-    { key: 'inactive', label: t('toolManagementStorage.filter.inactive') },
-    { key: 'archived', label: t('toolManagementStorage.filter.archived') },
-  ];
+  const statusTabs = useMemo(
+    () => [
+      { key: 'all', label: t('toolManagementStorage.filter.all') },
+      { key: 'active', label: t('toolManagementStorage.filter.active') },
+      { key: 'inactive', label: t('toolManagementStorage.filter.inactive') },
+      { key: 'archived', label: t('toolManagementStorage.filter.archived') },
+    ],
+    [t],
+  );
 
-  const ownerTabs = [
-    { key: 'all', label: t('toolManagementStorage.owner.all') },
-    { key: 'personal', label: t('toolManagementStorage.owner.personal') },
-    { key: 'shared', label: t('toolManagementStorage.owner.shared') },
-  ];
+  const ownerTabs = useMemo(
+    () => [
+      { key: 'all', label: t('toolManagementStorage.owner.all') },
+      { key: 'personal', label: t('toolManagementStorage.owner.personal') },
+      { key: 'shared', label: t('toolManagementStorage.owner.shared') },
+    ],
+    [t],
+  );
 
   // Build card items
   const cardItems = useMemo(() => {
@@ -227,38 +489,41 @@ export const ToolStorage: React.FC<ToolStorageProps> = ({ onNavigate, onSubToolb
         }
       }
 
+      const isTesting = testingToolId === tool.id;
+
       const primaryActions = tool.status !== 'inactive'
         ? [
             {
               id: 'test',
-              icon: <FiPlay />,
+              icon: <FiPlay className={isTesting ? 'animate-pulse' : ''} />,
               label: t('toolManagementStorage.actions.test'),
               onClick: () => handleTest(tool),
+              disabled: isTesting,
             },
             {
               id: 'edit',
               icon: <FiEdit2 />,
               label: t('toolManagementStorage.actions.edit'),
-              onClick: () => {},
+              onClick: () => handleEdit(tool),
               disabled: !isOwner(tool.userId) && tool.sharePermissions !== 'read_write',
             },
             {
               id: 'copy',
               icon: <FiCopy />,
               label: t('toolManagementStorage.actions.copy'),
-              onClick: () => {},
+              onClick: () => handleCopy(tool),
             },
           ]
         : [];
 
       const dropdownActions = isOwner(tool.userId)
         ? [
-            { id: 'download', icon: <FiDownload />, label: t('toolManagementStorage.actions.download'), onClick: () => {} },
-            { id: 'settings', icon: <FiSettings />, label: t('toolManagementStorage.actions.settings'), onClick: () => {} },
+            { id: 'download', icon: <FiDownload />, label: t('toolManagementStorage.actions.download'), onClick: () => handleDownload(tool) },
+            { id: 'settings', icon: <FiSettings />, label: t('toolManagementStorage.actions.settings'), onClick: () => handleSettings(tool) },
             { id: 'delete', icon: <FiTrash2 />, label: t('toolManagementStorage.actions.delete'), onClick: () => handleDelete(tool), danger: true, dividerBefore: true },
           ]
         : [
-            { id: 'download', icon: <FiDownload />, label: t('toolManagementStorage.actions.download'), onClick: () => {} },
+            { id: 'download', icon: <FiDownload />, label: t('toolManagementStorage.actions.download'), onClick: () => handleDownload(tool) },
           ];
 
       return {
@@ -287,13 +552,17 @@ export const ToolStorage: React.FC<ToolStorageProps> = ({ onNavigate, onSubToolb
         primaryActions,
         dropdownActions,
         inactive: tool.status === 'inactive',
-        onClick: () => {},
       };
     });
-  }, [filteredTools, isOwner, deployStatus, handleTest, handleDelete, t]);
+  }, [filteredTools, isOwner, deployStatus, testingToolId, handleTest, handleEdit, handleCopy, handleDownload, handleSettings, handleDelete, t]);
 
-  // Push subToolbar content to orchestrator
+  // Push subToolbar content to orchestrator — only show when in storage view
   useEffect(() => {
+    if (viewMode !== 'storage') {
+      onSubToolbarChange?.(null);
+      return;
+    }
+
     onSubToolbarChange?.(
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-4">
@@ -340,15 +609,60 @@ export const ToolStorage: React.FC<ToolStorageProps> = ({ onNavigate, onSubToolb
         </div>
       </div>,
     );
-  }, [onSubToolbarChange, statusFilter, ownerFilter, isMultiSelectMode, selectedIds, loading, handleToggleMultiSelect, handleBulkDelete, fetchTools, t]);
+  }, [viewMode, onSubToolbarChange, statusTabs, ownerTabs, statusFilter, ownerFilter, isMultiSelectMode, selectedIds, loading, handleToggleMultiSelect, handleBulkDelete, fetchTools, t]);
 
   // Cleanup subToolbar on unmount
   useEffect(() => {
     return () => { onSubToolbarChange?.(null); };
   }, [onSubToolbarChange]);
 
+  // ─────────────────────────────────────────────────────────────
+  // Render: Upload/Edit mode
+  // ─────────────────────────────────────────────────────────────
+
+  if (viewMode === 'upload' || viewMode === 'edit') {
+    return (
+      <ToolStorageUpload
+        onBack={handleBackToStorage}
+        editMode={viewMode === 'edit'}
+        initialData={editingTool}
+        importedData={importedToolData}
+      />
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Render: Storage list
+  // ─────────────────────────────────────────────────────────────
+
   return (
     <div className="flex flex-col flex-1 min-h-0 p-6">
+      {/* Top action bar */}
+      <div className="flex items-center justify-end gap-2 mb-4">
+        <Button variant="outline" size="sm" onClick={handleImportFromFile}>
+          <FiFile />
+          {t('toolManagementStorage.buttons.importFile')}
+        </Button>
+        <Button variant="outline" size="sm" onClick={handleOpenJsonModal}>
+          <FiClipboard />
+          {t('toolManagementStorage.buttons.importJson')}
+        </Button>
+        <Button onClick={handleCreateNew}>
+          <FiPlus />
+          {t('toolManagementStorage.buttons.createNew')}
+        </Button>
+      </div>
+
+      {/* Hidden file input for import */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        className="hidden"
+        onChange={handleFileUpload}
+      />
+
+      {/* Tool list */}
       <div className="flex-1 min-h-0 overflow-y-auto">
         {!isInitialized ? (
           <div className="flex items-center justify-center h-[200px] text-muted-foreground text-sm">
@@ -375,7 +689,7 @@ export const ToolStorage: React.FC<ToolStorageProps> = ({ onNavigate, onSubToolb
               description: t('toolManagementStorage.empty.description'),
               action: {
                 label: t('toolManagementStorage.empty.action'),
-                onClick: () => {},
+                onClick: handleCreateNew,
               },
             }}
             multiSelectMode={isMultiSelectMode}
@@ -384,6 +698,44 @@ export const ToolStorage: React.FC<ToolStorageProps> = ({ onNavigate, onSubToolb
           />
         )}
       </div>
+
+      {/* JSON Import Modal */}
+      <Modal
+        isOpen={isJsonModalOpen}
+        onClose={() => setIsJsonModalOpen(false)}
+        title={t('toolManagementStorage.import.jsonModalTitle')}
+        size="md"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setIsJsonModalOpen(false)}>
+              {t('toolManagementStorage.confirm.cancel')}
+            </Button>
+            <Button onClick={handleJsonSubmit}>
+              {t('toolManagementStorage.import.importButton')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-3">
+          <Label>{t('toolManagementStorage.import.jsonLabel')}</Label>
+          <Textarea
+            value={jsonInputText}
+            onChange={(e) => {
+              setJsonInputText(e.target.value);
+              setJsonInputError(null);
+            }}
+            placeholder={t('toolManagementStorage.import.jsonPlaceholder')}
+            rows={12}
+            className="font-mono text-sm"
+          />
+          {jsonInputError && (
+            <p className="text-sm text-error">{jsonInputError}</p>
+          )}
+          <p className="text-xs text-muted-foreground">
+            {t('toolManagementStorage.import.jsonHint')}
+          </p>
+        </div>
+      </Modal>
     </div>
   );
 };
