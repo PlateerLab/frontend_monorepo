@@ -9,6 +9,7 @@ import { getBackendLogs } from '@xgen/api-client';
 import { FiRefreshCw, FiChevronLeft, FiChevronRight } from '@xgen/icons';
 import type { BackendLog, LogLevel, SortField, SortDirection } from './types';
 import { LogDetailModal } from './components/log-detail-modal';
+import './locales';
 
 const LOG_LEVEL_PRIORITY: Record<string, number> = { error: 0, warning: 1, info: 2, debug: 3 };
 const LOG_LEVEL_COLORS: Record<string, string> = {
@@ -109,7 +110,7 @@ const AdminBackendLogsPage: React.FC<RouteComponentProps> = () => {
   const columns: DataTableColumn<BackendLog>[] = useMemo(() => [
     {
       id: 'log_level',
-      header: t('admin.pages.backendLogs.level', 'Level'),
+      header: t('admin.backendLogs.level'),
       field: 'log_level',
       sortable: true,
       sortFn: (a, b) => {
@@ -124,12 +125,12 @@ const AdminBackendLogsPage: React.FC<RouteComponentProps> = () => {
     },
     {
       id: 'message',
-      header: t('admin.pages.backendLogs.message', 'Message'),
+      header: t('admin.backendLogs.message'),
       cell: (row) => <span className="text-foreground max-w-md truncate block">{row.message}</span>,
     },
     {
       id: 'function_name',
-      header: t('admin.pages.backendLogs.function', 'Function'),
+      header: t('admin.backendLogs.function'),
       cell: (row) => (
         <span className="font-mono text-xs text-muted-foreground truncate max-w-36 block">
           {row.function_name ?? '-'}
@@ -138,7 +139,7 @@ const AdminBackendLogsPage: React.FC<RouteComponentProps> = () => {
     },
     {
       id: 'api_endpoint',
-      header: t('admin.pages.backendLogs.endpoint', 'Endpoint'),
+      header: t('admin.backendLogs.endpoint'),
       cell: (row) => (
         <span className="font-mono text-xs text-muted-foreground truncate max-w-40 block">
           {row.api_endpoint ?? '-'}
@@ -147,7 +148,7 @@ const AdminBackendLogsPage: React.FC<RouteComponentProps> = () => {
     },
     {
       id: 'created_at',
-      header: t('admin.pages.backendLogs.time', 'Time'),
+      header: t('admin.backendLogs.time'),
       field: 'created_at',
       sortable: true,
       cell: (row) => (
@@ -160,8 +161,8 @@ const AdminBackendLogsPage: React.FC<RouteComponentProps> = () => {
 
   return (
     <ContentArea
-      title={t('admin.pages.backendLogs.title', 'Backend Logs')}
-      description={t('admin.pages.backendLogs.description', 'View and filter backend application logs')}
+      title={t('admin.backendLogs.title')}
+      description={t('admin.backendLogs.description')}
       headerActions={
         <Button variant="outline" size="sm" onClick={fetchLogs} disabled={loading}>
           <FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -172,7 +173,7 @@ const AdminBackendLogsPage: React.FC<RouteComponentProps> = () => {
           <SearchInput
             value={search}
             onChange={setSearch}
-            placeholder={t('admin.pages.backendLogs.searchPlaceholder', 'Search logs...')}
+            placeholder={t('admin.backendLogs.searchPlaceholder')}
             className="w-72"
           />
           <div className="flex gap-1.5">
@@ -194,14 +195,14 @@ const AdminBackendLogsPage: React.FC<RouteComponentProps> = () => {
         columns={columns}
         rowKey={(row) => row.log_id}
         loading={loading}
-        emptyMessage={t('admin.pages.backendLogs.noLogs', 'No logs found')}
+        emptyMessage={t('admin.backendLogs.noLogs')}
         onRowClick={(row) => setSelectedLog(row)}
       />
 
       {/* Pagination */}
       <div className="flex items-center justify-between mt-4">
         <span className="text-sm text-muted-foreground">
-          {t('admin.pages.backendLogs.totalLogs', '{{count}} logs total', { count: total })} • {t('admin.pages.backendLogs.pageInfo', 'Page {{page}} of {{total}}', { page, total: totalPages || 1 })}
+          {t('admin.backendLogs.totalLogs', { count: total })} • {t('admin.backendLogs.pageInfo', { page, total: totalPages || 1 })}
         </span>
         <div className="flex items-center gap-2">
           <Button

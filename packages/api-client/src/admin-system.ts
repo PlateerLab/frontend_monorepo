@@ -252,9 +252,18 @@ export async function getBackendLogs(
   pageSize: number = 250,
 ): Promise<BackendLogsResponse> {
   const client = getClient();
-  return client.get<BackendLogsResponse>('/api/admin/logs', {
+  const raw = await client.get<{
+    logs: BackendLog[];
+    pagination?: { page: number; page_size: number; offset: number; total_returned: number };
+  }>('/api/admin/base/backend/logs', {
     params: { page: String(page), page_size: String(pageSize) },
   });
+  return {
+    logs: raw.logs ?? [],
+    total: raw.pagination?.total_returned ?? raw.logs?.length ?? 0,
+    page: raw.pagination?.page ?? page,
+    page_size: raw.pagination?.page_size ?? pageSize,
+  };
 }
 
 // ─────────────────────────────────────────────────────────────

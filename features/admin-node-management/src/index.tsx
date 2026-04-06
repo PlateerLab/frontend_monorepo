@@ -230,8 +230,8 @@ const AdminNodeManagementPage: React.FC<RouteComponentProps> = () => {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">
-              {t(`${prefix}.totalNodes`)}: {totalNodes}
-              {search.trim() && ` / ${t(`${prefix}.displayed`)}: ${displayedNodes}`}
+              {t(`${prefix}.totalNodes`, { count: totalNodes })}
+              {search.trim() && ` / ${t(`${prefix}.displayed`, { count: displayedNodes })}`}
             </span>
             <Button
               variant="outline"

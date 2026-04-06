@@ -341,8 +341,8 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
 
   // ── Pagination info ──
   const paginationInfo = activeUserId != null
-    ? `${t('admin.workflowManagement.chatMonitoring.userId')}: ${activeUserId} · ${t('admin.workflowManagement.chatMonitoring.totalLogsLoaded')}: ${filteredLogs.length}`
-    : `${t('admin.workflowManagement.chatMonitoring.totalLogsLoaded')}: ${filteredLogs.length}`;
+    ? `${t('admin.workflowManagement.chatMonitoring.userId')}: ${activeUserId} · ${t('admin.workflowManagement.chatMonitoring.totalLogsLoaded', { count: filteredLogs.length })}`
+    : t('admin.workflowManagement.chatMonitoring.totalLogsLoaded', { count: filteredLogs.length });
 
   return (
     <ContentArea
