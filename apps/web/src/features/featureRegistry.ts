@@ -187,7 +187,7 @@ export async function initializeFeatures(): Promise<void> {
 
     // Knowledge Section
     import('@xgen/main-document-management-orchestrator'),
-
+    import('@xgen/main-upload-history'),
 
   ]);
 
