@@ -219,7 +219,7 @@ export function DataTable<T>({
   }
 
   return (
-    <div className={cn('rounded-lg border border-border overflow-hidden', className)}>
+    <div className={cn('rounded-lg border border-[var(--color-line-50)] overflow-hidden', className)}>
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent border-border">
