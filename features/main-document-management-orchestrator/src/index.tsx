@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import type { RouteComponentProps, MainFeatureModule } from '@xgen/types';
 import { FeatureRegistry } from '@xgen/types';
-import { ContentArea, FilterTabs } from '@xgen/ui';
+import { ContentArea, FilterTabs, UploadStatusProvider, UploadStatusPanel } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import './locales';
 
@@ -42,27 +42,30 @@ const DocumentsPage: React.FC<DocumentsPageProps> = ({ onNavigate }) => {
   }, []);
 
   return (
-    <ContentArea
-      title={t('documents.title')}
-      description={t('documents.description')}
-      toolbar={
-        <FilterTabs
-          tabs={tabs}
-          activeKey={activeTab}
-          onChange={handleTabChange}
-        />
-      }
-      subToolbar={subToolbarContent}
-      contentPadding={false}
-      contentClassName="flex flex-col"
-    >
-      {ActiveComponent && (
-        <ActiveComponent
-          onNavigate={onNavigate}
-          onSubToolbarChange={handleSubToolbarChange}
-        />
-      )}
-    </ContentArea>
+    <UploadStatusProvider>
+      <ContentArea
+        title={t('documents.title')}
+        description={t('documents.description')}
+        toolbar={
+          <FilterTabs
+            tabs={tabs}
+            activeKey={activeTab}
+            onChange={handleTabChange}
+          />
+        }
+        subToolbar={subToolbarContent}
+        contentPadding={false}
+        contentClassName="flex flex-col"
+      >
+        {ActiveComponent && (
+          <ActiveComponent
+            onNavigate={onNavigate}
+            onSubToolbarChange={handleSubToolbarChange}
+          />
+        )}
+      </ContentArea>
+      <UploadStatusPanel />
+    </UploadStatusProvider>
   );
 };
 

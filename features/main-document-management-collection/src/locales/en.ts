@@ -72,6 +72,13 @@ export const en: TranslationData = {
         name: 'Folder Name',
         namePlaceholder: 'Enter folder name',
       },
+      uploadStatus: {
+        uploading: 'Uploading...',
+        processing: 'Processing...',
+        embedding: 'Embedding...',
+        complete: 'Complete',
+        error: 'Error',
+      },
       directoryTree: {
         title: 'Directory Structure',
         filesSuffix: ' files',

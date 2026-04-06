@@ -53,6 +53,20 @@ export type { ModalProps, ModalSize } from './feedback/modal';
 export { EmptyState } from './feedback/empty-state';
 export type { EmptyStateProps, SuggestionItem } from './feedback/empty-state';
 
+// Upload Status - 업로드 진행 상태 패널 (SSE 기반)
+export {
+  UploadStatusProvider,
+  UploadStatusPanel,
+  useUploadStatus,
+} from './feedback/upload-status';
+export type {
+  UploadSession,
+  UploadSessionStatus,
+  UploadStatusContextValue,
+  UploadStatusProviderProps,
+  UploadStatusPanelProps,
+} from './feedback/upload-status';
+
 // Toast System - 토스트 알림 시스템
 export { ToastProvider, useToast } from './feedback/toast';
 export type {
