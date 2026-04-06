@@ -63,7 +63,7 @@ export const ContentArea: React.FC<ContentAreaProps> = ({
     <div className={cn('flex flex-col h-screen overflow-hidden bg-[#f8f9fa]', className)}>
       {/* ── Header: h-14, 사이드바와 동일 ── */}
       {hasHeader && (
-        <header className="flex items-center justify-between h-14 min-h-14 max-h-14 px-[22px] bg-white border-b border-[var(--color-line-50)] shrink-0">
+        <header className="flex items-center justify-between h-14 min-h-14 max-h-14 px-[22px] border-b border-[var(--color-line-50)] shrink-0">
           {headerContent ?? (
             <>
               <div className="flex items-center gap-3 min-w-0">
@@ -84,14 +84,14 @@ export const ContentArea: React.FC<ContentAreaProps> = ({
 
       {/* ── Toolbar: 고정 영역 ── */}
       {toolbar && (
-        <div className="px-6 py-3 bg-white border-b border-[var(--color-line-50)] shrink-0">
+        <div className="px-6 py-3 border-b border-[var(--color-line-50)] shrink-0">
           {toolbar}
         </div>
       )}
 
       {/* ── SubToolbar: 추가 고정 영역 (2차 필터/검색) ── */}
       {subToolbar && (
-        <div className="px-6 py-3 bg-white border-b border-[var(--color-line-50)] shrink-0">
+        <div className="px-6 py-3 border-b border-[var(--color-line-50)] shrink-0">
           {subToolbar}
         </div>
       )}
@@ -109,7 +109,7 @@ export const ContentArea: React.FC<ContentAreaProps> = ({
 
       {/* ── Footer: 고정 영역 ── */}
       {footer && (
-        <div className="px-6 py-3 bg-white border-t border-[var(--color-line-50)] shrink-0">
+        <div className="px-6 py-3 border-t border-[var(--color-line-50)] shrink-0">
           {footer}
         </div>
       )}
