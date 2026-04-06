@@ -2,14 +2,13 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { AdminFeatureModule, RouteComponentProps } from '@xgen/types';
-import { ContentArea, Button, SearchInput, FilterTabs, useToast } from '@xgen/ui';
-import type { FilterTab } from '@xgen/ui';
+import { ContentArea, Button, SearchInput, FilterTabs, ResourceCardGrid, useToast } from '@xgen/ui';
+import type { FilterTab, ResourceCardProps, CardBadge, CardMetaItem, CardActionButton } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
-import { FiRefreshCw, FiDownload, FiPlus } from '@xgen/icons';
+import { FiRefreshCw, FiDownload, FiCopy, FiEdit, FiTrash2 } from '@xgen/icons';
 
 import { getAllPrompts, deletePrompt } from './api/prompt-api';
 import type { Prompt } from './types';
-import PromptCard from './components/prompt-card';
 import PromptCreateModal from './components/prompt-create-modal';
 import PromptEditModal from './components/prompt-edit-modal';
 import PromptExpandModal from './components/prompt-expand-modal';
@@ -156,6 +155,79 @@ const AdminPromptStorePage: React.FC<RouteComponentProps> = () => {
     { key: 'private', label: t(`${PS}.filter.private`) },
   ];
 
+  // ── Map prompts to ResourceCard items ──
+  const cardItems: ResourceCardProps<Prompt>[] = useMemo(
+    () =>
+      filteredPrompts.map((p) => {
+        const badges: CardBadge[] = [
+          { text: p.language.toUpperCase(), variant: 'info' },
+          {
+            text: p.prompt_type,
+            variant: p.prompt_type === 'system' ? 'warning' : 'default',
+          },
+          ...(p.is_template
+            ? [{ text: t(`${PS}.card.template`), variant: 'success' as const }]
+            : []),
+          {
+            text: p.public_available ? t(`${PS}.card.public`) : t(`${PS}.card.private`),
+            variant: p.public_available ? 'success' : 'default',
+          },
+        ];
+
+        const truncatedContent =
+          p.prompt_content.length > 80
+            ? `${p.prompt_content.slice(0, 80)}...`
+            : p.prompt_content;
+
+        const metadata: CardMetaItem[] = [
+          {
+            value: p.created_at
+              ? new Date(p.created_at).toLocaleDateString('ko-KR', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                })
+              : '-',
+          },
+          ...(p.username ? [{ value: p.username }] : []),
+          { value: `${t(`${PS}.card.charCount`)}: ${p.prompt_content.length}` },
+        ];
+
+        const primaryActions: CardActionButton[] = [
+          {
+            id: 'copy',
+            label: t(`${PS}.card.copy`),
+            icon: <FiCopy className="h-3.5 w-3.5" />,
+            onClick: () => handleCopy(p),
+          },
+          {
+            id: 'edit',
+            label: t(`${PS}.card.edit`),
+            icon: <FiEdit className="h-3.5 w-3.5" />,
+            onClick: () => setEditingPrompt(p),
+          },
+          {
+            id: 'delete',
+            label: t(`${PS}.card.delete`),
+            icon: <FiTrash2 className="h-3.5 w-3.5" />,
+            onClick: () => handleDelete(p),
+          },
+        ];
+
+        return {
+          id: String(p.id),
+          data: p,
+          title: p.prompt_title,
+          description: truncatedContent,
+          badges,
+          metadata,
+          primaryActions,
+          onClick: () => setExpandedPrompt(p),
+        };
+      }),
+    [filteredPrompts, t, handleCopy, handleDelete],
+  );
+
   // ── Error state ──
   if (error && prompts.length === 0) {
     return (
@@ -234,58 +306,17 @@ const AdminPromptStorePage: React.FC<RouteComponentProps> = () => {
         </div>
       }
     >
-      {/* Loading state */}
-        {loading && (
-          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-            <div className="mb-3 h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary" />
-            <p className="text-sm">{t(`${PS}.loading`)}</p>
-          </div>
-        )}
-
-        {/* Empty state */}
-        {!loading && filteredPrompts.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-sm text-muted-foreground">
-              {searchQuery
-                ? t(`${PS}.noResultsSearch`)
-                : prompts.length === 0
-                  ? t(`${PS}.noResults`)
-                  : t(`${PS}.noResultsFilter`)}
-            </p>
-          </div>
-        )}
-
-        {/* Prompt grid */}
-        {!loading && filteredPrompts.length >= 0 && (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {/* Add new card */}
-            <button
-              type="button"
-              className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-card p-4 text-muted-foreground transition-colors hover:border-primary hover:text-primary"
-              onClick={() => setCreateModalOpen(true)}
-            >
-              <FiPlus className="h-8 w-8" />
-              <span className="text-sm font-semibold">
-                {t(`${PS}.addCard.title`)}
-              </span>
-              <span className="text-xs">
-                {t(`${PS}.addCard.description`)}
-              </span>
-            </button>
-
-            {/* Prompt cards */}
-            {filteredPrompts.map((prompt) => (
-              <PromptCard
-                key={prompt.id}
-                prompt={prompt}
-                onCopy={handleCopy}
-                onEdit={(p) => setEditingPrompt(p)}
-                onDelete={handleDelete}
-                onClick={(p) => setExpandedPrompt(p)}
-              />
-            ))}
-          </div>
-        )}
+      <ResourceCardGrid<Prompt>
+        items={cardItems}
+        loading={loading}
+        emptyStateProps={{
+          title: searchQuery
+            ? t(`${PS}.noResultsSearch`)
+            : prompts.length === 0
+              ? t(`${PS}.noResults`)
+              : t(`${PS}.noResultsFilter`),
+        }}
+      />
       {/* Create Modal */}
       <PromptCreateModal
         isOpen={createModalOpen}

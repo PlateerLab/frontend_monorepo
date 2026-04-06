@@ -218,10 +218,10 @@ const MCPDetailSection: React.FC<MCPDetailSectionProps> = ({ item, onBack }) => 
   return (
     <div className="flex flex-col gap-6 p-6">
       {/* Back button */}
-      <button onClick={onBack} className="flex items-center gap-1 text-sm text-primary hover:underline w-fit">
+      <Button variant="ghost" size="sm" onClick={onBack} className="w-fit gap-1">
         <span>&larr;</span>
         <span>{t('admin.pages.mcpMarket.detail.backToList', 'Back to list')}</span>
-      </button>
+      </Button>
 
       {/* Item info card */}
       <div className="rounded-xl border border-border bg-card p-6">
@@ -268,9 +268,9 @@ const MCPDetailSection: React.FC<MCPDetailSectionProps> = ({ item, onBack }) => 
           <h2 className="text-sm font-semibold text-foreground">
             {t('admin.pages.mcpMarket.detail.envVars.title', 'Environment Variables')}
           </h2>
-          <button onClick={handleAddEnvVar} className="text-xs text-primary hover:underline">
+          <Button variant="ghost" size="sm" onClick={handleAddEnvVar}>
             + {t('admin.pages.mcpMarket.detail.envVars.add', 'Add')}
-          </button>
+          </Button>
         </div>
         {item.envVars && Object.keys(item.envVars).length > 0 && (
           <p className="text-xs text-muted-foreground mb-3">
@@ -303,12 +303,13 @@ const MCPDetailSection: React.FC<MCPDetailSectionProps> = ({ item, onBack }) => 
                     </span>
                   )}
                   {!entry.isFromTemplate && (
-                    <button
+                    <Button
+                      variant="danger"
+                      size="sm"
                       onClick={() => handleRemoveEnvVar(entry.id)}
-                      className="px-2 text-sm text-red-500 hover:text-red-700"
                     >
                       &times;
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>

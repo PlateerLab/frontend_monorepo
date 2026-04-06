@@ -316,8 +316,12 @@ const AdminMcpStationPage: React.FC<RouteComponentProps> = () => {
           )}
         </div>
       }
-    >
-      {/* Stats */}
+      toolbar={
+        viewMode === 'dashboard' ? (
+          <SearchInput value={search} onChange={setSearch} placeholder={t('admin.mcp.searchSessions', 'Search sessions...')} />
+        ) : undefined
+      }
+      subToolbar={
         <div className="grid grid-cols-4 gap-4">
           <StatCard
             label={t('admin.pages.mcpStation.stats.totalSessions', 'Total Sessions')}
@@ -343,6 +347,8 @@ const AdminMcpStationPage: React.FC<RouteComponentProps> = () => {
             variant="neutral"
           />
         </div>
+      }
+    >
 
         {/* Create Form */}
         {viewMode === 'create' && (
@@ -396,10 +402,6 @@ const AdminMcpStationPage: React.FC<RouteComponentProps> = () => {
         {/* Session List */}
         {viewMode === 'dashboard' && (
           <>
-            <div className="w-72">
-              <SearchInput value={search} onChange={setSearch} placeholder={t('admin.mcp.searchSessions', 'Search sessions...')} />
-            </div>
-
             {loading ? (
               <div className="flex items-center justify-center h-40">
                 <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />

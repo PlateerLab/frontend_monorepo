@@ -608,54 +608,56 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
     <ContentArea
       title={t('admin.pages.govAuditTracking.title', 'Audit Tracking')}
       description={t('admin.pages.govAuditTracking.description', 'Comprehensive audit trail and workflow tracking for AI governance')}
+      headerActions={
+        !selectedWorkflow ? (
+          <Button variant="outline" size="sm" onClick={loadData}>
+            {t('admin.governance.common.refresh', 'Refresh')}
+          </Button>
+        ) : undefined
+      }
+      toolbar={
+        !selectedWorkflow ? (
+          <SearchInput
+            value={search}
+            onChange={handleSearchChange}
+            placeholder={t('admin.governance.auditTracking.trackedSearchPlaceholder', 'Search workflows...')}
+          />
+        ) : undefined
+      }
+      subToolbar={
+        !selectedWorkflow ? (
+          <div className="grid grid-cols-4 gap-4">
+            <StatCard
+              label={t('admin.governance.auditTracking.totalLogs', 'Total Logs')}
+              value={loading ? '—' : (stats?.totalLogs ?? 0)}
+              variant="info"
+              loading={loading}
+            />
+            <StatCard
+              label={t('admin.governance.auditTracking.trackedWorkflowCount', 'Tracked Workflows')}
+              value={loading ? '—' : (stats?.trackedWorkflows ?? 0)}
+              variant="success"
+              loading={loading}
+            />
+            <StatCard
+              label={t('admin.governance.auditTracking.fullApprovalCount', 'Full Approvals')}
+              value={loading ? '—' : (stats?.actionCounts?.governance_full_approval ?? 0)}
+              accentColor="#7c3aed"
+              loading={loading}
+            />
+            <StatCard
+              label={t('admin.governance.auditTracking.revokedCount', 'Revoked')}
+              value={loading ? '—' : (stats?.actionCounts?.approval_revoked ?? 0)}
+              variant="error"
+              loading={loading}
+            />
+          </div>
+        ) : undefined
+      }
     >
       {selectedWorkflow ? (
           <WorkflowDetailView selected={selectedWorkflow} onBack={handleBack} />
         ) : (
-          <>
-            {/* Stats Cards */}
-            <div className="grid grid-cols-4 gap-4">
-              <StatCard
-                label={t('admin.governance.auditTracking.totalLogs', 'Total Logs')}
-                value={loading ? '—' : (stats?.totalLogs ?? 0)}
-                variant="info"
-                loading={loading}
-              />
-              <StatCard
-                label={t('admin.governance.auditTracking.trackedWorkflowCount', 'Tracked Workflows')}
-                value={loading ? '—' : (stats?.trackedWorkflows ?? 0)}
-                variant="success"
-                loading={loading}
-              />
-              <StatCard
-                label={t('admin.governance.auditTracking.fullApprovalCount', 'Full Approvals')}
-                value={loading ? '—' : (stats?.actionCounts?.governance_full_approval ?? 0)}
-                accentColor="#7c3aed"
-                loading={loading}
-              />
-              <StatCard
-                label={t('admin.governance.auditTracking.revokedCount', 'Revoked')}
-                value={loading ? '—' : (stats?.actionCounts?.approval_revoked ?? 0)}
-                variant="error"
-                loading={loading}
-              />
-            </div>
-
-            {/* Search toolbar */}
-            <div className="flex items-center gap-3">
-              <div className="w-80">
-                <SearchInput
-                  value={search}
-                  onChange={handleSearchChange}
-                  placeholder={t('admin.governance.auditTracking.trackedSearchPlaceholder', 'Search workflows...')}
-                />
-              </div>
-              <Button variant="outline" size="sm" onClick={loadData} className="ml-auto">
-                {t('admin.governance.common.refresh', 'Refresh')}
-              </Button>
-            </div>
-
-            {/* Workflow table */}
             <div className="rounded-xl border border-border bg-card overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
@@ -730,7 +732,6 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
                 </tbody>
               </table>
             </div>
-          </>
       )}
     </ContentArea>
   );

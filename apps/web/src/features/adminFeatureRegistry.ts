@@ -44,20 +44,29 @@ export async function initializeAdminFeatures(): Promise<void> {
       import('@xgen/feature-admin-backend-logs'),
       // 데이터 관리 (admin-data)
       import('@xgen/feature-admin-database'),
-      import('@xgen/feature-admin-data-scraper'),
 
       // MCP 관리 (admin-mcp)
       import('@xgen/feature-admin-mcp-market'),
       import('@xgen/feature-admin-mcp-station'),
       // AI 거버넌스 (admin-governance) — xgen-frontend 원본 구조: 4개
       import('@xgen/feature-admin-gov-risk-management'),
-      import('@xgen/feature-admin-gov-monitoring'),
+      import('@xgen/feature-admin-gov-monitoring-orchestrator'),
       import('@xgen/feature-admin-gov-control-policy'),
       import('@xgen/feature-admin-gov-audit-tracking'),
     ]);
 
     const features = featureModules.map(mod => mod.default || Object.values(mod)[0]);
     features.forEach(f => CoreRegistry.registerAdminFeature(f as AdminFeatureModule));
+
+    // Gov Monitoring Tab Plugins
+    const [historyMod, planMod, overdueMod] = await Promise.all([
+      import('@xgen/feature-admin-gov-monitoring-history'),
+      import('@xgen/feature-admin-gov-monitoring-plan'),
+      import('@xgen/feature-admin-gov-monitoring-overdue'),
+    ]);
+    CoreRegistry.registerGovMonitoringTabPlugin(historyMod.govMonitoringHistoryPlugin);
+    CoreRegistry.registerGovMonitoringTabPlugin(planMod.govMonitoringPlanPlugin);
+    CoreRegistry.registerGovMonitoringTabPlugin(overdueMod.govMonitoringOverduePlugin);
 
     adminInitialized = true;
   } catch (error) {

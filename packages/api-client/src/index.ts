@@ -283,6 +283,7 @@ export type {
 // Admin Database API exports
 export {
   getDatabaseInfo,
+  checkDatabaseConnection,
   getTableList,
   getTableStructure,
   getTableSampleData,

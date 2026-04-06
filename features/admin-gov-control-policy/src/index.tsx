@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import type { AdminFeatureModule, RouteComponentProps } from '@xgen/types';
-import { ContentArea, Button, SearchInput, Modal, StatCard } from '@xgen/ui';
+import { ContentArea, Button, SearchInput, Modal, StatCard, FilterTabs } from '@xgen/ui';
+import type { FilterTab } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import {
   getPIIsList,
@@ -1288,10 +1289,27 @@ const AdminGovControlPolicyPage: React.FC<RouteComponentProps> = () => {
 
   /* ================================================================ */
   /*  Main Render                                                      */
+  /* ── Tab definitions ── */
+  const policyTabs: FilterTab[] = useMemo(() => [
+    { key: 'pii', label: t('admin.settings.guarder.piis.piiTab'), count: piisList.length, icon: <span>{'\uD83D\uDEE1'}</span> },
+    { key: 'forbidden_words', label: t('admin.settings.guarder.piis.forbiddenWordTab'), count: fwList.length, icon: <span>{'\uD83D\uDEAB'}</span> },
+    { key: 'risk_level', label: t('admin.settings.guarder.piis.riskLevelTab'), count: riskSummary.gradeCount, icon: <span>{'\u26A0'}</span> },
+  ], [t, piisList.length, fwList.length, riskSummary.gradeCount]);
+
   /* ================================================================ */
   return (
-    <ContentArea showHeader={false}>
-      {/* Top summary cards */}
+    <ContentArea
+      title={t('admin.pages.govControlPolicy.title', 'Control Policy')}
+      description={t('admin.pages.govControlPolicy.description', 'Manage PII protection, forbidden words, and risk assessment policies')}
+      toolbar={
+        <FilterTabs
+          tabs={policyTabs}
+          activeKey={activeTab}
+          onChange={(key: string) => handleTabChange(key as PolicyTab)}
+          variant="underline"
+        />
+      }
+      subToolbar={
         <div className="grid grid-cols-5 gap-3">
           <StatCard
             label={t('admin.settings.guarder.piis.totalPolicies')}
@@ -1325,32 +1343,8 @@ const AdminGovControlPolicyPage: React.FC<RouteComponentProps> = () => {
             </div>
           </div>
         </div>
-
-        {/* Tabs */}
-        <div className="flex items-center gap-1 border-b border-border">
-          <button
-            className={`flex items-center gap-1.5 pb-2 px-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'pii' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-            onClick={() => handleTabChange('pii')}>
-            <span>{'\uD83D\uDEE1'}</span>
-            {t('admin.settings.guarder.piis.piiTab')}
-            <span className="text-xs text-muted-foreground ml-1">({piisList.length})</span>
-          </button>
-          <button
-            className={`flex items-center gap-1.5 pb-2 px-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'forbidden_words' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-            onClick={() => handleTabChange('forbidden_words')}>
-            <span>{'\uD83D\uDEAB'}</span>
-            {t('admin.settings.guarder.piis.forbiddenWordTab')}
-            <span className="text-xs text-muted-foreground ml-1">({fwList.length})</span>
-          </button>
-          <button
-            className={`flex items-center gap-1.5 pb-2 px-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'risk_level' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-            onClick={() => handleTabChange('risk_level')}>
-            <span>{'\u26A0'}</span>
-            {t('admin.settings.guarder.piis.riskLevelTab')}
-            <span className="text-xs text-muted-foreground ml-1">({riskSummary.gradeCount})</span>
-          </button>
-        </div>
-
+      }
+    >
         {/* Tab content */}
         {activeTab === 'risk_level' ? (
           renderRiskLevel()

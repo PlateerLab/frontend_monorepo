@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import type { AdminFeatureModule, RouteComponentProps } from '@xgen/types';
-import { ContentArea, Button, SearchInput, Modal, StatCard } from '@xgen/ui';
+import type { GovMonitoringTabPlugin, GovMonitoringTabPluginProps } from '@xgen/types';
+import { Button, SearchInput, Modal, StatCard } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import {
   getMonitoringWorkflows,
@@ -11,18 +11,14 @@ import {
   createInspection,
   updateInspection,
   deleteInspection,
-  getOverdueInspections,
   type InspectionRecord,
   type WorkflowSummary,
-  type OverdueItem,
   type InspectionCycle,
   type InspectionType,
   type InspectionResult,
 } from '@xgen/api-client';
 
 /* ── Constants ───────────────────────────────────────────── */
-type TabType = 'history' | 'plan' | 'overdue';
-
 const RESULT_CONFIG: Record<InspectionResult, { color: string; bg: string; label: string }> = {
   'normal':            { color: '#16a34a', bg: 'rgba(22,163,74,0.08)',   label: '정상' },
   'needs-improvement': { color: '#ca8a04', bg: 'rgba(202,138,4,0.08)',   label: '보완 필요' },
@@ -84,15 +80,11 @@ const formatDate = (dateStr: string): string => {
   }
 };
 
-/* ── Main Component ──────────────────────────────────────── */
-const AdminGovMonitoringPage: React.FC<RouteComponentProps> = () => {
+/* ── Component ───────────────────────────────────────────── */
+const GovMonitoringHistory: React.FC<GovMonitoringTabPluginProps> = ({ onSubToolbarChange }) => {
   const { t } = useTranslation();
 
-  // Common state
-  const [activeTab, setActiveTab] = useState<TabType>('history');
   const [loading, setLoading] = useState(false);
-
-  // History tab
   const [inspections, setInspections] = useState<InspectionRecord[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterResult, setFilterResult] = useState<InspectionResult | 'all'>('all');
@@ -100,13 +92,7 @@ const AdminGovMonitoringPage: React.FC<RouteComponentProps> = () => {
   const [sortField, setSortField] = useState<'inspectionDate' | 'nextInspectionDate' | 'workflowName'>('inspectionDate');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
-  // Plan tab
   const [workflows, setWorkflows] = useState<WorkflowSummary[]>([]);
-
-  // Overdue tab
-  const [overdueList, setOverdueList] = useState<OverdueItem[]>([]);
-
-  // Modal state
   const [selectedRecord, setSelectedRecord] = useState<InspectionRecord | null>(null);
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingRecord, setEditingRecord] = useState<InspectionRecord | null>(null);
@@ -126,35 +112,9 @@ const AdminGovMonitoringPage: React.FC<RouteComponentProps> = () => {
     }
   }, []);
 
-  const loadWorkflows = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getMonitoringWorkflows();
-      setWorkflows(Array.isArray(data) ? data : []);
-    } catch {
-      setWorkflows([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const loadOverdue = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getOverdueInspections();
-      setOverdueList(Array.isArray(data) ? data : []);
-    } catch {
-      setOverdueList([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    if (activeTab === 'history') loadInspections();
-    else if (activeTab === 'plan') loadWorkflows();
-    else if (activeTab === 'overdue') loadOverdue();
-  }, [activeTab, loadInspections, loadWorkflows, loadOverdue]);
+    loadInspections();
+  }, [loadInspections]);
 
   /* ── Filtering / sorting ── */
   const filteredInspections = useMemo(() => {
@@ -192,6 +152,23 @@ const AdminGovMonitoringPage: React.FC<RouteComponentProps> = () => {
     });
     return counts;
   }, [inspections]);
+
+  /* ── SubToolbar: summary cards ── */
+  useEffect(() => {
+    onSubToolbarChange?.(
+      <div className="grid grid-cols-4 gap-4">
+        {RESULT_OPTIONS.map((result: InspectionResult) => (
+          <StatCard
+            key={result}
+            label={RESULT_CONFIG[result].label}
+            value={stats[result]}
+            accentColor={RESULT_CONFIG[result].color}
+            subtitle={`/ ${inspections.length} ${t('admin.governance.monitoring.cases', '건')}`}
+          />
+        ))}
+      </div>
+    );
+  }, [stats, inspections.length, onSubToolbarChange, t]);
 
   /* ── Handlers ── */
   const handleSort = useCallback((field: 'inspectionDate' | 'nextInspectionDate' | 'workflowName') => {
@@ -261,47 +238,292 @@ const AdminGovMonitoringPage: React.FC<RouteComponentProps> = () => {
       setShowFormModal(false);
       setFormData({ ...EMPTY_FORM });
       setEditingRecord(null);
-      if (activeTab === 'history') loadInspections();
-      else if (activeTab === 'plan') loadWorkflows();
-      else if (activeTab === 'overdue') loadOverdue();
+      loadInspections();
     } catch {
       // error handled by API layer
     } finally {
       setSaving(false);
     }
-  }, [formData, editingRecord, activeTab, loadInspections, loadWorkflows, loadOverdue]);
+  }, [formData, editingRecord, loadInspections]);
 
   const handleDelete = useCallback(async (id: number) => {
     if (!window.confirm(t('admin.governance.monitoring.deleteConfirm', 'Delete this inspection record?'))) return;
     try {
       await deleteInspection(id);
-      if (activeTab === 'history') loadInspections();
+      loadInspections();
       if (selectedRecord?.id === id) setSelectedRecord(null);
     } catch {
       // error handled by API layer
     }
-  }, [activeTab, loadInspections, selectedRecord?.id, t]);
+  }, [loadInspections, selectedRecord?.id, t]);
 
-  /* ── Render: Summary Cards ── */
-  const renderSummaryCards = useCallback(() => (
-    <div className="grid grid-cols-4 gap-4 mb-6">
-      {RESULT_OPTIONS.map((result: InspectionResult) => (
-        <StatCard
-          key={result}
-          label={RESULT_CONFIG[result].label}
-          value={stats[result]}
-          accentColor={RESULT_CONFIG[result].color}
-          subtitle={`/ ${inspections.length} ${t('admin.governance.monitoring.cases', '건')}`}
-        />
-      ))}
-    </div>
-  ), [stats, inspections.length, t]);
+  /* ── Render: Detail Modal ── */
+  const renderDetailModal = useCallback(() => {
+    if (!selectedRecord) return null;
+    const resultCfg = RESULT_CONFIG[selectedRecord.inspectionResult as InspectionResult];
 
-  /* ── Render: History Tab ── */
-  const renderHistoryTab = useCallback(() => (
-    <>
-      {renderSummaryCards()}
+    return (
+      <Modal
+        isOpen={!!selectedRecord}
+        onClose={() => setSelectedRecord(null)}
+        title={`${selectedRecord.workflowName} - ${t('admin.governance.monitoring.inspectionDetail', 'Inspection Detail')}`}
+        size="lg"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setSelectedRecord(null)}>
+              {t('admin.governance.common.cancel', 'Cancel')}
+            </Button>
+            <Button onClick={() => { openEditModal(selectedRecord); setSelectedRecord(null); }}>
+              {t('admin.governance.common.edit', 'Edit')}
+            </Button>
+          </>
+        }
+      >
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div>
+            <p className="text-xs text-muted-foreground">{t('admin.governance.monitoring.inspectionCycle', 'Cycle')}</p>
+            <p className="text-sm text-foreground mt-0.5">{CYCLE_LABELS[selectedRecord.inspectionCycle as InspectionCycle] || selectedRecord.inspectionCycle}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">{t('admin.governance.monitoring.inspectionType', 'Type')}</p>
+            <p className="text-sm text-foreground mt-0.5">{TYPE_LABELS[selectedRecord.inspectionType as InspectionType] || selectedRecord.inspectionType}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">{t('admin.governance.monitoring.inspectionDate', 'Date')}</p>
+            <p className="text-sm text-foreground mt-0.5">{formatDate(selectedRecord.inspectionDate)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">{t('admin.governance.monitoring.nextInspection', 'Next Inspection')}</p>
+            <p className="text-sm text-foreground mt-0.5">{formatDate(selectedRecord.nextInspectionDate)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">{t('admin.governance.monitoring.result', 'Result')}</p>
+            <span
+              className="inline-block px-2 py-0.5 rounded text-xs font-medium mt-0.5"
+              style={{
+                color: resultCfg?.color || '#64748b',
+                backgroundColor: resultCfg?.bg || 'rgba(100,116,139,0.08)',
+              }}
+            >
+              {resultCfg?.label || selectedRecord.inspectionResult}
+            </span>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">{t('admin.governance.monitoring.manager', 'Manager')}</p>
+            <p className="text-sm text-foreground mt-0.5">{selectedRecord.managerName}</p>
+          </div>
+        </div>
 
+        <div className="space-y-4">
+          <div>
+            <h4 className="text-xs font-medium text-muted-foreground mb-1">{t('admin.governance.monitoring.inspectionItems', 'Items')}</h4>
+            <p className="text-sm text-foreground">{selectedRecord.inspectionItems || '-'}</p>
+          </div>
+          <div>
+            <h4 className="text-xs font-medium text-muted-foreground mb-1">{t('admin.governance.monitoring.inspectionContent', 'Content')}</h4>
+            <p className="text-sm text-foreground">{selectedRecord.inspectionContent || '-'}</p>
+          </div>
+          {selectedRecord.issueManagement && (
+            <div>
+              <h4 className="text-xs font-medium text-muted-foreground mb-1">{t('admin.governance.monitoring.issueManagement', 'Issue Management')}</h4>
+              <p className="text-sm text-foreground">{selectedRecord.issueManagement}</p>
+            </div>
+          )}
+          {selectedRecord.applicableScope && (
+            <div>
+              <h4 className="text-xs font-medium text-muted-foreground mb-1">{t('admin.governance.monitoring.applicableScope', 'Scope')}</h4>
+              <p className="text-sm text-foreground">{selectedRecord.applicableScope}</p>
+            </div>
+          )}
+        </div>
+      </Modal>
+    );
+  }, [selectedRecord, openEditModal, t]);
+
+  /* ── Render: Form Modal ── */
+  const renderFormModal = useCallback(() => {
+    if (!showFormModal) return null;
+    const isEdit = !!editingRecord;
+
+    return (
+      <Modal
+        isOpen={showFormModal}
+        onClose={() => setShowFormModal(false)}
+        title={isEdit
+          ? t('admin.governance.monitoring.editInspection', 'Edit Inspection')
+          : t('admin.governance.monitoring.addInspection', '점검 등록')
+        }
+        size="lg"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setShowFormModal(false)}>
+              {t('admin.governance.common.cancel', 'Cancel')}
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={saving || (!isEdit && !formData.workflow_id) || !formData.inspection_date}
+            >
+              {saving ? '...' : t('admin.governance.common.save', 'Save')}
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">
+              {t('admin.governance.monitoring.selectWorkflow', 'Workflow')}
+            </label>
+            {isEdit ? (
+              <input
+                type="text"
+                className="w-full h-9 rounded-lg border border-border bg-muted px-3 text-sm text-foreground"
+                value={editingRecord?.workflowName || ''}
+                disabled
+              />
+            ) : (
+              <select
+                className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                value={formData.workflow_id}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData((prev: FormData) => ({ ...prev, workflow_id: e.target.value }))}
+              >
+                <option value="">{t('admin.governance.monitoring.workflowPlaceholder', 'Select workflow...')}</option>
+                {workflows.map((wf: WorkflowSummary) => (
+                  <option key={wf.workflowId} value={wf.workflowId}>{wf.workflowName}</option>
+                ))}
+              </select>
+            )}
+            <p className="text-xs text-muted-foreground mt-1">
+              {t('admin.governance.monitoring.selectWorkflowHelp', 'Select the workflow to inspect.')}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                {t('admin.governance.monitoring.inspectionCycle', 'Cycle')}
+              </label>
+              <select
+                className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                value={formData.inspection_cycle}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData((prev: FormData) => ({ ...prev, inspection_cycle: e.target.value as InspectionCycle }))}
+              >
+                {CYCLE_OPTIONS.map((c: InspectionCycle) => <option key={c} value={c}>{CYCLE_LABELS[c]}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                {t('admin.governance.monitoring.inspectionDate', 'Date')}
+              </label>
+              <input
+                type="date"
+                className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                value={formData.inspection_date}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData((prev: FormData) => ({ ...prev, inspection_date: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                {t('admin.governance.monitoring.inspectionType', 'Type')}
+              </label>
+              <select
+                className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                value={formData.inspection_type}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData((prev: FormData) => ({ ...prev, inspection_type: e.target.value as InspectionType }))}
+              >
+                {TYPE_OPTIONS.map((typeVal: InspectionType) => <option key={typeVal} value={typeVal}>{TYPE_LABELS[typeVal]}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                {t('admin.governance.monitoring.result', 'Result')}
+              </label>
+              <select
+                className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                value={formData.inspection_result}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData((prev: FormData) => ({ ...prev, inspection_result: e.target.value as InspectionResult }))}
+              >
+                {RESULT_OPTIONS.map((r: InspectionResult) => <option key={r} value={r}>{RESULT_CONFIG[r].label}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">
+              {t('admin.governance.monitoring.nextInspection', 'Next Inspection')}
+            </label>
+            <input
+              type="date"
+              className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+              value={formData.next_inspection_date}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData((prev: FormData) => ({ ...prev, next_inspection_date: e.target.value }))}
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              {t('admin.governance.monitoring.nextInspectionHelp', 'Optional. Will be auto-calculated if left empty.')}
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">
+              {t('admin.governance.monitoring.inspectionItems', 'Items')}
+            </label>
+            <input
+              type="text"
+              className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+              value={formData.inspection_items}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData((prev: FormData) => ({ ...prev, inspection_items: e.target.value }))}
+              placeholder={t('admin.governance.monitoring.inspectionItemsPlaceholder', 'e.g. Security, Data integrity, Access control')}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">
+              {t('admin.governance.monitoring.inspectionContent', 'Content')}
+            </label>
+            <textarea
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground resize-y"
+              value={formData.inspection_content}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData((prev: FormData) => ({ ...prev, inspection_content: e.target.value }))}
+              placeholder={t('admin.governance.monitoring.inspectionContentPlaceholder', 'Describe the inspection content...')}
+              rows={4}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">
+              {t('admin.governance.monitoring.issueManagement', 'Issue Management')}
+            </label>
+            <textarea
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground resize-y"
+              value={formData.issue_management}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData((prev: FormData) => ({ ...prev, issue_management: e.target.value }))}
+              placeholder={t('admin.governance.monitoring.issueManagementPlaceholder', 'Describe any issues and actions taken...')}
+              rows={3}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">
+              {t('admin.governance.monitoring.applicableScope', 'Scope')}
+            </label>
+            <input
+              type="text"
+              className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+              value={formData.applicable_scope}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData((prev: FormData) => ({ ...prev, applicable_scope: e.target.value }))}
+              placeholder={t('admin.governance.monitoring.applicableScopePlaceholder', 'e.g. Production, Staging')}
+            />
+          </div>
+        </div>
+      </Modal>
+    );
+  }, [showFormModal, editingRecord, formData, saving, workflows, handleSave, t]);
+
+  /* ── Main render ── */
+  return (
+    <div className="p-6">
       <div className="flex items-center gap-3 mb-4 flex-wrap">
         <div className="w-72">
           <SearchInput
@@ -445,494 +667,20 @@ const AdminGovMonitoringPage: React.FC<RouteComponentProps> = () => {
           </tbody>
         </table>
       </div>
-    </>
-  ), [
-    renderSummaryCards, searchQuery, filterResult, filterType, sortField, sortDirection,
-    loading, filteredInspections, openCreateModal, handleSort, openDetail, openEditModal, handleDelete, t,
-  ]);
 
-  /* ── Render: Plan Tab ── */
-  const renderPlanTab = useCallback(() => (
-    <>
-      <p className="text-sm text-muted-foreground mb-4">
-        {t('admin.governance.monitoring.planDescription', 'Workflow inspection plan overview by workflow.')}
-      </p>
-      <div className="overflow-x-auto rounded-xl border border-border">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border bg-muted/30">
-              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.common.workflow', 'Workflow')}</th>
-              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.inspectionCount', 'Inspection Count')}</th>
-              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.lastInspection', 'Last Inspection')}</th>
-              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.nextInspection', 'Next Inspection')}</th>
-              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.result', 'Result')}</th>
-              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.common.actions', 'Actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-12 text-center">
-                  <div className="flex items-center justify-center">
-                    <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                  </div>
-                </td>
-              </tr>
-            ) : workflows.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">
-                  {t('admin.governance.common.noData', 'No data')}
-                </td>
-              </tr>
-            ) : (
-              workflows.map((wf: WorkflowSummary) => {
-                const latest = wf.latestInspection;
-                return (
-                  <tr key={wf.workflowId} className="border-b border-border hover:bg-muted/40 transition-colors">
-                    <td className="px-4 py-3 font-medium text-foreground">{wf.workflowName}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{wf.inspectionCount}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{latest ? formatDate(latest.inspectionDate) : '-'}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{latest ? formatDate(latest.nextInspectionDate) : '-'}</td>
-                    <td className="px-4 py-3">
-                      {latest ? (
-                        <span
-                          className="inline-block px-2 py-0.5 rounded text-xs font-medium"
-                          style={{
-                            color: RESULT_CONFIG[latest.inspectionResult]?.color || '#64748b',
-                            backgroundColor: RESULT_CONFIG[latest.inspectionResult]?.bg || 'rgba(100,116,139,0.08)',
-                          }}
-                        >
-                          {RESULT_CONFIG[latest.inspectionResult]?.label || latest.inspectionResult}
-                        </span>
-                      ) : (
-                        <span
-                          className="inline-block px-2 py-0.5 rounded text-xs font-medium"
-                          style={{ color: '#64748b', backgroundColor: 'rgba(100,116,139,0.08)' }}
-                        >
-                          {t('admin.governance.monitoring.noInspection', 'No inspection')}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {latest ? (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          title={t('admin.governance.monitoring.viewDetail', 'View detail')}
-                          onClick={() => openDetail(latest)}
-                        >
-                          🔍
-                        </Button>
-                      ) : null}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-    </>
-  ), [loading, workflows, openDetail, t]);
-
-  /* ── Render: Overdue Tab ── */
-  const renderOverdueTab = useCallback(() => (
-    <>
-      <p className="text-sm text-muted-foreground mb-4">
-        {t('admin.governance.monitoring.overdueDescription', 'List of overdue inspections requiring immediate attention.')}
-      </p>
-      <div className="overflow-x-auto rounded-xl border border-border">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border bg-muted/30">
-              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.common.workflow', 'Workflow')}</th>
-              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.inspectionCycle', 'Cycle')}</th>
-              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.expectedDate', 'Expected Date')}</th>
-              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.overdueDays', 'Overdue Days')}</th>
-              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.manager', 'Manager')}</th>
-              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.common.actions', 'Actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-12 text-center">
-                  <div className="flex items-center justify-center">
-                    <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                  </div>
-                </td>
-              </tr>
-            ) : overdueList.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">
-                  {t('admin.governance.common.noData', 'No data')}
-                </td>
-              </tr>
-            ) : (
-              overdueList.map((item: OverdueItem) => (
-                <tr key={item.id} className="border-b border-border hover:bg-muted/40 transition-colors">
-                  <td className="px-4 py-3 font-medium text-foreground">{item.workflowName}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{CYCLE_LABELS[item.inspectionCycle] || item.inspectionCycle}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{formatDate(item.expectedDate)}</td>
-                  <td className="px-4 py-3">
-                    <span className="font-semibold" style={{ color: '#dc2626' }}>
-                      +{item.overdueDays}{t('admin.governance.monitoring.days', '일')}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">{item.managerName}</td>
-                  <td className="px-4 py-3">
-                    <Button
-                      size="sm"
-                      onClick={async () => {
-                        setEditingRecord(null);
-                        setFormData({ ...EMPTY_FORM, workflow_id: item.workflowId });
-                        if (workflows.length === 0) {
-                          try {
-                            const data = await getMonitoringWorkflows();
-                            setWorkflows(Array.isArray(data) ? data : []);
-                          } catch { /* ignore */ }
-                        }
-                        setShowFormModal(true);
-                      }}
-                    >
-                      {t('admin.governance.monitoring.addInspection', '점검 등록')}
-                    </Button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-    </>
-  ), [loading, overdueList, workflows.length, t]);
-
-  /* ── Render: Detail Modal ── */
-  const renderDetailModal = useCallback(() => {
-    if (!selectedRecord) return null;
-    const resultCfg = RESULT_CONFIG[selectedRecord.inspectionResult as InspectionResult];
-
-    return (
-      <Modal
-        isOpen={!!selectedRecord}
-        onClose={() => setSelectedRecord(null)}
-        title={`${selectedRecord.workflowName} - ${t('admin.governance.monitoring.inspectionDetail', 'Inspection Detail')}`}
-        size="lg"
-        footer={
-          <>
-            <Button variant="outline" onClick={() => setSelectedRecord(null)}>
-              {t('admin.governance.common.cancel', 'Cancel')}
-            </Button>
-            <Button onClick={() => { openEditModal(selectedRecord); setSelectedRecord(null); }}>
-              {t('admin.governance.common.edit', 'Edit')}
-            </Button>
-          </>
-        }
-      >
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div>
-            <p className="text-xs text-muted-foreground">{t('admin.governance.monitoring.inspectionCycle', 'Cycle')}</p>
-            <p className="text-sm text-foreground mt-0.5">{CYCLE_LABELS[selectedRecord.inspectionCycle as InspectionCycle] || selectedRecord.inspectionCycle}</p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">{t('admin.governance.monitoring.inspectionType', 'Type')}</p>
-            <p className="text-sm text-foreground mt-0.5">{TYPE_LABELS[selectedRecord.inspectionType as InspectionType] || selectedRecord.inspectionType}</p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">{t('admin.governance.monitoring.inspectionDate', 'Date')}</p>
-            <p className="text-sm text-foreground mt-0.5">{formatDate(selectedRecord.inspectionDate)}</p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">{t('admin.governance.monitoring.nextInspection', 'Next Inspection')}</p>
-            <p className="text-sm text-foreground mt-0.5">{formatDate(selectedRecord.nextInspectionDate)}</p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">{t('admin.governance.monitoring.result', 'Result')}</p>
-            <span
-              className="inline-block px-2 py-0.5 rounded text-xs font-medium mt-0.5"
-              style={{
-                color: resultCfg?.color || '#64748b',
-                backgroundColor: resultCfg?.bg || 'rgba(100,116,139,0.08)',
-              }}
-            >
-              {resultCfg?.label || selectedRecord.inspectionResult}
-            </span>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">{t('admin.governance.monitoring.manager', 'Manager')}</p>
-            <p className="text-sm text-foreground mt-0.5">{selectedRecord.managerName}</p>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <h4 className="text-xs font-medium text-muted-foreground mb-1">{t('admin.governance.monitoring.inspectionItems', 'Items')}</h4>
-            <p className="text-sm text-foreground">{selectedRecord.inspectionItems || '-'}</p>
-          </div>
-          <div>
-            <h4 className="text-xs font-medium text-muted-foreground mb-1">{t('admin.governance.monitoring.inspectionContent', 'Content')}</h4>
-            <p className="text-sm text-foreground">{selectedRecord.inspectionContent || '-'}</p>
-          </div>
-          {selectedRecord.issueManagement && (
-            <div>
-              <h4 className="text-xs font-medium text-muted-foreground mb-1">{t('admin.governance.monitoring.issueManagement', 'Issue Management')}</h4>
-              <p className="text-sm text-foreground">{selectedRecord.issueManagement}</p>
-            </div>
-          )}
-          {selectedRecord.applicableScope && (
-            <div>
-              <h4 className="text-xs font-medium text-muted-foreground mb-1">{t('admin.governance.monitoring.applicableScope', 'Scope')}</h4>
-              <p className="text-sm text-foreground">{selectedRecord.applicableScope}</p>
-            </div>
-          )}
-        </div>
-      </Modal>
-    );
-  }, [selectedRecord, openEditModal, t]);
-
-  /* ── Render: Form Modal ── */
-  const renderFormModal = useCallback(() => {
-    if (!showFormModal) return null;
-    const isEdit = !!editingRecord;
-
-    return (
-      <Modal
-        isOpen={showFormModal}
-        onClose={() => setShowFormModal(false)}
-        title={isEdit
-          ? t('admin.governance.monitoring.editInspection', 'Edit Inspection')
-          : t('admin.governance.monitoring.addInspection', '점검 등록')
-        }
-        size="lg"
-        footer={
-          <>
-            <Button variant="outline" onClick={() => setShowFormModal(false)}>
-              {t('admin.governance.common.cancel', 'Cancel')}
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={saving || (!isEdit && !formData.workflow_id) || !formData.inspection_date}
-            >
-              {saving ? '...' : t('admin.governance.common.save', 'Save')}
-            </Button>
-          </>
-        }
-      >
-        <div className="space-y-4">
-          {/* Workflow */}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
-              {t('admin.governance.monitoring.selectWorkflow', 'Workflow')}
-            </label>
-            {isEdit ? (
-              <input
-                type="text"
-                className="w-full h-9 rounded-lg border border-border bg-muted px-3 text-sm text-foreground"
-                value={editingRecord?.workflowName || ''}
-                disabled
-              />
-            ) : (
-              <select
-                className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
-                value={formData.workflow_id}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData((prev: FormData) => ({ ...prev, workflow_id: e.target.value }))}
-              >
-                <option value="">{t('admin.governance.monitoring.workflowPlaceholder', 'Select workflow...')}</option>
-                {workflows.map((wf: WorkflowSummary) => (
-                  <option key={wf.workflowId} value={wf.workflowId}>{wf.workflowName}</option>
-                ))}
-              </select>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">
-              {t('admin.governance.monitoring.selectWorkflowHelp', 'Select the workflow to inspect.')}
-            </p>
-          </div>
-
-          {/* Cycle + Date */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                {t('admin.governance.monitoring.inspectionCycle', 'Cycle')}
-              </label>
-              <select
-                className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
-                value={formData.inspection_cycle}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData((prev: FormData) => ({ ...prev, inspection_cycle: e.target.value as InspectionCycle }))}
-              >
-                {CYCLE_OPTIONS.map((c: InspectionCycle) => <option key={c} value={c}>{CYCLE_LABELS[c]}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                {t('admin.governance.monitoring.inspectionDate', 'Date')}
-              </label>
-              <input
-                type="date"
-                className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
-                value={formData.inspection_date}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData((prev: FormData) => ({ ...prev, inspection_date: e.target.value }))}
-              />
-            </div>
-          </div>
-
-          {/* Type + Result */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                {t('admin.governance.monitoring.inspectionType', 'Type')}
-              </label>
-              <select
-                className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
-                value={formData.inspection_type}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData((prev: FormData) => ({ ...prev, inspection_type: e.target.value as InspectionType }))}
-              >
-                {TYPE_OPTIONS.map((typeVal: InspectionType) => <option key={typeVal} value={typeVal}>{TYPE_LABELS[typeVal]}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                {t('admin.governance.monitoring.result', 'Result')}
-              </label>
-              <select
-                className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
-                value={formData.inspection_result}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData((prev: FormData) => ({ ...prev, inspection_result: e.target.value as InspectionResult }))}
-              >
-                {RESULT_OPTIONS.map((r: InspectionResult) => <option key={r} value={r}>{RESULT_CONFIG[r].label}</option>)}
-              </select>
-            </div>
-          </div>
-
-          {/* Next inspection date */}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
-              {t('admin.governance.monitoring.nextInspection', 'Next Inspection')}
-            </label>
-            <input
-              type="date"
-              className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
-              value={formData.next_inspection_date}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData((prev: FormData) => ({ ...prev, next_inspection_date: e.target.value }))}
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              {t('admin.governance.monitoring.nextInspectionHelp', 'Optional. Will be auto-calculated if left empty.')}
-            </p>
-          </div>
-
-          {/* Inspection items */}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
-              {t('admin.governance.monitoring.inspectionItems', 'Items')}
-            </label>
-            <input
-              type="text"
-              className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
-              value={formData.inspection_items}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData((prev: FormData) => ({ ...prev, inspection_items: e.target.value }))}
-              placeholder={t('admin.governance.monitoring.inspectionItemsPlaceholder', 'e.g. Security, Data integrity, Access control')}
-            />
-          </div>
-
-          {/* Inspection content */}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
-              {t('admin.governance.monitoring.inspectionContent', 'Content')}
-            </label>
-            <textarea
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground resize-y"
-              value={formData.inspection_content}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData((prev: FormData) => ({ ...prev, inspection_content: e.target.value }))}
-              placeholder={t('admin.governance.monitoring.inspectionContentPlaceholder', 'Describe the inspection content...')}
-              rows={4}
-            />
-          </div>
-
-          {/* Issue management */}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
-              {t('admin.governance.monitoring.issueManagement', 'Issue Management')}
-            </label>
-            <textarea
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground resize-y"
-              value={formData.issue_management}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData((prev: FormData) => ({ ...prev, issue_management: e.target.value }))}
-              placeholder={t('admin.governance.monitoring.issueManagementPlaceholder', 'Describe any issues and actions taken...')}
-              rows={3}
-            />
-          </div>
-
-          {/* Applicable scope */}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
-              {t('admin.governance.monitoring.applicableScope', 'Scope')}
-            </label>
-            <input
-              type="text"
-              className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
-              value={formData.applicable_scope}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData((prev: FormData) => ({ ...prev, applicable_scope: e.target.value }))}
-              placeholder={t('admin.governance.monitoring.applicableScopePlaceholder', 'e.g. Production, Staging')}
-            />
-          </div>
-        </div>
-      </Modal>
-    );
-  }, [showFormModal, editingRecord, formData, saving, workflows, handleSave, t]);
-
-  /* ── Main render ── */
-  return (
-    <ContentArea showHeader={false}>
-      {/* Tab group */}
-        <div className="flex items-center gap-1 border-b border-border">
-          <button
-            className={`pb-2 px-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'history' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-            onClick={() => setActiveTab('history')}
-          >
-            {t('admin.governance.monitoring.tabs.inspectionHistory', 'Inspection History')}
-          </button>
-          <button
-            className={`pb-2 px-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'plan' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-            onClick={() => setActiveTab('plan')}
-          >
-            {t('admin.governance.monitoring.tabs.inspectionPlan', 'Inspection Plan')}
-          </button>
-          <button
-            className={`pb-2 px-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'overdue' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-            onClick={() => setActiveTab('overdue')}
-          >
-            {t('admin.governance.monitoring.tabs.overdue', 'Overdue')}
-            {overdueList.length > 0 && (
-              <span className="ml-1.5 text-xs text-red-500 font-bold">({overdueList.length})</span>
-            )}
-          </button>
-        </div>
-
-        {/* Tab content */}
-        {activeTab === 'history' && renderHistoryTab()}
-        {activeTab === 'plan' && renderPlanTab()}
-        {activeTab === 'overdue' && renderOverdueTab()}
-
-        {/* Modals */}
       {renderDetailModal()}
       {renderFormModal()}
-    </ContentArea>
+    </div>
   );
 };
 
-/* ── Feature module export ── */
-const feature: AdminFeatureModule = {
-  id: 'admin-gov-monitoring',
-  name: 'AdminGovMonitoringPage',
-  adminSection: 'admin-governance',
-  routes: {
-    'admin-gov-monitoring': AdminGovMonitoringPage,
-  },
+/* ── Plugin Export ── */
+export const govMonitoringHistoryPlugin: GovMonitoringTabPlugin = {
+  id: 'history',
+  name: 'GovMonitoringHistory',
+  tabLabelKey: 'admin.governance.monitoring.tabs.inspectionHistory',
+  order: 1,
+  component: GovMonitoringHistory,
 };
 
-export default feature;
+export default govMonitoringHistoryPlugin;

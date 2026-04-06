@@ -38,9 +38,6 @@ importers:
       '@xgen/feature-admin-chat-monitoring':
         specifier: workspace:*
         version: link:../../features/admin-chat-monitoring
-      '@xgen/feature-admin-data-scraper':
-        specifier: workspace:*
-        version: link:../../features/admin-data-scraper
       '@xgen/feature-admin-database':
         specifier: workspace:*
         version: link:../../features/admin-database
@@ -50,9 +47,18 @@ importers:
       '@xgen/feature-admin-gov-control-policy':
         specifier: workspace:*
         version: link:../../features/admin-gov-control-policy
-      '@xgen/feature-admin-gov-monitoring':
+      '@xgen/feature-admin-gov-monitoring-history':
         specifier: workspace:*
-        version: link:../../features/admin-gov-monitoring
+        version: link:../../features/admin-gov-monitoring-history
+      '@xgen/feature-admin-gov-monitoring-orchestrator':
+        specifier: workspace:*
+        version: link:../../features/admin-gov-monitoring-orchestrator
+      '@xgen/feature-admin-gov-monitoring-overdue':
+        specifier: workspace:*
+        version: link:../../features/admin-gov-monitoring-overdue
+      '@xgen/feature-admin-gov-monitoring-plan':
+        specifier: workspace:*
+        version: link:../../features/admin-gov-monitoring-plan
       '@xgen/feature-admin-gov-operation-history':
         specifier: workspace:*
         version: link:../../features/admin-gov-operation-history
@@ -373,27 +379,6 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
 
-  features/admin-data-scraper:
-    dependencies:
-      '@xgen/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@xgen/auth-provider':
-        specifier: workspace:*
-        version: link:../../packages/auth-provider
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-
   features/admin-database:
     dependencies:
       '@xgen/api-client':
@@ -498,6 +483,103 @@ importers:
       '@xgen/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+
+  features/admin-gov-monitoring-history:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/admin-gov-monitoring-orchestrator:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/admin-gov-monitoring-overdue:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/admin-gov-monitoring-plan:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
 
   features/admin-gov-operation-history:
     dependencies:

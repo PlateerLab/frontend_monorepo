@@ -83,7 +83,6 @@ const nextConfig: NextConfig = {
         '@xgen/feature-admin-system-health',
         '@xgen/feature-admin-backend-logs',
         '@xgen/feature-admin-database',
-        '@xgen/feature-admin-data-scraper',
         '@xgen/feature-admin-storage',
         '@xgen/feature-admin-backup',
         '@xgen/feature-admin-security-settings',

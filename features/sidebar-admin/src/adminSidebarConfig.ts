@@ -71,7 +71,6 @@ export const adminSidebarConfig: AdminSidebarSectionConfig[] = [
     titleKey: 'admin.sidebar.sections.data',
     items: [
       { id: 'admin-database', titleKey: 'admin.sidebar.data.database.title', descriptionKey: 'admin.sidebar.data.database.description' },
-      { id: 'admin-data-scraper', titleKey: 'admin.sidebar.data.dataScraper.title', descriptionKey: 'admin.sidebar.data.dataScraper.description' },
     ],
   },
   // ── 6. MCP 관리 ──

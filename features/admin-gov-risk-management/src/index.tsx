@@ -539,8 +539,33 @@ const AdminGovRiskManagementPage: React.FC<RouteComponentProps> = () => {
     <ContentArea
       title={t('admin.pages.govRiskManagement.title')}
       description={t('admin.pages.govRiskManagement.description')}
-    >
-      {/* Summary cards — act as filter */}
+      headerActions={
+        <Button variant="outline" size="sm" onClick={() => loadData()} disabled={loading}>
+          {t('admin.governance.common.refresh', 'Refresh')}
+        </Button>
+      }
+      toolbar={
+        <div className="flex items-center gap-3 w-full">
+          <SearchInput
+            value={searchQuery}
+            onChange={(val: string) => setSearchQuery(val)}
+            placeholder={t('admin.governance.riskManagement.searchPlaceholder')}
+          />
+          <div className="ml-auto">
+            <select
+              className="px-3 py-1.5 text-sm rounded-lg border border-border bg-card text-foreground"
+              value={filterLevel}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterLevel(e.target.value as RiskLevel | 'all')}
+            >
+              <option value="all">{t('admin.governance.common.allLevels')}</option>
+              {(Object.keys(RISK_LEVEL_CONFIG) as RiskLevel[]).map((lv: RiskLevel) => (
+                <option key={lv} value={lv}>{t(RISK_LEVEL_CONFIG[lv].labelKey)}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      }
+      subToolbar={
         <div className="grid grid-cols-5 gap-4">
           <StatCard
             label={t('admin.governance.common.total')}
@@ -561,32 +586,8 @@ const AdminGovRiskManagementPage: React.FC<RouteComponentProps> = () => {
             />
           ))}
         </div>
-
-        {/* Toolbar: search + filter + refresh */}
-        <div className="flex items-center gap-3">
-          <div className="w-72">
-            <SearchInput
-              value={searchQuery}
-              onChange={(val: string) => setSearchQuery(val)}
-              placeholder={t('admin.governance.riskManagement.searchPlaceholder')}
-            />
-          </div>
-          <div className="flex gap-2 ml-auto items-center">
-            <select
-              className="px-3 py-1.5 text-sm rounded-lg border border-border bg-card text-foreground"
-              value={filterLevel}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterLevel(e.target.value as RiskLevel | 'all')}
-            >
-              <option value="all">{t('admin.governance.common.allLevels')}</option>
-              {(Object.keys(RISK_LEVEL_CONFIG) as RiskLevel[]).map((lv: RiskLevel) => (
-                <option key={lv} value={lv}>{t(RISK_LEVEL_CONFIG[lv].labelKey)}</option>
-              ))}
-            </select>
-            <Button variant="outline" onClick={() => loadData()} disabled={loading}>
-              {t('admin.governance.common.refresh', 'Refresh')}
-            </Button>
-          </div>
-        </div>
+      }
+    >
 
         {/* Table */}
         {loading && records.length === 0 ? (

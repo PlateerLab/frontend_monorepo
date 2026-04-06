@@ -3,19 +3,19 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import type { AdminFeatureModule, RouteComponentProps } from '@xgen/types';
 import {
-  ContentArea, Button, StatusBadge, SearchInput, FilterTabs, Modal, useToast,
+  ContentArea, Button, StatusBadge, SearchInput, FilterTabs, ResourceCardGrid, Modal, useToast,
 } from '@xgen/ui';
-import type { FilterTab } from '@xgen/ui';
+import type { FilterTab, ResourceCardProps, CardBadge, CardMetaItem, CardActionButton, CardDropdownItem } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
-import { FiRefreshCw, FiUpload } from '@xgen/icons';
+import { FiRefreshCw, FiUpload, FiSettings, FiTrash2, FiCheck, FiX } from '@xgen/icons';
 
 import type { Workflow, FilterMode } from './types';
 import { listWorkflowStore, deleteWorkflowFromStore, updateWorkflowDeploy } from './api/workflow-store-api';
 import {
-  WorkflowCard,
   getWorkflowState,
   formatCompactDate,
   isWorkflowDeployed,
+  isWorkflowDeployPending,
 } from './components/workflow-card';
 
 // ─────────────────────────────────────────────────────────────
@@ -161,6 +161,81 @@ const AdminWorkflowStorePage: React.FC<RouteComponentProps> = () => {
     toast.info(t(`${NS}.uploadComingSoon`));
   }, [toast]);
 
+  // ── Map workflows to ResourceCard items ──
+  const cardItems: ResourceCardProps<Workflow>[] = useMemo(
+    () =>
+      filteredWorkflows.map((w) => {
+        const state = getWorkflowState(w);
+        const deployed = isWorkflowDeployed(w);
+        const deployPending = isWorkflowDeployPending(w);
+        const isPrivate = !w.is_shared;
+        const ownerName = w.username || w.full_name || t(`${NS}.card.unknownOwner`);
+
+        const badges: CardBadge[] = [
+          {
+            text: state === 'active' ? t(`${NS}.filter.active`) : t(`${NS}.filter.inactive`),
+            variant: state === 'active' ? 'success' : 'error',
+          },
+          ...(isPrivate ? [{ text: t(`${NS}.card.private`), variant: 'default' as const }] : []),
+          {
+            text: deployed ? t(`${NS}.card.deployed`) : t(`${NS}.card.notDeployed`),
+            variant: deployed ? 'success' : 'default',
+          },
+        ];
+
+        const metadata: CardMetaItem[] = [
+          { value: ownerName },
+          { value: formatCompactDate(w.updated_at || w.created_at) },
+          { value: `${t(`${NS}.card.nodes`)}: ${w.node_count}` },
+        ];
+
+        const primaryActions: CardActionButton[] = [
+          {
+            id: 'settings',
+            label: t(`${NS}.card.settings`),
+            icon: <FiSettings className="h-3.5 w-3.5" />,
+            onClick: () => setSelectedWorkflow(w),
+          },
+          {
+            id: 'delete',
+            label: t(`${NS}.card.delete`),
+            icon: <FiTrash2 className="h-3.5 w-3.5" />,
+            onClick: () => handleDelete(w),
+          },
+        ];
+
+        const dropdownActions: CardDropdownItem[] = deployPending
+          ? [
+              {
+                id: 'approve',
+                label: t(`${NS}.card.approve`),
+                icon: <FiCheck className="h-4 w-4" />,
+                onClick: () => handleApprove(w),
+              },
+              {
+                id: 'reject',
+                label: t(`${NS}.card.reject`),
+                icon: <FiX className="h-4 w-4" />,
+                danger: true,
+                onClick: () => handleReject(w),
+              },
+            ]
+          : [];
+
+        return {
+          id: String(w.id),
+          data: w,
+          title: w.workflow_upload_name,
+          badges,
+          metadata,
+          primaryActions,
+          dropdownActions,
+          onClick: () => setSelectedWorkflow(w),
+        };
+      }),
+    [filteredWorkflows, t, handleDelete, handleApprove, handleReject],
+  );
+
   // ── Error state ──
   if (error && workflows.length === 0) {
     return (
@@ -215,42 +290,17 @@ const AdminWorkflowStorePage: React.FC<RouteComponentProps> = () => {
         </div>
       }
     >
-      {/* Loading state */}
-        {loading && (
-          <div className="flex items-center justify-center py-16">
-            <p className="text-sm text-muted-foreground">{t(`${NS}.loading`)}</p>
-          </div>
-        )}
-
-        {/* Empty state */}
-        {!loading && filteredWorkflows.length === 0 && (
-          <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-            <p className="text-sm text-muted-foreground">
-              {search.trim()
-                ? t(`${NS}.noResultsSearch`)
-                : filter !== 'all'
-                  ? t(`${NS}.noResultsFilter`)
-                  : t(`${NS}.noResults`)}
-            </p>
-          </div>
-        )}
-
-        {/* Card grid */}
-        {!loading && filteredWorkflows.length > 0 && (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredWorkflows.map((w) => (
-              <WorkflowCard
-                key={w.id}
-                workflow={w}
-                onClick={() => setSelectedWorkflow(w)}
-                onSettings={() => setSelectedWorkflow(w)}
-                onDelete={() => handleDelete(w)}
-                onApprove={() => handleApprove(w)}
-                onReject={() => handleReject(w)}
-              />
-            ))}
-          </div>
-        )}
+      <ResourceCardGrid<Workflow>
+        items={cardItems}
+        loading={loading}
+        emptyStateProps={{
+          title: search.trim()
+            ? t(`${NS}.noResultsSearch`)
+            : filter !== 'all'
+              ? t(`${NS}.noResultsFilter`)
+              : t(`${NS}.noResults`),
+        }}
+      />
       {/* Detail Modal (simple info view) */}
       {selectedWorkflow && (
         <Modal
