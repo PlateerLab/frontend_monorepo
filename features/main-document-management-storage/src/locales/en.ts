@@ -64,6 +64,11 @@ export const en: TranslationData = {
         name: 'Folder Name',
         namePlaceholder: 'Enter folder name',
       },
+      directoryTree: {
+        title: 'Directory Structure',
+        filesSuffix: ' files',
+        searchPlaceholder: 'Search files...',
+      },
     },
   },
 };

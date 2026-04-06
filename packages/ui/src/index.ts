@@ -86,6 +86,15 @@ export type {
 export { ResourceCardGrid } from './data-display/resource-card-grid';
 export type { ResourceCardGridProps } from './data-display/resource-card-grid';
 
+// DirectoryTree - 폴더/파일 트리 네비게이션 (컬렉션, 파일 저장소 공용)
+export { DirectoryTree } from './data-display/directory-tree';
+export type {
+  DirectoryTreeProps,
+  TreeFolder,
+  TreeFile,
+  TreeRoot,
+} from './data-display/directory-tree';
+
 // DataTable - 정렬 가능한 데이터 테이블
 export { DataTable } from './data-display/data-table';
 export type {
