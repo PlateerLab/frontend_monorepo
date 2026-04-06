@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Button, Modal, Input, Label, DirectoryTree } from '@xgen/ui';
+import { Button, Modal, Input, Label, DirectoryTree, DocumentCard } from '@xgen/ui';
 import type { TreeFolder, TreeFile } from '@xgen/ui';
-import { FiArrowLeft, FiFile, FiFolder, FiChevronRight, FiClock, FiUpload, FiPlus } from '@xgen/icons';
+import { FiArrowLeft, FiFile, FiFolder, FiChevronRight, FiClock, FiDownload, FiUpload, FiPlus } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import type { FileStorageItem, StorageFileItem, StorageFolderItem, PaginationInfo } from '../api';
 import { listStorageFiles, getStorageFolderTree, deleteStorageFile, deleteStorageFolder, downloadStorageFile, uploadStorageFile, createStorageFolder } from '../api';
@@ -396,7 +396,7 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
               {t('common.retry')}
             </Button>
           </div>
-        ) : currentFolders.length === 0 && currentFiles.length === 0 ? (
+        ) : currentFolders.length === 0 && currentFiles.length === 0 && !currentFolder ? (
           <div className="flex flex-col items-center justify-center min-h-[300px] gap-2">
             <FiFile className="w-12 h-12 text-muted-foreground/40" />
             <p className="text-sm text-muted-foreground">{t('documents.storage.detail.empty')}</p>
@@ -406,93 +406,45 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
             <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3">
               {/* Parent Folder Card */}
               {currentFolder && (
-                <div
-                  className="flex items-center gap-3 p-4 bg-card border border-border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors"
+                <DocumentCard
+                  variant="parent"
+                  title=".."
                   onClick={handleNavigateUp}
-                >
-                  <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                    <FiArrowLeft className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                  <span className="text-sm text-muted-foreground">..</span>
-                </div>
+                />
               )}
 
               {/* Folder Cards */}
               {currentFolders.map(folder => (
-                <div
+                <DocumentCard
                   key={`folder-${folder.id}`}
-                  className="flex flex-col p-4 bg-card border border-border rounded-lg cursor-pointer hover:shadow-sm transition-all"
+                  variant="folder"
+                  title={folder.name}
+                  subtitle={`${t('documents.storage.detail.folderPathLabel', '경로')} : ${folder.fullPath}`}
                   onClick={() => handleNavigateToFolder(folder)}
-                >
-                  <div className="flex items-start gap-3 mb-2">
-                    <div className="w-9 h-9 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
-                      <FiFolder className="w-4 h-4 text-green-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{folder.name}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
-                        {t('documents.storage.detail.folderPathLabel', '경로')} : {folder.fullPath}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 mt-auto pt-2 border-t border-border">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs"
-                      onClick={(e) => { e.stopPropagation(); handleDeleteFolder(folder); }}
-                    >
-                      {t('documents.storage.detail.actions.delete', '삭제')}
-                    </Button>
-                  </div>
-                </div>
+                  onDelete={() => handleDeleteFolder(folder)}
+                />
               ))}
 
               {/* File Cards */}
               {currentFiles.map(file => (
-                <div
+                <DocumentCard
                   key={file.id}
-                  className="flex flex-col p-4 bg-card border border-border rounded-lg hover:shadow-sm transition-all"
-                >
-                  <div className="flex items-start gap-3 mb-2">
-                    <div className="w-9 h-9 rounded-lg bg-violet-500/10 flex items-center justify-center shrink-0">
-                      <FiFile className="w-4 h-4 text-violet-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{file.fileName}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
-                        {formatSize(file.fileSize)}
-                        {file.mimeType && ` · ${file.mimeType}`}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-                    {file.uploadedAt && (
-                      <span className="flex items-center gap-1">
-                        <FiClock className="w-3 h-3" />
-                        {formatDate(file.uploadedAt)}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 mt-auto pt-2 border-t border-border">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs"
-                      onClick={() => handleDownloadFile(file)}
-                    >
-                      {t('documents.storage.detail.actions.download', '다운로드')}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs"
-                      onClick={() => handleDeleteFile(file)}
-                    >
-                      {t('documents.storage.detail.actions.delete', '삭제')}
-                    </Button>
-                  </div>
-                </div>
+                  variant="file"
+                  title={file.fileName}
+                  subtitle={formatSize(file.fileSize)}
+                  metadata={[
+                    ...(file.uploadedAt ? [{ icon: <FiClock className="w-3 h-3" />, value: formatDate(file.uploadedAt) }] : []),
+                  ]}
+                  hoverActions={[
+                    {
+                      id: 'download',
+                      icon: <FiDownload className="w-3.5 h-3.5" />,
+                      onClick: () => handleDownloadFile(file),
+                      title: t('documents.storage.detail.actions.download', '다운로드'),
+                    },
+                  ]}
+                  onDelete={() => handleDeleteFile(file)}
+                />
               ))}
             </div>
 

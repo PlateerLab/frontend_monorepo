@@ -112,7 +112,7 @@ export const DocumentDetail: React.FC<DocumentDetailProps> = ({
             <p className="text-sm text-muted-foreground">{t('documents.collection.detail.noChunks')}</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3 max-w-[900px]">
+          <div className="flex flex-col gap-3">
             {chunks.map((chunk) => (
               <div
                 key={chunk.chunkId}

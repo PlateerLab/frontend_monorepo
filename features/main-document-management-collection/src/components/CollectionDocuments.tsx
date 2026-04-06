@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Button, Modal, Input, Label, Switch, DirectoryTree, useUploadStatus } from '@xgen/ui';
+import { Button, Modal, Input, Label, Switch, DirectoryTree, DocumentCard, useUploadStatus } from '@xgen/ui';
 import type { TreeFolder, TreeFile } from '@xgen/ui';
-import { FiArrowLeft, FiFileText, FiFolder, FiChevronRight, FiTrash2, FiClock, FiUpload, FiPlus } from '@xgen/icons';
+import { FiArrowLeft, FiFileText, FiChevronRight, FiClock, FiUpload, FiPlus } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
 import type { CollectionItem, DocumentItem, FolderItem, UploadProgressEvent } from '../api';
@@ -458,74 +458,37 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
             <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3">
               {/* Parent Folder Card */}
               {currentFolder && (
-                <div
-                  className="flex items-center gap-3 p-4 bg-card border border-border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors"
+                <DocumentCard
+                  variant="parent"
+                  title=".."
                   onClick={handleNavigateUp}
-                >
-                  <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                    <FiArrowLeft className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                  <span className="text-sm text-muted-foreground">..</span>
-                </div>
+                />
               )}
 
               {/* Folder Cards */}
               {currentFolders.map(folder => (
-                <div
+                <DocumentCard
                   key={`folder-${folder.id}`}
-                  className="group flex items-center gap-3 p-4 bg-card border border-border rounded-lg cursor-pointer hover:shadow-sm transition-all"
+                  variant="folder"
+                  title={folder.folderName}
                   onClick={() => handleNavigateToFolder(folder)}
-                >
-                  <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-                    <FiFolder className="w-4 h-4 text-blue-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{folder.folderName}</p>
-                  </div>
-                  <button
-                    className="opacity-0 group-hover:opacity-100 p-1 text-muted-foreground hover:text-destructive transition-all"
-                    onClick={(e) => { e.stopPropagation(); handleDeleteFolder(folder); }}
-                  >
-                    <FiTrash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                  onDelete={() => handleDeleteFolder(folder)}
+                />
               ))}
 
               {/* Document Cards */}
               {paginatedDocuments.map(doc => (
-                <div
+                <DocumentCard
                   key={doc.documentId}
-                  className="group flex flex-col p-4 bg-card border border-border rounded-lg cursor-pointer hover:shadow-sm transition-all"
+                  variant="file"
+                  title={doc.fileName}
+                  subtitle={`${doc.totalChunks} chunks${doc.fileSize > 0 ? ` · ${formatSize(doc.fileSize)}` : ''}`}
+                  metadata={[
+                    ...(doc.processedAt ? [{ icon: <FiClock className="w-3 h-3" />, value: formatDate(doc.processedAt) }] : []),
+                  ]}
                   onClick={() => onSelectDocument(doc)}
-                >
-                  <div className="flex items-start gap-3 mb-2">
-                    <div className="w-9 h-9 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
-                      <FiFileText className="w-4 h-4 text-orange-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{doc.fileName}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
-                        {doc.totalChunks} chunks
-                        {doc.fileSize > 0 && ` · ${formatSize(doc.fileSize)}`}
-                      </p>
-                    </div>
-                    <button
-                      className="opacity-0 group-hover:opacity-100 p-1 text-muted-foreground hover:text-destructive transition-all"
-                      onClick={(e) => { e.stopPropagation(); handleDeleteDocument(doc); }}
-                    >
-                      <FiTrash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-auto">
-                    <span className="uppercase">{doc.fileType}</span>
-                    {doc.processedAt && (
-                      <span className="flex items-center gap-1">
-                        <FiClock className="w-3 h-3" />
-                        {formatDate(doc.processedAt)}
-                      </span>
-                    )}
-                  </div>
-                </div>
+                  onDelete={() => handleDeleteDocument(doc)}
+                />
               ))}
             </div>
 
