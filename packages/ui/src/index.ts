@@ -100,6 +100,16 @@ export type {
 export { ResourceCardGrid } from './data-display/resource-card-grid';
 export type { ResourceCardGridProps } from './data-display/resource-card-grid';
 
+// DocumentCard - 문서/폴더/상위폴더 카드
+export { DocumentCard } from './data-display/document-card';
+export type {
+  DocumentCardProps,
+  DocumentCardVariant,
+  DocumentCardAction,
+  DocumentCardMeta,
+  DocumentCardHoverAction,
+} from './data-display/document-card';
+
 // DirectoryTree - 폴더/파일 트리 네비게이션 (컬렉션, 파일 저장소 공용)
 export { DirectoryTree } from './data-display/directory-tree';
 export type {
