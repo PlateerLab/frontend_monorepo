@@ -1,5 +1,14 @@
 import type { Position, CanvasNode, NodeData, CanvasEdge, EdgePreview, View, CanvasMemo, PredictedNode } from '@xgen/canvas-types';
 import type { PortMouseEventData } from './hooks/usePortHandlers';
+import type { HistoryEntry, HistoryActionType } from './hooks/useHistoryManagement';
+
+/** History state snapshot passed via onHistoryChange callback */
+export interface CanvasHistoryState {
+    history: HistoryEntry[];
+    currentHistoryIndex: number;
+    canUndo: boolean;
+    canRedo: boolean;
+}
 
 // ========== Canvas Component Props ==========
 
@@ -32,6 +41,8 @@ export interface CanvasProps {
     onOpenNodeModal?: (nodeId: string, paramId: string, paramName: string, currentValue: string) => void;
     /** Callback to view node details */
     onViewDetails?: (nodeId: string, nodeDataId: string, nodeName: string) => void;
+    /** Callback when history state changes (entries added, undo/redo, jump, clear) */
+    onHistoryChange?: (state: CanvasHistoryState) => void;
     /** CSS class name for the container */
     className?: string;
 }
@@ -77,6 +88,12 @@ export interface CanvasRef {
     canUndo: () => boolean;
     /** Check if can redo */
     canRedo: () => boolean;
+    /** Get full history state for the HistoryPanel */
+    getHistoryState: () => CanvasHistoryState;
+    /** Jump to a specific history index (-1 = current state) */
+    jumpToHistoryIndex: (index: number) => void;
+    /** Clear all history entries */
+    clearHistory: () => void;
     /** Toggle node expand/collapse */
     toggleExpanded: (nodeId: string) => void;
     /** Find auto connection for a node */

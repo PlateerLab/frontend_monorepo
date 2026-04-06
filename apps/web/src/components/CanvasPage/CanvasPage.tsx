@@ -10,7 +10,7 @@ import { useToast } from '@xgen/ui';
 
 // Canvas packages
 import { Canvas } from '@xgen/canvas-engine';
-import type { CanvasRef } from '@xgen/canvas-engine';
+import type { CanvasRef, CanvasHistoryState } from '@xgen/canvas-engine';
 
 // API
 import {
@@ -151,6 +151,9 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
     const [activeSidePanel, setActiveSidePanel] = useState<string | null>(null);
     const [isHistoryPanelOpen, setIsHistoryPanelOpen] = useState(false);
     const [isAutoWorkflowOpen, setIsAutoWorkflowOpen] = useState(false);
+    const [historyState, setHistoryState] = useState<CanvasHistoryState>({
+        history: [], currentHistoryIndex: -1, canUndo: false, canRedo: false,
+    });
 
     // ── Execution state ──
     const [executionOutput, setExecutionOutput] = useState<any>(null);
@@ -565,6 +568,14 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
 
     const handleAutoWorkflowClick = useCallback(() => {
         setIsAutoWorkflowOpen(true);
+    }, []);
+
+    const handleHistoryClick = useCallback(() => {
+        setIsHistoryPanelOpen((prev) => !prev);
+    }, []);
+
+    const handleHistoryChange = useCallback((state: CanvasHistoryState) => {
+        setHistoryState(state);
     }, []);
 
     const handleImportWorkflow = useCallback(() => {
@@ -1034,12 +1045,19 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         return panel?.component ?? null;
     }, [activeSidePanel, sidePanels]);
 
-    // ── Keyboard shortcuts (Ctrl+S) ──
+    // ── Keyboard shortcuts (Ctrl+S, Ctrl+Z, Ctrl+Y) ──
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            if (!(e.ctrlKey || e.metaKey)) return;
+            if (e.key === 's') {
                 e.preventDefault();
                 handleSave();
+            } else if (e.key === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                canvasRef.current?.undo();
+            } else if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) {
+                e.preventDefault();
+                canvasRef.current?.redo();
             }
         };
         window.addEventListener('keydown', handleKeyDown);
@@ -1094,6 +1112,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                     onTemplateStart={handleTemplateStart}
                     onAddNodeClick={handleAddNodeClick}
                     onAutoWorkflowClick={handleAutoWorkflowClick}
+                    onHistoryClick={handleHistoryClick}
                     onImportWorkflow={handleImportWorkflow}
                     onWorkflowNameChange={handleWorkflowNameChange}
                     isOwner={isOwner}
@@ -1124,6 +1143,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                         onStateChange={handleCanvasStateChange}
                         onOpenNodeModal={handleOpenNodeModal}
                         onViewDetails={handleOpenNodeDetailModal}
+                        onHistoryChange={handleHistoryChange}
                     />
 
                     {/* Empty state overlay */}
@@ -1243,6 +1263,14 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                 if (overlay.id === 'auto-workflow-sidebar') {
                     extraProps.onLoadWorkflow = handleLoadWorkflow;
                     extraProps.getCanvasState = () => canvasRef.current?.getCanvasState();
+                }
+                if (overlay.id === 'history-panel') {
+                    extraProps.history = historyState.history;
+                    extraProps.currentHistoryIndex = historyState.currentHistoryIndex;
+                    extraProps.canUndo = historyState.canUndo;
+                    extraProps.canRedo = historyState.canRedo;
+                    extraProps.onJumpToHistoryIndex = (index: number) => canvasRef.current?.jumpToHistoryIndex(index);
+                    extraProps.onClearHistory = () => canvasRef.current?.clearHistory();
                 }
                 return (
                     <OverlayComponent

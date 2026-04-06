@@ -65,7 +65,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       <div className="flex items-end gap-1.5 py-2 px-3 border-t border-[var(--color-line-50,#e5e7eb)] bg-[var(--color-bg-50,#fafafa)] shrink-0">
         <textarea
           ref={textareaRef}
-          className="flex-1 py-1.5 px-2.5 border border-[var(--color-line-50,#e5e7eb)] rounded-lg text-xs leading-[18px] text-[var(--color-gray-600,#4b5563)] bg-white resize-none min-h-[30px] max-h-[60px] outline-none transition-[border-color] duration-150 focus:border-primary focus:shadow-[0_0_0_2px_rgba(37,99,235,0.1)] placeholder:text-[var(--color-gray-400,#9ca3af)] disabled:opacity-50"
+          className="flex-1 py-1.5 px-2.5 border border-[var(--color-line-50,#e5e7eb)] rounded-lg text-xs leading-[18px] text-[var(--color-gray-600,#4b5563)] bg-white resize-none min-h-[30px] max-h-[60px] overflow-hidden outline-none transition-[border-color] duration-150 focus:border-primary focus:shadow-[0_0_0_2px_rgba(37,99,235,0.1)] placeholder:text-[var(--color-gray-400,#9ca3af)] disabled:opacity-50"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}

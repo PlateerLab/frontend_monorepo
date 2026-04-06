@@ -48,6 +48,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
         onNodeDoubleClick,
         onOpenNodeModal,
         onViewDetails,
+        onHistoryChange,
         className,
     } = props;
 
@@ -139,6 +140,30 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
     memosRef.current = memos;
     edgePreviewRef.current = edgePreview;
     snappedPortKeyRef.current = snappedPortKey;
+
+    // Wire history state restorer — enables undo/redo/jump to actually restore canvas
+    useEffect(() => {
+        history.setCanvasStateRestorer((canvasState: any) => {
+            if (!canvasState) return;
+            if (canvasState.nodes) {
+                const validNodes = canvasState.nodes
+                    .filter((n: any) => n && n.id && n.data)
+                    .map((n: any) => ({ ...n, isExpanded: n.isExpanded !== undefined ? n.isExpanded : true }));
+                setNodes(validNodes);
+            }
+            if (canvasState.edges) {
+                setEdges(canvasState.edges.filter((e: any) => e && e.id && e.source && e.target));
+            }
+            if (canvasState.memos) {
+                setMemos(canvasState.memos.filter((m: any) => m && m.id));
+            }
+        });
+        history.setCurrentStateCapture(() => ({
+            nodes: nodesRef.current,
+            edges: edgesRef.current,
+            memos: memosRef.current,
+        }));
+    }, [history, setNodes, setEdges, setMemos]);
 
     // 7. Drag state
     const {
@@ -317,6 +342,16 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
         onStateChange?.({ view, nodes, edges, memos });
     }, [view, nodes, edges, memos, onStateChange]);
 
+    // Notify parent when history state changes
+    useEffect(() => {
+        onHistoryChange?.({
+            history: history.history,
+            currentHistoryIndex: history.currentHistoryIndex,
+            canUndo: history.canUndo,
+            canRedo: history.canRedo,
+        });
+    }, [history.history, history.currentHistoryIndex, history.canUndo, history.canRedo, onHistoryChange]);
+
     // ── Imperative handle ──
     useImperativeHandle(ref, () => ({
         getNodes: () => nodes,
@@ -361,6 +396,14 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
         redo: () => { history.redo(); },
         canUndo: () => history.canUndo,
         canRedo: () => history.canRedo,
+        getHistoryState: () => ({
+            history: history.history,
+            currentHistoryIndex: history.currentHistoryIndex,
+            canUndo: history.canUndo,
+            canRedo: history.canRedo,
+        }),
+        jumpToHistoryIndex: (index: number) => { history.jumpToHistoryIndex(index); },
+        clearHistory: () => { history.clearHistory(); },
         toggleExpanded: (nodeId: string) => {
             setNodes(prevNodes => {
                 const idx = prevNodes.findIndex(n => n.id === nodeId);

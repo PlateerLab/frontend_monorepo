@@ -16,7 +16,7 @@ const BottomPanelContent: React.FC<BottomPanelContentProps> = ({ LogViewerCompon
 
     return (
         <div className={cn(
-            'flex flex-1 min-h-0 bg-[var(--color-bg-50)] border border-[var(--color-line-50)] border-t-0 border-l-0 overflow-hidden',
+            'flex flex-1 min-h-0 bg-[var(--color-bg-50)] border-b border-[var(--color-line-50)] overflow-hidden',
             !isVisible && 'hidden',
         )}>
             <ExecutionColumn />

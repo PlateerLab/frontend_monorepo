@@ -21,6 +21,7 @@ export interface HistoryEntry {
     actionType: HistoryActionType;
     description: string;
     timestamp: Date;
+    canvasState?: any;
     details: Record<string, any>;
 }
 
@@ -207,10 +208,9 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
 export const canvasHistoryPlugin: CanvasPagePlugin = {
     id: 'canvas-history',
     name: 'Canvas History',
-    sidePanels: [
+    overlays: [
         {
             id: 'history-panel',
-            position: 'right',
             component: HistoryPanel as any,
         },
     ],

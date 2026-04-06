@@ -69,6 +69,7 @@ export {
 export type {
     CanvasProps,
     CanvasRef,
+    CanvasHistoryState,
     EdgeProps,
     NodeProps,
     CanvasContextMenuProps,

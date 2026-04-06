@@ -1,6 +1,6 @@
 import './locales';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { LuCheck, LuX, LuPencil, LuUsers, LuChevronDown, LuCirclePlus, LuSparkles } from '@xgen/icons';
+import { LuCheck, LuX, LuPencil, LuUsers, LuChevronDown, LuCirclePlus, LuSparkles, LuHistory } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { Button, DropdownMenu } from '@xgen/ui';
 import type { DropdownMenuItem } from '@xgen/ui';
@@ -16,6 +16,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
     onDeploy,
     onAddNodeClick,
     onAutoWorkflowClick,
+    onHistoryClick,
     onTemplateStart,
     onImportWorkflow,
     onWorkflowNameChange,
@@ -255,6 +256,16 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                         title={t('canvas.header.addNode', 'Add Node')}
                     >
                         <LuCirclePlus />
+                    </button>
+                )}
+                {onHistoryClick && (
+                    <button
+                        type="button"
+                        className="flex items-center justify-center w-7 h-7 min-w-7 min-h-7 p-0 bg-transparent border-none text-[var(--color-gray-600)] cursor-pointer rounded-lg select-none transition-colors hover:bg-black/[0.04]"
+                        onClick={onHistoryClick}
+                        title={t('canvas.header.history', 'History')}
+                    >
+                        <LuHistory />
                     </button>
                 )}
                 {onAutoWorkflowClick && (

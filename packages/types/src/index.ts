@@ -1268,6 +1268,7 @@ export interface CanvasHeaderProps extends CanvasPluginContext {
   onDeploy: () => void;
   onAddNodeClick?: () => void;
   onAutoWorkflowClick?: () => void;
+  onHistoryClick?: () => void;
   onTemplateStart?: () => void;
   onImportWorkflow?: () => void;
   onWorkflowNameChange?: (name: string) => void;

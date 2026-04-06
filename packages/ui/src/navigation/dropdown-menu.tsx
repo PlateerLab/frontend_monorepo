@@ -56,7 +56,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
           align={alignMap[placement]}
           sideOffset={4}
           className={cn(
-            'z-50 rounded-md border border-border bg-popover py-1 shadow-lg',
+            'z-50 rounded-md border border-border bg-white py-1 shadow-lg',
             'animate-in fade-in-0 zoom-in-95',
             className,
           )}

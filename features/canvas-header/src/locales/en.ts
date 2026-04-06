@@ -23,6 +23,7 @@ export const en: Record<string, unknown> = {
     copy: 'Copy',
     deploySettings: 'Deploy Settings',
     addNode: 'Add Node',
+    history: 'History',
   },
   toast: {
     saving: 'Saving workflow...',

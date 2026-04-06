@@ -30,14 +30,14 @@ const BottomPanelHeader: React.FC = () => {
     return (
         <div className="flex-[0_0_42px] h-[42px] flex items-center bg-[var(--color-bg-50)] border-t border-b border-[var(--color-line-50)]">
             {/* Left: Execution label */}
-            <div className="flex-[0_0_500px] min-w-[350px] max-w-[500px] flex items-center px-4">
+            <div className="flex-[0_0_500px] min-w-[350px] max-w-[500px] flex items-center px-4 border-r border-[var(--color-line-50)]">
                 <span className="text-xs font-bold leading-4 text-[var(--color-gray-800)]">
                     {t('canvas.bottomPanel.execution')}
                 </span>
             </div>
 
             {/* Right: Log label + actions */}
-            <div className="flex-1 min-w-0 h-full flex items-center justify-between px-4 border-l border-[var(--color-line-50)]">
+            <div className="flex-1 min-w-0 h-full flex items-center justify-between px-4">
                 <span className="text-xs font-bold leading-4 text-[var(--color-gray-800)]">
                     {t('canvas.bottomPanel.log')}
                 </span>

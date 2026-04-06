@@ -148,6 +148,7 @@ export {
   LuTerminal,
   LuShare2,
   LuLoader,
+  LuHistory,
 } from 'react-icons/lu';
 
 // -----------------------------------------------------------------------------

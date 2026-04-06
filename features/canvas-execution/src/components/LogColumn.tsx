@@ -63,7 +63,7 @@ const LogColumn: React.FC<LogColumnInternalProps> = ({ LogViewerComponent }) => 
 
     return (
         <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
-            <div className="flex items-center gap-3 py-1.5 px-3 border-b border-[var(--color-line-50)] bg-[var(--color-bg-50)] shrink-0">
+            <div className="h-[41px] flex items-center gap-3 px-3 border-b border-[var(--color-line-50)] bg-[var(--color-bg-50)] shrink-0">
                 <input
                     type="text"
                     className="flex-1 py-1 px-2 border border-[var(--color-line-50)] rounded-lg text-xs leading-[18px] text-[var(--color-gray-600)] bg-white outline-none min-w-0 focus:border-primary placeholder:text-[var(--color-gray-400)]"

@@ -90,7 +90,7 @@ const ExecutionOrderColumn: React.FC = () => {
 
     return (
         <div className="flex-[0_0_252px] min-w-[180px] bg-[var(--color-bg-50)] border-r border-[var(--color-line-50)] overflow-auto flex flex-col">
-            <div className="py-2 px-4 border-b border-[var(--color-line-50)] shrink-0">
+            <div className="h-[41px] flex items-center px-4 border-b border-[var(--color-line-50)] shrink-0">
                 <span className="text-xs font-bold leading-4 text-[var(--color-gray-800)]">
                     {t('canvas.bottomPanel.order.title')}
                 </span>

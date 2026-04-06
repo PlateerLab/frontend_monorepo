@@ -25,7 +25,7 @@ export interface FilterTabsProps {
 const containerVariants = cva('flex', {
   variants: {
     variant: {
-      default: 'gap-1 bg-accent rounded-lg p-1',
+      default: 'gap-1 bg-[#dfe3e8] rounded-lg p-1 w-fit',
       pills: 'gap-2',
       underline: 'gap-0 border-b border-border',
     },
