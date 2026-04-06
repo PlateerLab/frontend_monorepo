@@ -463,27 +463,6 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
 
-  features/admin-gov-monitoring:
-    dependencies:
-      '@xgen/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@xgen/auth-provider':
-        specifier: workspace:*
-        version: link:../../packages/auth-provider
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-
   features/admin-gov-monitoring-history:
     dependencies:
       '@xgen/api-client':

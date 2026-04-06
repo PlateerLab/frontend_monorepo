@@ -521,79 +521,155 @@ export async function getOverdueInspections(): Promise<OverdueItem[]> {
 
 // ─── Control Policy ───────────────────────────────────────────
 
+/** Backend → PolicyRule field mapping */
+interface BackendPolicyItem {
+  id?: number;
+  policy_name: string;
+  description: string;
+  regex_pattern: string;
+  is_active: boolean;
+  masking: boolean;
+  masking_pattern: string;
+  is_default: boolean;
+}
+
+function mapBackendToPolicy(item: BackendPolicyItem, type: PolicyRule['type']): PolicyRule {
+  return {
+    id: String(item.id ?? item.policy_name),
+    name: item.policy_name,
+    type,
+    pattern: item.regex_pattern || '',
+    replacement: item.masking_pattern || undefined,
+    description: item.description || undefined,
+    masking: item.masking ? (item.masking_pattern || '****') : undefined,
+    enabled: item.is_active ?? true,
+    created_at: '',
+    updated_at: '',
+  };
+}
+
+function mapPolicyToBackend(data: Partial<PolicyRule>): Record<string, unknown> {
+  return {
+    policy_name: data.name,
+    description: data.description || '',
+    regex_pattern: data.pattern || '',
+    is_active: data.enabled ?? true,
+    masking: !!data.masking,
+    masking_pattern: data.masking || data.replacement || '',
+  };
+}
+
 /** PII 정책 목록 */
 export async function getPIIsList(): Promise<PolicyRule[]> {
   const client = getClient();
-  return client.get<PolicyRule[]>('/api/admin/config/pii');
+  const items = await client.get<BackendPolicyItem[]>('/api/config/piis/list');
+  return (Array.isArray(items) ? items : []).map(item => mapBackendToPolicy(item, 'pii'));
 }
 
 /** PII 정책 생성 */
 export async function createPII(data: Omit<PolicyRule, 'id' | 'created_at' | 'updated_at'>): Promise<PolicyRule> {
   const client = getClient();
-  return client.post<PolicyRule>('/api/admin/config/pii', data);
+  const result = await client.post<BackendPolicyItem>('/api/config/piis/create', mapPolicyToBackend(data));
+  return mapBackendToPolicy(result, 'pii');
 }
 
 /** PII 정책 수정 */
 export async function updatePII(id: string, data: Partial<PolicyRule>): Promise<PolicyRule> {
   const client = getClient();
-  return client.put<PolicyRule>(`/api/admin/config/pii/${encodeURIComponent(id)}`, data);
+  const payload = mapPolicyToBackend({ ...data, name: data.name ?? id });
+  const result = await client.post<BackendPolicyItem>('/api/config/piis/update', payload);
+  return mapBackendToPolicy(result, 'pii');
 }
 
 /** PII 정책 삭제 */
-export async function deletePII(id: string): Promise<void> {
+export async function deletePII(policyName: string): Promise<void> {
   const client = getClient();
-  await client.delete<void>(`/api/admin/config/pii/${encodeURIComponent(id)}`);
+  await client.delete<void>(`/api/config/piis/delete/${encodeURIComponent(policyName)}`);
 }
 
 /** 금칙어 목록 */
 export async function getForbiddenWordsList(): Promise<PolicyRule[]> {
   const client = getClient();
-  return client.get<PolicyRule[]>('/api/admin/config/forbidden-words');
+  const items = await client.get<BackendPolicyItem[]>('/api/config/forbidden-words/list');
+  return (Array.isArray(items) ? items : []).map(item => mapBackendToPolicy(item, 'forbidden-word'));
 }
 
 /** 금칙어 생성 */
 export async function createForbiddenWord(data: Omit<PolicyRule, 'id' | 'created_at' | 'updated_at'>): Promise<PolicyRule> {
   const client = getClient();
-  return client.post<PolicyRule>('/api/admin/config/forbidden-words', data);
+  const result = await client.post<BackendPolicyItem>('/api/config/forbidden-words/create', mapPolicyToBackend(data));
+  return mapBackendToPolicy(result, 'forbidden-word');
 }
 
 /** 금칙어 수정 */
 export async function updateForbiddenWord(id: string, data: Partial<PolicyRule>): Promise<PolicyRule> {
   const client = getClient();
-  return client.put<PolicyRule>(`/api/admin/config/forbidden-words/${encodeURIComponent(id)}`, data);
+  const payload = mapPolicyToBackend({ ...data, name: data.name ?? id });
+  const result = await client.post<BackendPolicyItem>('/api/config/forbidden-words/update', payload);
+  return mapBackendToPolicy(result, 'forbidden-word');
 }
 
 /** 금칙어 삭제 */
-export async function deleteForbiddenWord(id: string): Promise<void> {
+export async function deleteForbiddenWord(policyName: string): Promise<void> {
   const client = getClient();
-  await client.delete<void>(`/api/admin/config/forbidden-words/${encodeURIComponent(id)}`);
+  await client.delete<void>(`/api/config/forbidden-words/delete/${encodeURIComponent(policyName)}`);
 }
 
 /** 활성 리스크 정책 조회 */
 export async function getActiveRiskPolicy(): Promise<RiskPolicy> {
   const client = getClient();
-  return client.get<RiskPolicy>('/api/admin/config/risk-policy/active');
+  const result = await client.get<{ policy: {
+    id: string | number;
+    version?: number;
+    policy_data?: {
+      categories?: RiskPolicyCategory[];
+      grade_levels?: Record<RiskLevel, { min: number; max: number }>;
+    };
+    categories?: RiskPolicyCategory[];
+    grade_config?: Record<RiskLevel, { min: number; max: number }>;
+    is_active?: boolean;
+    created_at?: string;
+  } }>('/api/config/risk-assessment/active');
+  const p = result.policy;
+  return {
+    id: String(p.id),
+    version: p.version ?? 1,
+    categories: p.policy_data?.categories ?? p.categories ?? [],
+    grade_config: p.policy_data?.grade_levels ?? p.grade_config ?? {} as Record<RiskLevel, { min: number; max: number }>,
+    active: p.is_active ?? true,
+    created_at: p.created_at ?? '',
+  };
 }
 
 /** 리스크 정책 버전 목록 */
 export async function getRiskPolicyVersions(): Promise<RiskPolicyVersion[]> {
   const client = getClient();
-  return client.get<RiskPolicyVersion[]>('/api/admin/config/risk-policy/versions');
+  const result = await client.get<{ versions: RiskPolicyVersion[] }>('/api/config/risk-assessment/versions');
+  return result.versions;
 }
 
 /** 리스크 정책 저장 */
 export async function saveRiskPolicy(data: {
   categories: RiskPolicyCategory[];
   grade_levels: Record<RiskLevel, { min: number; max: number }>;
+  change_type?: string;
+  change_summary?: string;
 }): Promise<RiskPolicy> {
   const client = getClient();
-  return client.post<RiskPolicy>('/api/admin/config/risk-policy', data);
+  return client.post<RiskPolicy>('/api/config/risk-assessment/save', {
+    policy_data: {
+      categories: data.categories,
+      grade_levels: data.grade_levels,
+    },
+    change_type: data.change_type || 'update',
+    change_summary: data.change_summary || 'Policy updated',
+  });
 }
 
 /** 리스크 정책 이력 초기화 */
 export async function clearRiskPolicyHistory(): Promise<void> {
   const client = getClient();
-  await client.delete<void>('/api/admin/config/risk-policy/history');
+  await client.delete<void>('/api/config/risk-assessment/history');
 }
 
 // Legacy aliases for backward compatibility

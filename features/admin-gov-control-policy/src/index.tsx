@@ -5,6 +5,7 @@ import type { AdminFeatureModule, RouteComponentProps } from '@xgen/types';
 import { ContentArea, Button, SearchInput, Modal, StatCard, FilterTabs } from '@xgen/ui';
 import type { FilterTab } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
+import './locales';
 import {
   getPIIsList,
   createPII,
@@ -1363,7 +1364,7 @@ const AdminGovControlPolicyPage: React.FC<RouteComponentProps> = () => {
             </p>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setDeleteTarget(null)}>{t('admin.settings.guarder.piis.cancel')}</Button>
-              <Button onClick={() => handleDelete(deleteTarget.id)} className="bg-red-500 hover:bg-red-600 text-white">{t('admin.governance.common.delete')}</Button>
+              <Button onClick={() => handleDelete(deleteTarget.name)} className="bg-red-500 hover:bg-red-600 text-white">{t('admin.governance.common.delete')}</Button>
             </div>
           </div>
         </Modal>
