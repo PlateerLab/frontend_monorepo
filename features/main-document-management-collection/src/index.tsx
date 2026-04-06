@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { DocumentTabPlugin, DocumentTabPluginProps, CardBadge } from '@xgen/types';
 import { Button, FilterTabs, SearchInput, Modal, Input, Label, Switch, Textarea, ResourceCardGrid } from '@xgen/ui';
-import { FiFolder, FiFileText, FiClock, FiTrash2, FiLock } from '@xgen/icons';
+import { FiFolder, FiFileText, FiClock, FiTrash2, FiLock, FiSettings } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
-import { listCollections, createCollection, deleteCollection, verifyCollectionPassword, storeCollectionSessionToken, getCollectionSessionToken, type CollectionItem, type DocumentItem } from './api';
+import { listCollections, createCollection, deleteCollection, updateCollection, verifyCollectionPassword, storeCollectionSessionToken, getCollectionSessionToken, type CollectionItem, type DocumentItem } from './api';
 import { CollectionDocuments } from './components/CollectionDocuments';
 import { DocumentDetail } from './components/DocumentDetail';
 import './locales';
@@ -74,6 +74,14 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
   const [verifyPassword, setVerifyPassword] = useState('');
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
+
+  // Settings modal state
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [settingsCollection, setSettingsCollection] = useState<CollectionItem | null>(null);
+  const [settingsName, setSettingsName] = useState('');
+  const [settingsShared, setSettingsShared] = useState(false);
+  const [settingsSecured, setSettingsSecured] = useState(false);
+  const [settingsUpdating, setSettingsUpdating] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -222,6 +230,41 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
     setVerifyError(null);
   }, []);
 
+  const handleOpenSettings = useCallback((col: CollectionItem) => {
+    setSettingsCollection(col);
+    setSettingsName(col.displayName);
+    setSettingsShared(col.isShared);
+    setSettingsSecured(col.isSecured);
+    setIsSettingsModalOpen(true);
+  }, []);
+
+  const handleCloseSettings = useCallback(() => {
+    setIsSettingsModalOpen(false);
+    setSettingsCollection(null);
+  }, []);
+
+  const handleUpdateCollection = useCallback(async () => {
+    if (!settingsCollection || !settingsName.trim()) return;
+    setSettingsUpdating(true);
+    try {
+      const updateData: Record<string, any> = {
+        is_shared: settingsShared,
+        is_secured: settingsSecured,
+      };
+      if (settingsName.trim() !== settingsCollection.displayName) {
+        updateData.collection_make_name = settingsName.trim();
+      }
+      await updateCollection(settingsCollection.name, updateData);
+      setIsSettingsModalOpen(false);
+      setSettingsCollection(null);
+      await loadData();
+    } catch (err) {
+      console.error('Failed to update collection:', err);
+    } finally {
+      setSettingsUpdating(false);
+    }
+  }, [settingsCollection, settingsName, settingsShared, settingsSecured, loadData]);
+
   const filteredCollections = useMemo(() => {
     return collections.filter(c => {
       if (search && !c.displayName.toLowerCase().includes(search.toLowerCase())) return false;
@@ -259,19 +302,24 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
           ...(col.embedding ? [{ value: col.embedding }] : []),
           ...(col.updatedAt ? [{ icon: <FiClock />, value: formatDate(col.updatedAt) }] : []),
         ],
-        dropdownActions: [
+        primaryActions: [
+          {
+            id: 'settings',
+            icon: <FiSettings />,
+            label: t('documents.collection.buttons.settings'),
+            onClick: () => handleOpenSettings(col),
+          },
           {
             id: 'delete',
             icon: <FiTrash2 />,
-            label: t('common.delete'),
-            danger: true,
+            label: t('documents.collection.buttons.delete'),
             onClick: () => handleDeleteCollection(col),
           },
         ],
         onClick: () => handleSelectCollection(col),
       };
     });
-  }, [filteredCollections, handleDeleteCollection, handleSelectCollection, t]);
+  }, [filteredCollections, handleDeleteCollection, handleOpenSettings, handleSelectCollection, t]);
 
   // ── SubToolbar ──
   useEffect(() => {
@@ -428,6 +476,52 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
               </div>
             </>
           )}
+        </div>
+      </Modal>
+
+      {/* Settings Modal */}
+      <Modal
+        isOpen={isSettingsModalOpen}
+        onClose={handleCloseSettings}
+        title={t('documents.collection.settingsModal.title')}
+        size="md"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" className="flex-1" onClick={handleCloseSettings}>
+              {t('documents.collection.settingsModal.cancel')}
+            </Button>
+            <Button className="flex-1" onClick={handleUpdateCollection} disabled={settingsUpdating || !settingsName.trim()}>
+              {settingsUpdating ? t('documents.collection.settingsModal.updating') : t('documents.collection.settingsModal.update')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>{t('documents.collection.settingsModal.name')}</Label>
+            <Input
+              value={settingsName}
+              onChange={(e) => setSettingsName(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>{t('documents.collection.settingsModal.sharing')}</Label>
+            <Input
+              value={settingsShared ? t('documents.collection.settingsModal.sharingShared') : t('documents.collection.settingsModal.sharingPrivate')}
+              readOnly
+              onClick={() => setSettingsShared(!settingsShared)}
+              className="cursor-pointer"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>{t('documents.collection.settingsModal.encryption')}</Label>
+            <Input
+              value={settingsSecured ? t('documents.collection.settingsModal.encryptionEnabled') : t('documents.collection.settingsModal.encryptionNone')}
+              readOnly
+              onClick={() => setSettingsSecured(!settingsSecured)}
+              className="cursor-pointer"
+            />
+          </div>
         </div>
       </Modal>
 

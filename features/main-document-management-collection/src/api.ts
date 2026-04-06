@@ -152,6 +152,20 @@ export async function deleteCollection(collectionName: string): Promise<void> {
   await api.delete('/api/retrieval/collections', { collection_name: collectionName } as any);
 }
 
+export async function updateCollection(
+  collectionName: string,
+  data: {
+    collection_make_name?: string;
+    is_shared?: boolean;
+    share_group?: string | null;
+    is_secured?: boolean;
+    password_hash?: string | null;
+  }
+): Promise<void> {
+  const api = createApiClient();
+  await api.patch(`/api/retrieval/collections/${encodeURIComponent(collectionName)}`, data);
+}
+
 // ─────────────────────────────────────────────────────────────
 // Document / Folder Types (snake_case — matches backend)
 // ─────────────────────────────────────────────────────────────

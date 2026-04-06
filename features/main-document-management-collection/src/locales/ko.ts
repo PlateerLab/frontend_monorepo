@@ -9,8 +9,8 @@ export const ko: TranslationData = {
       shared: '공유',
     },
     buttons: {
-      newCollection: '새 컬렉션 생성',
-    },
+      newCollection: '새 컬렉션 생성',      settings: '설정',
+      delete: '삭제',    },
     createModal: {
       title: '새 컬렉션 생성',
       name: '컬렉션 이름',
@@ -37,6 +37,19 @@ export const ko: TranslationData = {
     },
     documents: '문서',
     shared: '공유됨',
+    settingsModal: {
+      title: '컴렉션 설정 편집',
+      name: '컴렉션 이름',
+      sharing: '컴렉션 공유',
+      sharingPrivate: '비공개',
+      sharingShared: '공유',
+      encryption: '암호화 설정',
+      encryptionNone: '암호화 안됨',
+      encryptionEnabled: '암호화 됨',
+      cancel: '취소',
+      update: '업데이트',
+      updating: '업데이트 중...',
+    },
     passwordModal: {
       title: '암호화된 컬렉션',
       description: '이 컬렉션은 암호로 보호되어 있습니다. 접근하려면 비밀번호를 입력해주세요.',

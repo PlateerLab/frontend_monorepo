@@ -182,8 +182,8 @@ export function ResourceCard<T = unknown>({
               type="button"
               className={cn(
                 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium',
-                'border border-[var(--color-line-50)] text-muted-foreground',
-                'hover:text-foreground hover:bg-gray-50 hover:border-gray-300 transition-colors',
+                'border border-gray-200 bg-gray-50/60 text-muted-foreground',
+                'hover:text-foreground hover:bg-gray-100 hover:border-gray-300 transition-colors',
                 action.disabled && 'opacity-40 cursor-not-allowed',
               )}
               title={action.disabled ? action.disabledMessage : action.label}

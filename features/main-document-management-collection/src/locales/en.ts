@@ -10,6 +10,8 @@ export const en: TranslationData = {
     },
     buttons: {
       newCollection: 'New Collection',
+      settings: 'Settings',
+      delete: 'Delete',
     },
     createModal: {
       title: 'Create New Collection',
@@ -37,6 +39,19 @@ export const en: TranslationData = {
     },
     documents: 'documents',
     shared: 'Shared',
+    settingsModal: {
+      title: 'Edit Collection Settings',
+      name: 'Collection Name',
+      sharing: 'Collection Sharing',
+      sharingPrivate: 'Private',
+      sharingShared: 'Shared',
+      encryption: 'Encryption Settings',
+      encryptionNone: 'Not Encrypted',
+      encryptionEnabled: 'Encrypted',
+      cancel: 'Cancel',
+      update: 'Update',
+      updating: 'Updating...',
+    },
     passwordModal: {
       title: 'Encrypted Collection',
       description: 'This collection is password protected. Please enter the password to access.',
