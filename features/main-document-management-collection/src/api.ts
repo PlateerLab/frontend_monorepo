@@ -412,19 +412,28 @@ function generateSessionId(): string {
   });
 }
 
-export async function uploadDocument(data: {
-  file: File;
-  collection_name: string;
-  user_id?: number;
-  chunk_size?: number;
-  chunk_overlap?: number;
-  use_ocr?: boolean;
-  use_llm_metadata?: boolean;
-  extract_default_metadata?: boolean;
-  force_chunking?: boolean;
-  folder_path?: string;
-}): Promise<void> {
-  const api = createApiClient();
+export interface UploadProgressEvent {
+  event: string;
+  totalChunks?: number;
+  processedChunks?: number;
+  message?: string;
+}
+
+export async function uploadDocument(
+  data: {
+    file: File;
+    collection_name: string;
+    user_id?: number;
+    chunk_size?: number;
+    chunk_overlap?: number;
+    use_ocr?: boolean;
+    use_llm_metadata?: boolean;
+    extract_default_metadata?: boolean;
+    force_chunking?: boolean;
+    folder_path?: string;
+  },
+  onProgress?: (event: UploadProgressEvent) => void,
+): Promise<void> {
   const formData = new FormData();
   formData.append('file', data.file);
   formData.append('collection_name', data.collection_name);
@@ -471,18 +480,77 @@ export async function uploadDocument(data: {
     throw new Error(`Upload failed: ${response.status} ${errText}`);
   }
 
-  // Consume the SSE stream until complete
+  // Notify start
+  onProgress?.({ event: 'uploading', totalChunks: 0, processedChunks: 0 });
+
+  // Consume and parse the SSE stream.
+  // Backend sends: "data: {JSON}\n\n" — messages separated by double newline.
   const reader = response.body?.getReader();
   if (reader) {
     const decoder = new TextDecoder();
+    let buffer = '';
+    let totalChunks = 0;
+    let processedChunks = 0;
+
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      const text = decoder.decode(value, { stream: true });
-      // Check for completion event
-      if (text.includes('"event": "complete"') || text.includes('"event":"complete"')) {
-        break;
+      buffer += decoder.decode(value, { stream: true });
+
+      // Split on double-newline (SSE message boundary)
+      const messages = buffer.split('\n\n');
+      buffer = messages.pop() || ''; // keep incomplete message in buffer
+
+      for (const msg of messages) {
+        // Each message may have multiple lines; find the "data: " line
+        for (const line of msg.split('\n')) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data: ') && !trimmed.startsWith('data:')) continue;
+          const jsonStr = trimmed.startsWith('data: ') ? trimmed.slice(6) : trimmed.slice(5);
+          if (!jsonStr.trim()) continue;
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const eventType = parsed.event || '';
+
+            if (eventType === 'start' || eventType === 'file_saving' || eventType === 'file_saved') {
+              onProgress?.({ event: 'uploading', totalChunks, processedChunks });
+            } else if (eventType === 'processing_start') {
+              onProgress?.({ event: 'processing', totalChunks, processedChunks });
+            } else if (eventType === 'total_chunks') {
+              totalChunks = parsed.total_chunks || totalChunks;
+              onProgress?.({ event: 'processing', totalChunks, processedChunks });
+            } else if (eventType === 'chunk_processed') {
+              processedChunks = (parsed.chunk_index ?? processedChunks) + 1;
+              onProgress?.({ event: 'processing', totalChunks, processedChunks });
+            } else if (eventType === 'embedding_start') {
+              processedChunks = 0;
+              onProgress?.({ event: 'embedding', totalChunks: parsed.total_chunks || totalChunks, processedChunks: 0 });
+            } else if (eventType === 'embedding_chunk_processed') {
+              processedChunks = (parsed.chunk_index ?? processedChunks) + 1;
+              totalChunks = parsed.total_chunks || totalChunks;
+              onProgress?.({ event: 'embedding', totalChunks, processedChunks });
+            } else if (eventType === 'embedding_complete') {
+              processedChunks = parsed.total_chunks || totalChunks;
+              totalChunks = processedChunks;
+              onProgress?.({ event: 'embedding', totalChunks, processedChunks });
+            } else if (eventType === 'complete') {
+              onProgress?.({ event: 'complete', totalChunks, processedChunks: totalChunks });
+              return;
+            } else if (eventType === 'error') {
+              const errMsg = parsed.message || parsed.error || 'Upload failed';
+              onProgress?.({ event: 'error', message: errMsg });
+              throw new Error(errMsg);
+            }
+            // Ignore heartbeat, reconnecting, etc.
+          } catch (e) {
+            if (e instanceof SyntaxError) continue;
+            throw e;
+          }
+        }
       }
     }
+    // Stream ended without explicit 'complete' — treat as complete
+    onProgress?.({ event: 'complete', totalChunks, processedChunks: totalChunks });
   }
 }

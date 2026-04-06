@@ -85,6 +85,13 @@ export const ko: TranslationData = {
         name: '폴더 이름',
         namePlaceholder: '폴더 이름을 입력하세요',
       },
+      uploadStatus: {
+        uploading: '업로드 중...',
+        processing: '처리 중...',
+        embedding: '임베딩 중...',
+        complete: '완료',
+        error: '오류',
+      },
       directoryTree: {
         title: '디렉토리 구조',
         filesSuffix: '개',
