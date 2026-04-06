@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import type { WorkflowDetail, CardBadge, WorkflowStatusFilter, WorkflowOwnerFilter, WorkflowTabPlugin, WorkflowTabPluginProps } from '@xgen/types';
 import { Button, EmptyState, ResourceCardGrid, FilterTabs, Modal, Label, Switch } from '@xgen/ui';
-import { FiFolder, FiPlay, FiEdit2, FiCopy, FiTrash2, FiSettings, FiFileText, FiServer, FiGitBranch, FiUser, FiClock, FiCheckSquare, FiRefreshCw, FiPlus } from '@xgen/icons';
+import { FiFolder, FiPlay, FiEdit2, FiCopy, FiTrash2, FiSettings, FiFileText, FiServer, FiGitBranch, FiUser, FiClock, FiCheckSquare, FiRefreshCw, FiPlus, FiArrowLeft } from '@xgen/icons';
 import { DeploymentModal } from '@xgen/feature-canvas-deploy';
 import { DeploySettings } from '@xgen/feature-deploy-settings';
 import { useTranslation } from '@xgen/i18n';
@@ -339,6 +339,21 @@ export const WorkflowStorage: React.FC<WorkflowStorageProps> = ({ onNavigate, on
 
   // Push subToolbar content to orchestrator
   useEffect(() => {
+    if (deploySettingsWorkflow) {
+      onSubToolbarChange?.(
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setDeploySettingsWorkflow(null)}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-200 bg-white text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 hover:border-blue-500 hover:text-blue-500 transition-all"
+          >
+            <FiArrowLeft className="w-4 h-4" />
+            {t('deploySettings.back')}
+          </button>
+        </div>
+      );
+      return;
+    }
+
     onSubToolbarChange?.(
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-4">
@@ -385,7 +400,7 @@ export const WorkflowStorage: React.FC<WorkflowStorageProps> = ({ onNavigate, on
         </div>
       </div>
     );
-  }, [onSubToolbarChange, statusFilter, ownerFilter, isMultiSelectMode, selectedIds, loading, handleToggleMultiSelect, handleBulkDelete, fetchWorkflows, t]);
+  }, [deploySettingsWorkflow, onSubToolbarChange, statusFilter, ownerFilter, isMultiSelectMode, selectedIds, loading, handleToggleMultiSelect, handleBulkDelete, fetchWorkflows, t]);
 
   // Cleanup subToolbar on unmount
   useEffect(() => {
@@ -393,7 +408,7 @@ export const WorkflowStorage: React.FC<WorkflowStorageProps> = ({ onNavigate, on
   }, [onSubToolbarChange]);
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 p-6">
+    <div className={`flex flex-col flex-1 min-h-0 ${deploySettingsWorkflow ? '' : 'p-6'}`}>
       {/* Deploy Settings — full page panel */}
       {deploySettingsWorkflow ? (
         <DeploySettings

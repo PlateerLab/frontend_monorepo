@@ -6,7 +6,7 @@ import { useAuth } from '@xgen/auth-provider';
 import { useToast, ChatPanel, ChatEmptyState } from '@xgen/ui';
 import type { ChatPanelMessage } from '@xgen/ui';
 import {
-  FiArrowLeft, FiTrash2, FiChevronRight, FiChevronDown, FiRefreshCw, FiUpload,
+  FiTrash2, FiChevronRight, FiChevronDown, FiRefreshCw, FiUpload,
 } from '@xgen/icons';
 import {
   getDeployStatus, updateDeploySettings, uploadDeployImage,
@@ -467,23 +467,7 @@ export const DeploySettings: React.FC<DeploySettingsProps> = ({ workflow, onBack
   // ── Render ──────────────────────────────────────────────
 
   return (
-    <div className="flex flex-col h-full w-full">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4 shrink-0">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 px-4 py-2 border border-gray-200 bg-white text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 hover:border-blue-500 hover:text-blue-500 transition-all"
-        >
-          <FiArrowLeft className="w-4 h-4" />
-          {t('deploySettings.back')}
-        </button>
-        {isSaving && (
-          <span className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-500 text-sm font-medium rounded-md animate-pulse">
-            {t('deploySettings.saving')}
-          </span>
-        )}
-      </div>
-
+    <div className="flex flex-col h-full w-full p-6">
       {/* Content: Left settings + Right tester */}
       <div className="flex gap-4 flex-1 min-h-0 overflow-hidden">
         {/* ─── Left Panel: Settings ─── */}

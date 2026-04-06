@@ -279,7 +279,7 @@ const AdminDatabasePage: React.FC<RouteComponentProps> = () => {
         ) : undefined
       }
     >
-      <div className="grid grid-cols-[260px_1fr] gap-6 max-lg:grid-cols-1">
+      <div className="grid grid-cols-[260px_minmax(0,1fr)] gap-6 max-lg:grid-cols-1">
         {/* Table List */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
@@ -318,7 +318,7 @@ const AdminDatabasePage: React.FC<RouteComponentProps> = () => {
         </div>
 
         {/* Query + Results */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 min-w-0">
           {/* Query Editor */}
           <div className="flex flex-col gap-2">
             <label className="text-xs text-muted-foreground">
