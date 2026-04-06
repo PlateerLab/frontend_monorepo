@@ -285,6 +285,11 @@ function transformFolder(raw: FolderAPIResponse): FolderItem {
 // Document / Folder API Functions
 // ─────────────────────────────────────────────────────────────
 
+function collectionAuthHeaders(collectionName: string): Record<string, string> {
+  const token = getCollectionSessionToken(collectionName);
+  return token ? { 'X-Collection-Session-Token': token } : {};
+}
+
 export interface DocumentsSummaryResponse {
   documents: DocumentItem[];
   folders: FolderItem[];
@@ -292,7 +297,9 @@ export interface DocumentsSummaryResponse {
 
 export async function listDocumentsSummary(collectionName: string): Promise<DocumentsSummaryResponse> {
   const api = createApiClient();
-  const response = await api.get<any>(`/api/retrieval/collections/${encodeURIComponent(collectionName)}/documents-summary`);
+  const response = await api.get<any>(`/api/retrieval/collections/${encodeURIComponent(collectionName)}/documents-summary`, {
+    headers: collectionAuthHeaders(collectionName),
+  });
   const data = response.data;
   const rawDocs: DocumentAPIResponse[] = data.documents || [];
   const rawFolders: FolderAPIResponse[] = data.directory_info || [];
@@ -305,14 +312,17 @@ export async function listDocumentsSummary(collectionName: string): Promise<Docu
 export async function getDocumentDetail(collectionName: string, documentId: string): Promise<DocumentItem> {
   const api = createApiClient();
   const response = await api.get<DocumentAPIResponse>(
-    `/api/retrieval/collections/${encodeURIComponent(collectionName)}/documents/${encodeURIComponent(documentId)}`
+    `/api/retrieval/collections/${encodeURIComponent(collectionName)}/documents/${encodeURIComponent(documentId)}`,
+    { headers: collectionAuthHeaders(collectionName) }
   );
   return transformDocument(response.data);
 }
 
 export async function deleteDocument(collectionName: string, documentId: string): Promise<void> {
   const api = createApiClient();
-  await api.delete(`/api/retrieval/collections/${encodeURIComponent(collectionName)}/documents/${encodeURIComponent(documentId)}`);
+  await api.delete(`/api/retrieval/collections/${encodeURIComponent(collectionName)}/documents/${encodeURIComponent(documentId)}`, undefined, {
+    headers: collectionAuthHeaders(collectionName),
+  });
 }
 
 export async function createFolder(data: {
@@ -365,7 +375,7 @@ export async function uploadDocument(data: {
   }
   formData.append('metadata', JSON.stringify(metadata));
   await api.post('/api/retrieval/documents/upload-sse', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+    headers: { 'Content-Type': 'multipart/form-data', ...collectionAuthHeaders(data.collection_name) },
     timeout: 300000,
   } as any);
 }
