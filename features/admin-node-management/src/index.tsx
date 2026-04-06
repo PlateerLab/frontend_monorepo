@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import type { AdminFeatureModule, RouteComponentProps } from '@xgen/types';
-import { ContentArea, Button, StatusBadge, useToast } from '@xgen/ui';
+import { ContentArea, Button, StatusBadge, SearchInput, FilterTabs, useToast } from '@xgen/ui';
+import type { FilterTab } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import { FiRefreshCw } from '@xgen/icons';
 import { getNodes } from './api/node-api';
@@ -165,6 +166,11 @@ const AdminNodeManagementPage: React.FC<RouteComponentProps> = () => {
     });
   }, []);
 
+  const viewTabs: FilterTab[] = useMemo(() => [
+    { key: 'table', label: t(`${prefix}.tableView`) },
+    { key: 'tree', label: t(`${prefix}.treeView`) },
+  ], [t, prefix]);
+
   // Loading state
   if (loading) {
     return (
@@ -207,54 +213,26 @@ const AdminNodeManagementPage: React.FC<RouteComponentProps> = () => {
     <ContentArea
       title={t(`${prefix}.title`)}
       description={t(`${prefix}.subtitle`)}
-    >
-      {/* Toolbar */}
-        <div className="flex items-center justify-between gap-4">
+      toolbar={
+        <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
-            {/* View mode toggle */}
-            <div className="flex rounded-lg border border-border overflow-hidden">
-              <button
-                type="button"
-                className={`px-3 py-1.5 text-sm font-medium transition-colors ${
-                  viewMode === 'table'
-                    ? 'bg-foreground text-background'
-                    : 'bg-card text-muted-foreground hover:text-foreground'
-                }`}
-                onClick={() => setViewMode('table')}
-              >
-                {t(`${prefix}.tableView`)}
-              </button>
-              <button
-                type="button"
-                className={`px-3 py-1.5 text-sm font-medium transition-colors ${
-                  viewMode === 'tree'
-                    ? 'bg-foreground text-background'
-                    : 'bg-card text-muted-foreground hover:text-foreground'
-                }`}
-                onClick={() => setViewMode('tree')}
-              >
-                {t(`${prefix}.treeView`)}
-              </button>
-            </div>
-
-            {/* Search */}
-            <input
-              type="text"
+            <FilterTabs
+              tabs={viewTabs}
+              activeKey={viewMode}
+              onChange={(key) => setViewMode(key as ViewMode)}
+            />
+            <SearchInput
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={setSearch}
               placeholder={t(`${prefix}.searchPlaceholder`)}
-              className="h-9 w-64 rounded-md border border-border bg-card px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-72"
             />
           </div>
-
           <div className="flex items-center gap-3">
-            {/* Stats */}
             <span className="text-sm text-muted-foreground">
               {t(`${prefix}.totalNodes`)}: {totalNodes}
               {search.trim() && ` / ${t(`${prefix}.displayed`)}: ${displayedNodes}`}
             </span>
-
-            {/* Refresh */}
             <Button
               variant="outline"
               size="sm"
@@ -270,33 +248,33 @@ const AdminNodeManagementPage: React.FC<RouteComponentProps> = () => {
             </Button>
           </div>
         </div>
-
-        {/* Content */}
-        {viewMode === 'table' ? (
-          filteredFlatNodes.length > 0 ? (
-            <NodeTableView nodes={filteredFlatNodes} />
-          ) : (
-            <div className="flex items-center justify-center rounded-lg border border-border p-12">
-              <p className="text-sm text-muted-foreground">
-                {t(`${prefix}.noSearchResults`)}
-              </p>
-            </div>
-          )
-        ) : filteredCategories.length > 0 ? (
-          <NodeTreeView
-            categories={filteredCategories}
-            expandedCategories={expandedCategories}
-            expandedFunctions={expandedFunctions}
-            onToggleCategory={handleToggleCategory}
-            onToggleFunction={handleToggleFunction}
-          />
+      }
+    >
+      {viewMode === 'table' ? (
+        filteredFlatNodes.length > 0 ? (
+          <NodeTableView nodes={filteredFlatNodes} />
         ) : (
           <div className="flex items-center justify-center rounded-lg border border-border p-12">
             <p className="text-sm text-muted-foreground">
               {t(`${prefix}.noSearchResults`)}
             </p>
           </div>
-        )}
+        )
+      ) : filteredCategories.length > 0 ? (
+        <NodeTreeView
+          categories={filteredCategories}
+          expandedCategories={expandedCategories}
+          expandedFunctions={expandedFunctions}
+          onToggleCategory={handleToggleCategory}
+          onToggleFunction={handleToggleFunction}
+        />
+      ) : (
+        <div className="flex items-center justify-center rounded-lg border border-border p-12">
+          <p className="text-sm text-muted-foreground">
+            {t(`${prefix}.noSearchResults`)}
+          </p>
+        </div>
+      )}
     </ContentArea>
   );
 };

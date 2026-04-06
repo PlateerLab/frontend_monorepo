@@ -180,23 +180,21 @@ const AdminUserCreatePage: React.FC<RouteComponentProps> = () => {
       title={t('admin.pages.userCreate.title')}
       description={t('admin.pages.userCreate.description')}
       toolbar={
-        <SearchInput
-          value={search}
-          onChange={setSearch}
-          placeholder={t('admin.userManagement.userList.searchPlaceholder')}
-          className="w-72"
-        />
-      }
-    >
-      {/* Pending count */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between w-full">
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder={t('admin.userManagement.userList.searchPlaceholder')}
+            className="w-72"
+          />
           <StatusBadge variant="warning">
             {t('admin.userManagement.userCreate.totalPending', {
               count: String(filteredUsers.length),
             })}
           </StatusBadge>
         </div>
-
+      }
+    >
         {/* Table */}
         <DataTable
           data={filteredUsers}

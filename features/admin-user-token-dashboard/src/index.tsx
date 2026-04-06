@@ -327,19 +327,7 @@ const AdminUserTokenDashboardPage: React.FC<RouteComponentProps> = () => {
     <ContentArea
       title={t(`${i18nPrefix}.title`)}
       description={t(`${i18nPrefix}.subtitle`)}
-      headerActions={
-        <Button
-          variant="outline"
-          size="sm"
-          leftIcon={<FiRefreshCw className="h-4 w-4" />}
-          onClick={handleRefresh}
-          loading={loading}
-        >
-          {t(`${i18nPrefix}.refresh`)}
-        </Button>
-      }
-    >
-      {/* Summary Stats */}
+      subToolbar={
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label={t(`${i18nPrefix}.stats.totalTokenUsage`)}
@@ -362,75 +350,54 @@ const AdminUserTokenDashboardPage: React.FC<RouteComponentProps> = () => {
             variant="neutral"
           />
         </div>
-
-        {/* Filters */}
-        <div className="flex flex-wrap items-end gap-4">
-          <div className="w-full max-w-sm">
+      }
+      toolbar={
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-2">
             <SearchInput
               value={search}
               onChange={setSearch}
               placeholder={t(`${i18nPrefix}.searchPlaceholder`)}
               debounceDelay={300}
+              className="w-72"
             />
-          </div>
-
-          <div className="flex items-end gap-2">
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-muted-foreground">
-                {t(`${i18nPrefix}.startDate`)}
-              </label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="h-10 rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-muted-foreground">
-                {t(`${i18nPrefix}.endDate`)}
-              </label>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="h-10 rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-            </div>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            />
             <Button variant="primary" size="sm" onClick={handleApplyDateFilter}>
               {t(`${i18nPrefix}.apply`)}
             </Button>
             <Button variant="ghost" size="sm" onClick={handleResetDateFilter}>
               {t(`${i18nPrefix}.reset`)}
             </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<FiRefreshCw className="h-3.5 w-3.5" />}
+              onClick={handleRefresh}
+              loading={loading}
+            >
+              {t(`${i18nPrefix}.refresh`)}
+            </Button>
           </div>
+          {search.trim() && (
+            <span className="text-xs text-muted-foreground">
+              {t(`${i18nPrefix}.searchCount`, { count: filteredUsers.length })}
+            </span>
+          )}
         </div>
-
-        {/* Search result count */}
-        {search.trim() && (
-          <p className="text-sm text-muted-foreground">
-            {t(`${i18nPrefix}.searchCount`, {
-              count: filteredUsers.length,
-            })}
-          </p>
-        )}
-
-        {/* Data Table */}
-        <DataTable<UserTokenUsage>
-          data={filteredUsers}
-          columns={columns}
-          rowKey={(row) => row.user_id}
-          loading={loading}
-          loadingMessage={t(`${i18nPrefix}.loading`)}
-          emptyMessage={
-            search.trim()
-              ? t(`${i18nPrefix}.noSearchResults`)
-              : t(`${i18nPrefix}.noTokenData`)
-          }
-        />
-
-        {/* Pagination */}
-        {pagination && totalPages > 1 && (
+      }
+      footer={
+        pagination && totalPages > 1 ? (
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
               {t(`${i18nPrefix}.pageInfo`, {
@@ -468,7 +435,22 @@ const AdminUserTokenDashboardPage: React.FC<RouteComponentProps> = () => {
               </Button>
             </div>
           </div>
-        )}
+        ) : undefined
+      }
+    >
+      <DataTable<UserTokenUsage>
+        data={filteredUsers}
+        columns={columns}
+        rowKey={(row) => row.user_id}
+        loading={loading}
+        loadingMessage={t(`${i18nPrefix}.loading`)}
+        emptyMessage={
+          search.trim()
+            ? t(`${i18nPrefix}.noSearchResults`)
+            : t(`${i18nPrefix}.noTokenData`)
+        }
+      />
+
       {/* Workflow Detail Modal */}
       {modalUser && modalUser.workflow_usage && (
         <WorkflowDetailModal

@@ -32,9 +32,6 @@ importers:
       '@xgen/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@xgen/feature-admin-agent-traces':
-        specifier: workspace:*
-        version: link:../../features/admin-agent-traces
       '@xgen/feature-admin-backend-logs':
         specifier: workspace:*
         version: link:../../features/admin-backend-logs
@@ -92,9 +89,6 @@ importers:
       '@xgen/feature-admin-system-settings':
         specifier: workspace:*
         version: link:../../features/admin-system-settings
-      '@xgen/feature-admin-test-monitoring':
-        specifier: workspace:*
-        version: link:../../features/admin-test-monitoring
       '@xgen/feature-admin-user-create':
         specifier: workspace:*
         version: link:../../features/admin-user-create
@@ -294,27 +288,6 @@ importers:
       typescript:
         specifier: ^5
         version: 5.9.3
-
-  features/admin-agent-traces:
-    dependencies:
-      '@xgen/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@xgen/auth-provider':
-        specifier: workspace:*
-        version: link:../../packages/auth-provider
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
 
   features/admin-audit-logs:
     dependencies:
@@ -1011,27 +984,6 @@ importers:
       '@xgen/feature-admin-setting-vl':
         specifier: workspace:*
         version: link:../admin-setting-vl
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-
-  features/admin-test-monitoring:
-    dependencies:
-      '@xgen/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@xgen/auth-provider':
-        specifier: workspace:*
-        version: link:../../packages/auth-provider
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n

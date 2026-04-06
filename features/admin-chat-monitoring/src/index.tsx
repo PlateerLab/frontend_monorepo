@@ -326,7 +326,6 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
       <ContentArea
         title={t('admin.workflowManagement.chatMonitoring.title')}
         description={t('admin.workflowManagement.chatMonitoring.subtitle')}
-        contentClassName="max-w-7xl mx-auto"
       >
         <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
           <p className="text-sm text-muted-foreground">
@@ -340,11 +339,15 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
     );
   }
 
+  // ── Pagination info ──
+  const paginationInfo = activeUserId != null
+    ? `${t('admin.workflowManagement.chatMonitoring.userId')}: ${activeUserId} · ${t('admin.workflowManagement.chatMonitoring.totalLogsLoaded')}: ${filteredLogs.length}`
+    : `${t('admin.workflowManagement.chatMonitoring.totalLogsLoaded')}: ${filteredLogs.length}`;
+
   return (
     <ContentArea
       title={t('admin.workflowManagement.chatMonitoring.title')}
       description={t('admin.workflowManagement.chatMonitoring.subtitle')}
-      contentClassName="max-w-7xl mx-auto"
       headerActions={
         <div className="flex items-center gap-2">
           <DownloadDropdown />
@@ -359,27 +362,19 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
           </Button>
         </div>
       }
-    >
-      <div className="flex flex-col gap-4">
-        {/* ── Toolbar ── */}
-        <div className="flex flex-wrap items-end gap-3">
-          {/* User ID search */}
-          <div className="flex items-end gap-2">
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-muted-foreground">
-                {t('admin.workflowManagement.chatMonitoring.userId')}
-              </label>
-              <input
-                type="text"
-                className="h-8 w-36 rounded-md border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                placeholder={t('admin.workflowManagement.chatMonitoring.userIdPlaceholder')}
-                value={userIdInput}
-                onChange={(e) => setUserIdInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleUserSearch();
-                }}
-              />
-            </div>
+      toolbar={
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              className="h-8 w-36 rounded-md border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              placeholder={t('admin.workflowManagement.chatMonitoring.userIdPlaceholder')}
+              value={userIdInput}
+              onChange={(e) => setUserIdInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleUserSearch();
+              }}
+            />
             <Button
               variant="outline"
               size="sm"
@@ -398,60 +393,19 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
                 {t('admin.workflowManagement.chatMonitoring.reset')}
               </Button>
             )}
+            <span className="text-xs text-muted-foreground ml-2">{paginationInfo}</span>
           </div>
-
-          {/* Text filter */}
-          <div className="ml-auto w-64">
-            <SearchInput
-              value={textFilter}
-              onChange={setTextFilter}
-              placeholder={t('admin.workflowManagement.chatMonitoring.filterPlaceholder')}
-              size="sm"
-            />
-          </div>
-        </div>
-
-        {/* ── Info bar ── */}
-        <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-          <span>
-            {t('admin.workflowManagement.chatMonitoring.totalLogsLoaded')}: {logs.length}
-          </span>
-          {textFilter && (
-            <span>
-              {t('admin.workflowManagement.chatMonitoring.searchCount')}: {filteredLogs.length}
-            </span>
-          )}
-          <span>
-            {t('admin.workflowManagement.chatMonitoring.page')}: {page}
-          </span>
-          <span>
-            {t('admin.workflowManagement.chatMonitoring.pageSize')}: {PAGE_SIZE}
-          </span>
-          {activeUserId != null && (
-            <span>
-              {t('admin.workflowManagement.chatMonitoring.searchMode')}: {t('admin.workflowManagement.chatMonitoring.userId')} = {activeUserId}
-            </span>
-          )}
-        </div>
-
-        {/* ── Table ── */}
-        <div className="overflow-x-auto">
-          <DataTable<WorkflowLog>
-            data={filteredLogs}
-            columns={columns}
-            rowKey={(row) => row.id}
-            loading={loading && logs.length === 0}
-            loadingMessage={t('admin.workflowManagement.chatMonitoring.loading')}
-            emptyMessage={
-              textFilter
-                ? t('admin.workflowManagement.chatMonitoring.noSearchResults')
-                : t('admin.workflowManagement.chatMonitoring.noLogs')
-            }
+          <SearchInput
+            value={textFilter}
+            onChange={setTextFilter}
+            placeholder={t('admin.workflowManagement.chatMonitoring.filterPlaceholder')}
+            size="sm"
+            className="w-72"
           />
         </div>
-
-        {/* ── Pagination controls ── */}
-        <div className="flex items-center justify-center gap-3 pt-2">
+      }
+      footer={
+        <div className="flex items-center justify-center gap-3">
           <Button
             variant="outline"
             size="sm"
@@ -472,7 +426,20 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
             {t('admin.workflowManagement.chatMonitoring.next')}
           </Button>
         </div>
-      </div>
+      }
+    >
+      <DataTable<WorkflowLog>
+        data={filteredLogs}
+        columns={columns}
+        rowKey={(row) => row.id}
+        loading={loading && logs.length === 0}
+        loadingMessage={t('admin.workflowManagement.chatMonitoring.loading')}
+        emptyMessage={
+          textFilter
+            ? t('admin.workflowManagement.chatMonitoring.noSearchResults')
+            : t('admin.workflowManagement.chatMonitoring.noLogs')
+        }
+      />
 
       {/* ── Detail Modal ── */}
       <ChatLogDetailModal

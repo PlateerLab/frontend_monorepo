@@ -342,29 +342,28 @@ const AdminGroupPermissionsPage: React.FC<RouteComponentProps> = () => {
           ? t('admin.userManagement.groupPermissions.membersTab', { groupName: selectedGroup })
           : t('admin.pages.groupPermissions.title')
       }
-      headerActions={
-        selectedGroup ? (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              setSelectedGroup(null);
-              setUserSearch('');
-            }}
-          >
-            ← {t('admin.userManagement.groupPermissions.backToGroups')}
-          </Button>
-        ) : undefined
-      }
+      headerActions={undefined}
       toolbar={
         selectedGroup ? (
           <div className="flex items-center justify-between w-full">
-            <SearchInput
-              value={userSearch}
-              onChange={setUserSearch}
-              placeholder={t('admin.userManagement.userList.searchPlaceholder')}
-              className="w-72"
-            />
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSelectedGroup(null);
+                  setUserSearch('');
+                }}
+              >
+                ← {t('admin.userManagement.groupPermissions.backToGroups')}
+              </Button>
+              <SearchInput
+                value={userSearch}
+                onChange={setUserSearch}
+                placeholder={t('admin.userManagement.userList.searchPlaceholder')}
+                className="w-72"
+              />
+            </div>
             <Button onClick={() => setShowAddMember(true)}>
               {t('admin.userManagement.groupPermissions.addMember')}
             </Button>

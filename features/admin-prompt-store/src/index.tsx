@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { AdminFeatureModule, RouteComponentProps } from '@xgen/types';
-import { ContentArea, Button, useToast } from '@xgen/ui';
+import { ContentArea, Button, SearchInput, FilterTabs, useToast } from '@xgen/ui';
+import type { FilterTab } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import { FiRefreshCw, FiDownload, FiPlus } from '@xgen/icons';
 
@@ -135,20 +136,20 @@ const AdminPromptStorePage: React.FC<RouteComponentProps> = () => {
     }
   };
 
-  // ── Language tab config ──
-  const languageTabs: { key: LanguageFilter; label: string }[] = [
+  // ── Filter tab configs ──
+  const languageTabs: FilterTab[] = [
     { key: 'all', label: `🌐 ${t(`${PS}.languageFilter.all`)}` },
     { key: 'ko', label: `🇰🇷 ${t(`${PS}.languageFilter.ko`)}` },
     { key: 'en', label: `🇺🇸 ${t(`${PS}.languageFilter.en`)}` },
   ];
 
-  const typeTabs: { key: TypeFilter; label: string }[] = [
+  const typeTabs: FilterTab[] = [
     { key: 'all', label: t(`${PS}.promptTypeFilter.all`) },
     { key: 'user', label: t(`${PS}.promptTypeFilter.user`) },
     { key: 'system', label: t(`${PS}.promptTypeFilter.system`) },
   ];
 
-  const visibilityTabs: { key: VisibilityFilter; label: string }[] = [
+  const visibilityTabs: FilterTab[] = [
     { key: 'all', label: t(`${PS}.filter.all`) },
     { key: 'template', label: t(`${PS}.filter.template`) },
     { key: 'shared', label: t(`${PS}.filter.shared`) },
@@ -180,97 +181,60 @@ const AdminPromptStorePage: React.FC<RouteComponentProps> = () => {
     <ContentArea
       title={t(`${PS}.title`)}
       description={t(`${PS}.subtitle`)}
-    >
-      {/* Controls bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/50 px-4 py-3">
-          {/* Language filter tabs */}
-          <div className="flex items-center gap-1">
-            {languageTabs.map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                  languageFilter === tab.key
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                }`}
-                onClick={() => setLanguageFilter(tab.key)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Prompt type filter */}
-          <div className="flex items-center gap-1">
-            {typeTabs.map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                  typeFilter === tab.key
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                }`}
-                onClick={() => setTypeFilter(tab.key)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Visibility filter */}
-          <div className="flex items-center gap-1">
-            {visibilityTabs.map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                  visibilityFilter === tab.key
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                }`}
-                onClick={() => setVisibilityFilter(tab.key)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Search + actions bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          {/* Search */}
-          <input
-            type="text"
-            className="min-w-[240px] flex-1 rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            placeholder={t(`${PS}.searchPlaceholder`)}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+      headerActions={
+        <div className="relative flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setDownloadOpen((prev) => !prev)}
+          >
+            <FiDownload className="mr-1 h-3.5 w-3.5" />
+            {t(`${PS}.download.title`)}
+          </Button>
+          <DownloadDropdown
+            isOpen={downloadOpen}
+            onToggle={() => setDownloadOpen(false)}
           />
-
-          {/* Actions */}
-          <div className="relative flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setDownloadOpen((prev) => !prev)}
-            >
-              <FiDownload className="mr-1 h-3.5 w-3.5" />
-              {t(`${PS}.download.title`)}
-            </Button>
-            <DownloadDropdown
-              isOpen={downloadOpen}
-              onToggle={() => setDownloadOpen(false)}
-            />
-            <Button variant="primary" size="sm" onClick={loadPrompts}>
-              <FiRefreshCw className="mr-1 h-3.5 w-3.5" />
-              {t(`${PS}.refresh`)}
-            </Button>
-          </div>
+          <Button variant="primary" size="sm" onClick={loadPrompts}>
+            <FiRefreshCw className="mr-1 h-3.5 w-3.5" />
+            {t(`${PS}.refresh`)}
+          </Button>
         </div>
-
-        {/* Loading state */}
+      }
+      toolbar={
+        <div className="flex flex-wrap items-center justify-between gap-3 w-full">
+          <div className="flex items-center gap-4">
+            <FilterTabs
+              tabs={languageTabs}
+              activeKey={languageFilter}
+              onChange={(key) => setLanguageFilter(key as LanguageFilter)}
+              variant="pills"
+            />
+            <div className="h-5 w-px bg-border" />
+            <FilterTabs
+              tabs={typeTabs}
+              activeKey={typeFilter}
+              onChange={(key) => setTypeFilter(key as TypeFilter)}
+              variant="pills"
+            />
+            <div className="h-5 w-px bg-border" />
+            <FilterTabs
+              tabs={visibilityTabs}
+              activeKey={visibilityFilter}
+              onChange={(key) => setVisibilityFilter(key as VisibilityFilter)}
+              variant="pills"
+            />
+          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder={t(`${PS}.searchPlaceholder`)}
+            className="w-72"
+          />
+        </div>
+      }
+    >
+      {/* Loading state */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
             <div className="mb-3 h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary" />

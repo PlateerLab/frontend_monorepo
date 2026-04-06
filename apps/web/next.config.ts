@@ -72,8 +72,6 @@ const nextConfig: NextConfig = {
         '@xgen/feature-admin-group-permissions',
         '@xgen/feature-admin-workflow-management',
         '@xgen/feature-admin-workflow-monitoring',
-        '@xgen/feature-admin-test-monitoring',
-        '@xgen/feature-admin-agent-traces',
         '@xgen/feature-admin-chat-monitoring',
         '@xgen/feature-admin-user-token-dashboard',
         '@xgen/feature-admin-node-management',

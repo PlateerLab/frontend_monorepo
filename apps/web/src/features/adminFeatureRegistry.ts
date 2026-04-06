@@ -30,8 +30,6 @@ export async function initializeAdminFeatures(): Promise<void> {
       // 워크플로우 리소스 (admin-workflow)
       import('@xgen/feature-admin-workflow-management'),
       import('@xgen/feature-admin-workflow-monitoring'),
-      import('@xgen/feature-admin-test-monitoring'),
-      import('@xgen/feature-admin-agent-traces'),
       import('@xgen/feature-admin-chat-monitoring'),
       import('@xgen/feature-admin-user-token-dashboard'),
       import('@xgen/feature-admin-node-management'),

@@ -27,14 +27,14 @@ const FolderIcon: React.FC = () => (
 );
 
 const badgeVariantClasses: Record<string, string> = {
-  success: 'bg-success/10 text-success',
-  warning: 'bg-warning/10 text-warning',
-  error: 'bg-error/10 text-error',
-  info: 'bg-info/10 text-info',
-  default: 'bg-gray-100 text-gray-600',
-  secondary: 'bg-gray-100 text-gray-500',
-  primary: 'bg-primary/10 text-primary',
-  purple: 'bg-purple-100 text-purple-600',
+  success: 'bg-success/5 text-success border border-success/20',
+  warning: 'bg-warning/5 text-warning border border-warning/20',
+  error: 'bg-error/5 text-error border border-error/20',
+  info: 'bg-info/5 text-info border border-info/20',
+  default: 'bg-gray-50 text-gray-500 border border-gray-200',
+  secondary: 'bg-gray-50 text-gray-500 border border-gray-200',
+  primary: 'bg-primary/5 text-primary border border-primary/20',
+  purple: 'bg-purple-50 text-purple-600 border border-purple-200',
 };
 
 export function ResourceCard<T = unknown>({
@@ -100,7 +100,7 @@ export function ResourceCard<T = unknown>({
   const renderThumbnail = () => {
     if (!thumbnail) {
       return (
-        <div className="flex items-center justify-center h-10 w-10 rounded-md bg-gray-100 text-muted-foreground">
+        <div className="flex items-center justify-center h-6 w-6 rounded-md text-muted-foreground shrink-0">
           <FolderIcon />
         </div>
       );
@@ -108,7 +108,7 @@ export function ResourceCard<T = unknown>({
 
     return (
       <div
-        className="flex items-center justify-center h-10 w-10 rounded-md overflow-hidden shrink-0"
+        className="flex items-center justify-center h-6 w-6 rounded-md overflow-hidden shrink-0"
         style={{
           backgroundColor: thumbnail.backgroundColor || undefined,
           color: thumbnail.iconColor || undefined,
@@ -132,7 +132,7 @@ export function ResourceCard<T = unknown>({
         {badges.map((badge, index) => (
           <span
             key={`${badge.text}-${index}`}
-            className={cn('px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase', badgeVariantClasses[badge.variant] || badgeVariantClasses.default)}
+            className={cn('px-2 py-0.5 rounded-full text-[11px] font-medium', badgeVariantClasses[badge.variant] || badgeVariantClasses.default)}
             title={badge.tooltip}
           >
             {badge.text}
@@ -145,13 +145,16 @@ export function ResourceCard<T = unknown>({
   const renderMetadata = () => {
     if (!metadata || metadata.length === 0) return null;
     return (
-      <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
         {metadata.map((meta, index) => (
-          <div key={index} className="flex items-center gap-1 text-xs text-muted-foreground" title={meta.tooltip || String(meta.value)}>
-            {meta.icon}
-            {meta.label && <span>{meta.label}:</span>}
-            <span>{meta.value}</span>
-          </div>
+          <React.Fragment key={index}>
+            {index > 0 && <span className="text-gray-300">·</span>}
+            <span className="flex items-center gap-1" title={meta.tooltip || String(meta.value)}>
+              {meta.icon}
+              {meta.label && <span>{meta.label}:</span>}
+              <span>{meta.value}</span>
+            </span>
+          </React.Fragment>
         ))}
       </div>
     );
@@ -160,7 +163,7 @@ export function ResourceCard<T = unknown>({
   const renderActions = () => {
     if (inactive) {
       return (
-        <div data-card-actions className="pt-2 border-t border-[var(--color-line-50)] mt-2">
+        <div data-card-actions className="pt-3 border-t border-[var(--color-line-50)] mt-3">
           <div className="text-xs text-muted-foreground italic">{inactiveMessage || '비활성 상태'}</div>
         </div>
       );
@@ -171,14 +174,16 @@ export function ResourceCard<T = unknown>({
     if (!hasPrimary && !hasDropdown) return null;
 
     return (
-      <div data-card-actions className="flex items-center justify-between pt-2 border-t border-[var(--color-line-50)] mt-2">
-        <div className="flex items-center gap-1">
+      <div data-card-actions className="flex items-center justify-between pt-3 border-t border-[var(--color-line-50)] mt-3">
+        <div className="flex items-center gap-1.5">
           {primaryActions?.map((action) => (
             <button
               key={action.id}
               type="button"
               className={cn(
-                'p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors',
+                'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium',
+                'border border-[var(--color-line-50)] text-muted-foreground',
+                'hover:text-foreground hover:bg-gray-50 hover:border-gray-300 transition-colors',
                 action.disabled && 'opacity-40 cursor-not-allowed',
               )}
               title={action.disabled ? action.disabledMessage : action.label}
@@ -186,6 +191,7 @@ export function ResourceCard<T = unknown>({
               onClick={(e) => handleActionClick(action, e)}
             >
               {action.icon}
+              <span>{action.label}</span>
             </button>
           ))}
         </div>
@@ -249,7 +255,7 @@ export function ResourceCard<T = unknown>({
   return (
     <div
       className={cn(
-        'relative rounded-lg border border-[var(--color-line-50)] bg-card p-4 transition-all',
+        'relative rounded-xl border border-[var(--color-line-50)] bg-card p-4 transition-all',
         selected && 'ring-2 ring-primary border-primary',
         isClickable && 'cursor-pointer hover:shadow-md',
         inactive && 'opacity-60',
@@ -271,17 +277,21 @@ export function ResourceCard<T = unknown>({
         </div>
       )}
 
-      <div className="flex items-start gap-3 mb-2">
+      {/* Badges row */}
+      {renderBadges()}
+
+      {/* Title with thumbnail */}
+      <div className="flex items-center gap-2.5 mt-2.5 mb-1.5">
         {renderThumbnail()}
-        {renderBadges()}
+        <h3 className="text-sm font-semibold text-foreground line-clamp-1" title={title}>{title}</h3>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <h3 className="text-sm font-semibold text-foreground line-clamp-1" title={title}>{title}</h3>
-        {description && <p className="text-xs text-muted-foreground line-clamp-2">{description}</p>}
-        {errorMessage && <p className="text-xs text-error">오류: {errorMessage}</p>}
-        {renderMetadata()}
-      </div>
+      {/* Description */}
+      {description && <p className="text-xs text-muted-foreground line-clamp-2 mb-1">{description}</p>}
+      {errorMessage && <p className="text-xs text-error mb-1">오류: {errorMessage}</p>}
+
+      {/* Metadata */}
+      {renderMetadata()}
 
       {renderActions()}
     </div>

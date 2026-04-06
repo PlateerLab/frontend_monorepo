@@ -198,9 +198,8 @@ const AdminWorkflowStorePage: React.FC<RouteComponentProps> = () => {
           </Button>
         </div>
       }
-    >
-      {/* Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      toolbar={
+        <div className="flex flex-wrap items-center justify-between gap-3 w-full">
           <FilterTabs
             tabs={filterTabs}
             activeKey={filter}
@@ -214,8 +213,9 @@ const AdminWorkflowStorePage: React.FC<RouteComponentProps> = () => {
             className="w-72"
           />
         </div>
-
-        {/* Loading state */}
+      }
+    >
+      {/* Loading state */}
         {loading && (
           <div className="flex items-center justify-center py-16">
             <p className="text-sm text-muted-foreground">{t(`${NS}.loading`)}</p>

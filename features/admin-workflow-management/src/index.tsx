@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import type { AdminFeatureModule, RouteComponentProps } from '@xgen/types';
+import type { AdminFeatureModule, RouteComponentProps, CardBadge, ResourceCardProps } from '@xgen/types';
 import type { AdminWorkflowMeta } from '@xgen/api-client';
 import {
-  ContentArea, DataTable, StatusBadge, SearchInput, FilterTabs, Button, useToast,
+  ContentArea, ResourceCardGrid, SearchInput, FilterTabs, Button, useToast,
 } from '@xgen/ui';
-import type { DataTableColumn, FilterTab } from '@xgen/ui';
+import type { FilterTab } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
+import { FiBox, FiSettings, FiTrash2 } from '@xgen/icons';
 import {
   getAllWorkflowMetaAdmin, deleteWorkflowAdmin, updateWorkflowAdmin,
 } from '@xgen/api-client';
@@ -144,155 +145,120 @@ const AdminWorkflowManagementPage: React.FC<RouteComponentProps> = () => {
     }
   }, [fetchWorkflows, t, toast]);
 
-  // ── Columns ──
-  const columns: DataTableColumn<AdminWorkflowMeta>[] = useMemo(() => [
-    {
-      id: 'workflow_name',
-      header: t('admin.workflowManagement.workflowControl.tableHeaders.name'),
-      field: 'workflow_name',
-      sortable: true,
-      cell: (row) => <span className="font-medium">{row.workflow_name}</span>,
-    },
-    {
-      id: 'username',
-      header: t('admin.workflowManagement.workflowControl.tableHeaders.author'),
-      field: 'username',
-      sortable: true,
-      cell: (row) => <span className="text-sm">{row.username || 'Unknown'}</span>,
-    },
-    {
-      id: 'status',
-      header: t('admin.workflowManagement.workflowControl.tableHeaders.status'),
-      sortable: true,
-      cell: (row) => {
-        const s = deriveStatus(row);
-        return (
-          <StatusBadge variant={s === 'active' ? 'success' : 'error'}>
-            {s === 'active'
-              ? t('admin.workflowManagement.workflowControl.statusActive')
-              : t('admin.workflowManagement.workflowControl.statusInactive')}
-          </StatusBadge>
-        );
-      },
-    },
-    {
-      id: 'sharing',
-      header: t('admin.workflowManagement.workflowControl.tableHeaders.sharing'),
-      sortable: true,
-      cell: (row) => (
-        <StatusBadge variant={row.is_shared ? 'info' : 'neutral'}>
-          {row.is_shared
+  // ── Card items ──
+  const cardItems: ResourceCardProps<AdminWorkflowMeta>[] = useMemo(() => {
+    return filteredWorkflows.map((w) => {
+      const status = deriveStatus(w);
+      const deploy = deriveDeployLabel(w, t);
+
+      const badges: CardBadge[] = [
+        {
+          text: status === 'active'
+            ? t('admin.workflowManagement.workflowControl.statusActive')
+            : t('admin.workflowManagement.workflowControl.statusInactive'),
+          variant: status === 'active' ? 'success' : 'error',
+        },
+        {
+          text: w.is_shared
             ? t('admin.workflowManagement.workflowControl.shared')
-            : t('admin.workflowManagement.workflowControl.personal')}
-        </StatusBadge>
-      ),
-    },
-    {
-      id: 'deploy',
-      header: t('admin.workflowManagement.workflowControl.tableHeaders.deploy'),
-      sortable: true,
-      cell: (row) => {
-        const d = deriveDeployLabel(row, t);
-        return <StatusBadge variant={d.variant}>{d.label}</StatusBadge>;
-      },
-    },
-    {
-      id: 'node_count',
-      header: t('admin.workflowManagement.workflowControl.tableHeaders.nodes'),
-      field: 'node_count',
-      sortable: true,
-      cell: (row) => <span className="font-mono text-xs">{row.node_count}</span>,
-      minWidth: '80px',
-    },
-    {
-      id: 'updated_at',
-      header: t('admin.workflowManagement.workflowControl.tableHeaders.lastModified'),
-      field: 'updated_at',
-      sortable: true,
-      cell: (row) =>
-        row.updated_at ? (
-          <span className="text-xs">{new Date(row.updated_at).toLocaleDateString('ko-KR')}</span>
-        ) : (
-          <span className="text-xs text-muted-foreground">-</span>
-        ),
-    },
-    {
-      id: 'actions',
-      header: t('admin.workflowManagement.workflowControl.tableHeaders.actions'),
-      cell: (row) => (
-        <div className="flex gap-1 flex-wrap">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => { e.stopPropagation(); setEditingWorkflow(row); }}
-          >
-            {t('admin.workflowManagement.workflowControl.settings')}
-          </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={(e) => { e.stopPropagation(); handleDelete(row); }}
-          >
-            {t('admin.workflowManagement.workflowControl.delete')}
-          </Button>
-          {row.inquire_deploy && (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300"
-                onClick={(e) => { e.stopPropagation(); handleDeployApprove(row); }}
-              >
-                {t('admin.workflowManagement.workflowControl.approve')}
-              </Button>
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={(e) => { e.stopPropagation(); handleDeployReject(row); }}
-              >
-                {t('admin.workflowManagement.workflowControl.reject')}
-              </Button>
-            </>
-          )}
-        </div>
-      ),
-    },
-  ], [t, handleDelete, handleDeployApprove, handleDeployReject]);
+            : t('admin.workflowManagement.workflowControl.personal'),
+          variant: w.is_shared ? 'primary' : 'secondary',
+        },
+        {
+          text: deploy.label,
+          variant: deploy.variant === 'neutral' ? 'default' : deploy.variant,
+        },
+      ];
+
+      return {
+        id: String(w.workflow_id ?? w.id),
+        data: w,
+        title: w.workflow_name,
+        thumbnail: {
+          icon: <FiBox />,
+          backgroundColor: 'rgba(120, 60, 237, 0.1)',
+          iconColor: '#783ced',
+        },
+        badges,
+        metadata: [
+          { value: w.username || 'Unknown' },
+          {
+            value: w.updated_at
+              ? new Date(w.updated_at).toLocaleDateString('ko-KR')
+              : '-',
+          },
+          {
+            value: t('admin.workflowManagement.workflowControl.nodeCount', {
+              count: w.node_count ?? 0,
+            }),
+          },
+        ],
+        primaryActions: [
+          {
+            id: 'settings',
+            icon: <FiSettings />,
+            label: t('admin.workflowManagement.workflowControl.settings'),
+            onClick: () => setEditingWorkflow(w),
+          },
+          {
+            id: 'delete',
+            icon: <FiTrash2 />,
+            label: t('admin.workflowManagement.workflowControl.delete'),
+            onClick: () => handleDelete(w),
+          },
+        ],
+        dropdownActions: w.inquire_deploy
+          ? [
+              {
+                id: 'approve',
+                label: t('admin.workflowManagement.workflowControl.approve'),
+                onClick: () => handleDeployApprove(w),
+              },
+              {
+                id: 'reject',
+                label: t('admin.workflowManagement.workflowControl.reject'),
+                onClick: () => handleDeployReject(w),
+                danger: true,
+              },
+            ]
+          : [],
+        onClick: () => setEditingWorkflow(w),
+      };
+    });
+  }, [filteredWorkflows, t, handleDelete, handleDeployApprove, handleDeployReject]);
 
   return (
     <ContentArea
       title={t('admin.pages.workflowManagement.title')}
-      description={`${t('admin.workflowManagement.workflowControl.total')} ${filteredWorkflows.length}${t('admin.workflowManagement.workflowControl.unit')}`}
-      headerActions={
-        <SearchInput
-          value={search}
-          onChange={setSearch}
-          placeholder={t('admin.workflowManagement.workflowControl.searchPlaceholder')}
-          className="w-72"
-        />
+      description={t('admin.pages.workflowManagement.description')}
+      toolbar={
+        <div className="flex items-center justify-between w-full">
+          <FilterTabs
+            tabs={filterTabs}
+            activeKey={filter}
+            onChange={(key) => setFilter(key as StatusFilter)}
+            variant="underline"
+          />
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder={t('admin.workflowManagement.workflowControl.searchPlaceholder')}
+            className="w-72"
+          />
+        </div>
       }
     >
-      {/* Filter tabs */}
-        <FilterTabs
-          tabs={filterTabs}
-          activeKey={filter}
-          onChange={(key) => setFilter(key as StatusFilter)}
-        />
+      <ResourceCardGrid
+        items={cardItems}
+        loading={loading}
+        showEmptyState
+        emptyStateProps={{
+          title: search
+            ? t('admin.workflowManagement.workflowControl.noSearchResults', { query: search })
+            : t('admin.workflowManagement.workflowControl.noWorkflows'),
+        }}
+      />
 
-        {/* Table */}
-        <DataTable
-          data={filteredWorkflows}
-          columns={columns}
-          rowKey={(row) => row.id}
-          loading={loading}
-          emptyMessage={
-            search
-              ? t('admin.workflowManagement.workflowControl.noSearchResults', { query: search })
-              : t('admin.workflowManagement.workflowControl.noWorkflows')
-          }
-          onRowClick={(row) => setEditingWorkflow(row)}
-          className="border rounded-lg"
-        />
       {/* Edit Modal */}
       {editingWorkflow && (
         <WorkflowEditModal
