@@ -217,18 +217,15 @@ export async function initializeFeatures(): Promise<void> {
   const [
     docCollectionMod,
     docStorageMod,
-    docRepositoryMod,
     docDatabaseMod,
   ] = await Promise.all([
     import('@xgen/main-document-management-collection'),
     import('@xgen/main-document-management-storage'),
-    import('@xgen/main-document-management-repository'),
     import('@xgen/main-document-management-database'),
   ]);
 
   CoreRegistry.registerDocumentTabPlugin(docCollectionMod.documentCollectionPlugin);
   CoreRegistry.registerDocumentTabPlugin(docStorageMod.documentStoragePlugin);
-  CoreRegistry.registerDocumentTabPlugin(docRepositoryMod.documentRepositoryPlugin);
   CoreRegistry.registerDocumentTabPlugin(docDatabaseMod.documentDatabasePlugin);
 
   // Register Tool Tab Plugins (순서 = 탭 순서)

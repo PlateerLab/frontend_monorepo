@@ -78,7 +78,6 @@
     "@xgen/main-document-management-collection": "workspace:*",
     "@xgen/main-document-management-database": "workspace:*",
     "@xgen/main-document-management-orchestrator": "workspace:*",
-    "@xgen/main-document-management-repository": "workspace:*",
     "@xgen/main-document-management-storage": "workspace:*",
     "@xgen/main-prompt-management-library": "workspace:*",
     "@xgen/main-prompt-management-orchestrator": "workspace:*",
