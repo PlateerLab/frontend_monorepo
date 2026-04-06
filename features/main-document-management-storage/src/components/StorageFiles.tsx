@@ -145,7 +145,7 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
   // ── Actions ──
   const handleDeleteFile = useCallback(async (file: StorageFileItem) => {
     try {
-      await deleteStorageFile(parseInt(file.id, 10));
+      await deleteStorageFile(parseInt(file.id, 10), storage.storageId);
       await loadFiles(currentPage, currentFolder?.id ?? null);
     } catch (err) {
       console.error('Failed to delete file:', err);
@@ -154,7 +154,7 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
 
   const handleDeleteFolder = useCallback(async (folder: StorageFolderItem) => {
     try {
-      await deleteStorageFolder(folder.id);
+      await deleteStorageFolder(folder.id, true, storage.storageId);
       await loadFolders();
       await loadFiles(currentPage, currentFolder?.id ?? null);
     } catch (err) {
@@ -164,7 +164,7 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
 
   const handleDownloadFile = useCallback(async (file: StorageFileItem) => {
     try {
-      const blob = await downloadStorageFile(parseInt(file.id, 10));
+      const blob = await downloadStorageFile(parseInt(file.id, 10), storage.storageId);
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
