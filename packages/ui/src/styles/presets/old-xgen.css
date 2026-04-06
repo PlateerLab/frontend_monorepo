@@ -8,8 +8,8 @@ html[data-theme='old-xgen'] {
   /* ─── Sidebar / Border Lines ─── */
   --color-line-50: rgba(0, 0, 0, 0.06);
 
-  /* ─── Sidebar Background ─── */
-  --color-bg-50: #ffffff;
+  /* ─── Sidebar Background (match content area) ─── */
+  --color-bg-50: var(--color-muted);
 
   /* ─── Global Borders ─── */
   --color-border: #e9ecef;
