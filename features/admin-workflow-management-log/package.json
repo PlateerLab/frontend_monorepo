@@ -1,5 +1,5 @@
 {
-  "name": "@xgen/feature-admin-workflow-management",
+  "name": "@xgen/feature-admin-workflow-management-log",
   "version": "0.0.0",
   "private": true,
   "main": "src/index.tsx",
@@ -11,8 +11,11 @@
     "@xgen/types": "workspace:*",
     "@xgen/ui": "workspace:*",
     "@xgen/i18n": "workspace:*",
-    "@xgen/api-client": "workspace:*",
-    "@xgen/auth-provider": "workspace:*",
-    "@xgen/icons": "workspace:*"
+    "@xgen/icons": "workspace:*",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "typescript": "^5"
   }
 }

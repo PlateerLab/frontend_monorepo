@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import type { AdminFeatureModule, RouteComponentProps, CardBadge, ResourceCardProps } from '@xgen/types';
+import type { WorkflowMgmtTabPlugin, WorkflowMgmtTabPluginProps, CardBadge, ResourceCardProps } from '@xgen/types';
 import type { AdminWorkflowMeta } from '@xgen/api-client';
 import {
-  ContentArea, ResourceCardGrid, SearchInput, FilterTabs, Button, useToast,
+  ResourceCardGrid, SearchInput, FilterTabs, Button, useToast,
 } from '@xgen/ui';
 import type { FilterTab } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
@@ -37,10 +37,18 @@ function deriveDeployLabel(
 }
 
 // ─────────────────────────────────────────────────────────────
-// Page Component
+// Props (view plugin receives extra onSelectWorkflow callback)
 // ─────────────────────────────────────────────────────────────
 
-const AdminWorkflowManagementPage: React.FC<RouteComponentProps> = () => {
+interface ViewProps extends WorkflowMgmtTabPluginProps {
+  onSelectWorkflow?: (wf: AdminWorkflowMeta) => void;
+}
+
+// ─────────────────────────────────────────────────────────────
+// WorkflowListView
+// ─────────────────────────────────────────────────────────────
+
+const WorkflowListView: React.FC<ViewProps> = ({ onSelectWorkflow, onSubToolbarChange }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
 
@@ -93,6 +101,26 @@ const AdminWorkflowManagementPage: React.FC<RouteComponentProps> = () => {
     ];
   }, [workflows, t]);
 
+  // Push toolbar to orchestrator
+  useEffect(() => {
+    onSubToolbarChange?.(
+      <div className="flex items-center justify-between w-full px-6">
+        <FilterTabs
+          tabs={filterTabs}
+          activeKey={filter}
+          onChange={(key) => setFilter(key as StatusFilter)}
+          variant="underline"
+        />
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder={t('admin.workflowManagement.workflowControl.searchPlaceholder')}
+          className="w-72"
+        />
+      </div>
+    );
+  }, [filterTabs, filter, search, t, onSubToolbarChange]);
+
   // ── Deploy Approve / Reject ──
   const handleDeployApprove = useCallback(async (w: AdminWorkflowMeta) => {
     try {
@@ -132,7 +160,7 @@ const AdminWorkflowManagementPage: React.FC<RouteComponentProps> = () => {
   const handleDelete = useCallback(async (w: AdminWorkflowMeta) => {
     const confirmed = await toast.confirm({
       title: t('admin.workflowManagement.workflowControl.deleteTitle'),
-      description: t('admin.workflowManagement.workflowControl.deleteMessage', { name: w.workflow_name }),
+      message: t('admin.workflowManagement.workflowControl.deleteMessage', { name: w.workflow_name }),
       variant: 'danger',
     });
     if (!confirmed) return;
@@ -222,32 +250,13 @@ const AdminWorkflowManagementPage: React.FC<RouteComponentProps> = () => {
               },
             ]
           : [],
-        onClick: () => setEditingWorkflow(w),
+        onClick: () => onSelectWorkflow?.(w),
       };
     });
-  }, [filteredWorkflows, t, handleDelete, handleDeployApprove, handleDeployReject]);
+  }, [filteredWorkflows, t, handleDelete, handleDeployApprove, handleDeployReject, onSelectWorkflow]);
 
   return (
-    <ContentArea
-      title={t('admin.pages.workflowManagement.title')}
-      description={t('admin.pages.workflowManagement.description')}
-      toolbar={
-        <div className="flex items-center justify-between w-full">
-          <FilterTabs
-            tabs={filterTabs}
-            activeKey={filter}
-            onChange={(key) => setFilter(key as StatusFilter)}
-            variant="underline"
-          />
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder={t('admin.workflowManagement.workflowControl.searchPlaceholder')}
-            className="w-72"
-          />
-        </div>
-      }
-    >
+    <div className="p-6">
       <ResourceCardGrid
         items={cardItems}
         loading={loading}
@@ -259,30 +268,29 @@ const AdminWorkflowManagementPage: React.FC<RouteComponentProps> = () => {
         }}
       />
 
-      {/* Edit Modal */}
+      {/* Settings Modal */}
       {editingWorkflow && (
         <WorkflowEditModal
           workflow={editingWorkflow}
-          isOpen={!!editingWorkflow}
+          isOpen
           onClose={() => setEditingWorkflow(null)}
           onUpdated={fetchWorkflows}
         />
       )}
-    </ContentArea>
+    </div>
   );
 };
 
 // ─────────────────────────────────────────────────────────────
-// Feature Module
+// Plugin Export
 // ─────────────────────────────────────────────────────────────
 
-const feature: AdminFeatureModule = {
-  id: 'admin-workflow-management',
-  name: 'AdminWorkflowManagementPage',
-  adminSection: 'admin-workflow',
-  routes: {
-    'admin-workflow-management': AdminWorkflowManagementPage,
-  },
+export const workflowMgmtViewPlugin: WorkflowMgmtTabPlugin = {
+  id: 'view',
+  name: 'WorkflowListView',
+  tabLabelKey: 'admin.workflowMgmt.title',
+  order: 0,
+  component: WorkflowListView as React.ComponentType<WorkflowMgmtTabPluginProps>,
 };
 
-export default feature;
+export default workflowMgmtViewPlugin;

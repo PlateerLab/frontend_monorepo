@@ -104,12 +104,24 @@ importers:
       '@xgen/feature-admin-users':
         specifier: workspace:*
         version: link:../../features/admin-users
-      '@xgen/feature-admin-workflow-management':
+      '@xgen/feature-admin-workflow-management-executor':
         specifier: workspace:*
-        version: link:../../features/admin-workflow-management
-      '@xgen/feature-admin-workflow-monitoring':
+        version: link:../../features/admin-workflow-management-executor
+      '@xgen/feature-admin-workflow-management-log':
         specifier: workspace:*
-        version: link:../../features/admin-workflow-monitoring
+        version: link:../../features/admin-workflow-management-log
+      '@xgen/feature-admin-workflow-management-monitoring':
+        specifier: workspace:*
+        version: link:../../features/admin-workflow-management-monitoring
+      '@xgen/feature-admin-workflow-management-orchestrator':
+        specifier: workspace:*
+        version: link:../../features/admin-workflow-management-orchestrator
+      '@xgen/feature-admin-workflow-management-test':
+        specifier: workspace:*
+        version: link:../../features/admin-workflow-management-test
+      '@xgen/feature-admin-workflow-management-view':
+        specifier: workspace:*
+        version: link:../../features/admin-workflow-management-view
       '@xgen/feature-admin-workflow-store':
         specifier: workspace:*
         version: link:../../features/admin-workflow-store
@@ -1121,14 +1133,11 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
 
-  features/admin-workflow-management:
+  features/admin-workflow-management-executor:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
-      '@xgen/auth-provider':
-        specifier: workspace:*
-        version: link:../../packages/auth-provider
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
@@ -1141,15 +1150,19 @@ importers:
       '@xgen/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
 
-  features/admin-workflow-monitoring:
+  features/admin-workflow-management-log:
     dependencies:
-      '@xgen/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@xgen/auth-provider':
-        specifier: workspace:*
-        version: link:../../packages/auth-provider
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
@@ -1162,6 +1175,125 @@ importers:
       '@xgen/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/admin-workflow-management-monitoring:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/admin-workflow-management-orchestrator:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/admin-workflow-management-test:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/admin-workflow-management-view:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
 
   features/admin-workflow-store:
     dependencies:

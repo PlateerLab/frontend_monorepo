@@ -38,7 +38,6 @@ export const adminSidebarConfig: AdminSidebarSectionConfig[] = [
     titleKey: 'admin.sidebar.sections.workflow',
     items: [
       { id: 'admin-workflow-management', titleKey: 'admin.sidebar.workflow.workflowManagement.title', descriptionKey: 'admin.sidebar.workflow.workflowManagement.description' },
-      { id: 'admin-workflow-monitoring', titleKey: 'admin.sidebar.workflow.workflowMonitoring.title', descriptionKey: 'admin.sidebar.workflow.workflowMonitoring.description' },
       { id: 'admin-chat-monitoring', titleKey: 'admin.sidebar.workflow.chatMonitoring.title', descriptionKey: 'admin.sidebar.workflow.chatMonitoring.description' },
       { id: 'admin-user-token-dashboard', titleKey: 'admin.sidebar.workflow.userTokenDashboard.title', descriptionKey: 'admin.sidebar.workflow.userTokenDashboard.description' },
       { id: 'admin-node-management', titleKey: 'admin.sidebar.workflow.nodeManagement.title', descriptionKey: 'admin.sidebar.workflow.nodeManagement.description' },

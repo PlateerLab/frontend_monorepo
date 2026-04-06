@@ -28,8 +28,7 @@ export async function initializeAdminFeatures(): Promise<void> {
       import('@xgen/feature-admin-user-create'),
       import('@xgen/feature-admin-group-permissions'),
       // 워크플로우 리소스 (admin-workflow)
-      import('@xgen/feature-admin-workflow-management'),
-      import('@xgen/feature-admin-workflow-monitoring'),
+      import('@xgen/feature-admin-workflow-management-orchestrator'),
       import('@xgen/feature-admin-chat-monitoring'),
       import('@xgen/feature-admin-user-token-dashboard'),
       import('@xgen/feature-admin-node-management'),
@@ -67,6 +66,20 @@ export async function initializeAdminFeatures(): Promise<void> {
     CoreRegistry.registerGovMonitoringTabPlugin(historyMod.govMonitoringHistoryPlugin);
     CoreRegistry.registerGovMonitoringTabPlugin(planMod.govMonitoringPlanPlugin);
     CoreRegistry.registerGovMonitoringTabPlugin(overdueMod.govMonitoringOverduePlugin);
+
+    // Workflow Management Tab Plugins
+    const [viewMod, executorMod, monitoringMod, testMod, logMod] = await Promise.all([
+      import('@xgen/feature-admin-workflow-management-view'),
+      import('@xgen/feature-admin-workflow-management-executor'),
+      import('@xgen/feature-admin-workflow-management-monitoring'),
+      import('@xgen/feature-admin-workflow-management-test'),
+      import('@xgen/feature-admin-workflow-management-log'),
+    ]);
+    CoreRegistry.registerWorkflowMgmtTabPlugin(viewMod.workflowMgmtViewPlugin);
+    CoreRegistry.registerWorkflowMgmtTabPlugin(executorMod.workflowMgmtExecutorPlugin);
+    CoreRegistry.registerWorkflowMgmtTabPlugin(monitoringMod.workflowMgmtMonitoringPlugin);
+    CoreRegistry.registerWorkflowMgmtTabPlugin(testMod.workflowMgmtTestPlugin);
+    CoreRegistry.registerWorkflowMgmtTabPlugin(logMod.workflowMgmtLogPlugin);
 
     adminInitialized = true;
   } catch (error) {

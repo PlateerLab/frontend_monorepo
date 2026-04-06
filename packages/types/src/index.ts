@@ -1153,6 +1153,50 @@ export interface GovMonitoringTabPluginProps {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Workflow Management Tab Plugin
+// 워크플로우 관리 오케스트레이터에 탭으로 끼워지는 플러그인 인터페이스
+// ─────────────────────────────────────────────────────────────
+export interface WorkflowMgmtTabPlugin {
+  /** 플러그인 고유 ID (탭 key로도 사용) */
+  id: string;
+  /** 플러그인 이름 */
+  name: string;
+  /** 탭 라벨 i18n 키 */
+  tabLabelKey: string;
+  /** 탭 순서 (작을수록 앞) */
+  order: number;
+  /** 탭 컨텐츠 컴포넌트 */
+  component: ComponentType<WorkflowMgmtTabPluginProps>;
+}
+
+export interface WorkflowMgmtTabPluginProps {
+  /** 선택된 워크플로우 (AdminWorkflowMeta from @xgen/api-client) */
+  selectedWorkflow: Record<string, unknown>;
+  /** 서브 툴바 콘텐츠를 상위로 전달 */
+  onSubToolbarChange?: (content: React.ReactNode) => void;
+}
+
+/** Admin 워크플로우 메타 (api-client에서 가져오는 타입 미러) */
+export interface AdminWorkflowMeta {
+  id: number;
+  user_id: number;
+  workflow_id: string;
+  workflow_name: string;
+  username?: string;
+  node_count?: number;
+  has_startnode?: boolean;
+  has_endnode?: boolean;
+  is_deployed?: boolean;
+  inquire_deploy?: boolean;
+  is_accepted?: boolean;
+  is_shared?: boolean;
+  share_group?: string | null;
+  share_permissions?: string | null;
+  updated_at: string;
+  created_at?: string;
+}
+
+// ─────────────────────────────────────────────────────────────
 // Canvas Page Plugin
 // 캔버스 페이지에 끼워지는 플러그인 인터페이스
 // ─────────────────────────────────────────────────────────────
@@ -1269,6 +1313,7 @@ class FeatureRegistryClass {
   private promptTabPlugins: Map<string, PromptTabPlugin> = new Map();
   private canvasPagePlugins: Map<string, CanvasPagePlugin> = new Map();
   private govMonitoringTabPlugins: Map<string, GovMonitoringTabPlugin> = new Map();
+  private workflowMgmtTabPlugins: Map<string, WorkflowMgmtTabPlugin> = new Map();
 
   // ── FeatureModule (기존 호환) ──
   register(feature: FeatureModule): void {
@@ -1409,6 +1454,16 @@ class FeatureRegistryClass {
 
   getGovMonitoringTabPlugins(): GovMonitoringTabPlugin[] {
     return Array.from(this.govMonitoringTabPlugins.values())
+      .sort((a, b) => a.order - b.order);
+  }
+
+  // ── WorkflowMgmtTabPlugin ──
+  registerWorkflowMgmtTabPlugin(plugin: WorkflowMgmtTabPlugin): void {
+    this.workflowMgmtTabPlugins.set(plugin.id, plugin);
+  }
+
+  getWorkflowMgmtTabPlugins(): WorkflowMgmtTabPlugin[] {
+    return Array.from(this.workflowMgmtTabPlugins.values())
       .sort((a, b) => a.order - b.order);
   }
 
