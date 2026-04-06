@@ -21,6 +21,7 @@ const DocumentsPage: React.FC<DocumentsPageProps> = ({ onNavigate }) => {
   const plugins = useMemo(() => FeatureRegistry.getDocumentTabPlugins(), []);
   const [activeTab, setActiveTab] = useState(plugins[0]?.id ?? '');
   const [subToolbarContent, setSubToolbarContent] = useState<React.ReactNode>(null);
+  const [toolbarExtraContent, setToolbarExtraContent] = useState<React.ReactNode>(null);
 
   const tabs = useMemo(
     () => plugins.map((p) => ({ key: p.id, label: t(p.tabLabelKey) })),
@@ -35,10 +36,15 @@ const DocumentsPage: React.FC<DocumentsPageProps> = ({ onNavigate }) => {
   const handleTabChange = useCallback((key: string) => {
     setActiveTab(key);
     setSubToolbarContent(null);
+    setToolbarExtraContent(null);
   }, []);
 
   const handleSubToolbarChange = useCallback((content: React.ReactNode) => {
     setSubToolbarContent(content);
+  }, []);
+
+  const handleToolbarExtraChange = useCallback((content: React.ReactNode) => {
+    setToolbarExtraContent(content);
   }, []);
 
   return (
@@ -47,11 +53,14 @@ const DocumentsPage: React.FC<DocumentsPageProps> = ({ onNavigate }) => {
         title={t('documents.title')}
         description={t('documents.description')}
         toolbar={
-          <FilterTabs
-            tabs={tabs}
-            activeKey={activeTab}
-            onChange={handleTabChange}
-          />
+          <div className="flex items-center gap-6">
+            <FilterTabs
+              tabs={tabs}
+              activeKey={activeTab}
+              onChange={handleTabChange}
+            />
+            {toolbarExtraContent}
+          </div>
         }
         subToolbar={subToolbarContent}
         contentPadding={false}
@@ -61,6 +70,7 @@ const DocumentsPage: React.FC<DocumentsPageProps> = ({ onNavigate }) => {
           <ActiveComponent
             onNavigate={onNavigate}
             onSubToolbarChange={handleSubToolbarChange}
+            onToolbarExtraChange={handleToolbarExtraChange}
           />
         )}
       </ContentArea>

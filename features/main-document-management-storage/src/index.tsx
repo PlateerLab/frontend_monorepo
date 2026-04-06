@@ -241,7 +241,8 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
           { icon: <FiDatabase />, value: formatSize(fs.totalSize) },
           ...(fs.updatedAt ? [{ icon: <FiClock />, value: formatDate(fs.updatedAt) }] : []),
         ],
-        dropdownActions: [
+        dropdownActions: [],
+        primaryActions: [
           {
             id: 'delete',
             icon: <FiTrash2 />,
@@ -276,7 +277,7 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
             placeholder={t('documents.storage.searchPlaceholder')}
             size="sm"
           />
-          <Button onClick={() => setIsCreateModalOpen(true)}>
+          <Button size="toolbar" onClick={() => setIsCreateModalOpen(true)}>
             <PlusIcon />
             {t('documents.storage.buttons.newStorage')}
           </Button>

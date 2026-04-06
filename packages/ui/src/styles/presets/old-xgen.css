@@ -1,0 +1,17 @@
+/*
+ * ─── Old XGEN Preset ───
+ * 기존 XGEN 스타일을 재현하는 프리셋.
+ * 사이드바 구분선이 얇고 부드러우며, 전체적으로 가벼운 느낌.
+ */
+
+html[data-theme='old-xgen'] {
+  /* ─── Sidebar / Border Lines ─── */
+  --color-line-50: rgba(0, 0, 0, 0.06);
+
+  /* ─── Sidebar Background ─── */
+  --color-bg-50: #ffffff;
+
+  /* ─── Global Borders ─── */
+  --color-border: #e9ecef;
+  --color-input: #e9ecef;
+}

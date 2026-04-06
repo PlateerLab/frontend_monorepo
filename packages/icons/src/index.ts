@@ -88,6 +88,7 @@ export {
 
   // Communication
   FiMessageCircle,
+  FiShare2,
 
   // Toggle & State
   FiToggleLeft,

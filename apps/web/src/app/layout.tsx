@@ -22,8 +22,10 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const theme = process.env.NEXT_PUBLIC_THEME || '';
+
     return (
-        <html lang="en" suppressHydrationWarning>
+        <html lang="en" data-theme={theme || undefined} suppressHydrationWarning>
             <head>
                 <link rel="icon" href="/favicon.png" sizes="32x32" />
             </head>

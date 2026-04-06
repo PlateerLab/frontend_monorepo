@@ -1126,6 +1126,8 @@ export interface DocumentTabPluginProps {
   onNavigate?: (sectionId: string) => void;
   /** 서브 툴바 콘텐츠를 상위로 전달 */
   onSubToolbarChange?: (content: React.ReactNode) => void;
+  /** 탭 바 우측에 추가 탭을 표시 (메인 탭과 같은 행) */
+  onToolbarExtraChange?: (content: React.ReactNode) => void;
 }
 
 // ─────────────────────────────────────────────────────────────

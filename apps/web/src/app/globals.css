@@ -4,6 +4,8 @@
 
 @import 'tailwindcss';
 @import '../../../../packages/ui/src/styles/globals.css';
+@import '../../../../packages/ui/src/styles/presets/default.css';
+@import '../../../../packages/ui/src/styles/presets/old-xgen.css';
 
 /* ─── Tailwind v4 Source Detection ─── */
 /* 모노레포의 features/packages 디렉토리에서 Tailwind 클래스를 스캔한다. */

@@ -1,0 +1,25 @@
+/*
+ * ─── XGEN Default Preset ───
+ * 기본 테마 프리셋. 현재 디자인 시스템의 기본값.
+ * globals.css @theme 블록의 값을 그대로 사용하므로 오버라이드 없음.
+ *
+ * 새 프리셋을 만들 때 이 파일을 참고하여
+ * [data-theme="your-theme"] 셀렉터로 필요한 토큰만 오버라이드하면 됨.
+ *
+ * ─── 오버라이드 가능한 시맨틱 토큰 목록 ───
+ *
+ * Sidebar:
+ *   --color-line-50          : 사이드바 및 전역 구분선 색상
+ *   --color-bg-50            : 사이드바 배경색
+ *   --color-sidebar          : 사이드바 배경 (다크 모드용)
+ *   --color-sidebar-foreground
+ *   --color-sidebar-border
+ *
+ * Global:
+ *   --color-primary, --color-primary-start, --color-primary-end
+ *   --color-background, --color-foreground
+ *   --color-border, --color-input
+ *   --color-card, --color-muted, --color-accent
+ */
+
+/* default: no overrides needed — uses @theme values as-is */

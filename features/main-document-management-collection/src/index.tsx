@@ -5,7 +5,7 @@ import type { DocumentTabPlugin, DocumentTabPluginProps, CardBadge } from '@xgen
 import { Button, FilterTabs, SearchInput, Modal, Input, Label, Switch, Textarea, ResourceCardGrid } from '@xgen/ui';
 import { FiFolder, FiFileText, FiClock, FiTrash2, FiLock, FiSettings } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
-import { listCollections, createCollection, deleteCollection, updateCollection, verifyCollectionPassword, storeCollectionSessionToken, getCollectionSessionToken, type CollectionItem, type DocumentItem } from './api';
+import { listCollections, createCollection, deleteCollection, updateCollection, verifyCollectionPassword, storeCollectionSessionToken, getCollectionSessionToken, sha256, type CollectionItem, type DocumentItem } from './api';
 import { CollectionDocuments } from './components/CollectionDocuments';
 import { DocumentDetail } from './components/DocumentDetail';
 import './locales';
@@ -82,6 +82,8 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
   const [settingsShared, setSettingsShared] = useState(false);
   const [settingsSecured, setSettingsSecured] = useState(false);
   const [settingsUpdating, setSettingsUpdating] = useState(false);
+  const [settingsPassword, setSettingsPassword] = useState('');
+  const [settingsPasswordConfirm, setSettingsPasswordConfirm] = useState('');
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -241,10 +243,13 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
   const handleCloseSettings = useCallback(() => {
     setIsSettingsModalOpen(false);
     setSettingsCollection(null);
+    setSettingsPassword('');
+    setSettingsPasswordConfirm('');
   }, []);
 
   const handleUpdateCollection = useCallback(async () => {
     if (!settingsCollection || !settingsName.trim()) return;
+    if (settingsSecured && settingsPassword && settingsPassword !== settingsPasswordConfirm) return;
     setSettingsUpdating(true);
     try {
       const updateData: Record<string, any> = {
@@ -254,16 +259,24 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
       if (settingsName.trim() !== settingsCollection.displayName) {
         updateData.collection_make_name = settingsName.trim();
       }
+      if (settingsSecured && settingsPassword) {
+        updateData.password_hash = await sha256(settingsPassword);
+      }
+      if (!settingsSecured && settingsCollection.isSecured) {
+        updateData.password_hash = null;
+      }
       await updateCollection(settingsCollection.name, updateData);
       setIsSettingsModalOpen(false);
       setSettingsCollection(null);
+      setSettingsPassword('');
+      setSettingsPasswordConfirm('');
       await loadData();
     } catch (err) {
       console.error('Failed to update collection:', err);
     } finally {
       setSettingsUpdating(false);
     }
-  }, [settingsCollection, settingsName, settingsShared, settingsSecured, loadData]);
+  }, [settingsCollection, settingsName, settingsShared, settingsSecured, settingsPassword, settingsPasswordConfirm, loadData]);
 
   const filteredCollections = useMemo(() => {
     return collections.filter(c => {
@@ -342,7 +355,7 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
             placeholder={t('documents.collection.searchPlaceholder')}
             size="sm"
           />
-          <Button onClick={() => setIsCreateModalOpen(true)}>
+          <Button size="toolbar" onClick={() => setIsCreateModalOpen(true)}>
             <PlusIcon />
             {t('documents.collection.buttons.newCollection')}
           </Button>
@@ -486,42 +499,87 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
         title={t('documents.collection.settingsModal.title')}
         size="md"
         footer={
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <Button variant="outline" className="flex-1" onClick={handleCloseSettings}>
               {t('documents.collection.settingsModal.cancel')}
             </Button>
-            <Button className="flex-1" onClick={handleUpdateCollection} disabled={settingsUpdating || !settingsName.trim()}>
+            <Button
+              className="flex-1"
+              onClick={handleUpdateCollection}
+              disabled={settingsUpdating || !settingsName.trim() || (settingsSecured && settingsPassword !== '' && settingsPassword !== settingsPasswordConfirm)}
+            >
               {settingsUpdating ? t('documents.collection.settingsModal.updating') : t('documents.collection.settingsModal.update')}
             </Button>
           </div>
         }
       >
         <div className="space-y-4">
-          <div className="space-y-2">
+          {/* Name — read-only display */}
+          <div className="space-y-1">
             <Label>{t('documents.collection.settingsModal.name')}</Label>
-            <Input
-              value={settingsName}
-              onChange={(e) => setSettingsName(e.target.value)}
-            />
+            <p className="text-sm text-foreground py-1">{settingsName}</p>
           </div>
-          <div className="space-y-2">
+
+          {/* Sharing — toggle button */}
+          <div className="space-y-1">
             <Label>{t('documents.collection.settingsModal.sharing')}</Label>
-            <Input
-              value={settingsShared ? t('documents.collection.settingsModal.sharingShared') : t('documents.collection.settingsModal.sharingPrivate')}
-              readOnly
+            <button
+              type="button"
               onClick={() => setSettingsShared(!settingsShared)}
-              className="cursor-pointer"
-            />
+              className="w-full px-4 py-2.5 text-sm text-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
+            >
+              {settingsShared ? t('documents.collection.settingsModal.sharingShared') : t('documents.collection.settingsModal.sharingPrivate')}
+            </button>
           </div>
-          <div className="space-y-2">
+
+          {/* Encryption — toggle button */}
+          <div className="space-y-1">
             <Label>{t('documents.collection.settingsModal.encryption')}</Label>
-            <Input
-              value={settingsSecured ? t('documents.collection.settingsModal.encryptionEnabled') : t('documents.collection.settingsModal.encryptionNone')}
-              readOnly
-              onClick={() => setSettingsSecured(!settingsSecured)}
-              className="cursor-pointer"
-            />
+            <button
+              type="button"
+              onClick={() => {
+                setSettingsSecured(!settingsSecured);
+                if (settingsSecured) {
+                  setSettingsPassword('');
+                  setSettingsPasswordConfirm('');
+                }
+              }}
+              className={`w-full px-4 py-2.5 text-sm text-center rounded-lg border transition-colors ${
+                settingsSecured
+                  ? 'border-blue-400 bg-blue-50 text-blue-600'
+                  : 'border-gray-200 bg-white text-foreground hover:bg-gray-50'
+              }`}
+            >
+              {settingsSecured ? t('documents.collection.settingsModal.encryptionEnabled') : t('documents.collection.settingsModal.encryptionNone')}
+            </button>
           </div>
+
+          {/* Password fields — shown when encryption is enabled */}
+          {settingsSecured && (
+            <>
+              <div className="space-y-1">
+                <Label>{t('documents.collection.settingsModal.newPassword')}</Label>
+                <Input
+                  type="password"
+                  value={settingsPassword}
+                  onChange={(e) => setSettingsPassword(e.target.value)}
+                  placeholder={t('documents.collection.settingsModal.newPasswordPlaceholder')}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>{t('documents.collection.settingsModal.confirmPassword')}</Label>
+                <Input
+                  type="password"
+                  value={settingsPasswordConfirm}
+                  onChange={(e) => setSettingsPasswordConfirm(e.target.value)}
+                  placeholder={t('documents.collection.settingsModal.confirmPasswordPlaceholder')}
+                />
+                {settingsPassword && settingsPasswordConfirm && settingsPassword !== settingsPasswordConfirm && (
+                  <p className="text-xs text-red-500 mt-1">{t('documents.collection.settingsModal.passwordMismatch')}</p>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </Modal>
 

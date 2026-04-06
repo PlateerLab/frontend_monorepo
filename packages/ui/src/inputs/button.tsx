@@ -6,7 +6,7 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'gradient';
-export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
+export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon' | 'toolbar';
 export type ButtonPadding = 'none' | 'compact' | 'default' | 'relaxed';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -39,6 +39,7 @@ const buttonVariants = cva(
         md: 'h-10 text-sm',
         lg: 'h-12 text-base',
         icon: 'h-9 w-9 p-0',
+        toolbar: 'h-8 text-sm',
       },
       padding: {
         none: '',
@@ -51,12 +52,15 @@ const buttonVariants = cva(
       { padding: 'compact', size: 'sm', class: 'px-3' },
       { padding: 'compact', size: 'md', class: 'px-4' },
       { padding: 'compact', size: 'lg', class: 'px-5' },
+      { padding: 'compact', size: 'toolbar', class: 'px-4' },
       { padding: 'default', size: 'sm', class: 'px-4' },
       { padding: 'default', size: 'md', class: 'px-6' },
       { padding: 'default', size: 'lg', class: 'px-8' },
+      { padding: 'default', size: 'toolbar', class: 'px-6' },
       { padding: 'relaxed', size: 'sm', class: 'px-6' },
       { padding: 'relaxed', size: 'md', class: 'px-8' },
       { padding: 'relaxed', size: 'lg', class: 'px-10' },
+      { padding: 'relaxed', size: 'toolbar', class: 'px-8' },
     ],
     defaultVariants: { variant: 'primary', size: 'md', padding: 'default' },
   }

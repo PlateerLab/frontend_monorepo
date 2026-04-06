@@ -1,17 +1,14 @@
 {
-  "name": "@xgen/main-document-management-database",
-  "version": "0.0.0",
+  "name": "@xgen/main-document-management-db-documentation",
+  "version": "0.0.1",
   "private": true,
   "main": "src/index.tsx",
-  "types": "src/index.tsx",
   "dependencies": {
     "@xgen/types": "workspace:*",
     "@xgen/ui": "workspace:*",
     "@xgen/i18n": "workspace:*",
     "@xgen/icons": "workspace:*",
-    "@xgen/auth-provider": "workspace:*",
     "@xgen/api-client": "workspace:*",
-    "@xgen/main-document-management-db-documentation": "workspace:*",
     "react": "^19.0.0"
   },
   "devDependencies": {
