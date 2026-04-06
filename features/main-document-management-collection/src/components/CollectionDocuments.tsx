@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Button, Modal, Input, Label, Switch, DirectoryTree } from '@xgen/ui';
+import { Button, Modal, Input, Label, Switch, DirectoryTree, useUploadStatus } from '@xgen/ui';
 import type { TreeFolder, TreeFile } from '@xgen/ui';
 import { FiArrowLeft, FiFileText, FiFolder, FiChevronRight, FiTrash2, FiClock, FiUpload, FiPlus } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
-import type { CollectionItem, DocumentItem, FolderItem } from '../api';
+import type { CollectionItem, DocumentItem, FolderItem, UploadProgressEvent } from '../api';
 import { listDocumentsSummary, deleteDocument, deleteFolderWithDocuments, uploadDocument, createFolder, moveFolder, updateDocumentFolder } from '../api';
 
 // ─────────────────────────────────────────────────────────────
@@ -114,6 +114,16 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
 
+  const { addSession, updateSession, registerSessionClickHandler } = useUploadStatus();
+
+  // Register handler so clicking the status panel reopens the upload modal
+  React.useEffect(() => {
+    registerSessionClickHandler(() => {
+      setIsUploadModalOpen(true);
+    });
+    return () => registerSessionClickHandler(null);
+  }, [registerSessionClickHandler]);
+
   // Upload modal state
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -124,7 +134,9 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
   const [useMeta, setUseMeta] = useState(true);
   const [forceChunk, setForceChunk] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgressEvent | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadSessionIdRef = useRef<string | null>(null);
 
   // Create folder modal state
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
@@ -243,33 +255,81 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
   const handleUpload = useCallback(async () => {
     if (!uploadFile) return;
     setUploading(true);
+    setUploadProgress(null);
+
+    // Create a session for the global status panel
+    const sessionId = `upload-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    uploadSessionIdRef.current = sessionId;
+    addSession({
+      id: sessionId,
+      fileName: uploadFile.name,
+      targetName: collection.displayName,
+      status: 'uploading',
+      totalChunks: 0,
+      processedChunks: 0,
+    });
+
     try {
-      await uploadDocument({
-        file: uploadFile,
-        collection_name: collection.name,
-        user_id: user?.user_id,
-        chunk_size: parseInt(chunkSize, 10) || 1000,
-        chunk_overlap: parseInt(chunkOverlap, 10) || 150,
-        use_ocr: useOcr,
-        use_llm_metadata: useLlm,
-        extract_default_metadata: useMeta,
-        force_chunking: forceChunk,
-        folder_path: currentFolder?.fullPath || undefined,
-      });
-      setIsUploadModalOpen(false);
-      setUploadFile(null);
+      await uploadDocument(
+        {
+          file: uploadFile,
+          collection_name: collection.name,
+          user_id: user?.user_id,
+          chunk_size: parseInt(chunkSize, 10) || 1000,
+          chunk_overlap: parseInt(chunkOverlap, 10) || 150,
+          use_ocr: useOcr,
+          use_llm_metadata: useLlm,
+          extract_default_metadata: useMeta,
+          force_chunking: forceChunk,
+          folder_path: currentFolder?.fullPath || undefined,
+        },
+        (evt) => {
+          setUploadProgress(evt);
+          // Map every SSE event to session status for real-time panel updates
+          const statusMap: Record<string, 'uploading' | 'processing' | 'embedding' | 'complete' | 'error'> = {
+            uploading: 'uploading',
+            processing: 'processing',
+            embedding: 'embedding',
+            complete: 'complete',
+            error: 'error',
+          };
+          const mappedStatus = statusMap[evt.event];
+          if (mappedStatus) {
+            updateSession(sessionId, {
+              status: mappedStatus,
+              totalChunks: evt.totalChunks ?? 0,
+              processedChunks: evt.processedChunks ?? 0,
+              ...(evt.message ? { errorMessage: evt.message } : {}),
+            });
+          }
+        },
+      );
+
+      // Upload complete — auto-close modal after delay
+      updateSession(sessionId, { status: 'complete' });
+      setTimeout(() => {
+        setIsUploadModalOpen(false);
+        setUploadFile(null);
+        setUploadProgress(null);
+      }, 2000);
       await loadData();
     } catch (err) {
       console.error('Failed to upload document:', err);
+      updateSession(sessionId, { status: 'error', errorMessage: String(err) });
     } finally {
       setUploading(false);
+      uploadSessionIdRef.current = null;
     }
-  }, [uploadFile, collection.name, chunkSize, chunkOverlap, useOcr, useLlm, useMeta, forceChunk, currentFolder, loadData]);
+  }, [uploadFile, collection.name, collection.displayName, user, chunkSize, chunkOverlap, useOcr, useLlm, useMeta, forceChunk, currentFolder, loadData, addSession, updateSession]);
 
   const handleCloseUploadModal = useCallback(() => {
+    // If uploading, just close the modal — progress continues in the status panel
     setIsUploadModalOpen(false);
-    setUploadFile(null);
-  }, []);
+    if (!uploading) {
+      setUploadFile(null);
+      setUploadProgress(null);
+    }
+  }, [uploading]);
 
   // ── Create Folder ──
   const handleCreateFolder = useCallback(async () => {
@@ -591,6 +651,37 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
               <Switch checked={forceChunk} onCheckedChange={setForceChunk} />
             </div>
           </div>
+
+          {/* Upload Progress */}
+          {uploading && uploadProgress && (
+            <div className="p-3 bg-muted/50 rounded-lg space-y-2">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="animate-pulse">
+                  {uploadProgress.event === 'embedding' ? '🧠' : uploadProgress.event === 'processing' ? '⚙️' : '📤'}
+                </span>
+                <span className="font-medium">
+                  {uploadProgress.event === 'embedding'
+                    ? t('documents.collection.detail.uploadStatus.embedding')
+                    : uploadProgress.event === 'processing'
+                      ? t('documents.collection.detail.uploadStatus.processing')
+                      : t('documents.collection.detail.uploadStatus.uploading')}
+                </span>
+                {uploadProgress.totalChunks != null && uploadProgress.totalChunks > 0 && (
+                  <span className="text-muted-foreground text-xs ml-auto">
+                    {uploadProgress.processedChunks ?? 0}/{uploadProgress.totalChunks}
+                  </span>
+                )}
+              </div>
+              {uploadProgress.totalChunks != null && uploadProgress.totalChunks > 0 && (
+                <div className="h-1.5 bg-border rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all duration-300"
+                    style={{ width: `${Math.round(((uploadProgress.processedChunks ?? 0) / uploadProgress.totalChunks) * 100)}%` }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </Modal>
 
