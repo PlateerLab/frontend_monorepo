@@ -1,11 +1,31 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Button, Modal, Input, Label, Switch } from '@xgen/ui';
+import { Button, Modal, Input, Label, Switch, DirectoryTree } from '@xgen/ui';
+import type { TreeFolder, TreeFile } from '@xgen/ui';
 import { FiArrowLeft, FiFileText, FiFolder, FiChevronRight, FiTrash2, FiClock, FiUpload, FiPlus } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
+import { useAuth } from '@xgen/auth-provider';
 import type { CollectionItem, DocumentItem, FolderItem } from '../api';
-import { listDocumentsSummary, deleteDocument, deleteFolderWithDocuments, uploadDocument, createFolder } from '../api';
+import { listDocumentsSummary, deleteDocument, deleteFolderWithDocuments, uploadDocument, createFolder, moveFolder, updateDocumentFolder } from '../api';
+
+// ─────────────────────────────────────────────────────────────
+// Tree Adapters (FolderItem/DocumentItem → TreeFolder/TreeFile)
+// ─────────────────────────────────────────────────────────────
+
+function folderToTreeFolder(f: FolderItem): TreeFolder {
+  return { id: f.id, name: f.folderName, fullPath: f.fullPath, parentFolderId: f.parentFolderId, isRoot: f.isRoot };
+}
+
+function docToTreeFile(doc: DocumentItem): TreeFile {
+  return {
+    id: doc.documentId,
+    name: doc.fileName,
+    folderPath: doc.directoryFullPath || '',
+    badge: String(doc.totalChunks),
+    sortKey: doc.processedAt ? new Date(doc.processedAt).getTime() : 0,
+  };
+}
 
 // ─────────────────────────────────────────────────────────────
 // Helpers
@@ -83,6 +103,7 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
   onSelectDocument,
 }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -155,10 +176,26 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
   }, [currentFolder]);
 
   // ── Folder Navigation ──
-  const handleNavigateToFolder = useCallback((folder: FolderItem) => {
-    setFolderPath(prev => [...prev, folder]);
-    setCurrentFolder(folder);
-  }, []);
+  const handleNavigateToFolder = useCallback((folder: FolderItem | null) => {
+    if (!folder) {
+      // Navigate to root
+      setFolderPath([]);
+      setCurrentFolder(null);
+    } else {
+      // Build breadcrumb path from root to target folder
+      const buildPath = (target: FolderItem): FolderItem[] => {
+        const path: FolderItem[] = [];
+        let current: FolderItem | undefined = target;
+        while (current && !current.isRoot) {
+          path.unshift(current);
+          current = folders.find(f => f.id === current!.parentFolderId);
+        }
+        return path;
+      };
+      setFolderPath(buildPath(folder));
+      setCurrentFolder(folder);
+    }
+  }, [folders]);
 
   const handleNavigateUp = useCallback(() => {
     setFolderPath(prev => {
@@ -210,6 +247,7 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
       await uploadDocument({
         file: uploadFile,
         collection_name: collection.name,
+        user_id: user?.user_id,
         chunk_size: parseInt(chunkSize, 10) || 1000,
         chunk_overlap: parseInt(chunkOverlap, 10) || 150,
         use_ocr: useOcr,
@@ -240,9 +278,10 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
     try {
       await createFolder({
         folder_name: newFolderName.trim(),
-        parent_collection_id: 0,
+        parent_collection_id: collection.collectionId,
         parent_folder_id: currentFolder?.id ?? null,
         parent_folder_name: currentFolder?.folderName ?? null,
+        collection_name: collection.name,
       });
       setIsCreateFolderModalOpen(false);
       setNewFolderName('');
@@ -296,8 +335,50 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 min-h-0 overflow-y-auto p-6">
+      {/* Content: Tree + Cards */}
+      <div className="flex flex-1 min-h-0">
+        {/* Directory Tree (Left Panel) */}
+        <div className="w-64 shrink-0 min-h-0 overflow-hidden">
+          <DirectoryTree
+            root={{ displayName: collection.displayName }}
+            folders={folders.map(folderToTreeFolder)}
+            files={allDocuments.map(docToTreeFile)}
+            currentFolder={currentFolder ? folderToTreeFolder(currentFolder) : null}
+            loading={loading}
+            onNavigateToFolder={(tf) => {
+              if (!tf) { handleNavigateToFolder(null); return; }
+              const original = folders.find(f => f.id === tf.id);
+              if (original) handleNavigateToFolder(original);
+            }}
+            onSelectFile={(tf) => {
+              const doc = allDocuments.find(d => d.documentId === tf.id);
+              if (doc) onSelectDocument(doc);
+            }}
+            onMoveFile={async (tf, targetTf) => {
+              const doc = allDocuments.find(d => d.documentId === tf.id);
+              if (!doc) return;
+              const targetPath = targetTf ? targetTf.fullPath : `/${collection.displayName}`;
+              const ownerUserId = collection.ownerUserId !== user?.user_id ? collection.ownerUserId : undefined;
+              try {
+                await updateDocumentFolder(doc.documentId, collection.name, targetPath, ownerUserId);
+                loadData();
+              } catch (err) { console.error('Failed to move document:', err); }
+            }}
+            onMoveFolder={async (tf, targetTf) => {
+              const ownerUserId = collection.ownerUserId !== user?.user_id ? collection.ownerUserId : undefined;
+              try {
+                await moveFolder(tf.id, targetTf?.id ?? null, collection.collectionId, ownerUserId);
+                loadData();
+              } catch (err) { console.error('Failed to move folder:', err); }
+            }}
+            title={t('documents.collection.detail.directoryTree.title')}
+            fileSuffix={t('documents.collection.detail.directoryTree.filesSuffix')}
+            searchPlaceholder={t('documents.collection.detail.directoryTree.searchPlaceholder')}
+          />
+        </div>
+
+        {/* Document Cards (Right Panel) */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-6">
         {loading ? (
           <div className="flex items-center justify-center min-h-[300px]">
             <div className="w-10 h-10 border-3 border-border border-t-primary rounded-full animate-spin" />
@@ -430,6 +511,7 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
             )}
           </>
         )}
+        </div>
       </div>
 
       {/* Upload Document Modal */}

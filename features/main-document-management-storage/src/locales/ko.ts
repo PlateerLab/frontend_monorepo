@@ -64,6 +64,11 @@ export const ko: TranslationData = {
         name: '폴더 이름',
         namePlaceholder: '폴더 이름을 입력하세요',
       },
+      directoryTree: {
+        title: '디렉토리 구조',
+        filesSuffix: ' 파일',
+        searchPlaceholder: '파일 검색...',
+      },
     },
   },
 };

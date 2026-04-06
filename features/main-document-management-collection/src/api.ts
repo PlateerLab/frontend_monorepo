@@ -7,7 +7,9 @@ import { createApiClient } from '@xgen/api-client';
 // ─────────────────────────────────────────────────────────────
 
 export interface CollectionAPIResponse {
+  id?: number;
   collection_name: string;
+  collection_make_name?: string;
   display_name?: string;
   description?: string;
   document_count: number;
@@ -26,6 +28,7 @@ export interface CollectionAPIResponse {
 
 export interface CollectionItem {
   id: string;
+  collectionId: number;
   name: string;
   displayName: string;
   description: string;
@@ -46,8 +49,9 @@ export interface CollectionItem {
 function transformCollection(raw: CollectionAPIResponse): CollectionItem {
   return {
     id: raw.collection_name,
+    collectionId: raw.id ?? 0,
     name: raw.collection_name,
-    displayName: raw.display_name || raw.collection_name,
+    displayName: raw.collection_make_name || raw.display_name || raw.collection_name,
     description: raw.description || '',
     documentCount: raw.document_count ?? 0,
     isShared: raw.is_shared ?? false,
@@ -330,9 +334,13 @@ export async function createFolder(data: {
   parent_collection_id: number;
   parent_folder_id?: number | null;
   parent_folder_name?: string | null;
+  collection_name?: string;
 }): Promise<void> {
   const api = createApiClient();
-  await api.post('/api/folder/create', data);
+  const { collection_name, ...payload } = data;
+  await api.post('/api/folder/create', payload, collection_name ? {
+    headers: collectionAuthHeaders(collection_name),
+  } : undefined);
 }
 
 export async function deleteFolderWithDocuments(data: {
@@ -344,9 +352,56 @@ export async function deleteFolderWithDocuments(data: {
   await api.delete('/api/folder/delete-with-documents', data as any);
 }
 
+export async function moveFolder(
+  folderId: number,
+  targetParentFolderId: number | null,
+  collectionId: number,
+  ownerUserId?: number | null
+): Promise<void> {
+  const api = createApiClient();
+  const payload: Record<string, any> = {
+    folder_id: folderId,
+    target_parent_folder_id: targetParentFolderId,
+    collection_id: collectionId,
+  };
+  if (ownerUserId != null) {
+    payload.owner_user_id = ownerUserId;
+  }
+  await api.post('/api/folder/move', payload);
+}
+
+export async function updateDocumentFolder(
+  documentId: string,
+  collectionName: string,
+  newDirectoryFullPath: string,
+  ownerUserId?: number | null
+): Promise<void> {
+  const api = createApiClient();
+  const payload: Record<string, any> = {
+    document_id: documentId,
+    collection_name: collectionName,
+    new_directory_full_path: newDirectoryFullPath,
+  };
+  if (ownerUserId != null) {
+    payload.owner_user_id = ownerUserId;
+  }
+  await api.post('/api/folder/update/document-folder', payload, {
+    headers: collectionAuthHeaders(collectionName),
+  });
+}
+
+function generateSessionId(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 export async function uploadDocument(data: {
   file: File;
   collection_name: string;
+  user_id?: number;
   chunk_size?: number;
   chunk_overlap?: number;
   use_ocr?: boolean;
@@ -361,10 +416,14 @@ export async function uploadDocument(data: {
   formData.append('collection_name', data.collection_name);
   formData.append('chunk_size', String(data.chunk_size ?? 1000));
   formData.append('chunk_overlap', String(data.chunk_overlap ?? 150));
+  formData.append('user_id', String(data.user_id ?? 1));
+  formData.append('session', generateSessionId());
   formData.append('use_ocr', String(data.use_ocr ?? false));
   formData.append('use_llm_metadata', String(data.use_llm_metadata ?? false));
   formData.append('extract_default_metadata', String(data.extract_default_metadata ?? true));
   formData.append('force_chunking', String(data.force_chunking ?? false));
+  formData.append('chunking_strategy', 'recursive');
+  formData.append('generate_ontology_graph', 'true');
   const metadata: Record<string, any> = {
     original_file_name: data.file.name,
     file_size: data.file.size,
@@ -374,8 +433,42 @@ export async function uploadDocument(data: {
     metadata.directory_full_path = data.folder_path;
   }
   formData.append('metadata', JSON.stringify(metadata));
-  await api.post('/api/retrieval/documents/upload-sse', formData, {
-    headers: { 'Content-Type': 'multipart/form-data', ...collectionAuthHeaders(data.collection_name) },
-    timeout: 300000,
-  } as any);
+
+  // SSE endpoint returns text/event-stream, not JSON.
+  // Use fetch directly to avoid JSON parse errors.
+  const headers: Record<string, string> = {
+    ...collectionAuthHeaders(data.collection_name),
+  };
+  const accessToken = typeof document !== 'undefined'
+    ? document.cookie.match(/xgen_access_token=([^;]+)/)?.[1] ?? null
+    : null;
+  if (accessToken) {
+    headers['Authorization'] = `Bearer ${accessToken}`;
+  }
+
+  const response = await fetch('/api/retrieval/documents/upload-sse', {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => '');
+    throw new Error(`Upload failed: ${response.status} ${errText}`);
+  }
+
+  // Consume the SSE stream until complete
+  const reader = response.body?.getReader();
+  if (reader) {
+    const decoder = new TextDecoder();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const text = decoder.decode(value, { stream: true });
+      // Check for completion event
+      if (text.includes('"event": "complete"') || text.includes('"event":"complete"')) {
+        break;
+      }
+    }
+  }
 }

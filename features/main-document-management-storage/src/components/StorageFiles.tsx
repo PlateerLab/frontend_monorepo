@@ -1,11 +1,35 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Button, Modal, Input, Label } from '@xgen/ui';
-import { FiArrowLeft, FiFile, FiFolder, FiChevronRight, FiTrash2, FiClock, FiDownload, FiUpload, FiPlus } from '@xgen/icons';
+import { Button, Modal, Input, Label, DirectoryTree } from '@xgen/ui';
+import type { TreeFolder, TreeFile } from '@xgen/ui';
+import { FiArrowLeft, FiFile, FiFolder, FiChevronRight, FiClock, FiUpload, FiPlus } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import type { FileStorageItem, StorageFileItem, StorageFolderItem, PaginationInfo } from '../api';
 import { listStorageFiles, getStorageFolderTree, deleteStorageFile, deleteStorageFolder, downloadStorageFile, uploadStorageFile, createStorageFolder } from '../api';
+
+// ─────────────────────────────────────────────────────────────
+// Tree Adapters (StorageFolderItem/StorageFileItem → TreeFolder/TreeFile)
+// ─────────────────────────────────────────────────────────────
+
+function storageFolderToTreeFolder(f: StorageFolderItem): TreeFolder {
+  return { id: f.id, name: f.name, fullPath: f.fullPath, parentFolderId: f.parentFolderId, isRoot: f.isRoot };
+}
+
+function storageFileToTreeFile(f: StorageFileItem, folders: StorageFolderItem[]): TreeFile {
+  // Resolve folderId to the folder's fullPath for tree placement
+  let folderPath = '';
+  if (f.folderId != null) {
+    const folder = folders.find(fl => fl.id === f.folderId);
+    if (folder) folderPath = folder.fullPath;
+  }
+  return {
+    id: f.id,
+    name: f.fileName,
+    folderPath,
+    sortKey: f.uploadedAt ? new Date(f.uploadedAt).getTime() : 0,
+  };
+}
 
 // ─────────────────────────────────────────────────────────────
 // Helpers
@@ -79,8 +103,8 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
       const data = await listStorageFiles(storage.storageId, page, 50, folderId);
       setFiles(data.files);
       setPagination(data.pagination);
-      if (data.folders.length > 0 && allFolders.length === 0) {
-        setAllFolders(data.folders);
+      if (data.folders.length > 0) {
+        setAllFolders(prev => prev.length === 0 ? data.folders : prev);
       }
     } catch (err) {
       console.error('Failed to load files:', err);
@@ -88,7 +112,7 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
     } finally {
       setLoading(false);
     }
-  }, [storage.storageId, allFolders.length, t]);
+  }, [storage.storageId, t]);
 
   useEffect(() => {
     loadFolders();
@@ -103,13 +127,42 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
     return allFolders.filter(f => f.parentFolderId === currentFolder.id);
   }, [currentFolder, allFolders]);
 
+  // ── Filter files to only show those belonging to the current folder level ──
+  // Without this, the backend returns ALL files (including nested) when no folder_id is specified.
+  const currentFiles = useMemo(() => {
+    if (currentFolder) {
+      // Inside a folder: show files whose folderId matches
+      return files.filter(f => f.folderId === currentFolder.id);
+    }
+    // At root: only show files that are NOT inside any folder
+    return files.filter(f => f.folderId == null);
+  }, [files, currentFolder]);
+
   // ── Folder Navigation ──
-  const handleNavigateToFolder = useCallback((folder: StorageFolderItem) => {
-    setFolderPath(prev => [...prev, folder]);
-    setCurrentFolder(folder);
-    setCurrentPage(1);
-    loadFiles(1, folder.id);
-  }, [loadFiles]);
+  const handleNavigateToFolder = useCallback((folder: StorageFolderItem | null) => {
+    if (!folder) {
+      // Navigate to root
+      setFolderPath([]);
+      setCurrentFolder(null);
+      setCurrentPage(1);
+      loadFiles(1, null);
+    } else {
+      // Build breadcrumb path from root to target folder
+      const buildPath = (target: StorageFolderItem): StorageFolderItem[] => {
+        const path: StorageFolderItem[] = [];
+        let current: StorageFolderItem | undefined = target;
+        while (current && !current.isRoot) {
+          path.unshift(current);
+          current = allFolders.find(f => f.id === current!.parentFolderId);
+        }
+        return path;
+      };
+      setFolderPath(buildPath(folder));
+      setCurrentFolder(folder);
+      setCurrentPage(1);
+      loadFiles(1, folder.id);
+    }
+  }, [loadFiles, allFolders]);
 
   const handleNavigateUp = useCallback(() => {
     setFolderPath(prev => {
@@ -202,16 +255,18 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
     const files = e.target.files;
     if (!files || files.length === 0) return;
     const fileArray = Array.from(files);
-    // Extract folder name from the first file's path
-    const firstPath = fileArray[0].webkitRelativePath || '';
-    const folderName = firstPath.split('/')[0] || 'uploaded-folder';
     setUploading(true);
     try {
       for (const file of fileArray) {
+        const fullPath = (file as any).webkitRelativePath || '';
+        // Extract folder path only (exclude file name)
+        const lastSlash = fullPath.lastIndexOf('/');
+        const relativePath = lastSlash !== -1 ? fullPath.substring(0, lastSlash) : null;
         await uploadStorageFile({
           file,
           storage_id: storage.storageId,
           folder_id: currentFolder?.id ?? null,
+          relative_path: relativePath,
         });
       }
       await loadFolders();
@@ -307,8 +362,29 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 min-h-0 overflow-y-auto p-6">
+      {/* Content: Tree + Cards */}
+      <div className="flex flex-1 min-h-0">
+        {/* Directory Tree (Left Panel) */}
+        <div className="w-64 shrink-0 min-h-0 overflow-hidden">
+          <DirectoryTree
+            root={{ displayName: storage.name }}
+            folders={allFolders.map(storageFolderToTreeFolder)}
+            files={files.map(f => storageFileToTreeFile(f, allFolders))}
+            currentFolder={currentFolder ? storageFolderToTreeFolder(currentFolder) : null}
+            loading={loading}
+            onNavigateToFolder={(tf) => {
+              if (!tf) { handleNavigateToFolder(null); return; }
+              const original = allFolders.find(f => f.id === tf.id);
+              if (original) handleNavigateToFolder(original);
+            }}
+            title={t('documents.storage.detail.directoryTree.title', '디렉토리 구조')}
+            fileSuffix={t('documents.storage.detail.directoryTree.filesSuffix', ' 파일')}
+            searchPlaceholder={t('documents.storage.detail.directoryTree.searchPlaceholder', '파일 검색...')}
+          />
+        </div>
+
+        {/* File Cards (Right Panel) */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-6">
         {loading ? (
           <div className="flex items-center justify-center min-h-[300px]">
             <div className="w-10 h-10 border-3 border-border border-t-primary rounded-full animate-spin" />
@@ -320,7 +396,7 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
               {t('common.retry')}
             </Button>
           </div>
-        ) : currentFolders.length === 0 && files.length === 0 ? (
+        ) : currentFolders.length === 0 && currentFiles.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[300px] gap-2">
             <FiFile className="w-12 h-12 text-muted-foreground/40" />
             <p className="text-sm text-muted-foreground">{t('documents.storage.detail.empty')}</p>
@@ -345,29 +421,38 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
               {currentFolders.map(folder => (
                 <div
                   key={`folder-${folder.id}`}
-                  className="group flex items-center gap-3 p-4 bg-card border border-border rounded-lg cursor-pointer hover:shadow-sm transition-all"
+                  className="flex flex-col p-4 bg-card border border-border rounded-lg cursor-pointer hover:shadow-sm transition-all"
                   onClick={() => handleNavigateToFolder(folder)}
                 >
-                  <div className="w-9 h-9 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
-                    <FiFolder className="w-4 h-4 text-green-500" />
+                  <div className="flex items-start gap-3 mb-2">
+                    <div className="w-9 h-9 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
+                      <FiFolder className="w-4 h-4 text-green-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{folder.name}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        {t('documents.storage.detail.folderPathLabel', '경로')} : {folder.fullPath}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{folder.name}</p>
+                  <div className="flex items-center gap-2 mt-auto pt-2 border-t border-border">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                      onClick={(e) => { e.stopPropagation(); handleDeleteFolder(folder); }}
+                    >
+                      {t('documents.storage.detail.actions.delete', '삭제')}
+                    </Button>
                   </div>
-                  <button
-                    className="opacity-0 group-hover:opacity-100 p-1 text-muted-foreground hover:text-destructive transition-all"
-                    onClick={(e) => { e.stopPropagation(); handleDeleteFolder(folder); }}
-                  >
-                    <FiTrash2 className="w-3.5 h-3.5" />
-                  </button>
                 </div>
               ))}
 
               {/* File Cards */}
-              {files.map(file => (
+              {currentFiles.map(file => (
                 <div
                   key={file.id}
-                  className="group flex flex-col p-4 bg-card border border-border rounded-lg hover:shadow-sm transition-all"
+                  className="flex flex-col p-4 bg-card border border-border rounded-lg hover:shadow-sm transition-all"
                 >
                   <div className="flex items-start gap-3 mb-2">
                     <div className="w-9 h-9 rounded-lg bg-violet-500/10 flex items-center justify-center shrink-0">
@@ -377,31 +462,35 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
                       <p className="text-sm font-medium text-foreground truncate">{file.fileName}</p>
                       <p className="text-[11px] text-muted-foreground mt-0.5">
                         {formatSize(file.fileSize)}
-                        {file.fileType && ` · ${file.fileType}`}
+                        {file.mimeType && ` · ${file.mimeType}`}
                       </p>
                     </div>
-                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all">
-                      <button
-                        className="p-1 text-muted-foreground hover:text-primary transition-colors"
-                        onClick={() => handleDownloadFile(file)}
-                      >
-                        <FiDownload className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        className="p-1 text-muted-foreground hover:text-destructive transition-colors"
-                        onClick={() => handleDeleteFile(file)}
-                      >
-                        <FiTrash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
                   </div>
-                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-auto">
+                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                     {file.uploadedAt && (
                       <span className="flex items-center gap-1">
                         <FiClock className="w-3 h-3" />
                         {formatDate(file.uploadedAt)}
                       </span>
                     )}
+                  </div>
+                  <div className="flex items-center gap-2 mt-auto pt-2 border-t border-border">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => handleDownloadFile(file)}
+                    >
+                      {t('documents.storage.detail.actions.download', '다운로드')}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => handleDeleteFile(file)}
+                    >
+                      {t('documents.storage.detail.actions.delete', '삭제')}
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -449,6 +538,7 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
             )}
           </>
         )}
+        </div>
       </div>
 
       {/* Create Folder Modal */}
