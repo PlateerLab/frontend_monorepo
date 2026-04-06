@@ -21,6 +21,7 @@ export const routeMappings: Record<string, string> = {
   'canvas-intro': 'canvas-intro',
   'workflows': 'workflows',
   'documents': 'documents',
+  'upload-history': 'upload-history',
   'tool-storage': 'tool-storage',
   'prompt-storage': 'prompt-storage',
   'auth-profile': 'auth-profile',

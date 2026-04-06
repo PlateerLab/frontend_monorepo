@@ -79,6 +79,7 @@
     "@xgen/main-document-management-orchestrator": "workspace:*",
     "@xgen/main-document-management-repository": "workspace:*",
     "@xgen/main-document-management-storage": "workspace:*",
+    "@xgen/main-upload-history": "workspace:*",
     "@xgen/main-prompt-management-library": "workspace:*",
     "@xgen/main-prompt-management-orchestrator": "workspace:*",
     "@xgen/main-prompt-management-storage": "workspace:*",

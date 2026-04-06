@@ -77,6 +77,7 @@ export const commonEn: TranslationData = {
     knowledge: {
       title: 'Knowledge',
       collections: { title: 'Document Management' },
+      uploadHistory: { title: 'Upload History', description: 'Document upload processing history' },
     },
     model: {
       title: 'Model',
