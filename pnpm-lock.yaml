@@ -215,9 +215,6 @@ importers:
       '@xgen/main-document-management-orchestrator':
         specifier: workspace:*
         version: link:../../features/main-document-management-orchestrator
-      '@xgen/main-document-management-repository':
-        specifier: workspace:*
-        version: link:../../features/main-document-management-repository
       '@xgen/main-document-management-storage':
         specifier: workspace:*
         version: link:../../features/main-document-management-storage
