@@ -1,6 +1,6 @@
 export const en: Record<string, unknown> = {
   deploy: {
-    title: 'Deploy Settings — {workflowName}',
+    title: 'Deploy Settings — {{workflowName}}',
     tabWebpage: 'Website',
     tabApi: 'API',
     tabCurl: 'cURL',

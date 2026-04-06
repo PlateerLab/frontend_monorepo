@@ -45,7 +45,7 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({
   return (
     <motion.aside
       className={cn(
-        'fixed top-0 left-0 h-screen flex flex-col flex-shrink-0 z-[100] overflow-visible',
+        'fixed top-0 left-0 h-screen flex flex-col flex-shrink-0 z-40 overflow-visible',
         'border-r border-[var(--color-line-50)] bg-[var(--color-bg-50)]',
         'transition-[width] duration-[250ms] ease-out',
         className,

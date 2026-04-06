@@ -15,20 +15,6 @@ import { listWorkflowsDetail, deleteWorkflow, duplicateWorkflow } from './api';
 // Constants & Helpers
 // ─────────────────────────────────────────────────────────────
 
-const STATUS_BADGE_VARIANT: Record<string, CardBadge['variant']> = {
-  active: 'success',
-  draft: 'warning',
-  archived: 'secondary',
-  unactive: 'error',
-};
-
-const STATUS_BADGE_KEY: Record<string, string> = {
-  active: 'workflows.badges.live',
-  draft: 'workflows.badges.draft',
-  archived: 'workflows.badges.archived',
-  unactive: 'workflows.badges.disabled',
-};
-
 const DEPLOY_BADGE_VARIANT: Record<string, CardBadge['variant']> = {
   deployed: 'purple',
   pending: 'warning',
@@ -259,12 +245,6 @@ export const WorkflowStorage: React.FC<WorkflowStorageProps> = ({ onNavigate, on
   const cardItems = useMemo(() => {
     return filteredWorkflows.map((workflow) => {
       const badges: CardBadge[] = [];
-
-      const statusVariant = STATUS_BADGE_VARIANT[workflow.status];
-      const statusKey = STATUS_BADGE_KEY[workflow.status];
-      if (statusVariant && statusKey) {
-        badges.push({ text: t(statusKey), variant: statusVariant });
-      }
 
       badges.push({
         text: workflow.isShared ? t('workflows.badges.shared') : t('workflows.badges.my'),

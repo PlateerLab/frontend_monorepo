@@ -51,7 +51,7 @@ export const SidebarPopover: React.FC<SidebarPopoverProps> = ({
   const content = (
     <div
       ref={popoverRef}
-      className="fixed z-50 min-w-[180px] rounded-lg border border-border bg-popover shadow-lg py-1"
+      className="fixed z-40 min-w-[180px] rounded-lg border border-border bg-popover shadow-lg py-1"
       style={{ left, top }}
       role="menu"
     >
