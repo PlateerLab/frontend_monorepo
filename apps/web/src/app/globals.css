@@ -13,6 +13,9 @@
 @source "../../../../features";
 
 :root {
+  /* ─── Tailwind v4 base layer font override ─── */
+  --default-font-family: 'Noto Sans KR', sans-serif;
+
   /* ─── Legacy Compatibility — 기존 var(--background) 등을 사용하는 코드용 ─── */
   --background: var(--color-background);
   --foreground: var(--color-foreground);
@@ -30,10 +33,13 @@
   --shadow-basic-50: var(--shadow-md);
 }
 
+html {
+  font-family: var(--font-sans);
+}
+
 body {
   background: var(--color-background);
   color: var(--color-foreground);
-  font-family: var(--font-sans);
 }
 
 /* ─── Typography Utility Classes (Figma publish/component/typography) ─── */

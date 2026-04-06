@@ -57,7 +57,7 @@
   --color-sidebar-border: rgba(255, 255, 255, 0.1);
 
   /* ─── Typography ─── */
-  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-sans: 'Noto Sans KR', sans-serif;
   --font-mono: 'Fira Code', 'Consolas', monospace;
 
   /* ─── Border Radius ─── */

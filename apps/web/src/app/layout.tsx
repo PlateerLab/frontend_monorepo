@@ -28,6 +28,12 @@ export default function RootLayout({
         <html lang="en" data-theme={theme || undefined} suppressHydrationWarning>
             <head>
                 <link rel="icon" href="/favicon.png" sizes="32x32" />
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link
+                    rel="stylesheet"
+                    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap"
+                />
             </head>
             <body suppressHydrationWarning>
                 <AuthProvider>
