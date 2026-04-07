@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Button, Modal, Input, Label, Switch, DirectoryTree, DocumentCard, useUploadStatus } from '@xgen/ui';
-import type { TreeFolder, TreeFile } from '@xgen/ui';
+import { Button, Modal, Input, Label, Switch, DirectoryTree, DocumentCard, useUploadStatus, useExternalDrop, isExternalFileDrag, extractFilesFromDataTransfer } from '@xgen/ui';
+import type { TreeFolder, TreeFile, ExternalDropResult } from '@xgen/ui';
 import { FiArrowLeft, FiFileText, FiChevronRight, FiClock, FiUpload, FiPlus } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
 import type { CollectionItem, DocumentItem, FolderItem, UploadProgressEvent } from '../api';
-import { listDocumentsSummary, deleteDocument, deleteFolderWithDocuments, uploadDocument, createFolder, moveFolder, updateDocumentFolder } from '../api';
+import { listDocumentsSummary, deleteDocument, deleteFolderWithDocuments, uploadDocument, createFolder, moveFolder, updateDocumentFolder, ensureFolderStructure } from '../api';
 
 // ─────────────────────────────────────────────────────────────
 // Tree Adapters (FolderItem/DocumentItem → TreeFolder/TreeFile)
@@ -127,6 +127,8 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
   // Upload modal state
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+  const [uploadFilesRelativePaths, setUploadFilesRelativePaths] = useState<Map<File, string>>(new Map());
   const [chunkSize, setChunkSize] = useState('1000');
   const [chunkOverlap, setChunkOverlap] = useState('150');
   const [useOcr, setUseOcr] = useState(false);
@@ -137,6 +139,13 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
   const [uploadProgress, setUploadProgress] = useState<UploadProgressEvent | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadSessionIdRef = useRef<string | null>(null);
+
+  // External drop confirm state
+  const [isDropConfirmOpen, setIsDropConfirmOpen] = useState(false);
+  const [pendingDropFiles, setPendingDropFiles] = useState<File[]>([]);
+  const [pendingDropRelativePaths, setPendingDropRelativePaths] = useState<Map<File, string>>(new Map());
+  const [pendingDropTargetFolder, setPendingDropTargetFolder] = useState<FolderItem | null>(null);
+  const [pendingDropTargetPath, setPendingDropTargetPath] = useState<string>('');
 
   // Create folder modal state
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
@@ -327,9 +336,184 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
     setIsUploadModalOpen(false);
     if (!uploading) {
       setUploadFile(null);
+      setUploadFiles([]);
+      setUploadFilesRelativePaths(new Map());
       setUploadProgress(null);
     }
   }, [uploading]);
+
+  // ── Multi-file upload (from external drop) ──
+  const handleUploadMultiple = useCallback(async () => {
+    if (uploadFiles.length === 0) return;
+    setUploading(true);
+    setUploadProgress(null);
+    // Auto-close modal immediately — progress shown in status panel
+    setIsUploadModalOpen(false);
+    const filesToUpload = [...uploadFiles];
+    const pathsMap = new Map(uploadFilesRelativePaths);
+    setUploadFiles([]);
+    setUploadFilesRelativePaths(new Map());
+    setUploadFile(null);
+
+    try {
+      // Create folder structure before uploading
+      const basePath = pendingDropTargetFolder?.fullPath || currentFolder?.fullPath || undefined;
+      await ensureFolderStructure(
+        pathsMap,
+        collection.collectionId,
+        collection.name,
+        collection.displayName,
+        basePath,
+      );
+
+      for (let i = 0; i < filesToUpload.length; i++) {
+        const file = filesToUpload[i];
+        const relPath = pathsMap.get(file) || '';
+
+        // Compute target folder_path
+        let targetFolderPath = pendingDropTargetFolder?.fullPath || currentFolder?.fullPath || undefined;
+        if (relPath) {
+          // Append relative path from folder structure
+          const lastSlash = relPath.lastIndexOf('/');
+          const folderPortion = lastSlash !== -1 ? relPath : relPath;
+          targetFolderPath = targetFolderPath
+            ? `${targetFolderPath}/${folderPortion}`
+            : `/${collection.displayName}/${folderPortion}`;
+        }
+
+        const sessionId = `upload-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        addSession({
+          id: sessionId,
+          fileName: file.name,
+          targetName: collection.displayName,
+          status: 'uploading',
+          totalChunks: 0,
+          processedChunks: 0,
+        });
+
+        await uploadDocument(
+          {
+            file,
+            collection_name: collection.name,
+            user_id: user?.user_id,
+            chunk_size: parseInt(chunkSize, 10) || 1000,
+            chunk_overlap: parseInt(chunkOverlap, 10) || 150,
+            use_ocr: useOcr,
+            use_llm_metadata: useLlm,
+            extract_default_metadata: useMeta,
+            force_chunking: forceChunk,
+            folder_path: targetFolderPath,
+          },
+          (evt) => {
+            setUploadProgress(evt);
+            const statusMap: Record<string, 'uploading' | 'processing' | 'embedding' | 'complete' | 'error'> = {
+              uploading: 'uploading', processing: 'processing', embedding: 'embedding', complete: 'complete', error: 'error',
+            };
+            const mappedStatus = statusMap[evt.event];
+            if (mappedStatus) {
+              updateSession(sessionId, {
+                status: mappedStatus,
+                totalChunks: evt.totalChunks ?? 0,
+                processedChunks: evt.processedChunks ?? 0,
+                ...(evt.message ? { errorMessage: evt.message } : {}),
+              });
+            }
+          },
+        );
+        updateSession(sessionId, { status: 'complete' });
+      }
+      setUploadProgress(null);
+      await loadData();
+    } catch (err) {
+      console.error('Failed to upload documents:', err);
+    } finally {
+      setUploading(false);
+      setPendingDropTargetFolder(null);
+    }
+  }, [uploadFiles, uploadFilesRelativePaths, pendingDropTargetFolder, currentFolder, collection, user, chunkSize, chunkOverlap, useOcr, useLlm, useMeta, forceChunk, loadData, addSession, updateSession]);
+
+  // ── External Drop Handlers ──
+  const handleExternalDropToFolder = useCallback((result: ExternalDropResult, targetFolder: FolderItem | null, targetPath: string) => {
+    setPendingDropFiles(result.files);
+    setPendingDropRelativePaths(result.relativePaths);
+    setPendingDropTargetFolder(targetFolder);
+    setPendingDropTargetPath(targetPath || collection.displayName);
+    setIsDropConfirmOpen(true);
+  }, [collection.displayName]);
+
+  const handleConfirmDrop = useCallback(() => {
+    setIsDropConfirmOpen(false);
+    // Move files to upload modal with pre-filled files
+    setUploadFiles(pendingDropFiles);
+    setUploadFilesRelativePaths(pendingDropRelativePaths);
+    setIsUploadModalOpen(true);
+    setPendingDropFiles([]);
+    setPendingDropRelativePaths(new Map());
+  }, [pendingDropFiles, pendingDropRelativePaths]);
+
+  const handleCancelDrop = useCallback(() => {
+    setIsDropConfirmOpen(false);
+    setPendingDropFiles([]);
+    setPendingDropRelativePaths(new Map());
+    setPendingDropTargetFolder(null);
+    setPendingDropTargetPath('');
+  }, []);
+
+  // Folder card drop highlight state
+  const [dropOverFolderCardId, setDropOverFolderCardId] = useState<number | null>(null);
+  const folderCardDragCounterRef = useRef<Map<number, number>>(new Map());
+
+  const handleFolderCardDragEnter = useCallback((e: React.DragEvent, folderId: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isExternalFileDrag(e)) return;
+    const counter = (folderCardDragCounterRef.current.get(folderId) || 0) + 1;
+    folderCardDragCounterRef.current.set(folderId, counter);
+    if (counter === 1) setDropOverFolderCardId(folderId);
+  }, []);
+
+  const handleFolderCardDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'copy';
+  }, []);
+
+  const handleFolderCardDragLeave = useCallback((e: React.DragEvent, folderId: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const counter = (folderCardDragCounterRef.current.get(folderId) || 1) - 1;
+    folderCardDragCounterRef.current.set(folderId, Math.max(0, counter));
+    if (counter <= 0) {
+      setDropOverFolderCardId(prev => prev === folderId ? null : prev);
+    }
+  }, []);
+
+  const handleFolderCardDrop = useCallback(async (e: React.DragEvent, folder: FolderItem) => {
+    e.preventDefault();
+    e.stopPropagation();
+    folderCardDragCounterRef.current.set(folder.id, 0);
+    setDropOverFolderCardId(null);
+    if (!isExternalFileDrag(e)) return;
+    const result = await extractFilesFromDataTransfer(e.dataTransfer);
+    if (result.files.length > 0) {
+      handleExternalDropToFolder(result, folder, folder.fullPath);
+    }
+  }, [handleExternalDropToFolder]);
+
+  // External drop on the right panel (cards area) → current folder
+  const { isDragOver: isCardAreaDragOver, dropHandlers: cardAreaDropHandlers } = useExternalDrop({
+    onDrop: (result) => handleExternalDropToFolder(result, currentFolder, currentFolder?.fullPath || ''),
+  });
+
+  // External drop handler for DirectoryTree
+  const handleTreeExternalDrop = useCallback((result: ExternalDropResult, targetTreeFolder: TreeFolder | null) => {
+    if (targetTreeFolder) {
+      const original = folders.find(f => f.id === targetTreeFolder.id);
+      handleExternalDropToFolder(result, original || null, original?.fullPath || '');
+    } else {
+      handleExternalDropToFolder(result, null, '');
+    }
+  }, [folders, handleExternalDropToFolder]);
 
   // ── Create Folder ──
   const handleCreateFolder = useCallback(async () => {
@@ -431,6 +615,7 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
                 loadData();
               } catch (err) { console.error('Failed to move folder:', err); }
             }}
+            onExternalFileDrop={handleTreeExternalDrop}
             title={t('documents.collection.detail.directoryTree.title')}
             fileSuffix={t('documents.collection.detail.directoryTree.filesSuffix')}
             searchPlaceholder={t('documents.collection.detail.directoryTree.searchPlaceholder')}
@@ -438,7 +623,19 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
         </div>
 
         {/* Document Cards (Right Panel) */}
-        <div className="flex-1 min-h-0 overflow-y-auto p-6">
+        <div
+          className={`flex-1 min-h-0 overflow-y-auto p-6 relative transition-colors ${isCardAreaDragOver ? 'bg-primary/5' : ''}`}
+          {...cardAreaDropHandlers}
+        >
+        {/* Drop overlay */}
+        {isCardAreaDragOver && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+            <div className="absolute inset-3 border-2 border-dashed border-primary/50 rounded-xl" />
+            <div className="bg-background/90 px-4 py-2 rounded-lg shadow-sm border border-primary/30">
+              <p className="text-sm font-medium text-primary">{t('documents.collection.detail.dropOverlay', '파일을 여기에 놓아주세요')}</p>
+            </div>
+          </div>
+        )}
         {loading ? (
           <div className="flex items-center justify-center min-h-[300px]">
             <div className="w-10 h-10 border-3 border-border border-t-primary rounded-full animate-spin" />
@@ -467,13 +664,21 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
 
               {/* Folder Cards */}
               {currentFolders.map(folder => (
-                <DocumentCard
+                <div
                   key={`folder-${folder.id}`}
-                  variant="folder"
-                  title={folder.folderName}
-                  onClick={() => handleNavigateToFolder(folder)}
-                  onDelete={() => handleDeleteFolder(folder)}
-                />
+                  className={`rounded-lg transition-all h-fit ${dropOverFolderCardId === folder.id ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+                  onDragEnter={(e) => handleFolderCardDragEnter(e, folder.id)}
+                  onDragOver={handleFolderCardDragOver}
+                  onDragLeave={(e) => handleFolderCardDragLeave(e, folder.id)}
+                  onDrop={(e) => handleFolderCardDrop(e, folder)}
+                >
+                  <DocumentCard
+                    variant="folder"
+                    title={folder.folderName}
+                    onClick={() => handleNavigateToFolder(folder)}
+                    onDelete={() => handleDeleteFolder(folder)}
+                  />
+                </div>
               ))}
 
               {/* Document Cards */}
@@ -548,7 +753,7 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
             <Button variant="outline" onClick={handleCloseUploadModal}>
               {t('documents.collection.createModal.cancel')}
             </Button>
-            <Button onClick={handleUpload} disabled={uploading || !uploadFile}>
+            <Button onClick={uploadFiles.length > 0 ? handleUploadMultiple : handleUpload} disabled={uploading || (!uploadFile && uploadFiles.length === 0)}>
               {uploading ? t('documents.collection.detail.uploadModal.uploading') : t('documents.collection.detail.uploadModal.upload')}
             </Button>
           </div>
@@ -564,15 +769,33 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
               className="hidden"
               onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
             />
-            <div
-              className="flex items-center gap-3 p-3 border border-dashed border-border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <FiUpload className="w-5 h-5 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                {uploadFile ? uploadFile.name : t('documents.collection.detail.uploadModal.selectFile')}
-              </span>
-            </div>
+            {uploadFiles.length > 0 ? (
+              <div className="max-h-32 overflow-y-auto border border-border rounded-lg p-2 space-y-1">
+                {uploadFiles.map((file, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <FiFileText className="w-3 h-3 shrink-0" />
+                    <span className="truncate flex-1">{file.name}</span>
+                    <button
+                      className="shrink-0 text-muted-foreground hover:text-destructive transition-colors"
+                      onClick={() => setUploadFiles(prev => prev.filter((_, i) => i !== idx))}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+                <p className="text-xs text-muted-foreground text-center pt-1">{uploadFiles.length}{t('documents.collection.detail.uploadModal.fileCount', '개 파일')}</p>
+              </div>
+            ) : (
+              <div
+                className="flex items-center gap-3 p-3 border border-dashed border-border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <FiUpload className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
+                  {uploadFile ? uploadFile.name : t('documents.collection.detail.uploadModal.selectFile')}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Chunk Size & Overlap */}
@@ -672,6 +895,48 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
             onChange={(e) => setNewFolderName(e.target.value)}
             placeholder={t('documents.collection.detail.createFolderModal.namePlaceholder')}
           />
+        </div>
+      </Modal>
+
+      {/* Drop Confirm Modal */}
+      <Modal
+        isOpen={isDropConfirmOpen}
+        onClose={handleCancelDrop}
+        title={t('documents.collection.detail.dropConfirm.title', '파일 업로드 확인')}
+        size="sm"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCancelDrop}>
+              {t('documents.collection.createModal.cancel')}
+            </Button>
+            <Button onClick={handleConfirmDrop}>
+              {t('documents.collection.detail.dropConfirm.confirm', '임베딩 설정')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-3">
+          <p className="text-sm text-foreground">
+            {pendingDropTargetPath || collection.displayName} {t('documents.collection.detail.dropConfirm.pathSuffix', '경로에')} {pendingDropFiles.length}{t('documents.collection.detail.dropConfirm.fileCountSuffix', '개의 파일을 업로드합니다.')}
+          </p>
+          {pendingDropFiles.length > 0 && (
+            <div className="max-h-40 overflow-y-auto border border-border rounded-lg p-2 space-y-1">
+              {pendingDropFiles.slice(0, 20).map((file, idx) => (
+                <div key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <FiFileText className="w-3 h-3 shrink-0" />
+                  <span className="truncate">{file.name}</span>
+                </div>
+              ))}
+              {pendingDropFiles.length > 20 && (
+                <p className="text-xs text-muted-foreground text-center pt-1">
+                  ... 외 {pendingDropFiles.length - 20}개 파일
+                </p>
+              )}
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">
+            {t('documents.collection.detail.dropConfirm.hint', '확인 버튼을 누르면 임베딩 옵션을 설정할 수 있습니다.')}
+          </p>
         </div>
       </Modal>
     </div>

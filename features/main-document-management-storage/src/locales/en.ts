@@ -42,8 +42,29 @@ export const en: TranslationData = {
       verify: 'Verify',
       verifying: 'Verifying...',
     },
+    dropOverlay: 'Drop files to upload to storage',
+    dropConfirm: {
+      title: 'Upload Confirmation',
+      upload: 'Upload',
+      uploading: 'Uploading...',
+      storageSuffix: 'storage:',
+      fileCountSuffix: ' file(s) will be uploaded.',
+    },
+    dropSelect: {
+      title: 'Select Storage',
+      description: 'Select a storage to upload the files to.',
+      createNew: 'Create New Storage',
+    },
     detail: {
       empty: 'No files',
+      dropOverlay: 'Drop files here',
+      dropConfirm: {
+        title: 'Upload Confirmation',
+        upload: 'Upload',
+        pathSuffix: 'path:',
+        fileCountSuffix: ' file(s) will be uploaded.',
+        moreFiles: ' more files',
+      },
       error: {
         loadFailed: 'Failed to load files',
       },
