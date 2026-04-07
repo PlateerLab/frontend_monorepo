@@ -3,29 +3,20 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { MypageSidebar } from '@xgen/sidebar-mypage';
-import { mypageSidebarConfig } from '@xgen/sidebar-mypage';
 import { useTranslation } from '@xgen/i18n';
 import { AuthGuard, useAuth } from '@xgen/auth-provider';
 import { ContentArea } from '@xgen/ui';
+import { initializeMypageFeatures, getMypageRouteComponent, getMypageSidebarSections } from '@/features/mypage-feature-registry';
 import styles from './MypagePage.module.scss';
 
 // Register mypage i18n translations
 import '@xgen/mypage-profile/src/locales';
 
-// Lazy-loaded content components
-import { ProfileView } from '@xgen/mypage-profile/src/components/ProfileView';
-import { ProfileEdit } from '@xgen/mypage-profile/src/components/ProfileEdit';
-
 // ─────────────────────────────────────────────────────────────
-// Valid section IDs
+// Constants
 // ─────────────────────────────────────────────────────────────
 
-const ALL_SECTION_IDS = mypageSidebarConfig.flatMap((s) => s.items.map((i) => i.id));
 const DEFAULT_SECTION = 'profile';
-
-function isValidSection(id: string | null): id is string {
-  return id !== null && ALL_SECTION_IDS.includes(id);
-}
 
 // ─────────────────────────────────────────────────────────────
 // Loading Component
@@ -60,21 +51,6 @@ const PlaceholderSection: React.FC = () => {
 };
 
 // ─────────────────────────────────────────────────────────────
-// Section renderer
-// ─────────────────────────────────────────────────────────────
-
-function getSectionComponent(section: string): React.ComponentType | null {
-  switch (section) {
-    case 'profile':
-      return ProfileView;
-    case 'profile-edit':
-      return ProfileEdit;
-    default:
-      return null;
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
 // MypagePageContent (uses useSearchParams)
 // ─────────────────────────────────────────────────────────────
 
@@ -83,22 +59,38 @@ function MypagePageContent() {
   const searchParams = useSearchParams();
   const { user, logout, hasAccessToSection } = useAuth();
 
+  const [initialized, setInitialized] = useState(false);
   const [activeSection, setActiveSection] = useState<string>(DEFAULT_SECTION);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [CurrentComponent, setCurrentComponent] = useState<React.ComponentType | null>(null);
+  const [CurrentComponent, setCurrentComponent] = useState<React.ComponentType<any> | null>(null);
+  const [sections, setSections] = useState<{ id: string; titleKey: string; items: any[] }[]>([]);
+
+  // Initialize mypage features on mount
+  useEffect(() => {
+    async function init() {
+      await initializeMypageFeatures();
+      setSections(getMypageSidebarSections());
+      setInitialized(true);
+    }
+    init();
+  }, []);
 
   // Sync with URL ?view= param
   useEffect(() => {
+    if (!initialized) return;
+
     const view = searchParams.get('view');
-    const target = isValidSection(view) ? view : DEFAULT_SECTION;
+    const target = view || DEFAULT_SECTION;
     setActiveSection(target);
-    setCurrentComponent(() => getSectionComponent(target));
-  }, [searchParams]);
+
+    const component = getMypageRouteComponent(target);
+    setCurrentComponent(() => component || null);
+  }, [initialized, searchParams]);
 
   const handleItemClick = useCallback((itemId: string) => {
-    if (!ALL_SECTION_IDS.includes(itemId)) return;
     setActiveSection(itemId);
-    setCurrentComponent(() => getSectionComponent(itemId));
+    const component = getMypageRouteComponent(itemId);
+    setCurrentComponent(() => component || null);
     router.push(`/mypage?view=${itemId}`, { scroll: false });
   }, [router]);
 
@@ -116,9 +108,14 @@ function MypagePageContent() {
 
   const showAdmin = hasAccessToSection('admin-page');
 
+  if (!initialized) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <div className={styles.container}>
       <MypageSidebar
+        sections={sections}
         isOpen={sidebarOpen}
         onToggle={handleSidebarToggle}
         activeItem={activeSection}

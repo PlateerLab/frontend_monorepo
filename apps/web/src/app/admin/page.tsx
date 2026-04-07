@@ -6,7 +6,7 @@ import { AdminSidebar } from '@xgen/sidebar-admin';
 import { useTranslation } from '@xgen/i18n';
 import { AuthGuard, useAuth } from '@xgen/auth-provider';
 import { ContentArea } from '@xgen/ui';
-import { initializeAdminFeatures, getAdminRouteComponent } from '@/features/admin-feature-registry';
+import { initializeAdminFeatures, getAdminRouteComponent, getAdminSidebarSections } from '@/features/admin-feature-registry';
 import styles from './AdminPage.module.scss';
 
 // ─────────────────────────────────────────────────────────────
@@ -52,11 +52,13 @@ function AdminPageContent() {
   const [activeItemId, setActiveItemId] = useState<string>(DEFAULT_ADMIN_VIEW);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [CurrentComponent, setCurrentComponent] = useState<React.ComponentType<any> | null>(null);
+  const [sections, setSections] = useState<{ id: string; titleKey: string; items: any[] }[]>([]);
 
   // Initialize admin features on mount
   useEffect(() => {
     async function init() {
       await initializeAdminFeatures();
+      setSections(getAdminSidebarSections());
       setInitialized(true);
     }
     init();
@@ -109,6 +111,7 @@ function AdminPageContent() {
   return (
     <div className={styles.container}>
       <AdminSidebar
+        sections={sections}
         isOpen={sidebarOpen}
         onToggle={handleSidebarToggle}
         activeItem={activeItemId}

@@ -354,6 +354,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-prompt-store',
   name: 'AdminPromptStorePage',
   adminSection: 'admin-workflow',
+  sidebarItems: [
+    { id: 'admin-prompt-store', titleKey: 'admin.sidebar.workflow.promptStore.title', descriptionKey: 'admin.sidebar.workflow.promptStore.description' },
+  ],
   routes: {
     'admin-prompt-store': AdminPromptStorePage,
   },

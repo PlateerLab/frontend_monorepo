@@ -216,6 +216,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-user-create',
   name: 'AdminUserCreatePage',
   adminSection: 'admin-user',
+  sidebarItems: [
+    { id: 'admin-user-create', titleKey: 'admin.sidebar.user.userCreate.title', descriptionKey: 'admin.sidebar.user.userCreate.description' },
+  ],
   routes: {
     'admin-user-create': AdminUserCreatePage,
   },

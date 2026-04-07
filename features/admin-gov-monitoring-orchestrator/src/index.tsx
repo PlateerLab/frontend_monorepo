@@ -69,6 +69,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-gov-monitoring-orchestrator',
   name: 'GovMonitoringOrchestrator',
   adminSection: 'admin-governance',
+  sidebarItems: [
+    { id: 'admin-gov-monitoring', titleKey: 'admin.sidebar.governance.monitoring.title', descriptionKey: 'admin.sidebar.governance.monitoring.description' },
+  ],
   routes: {
     'admin-gov-monitoring': GovMonitoringPage,
   },

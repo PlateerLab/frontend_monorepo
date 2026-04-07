@@ -21,7 +21,7 @@ import {
   SidebarPopover,
   type PopoverItem,
 } from '@xgen/ui';
-import { mypageSidebarConfig, toSidebarSections } from './mypageSidebarConfig';
+import type { SidebarSection } from '@xgen/types';
 
 // ─────────────────────────────────────────────────────────────
 // Mypage Sidebar Section Icons (Feather style — matching admin)
@@ -46,6 +46,8 @@ const SECTION_ICONS: Record<string, React.ReactNode> = {
 // ─────────────────────────────────────────────────────────────
 
 export interface MypageSidebarProps {
+  /** Feature registry에서 동적으로 빌드된 섹션 목록 */
+  sections: SidebarSection[];
   isOpen: boolean;
   onToggle: () => void;
   activeItem: string;
@@ -60,6 +62,7 @@ export interface MypageSidebarProps {
 }
 
 export const MypageSidebar: React.FC<MypageSidebarProps> = ({
+  sections,
   isOpen,
   onToggle,
   activeItem,
@@ -73,8 +76,6 @@ export const MypageSidebar: React.FC<MypageSidebarProps> = ({
   className,
 }) => {
   const { t } = useTranslation();
-
-  const sections = useMemo(() => toSidebarSections(mypageSidebarConfig), []);
 
   // Only 1 section open at a time (accordion)
   const [expandedSection, setExpandedSection] = useState<string | null>(null);

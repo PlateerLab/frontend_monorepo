@@ -1872,10 +1872,15 @@
         "noSettings": "설정이 없습니다.",
         "categories": {
           "database": "데이터베이스",
-          "application": "애플리케이션",
+          "app": "애플리케이션",
           "workflow": "워크플로우",
           "node": "노드",
-          "vectorDatabase": "벡터 DB",
+          "vectordb": "벡터 DB",
+          "openai": "OpenAI",
+          "gemini": "Gemini",
+          "anthropic": "Anthropic",
+          "aws": "AWS",
+          "vision_language": "비전/언어",
           "other": "기타"
         }
       },

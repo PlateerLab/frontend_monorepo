@@ -242,12 +242,40 @@ export interface AdminFeatureModule {
   name: string;
   /** Admin 사이드바 섹션 */
   adminSection: AdminSidebarSectionId;
+  /** 사이드바 메뉴 아이템들 (Feature가 자신의 sidebar 항목을 선언) */
+  sidebarItems: SidebarItem[];
   /** 라우트 맵 (sidebarItem.id → 컴포넌트) */
   routes: Record<string, ComponentType<RouteComponentProps>>;
   /** 인증 필수 여부 */
   requiresAuth?: boolean;
   /** 필요 권한 목록 */
   permissions?: string[];
+}
+
+// ─────────────────────────────────────────────────────────────
+// Mypage Feature Module
+// /mypage 페이지에 등록되는 Feature 인터페이스
+// ─────────────────────────────────────────────────────────────
+
+/** Mypage 사이드바 섹션 ID */
+export type MypageSidebarSectionId =
+  | 'mypage-profile'
+  | 'mypage-settings'
+  | string;
+
+export interface MypageFeatureModule {
+  /** Feature 고유 ID (디렉토리명과 동일해야 함) */
+  id: string;
+  /** Feature 표시 이름 */
+  name: string;
+  /** Mypage 사이드바 섹션 */
+  mypageSection: MypageSidebarSectionId;
+  /** 사이드바 메뉴 아이템들 */
+  sidebarItems: SidebarItem[];
+  /** 라우트 맵 (sidebarItem.id → 컴포넌트) */
+  routes: Record<string, ComponentType<RouteComponentProps>>;
+  /** 인증 필수 여부 */
+  requiresAuth?: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1335,6 +1363,7 @@ class FeatureRegistryClass {
   private features: Map<string, FeatureModule> = new Map();
   private mainFeatures: Map<string, MainFeatureModule> = new Map();
   private adminFeatures: Map<string, AdminFeatureModule> = new Map();
+  private mypageFeatures: Map<string, MypageFeatureModule> = new Map();
   private introductionPlugins: Map<string, IntroductionSectionPlugin> = new Map();
   private dashboardPlugins: Map<string, DashboardPlugin> = new Map();
   private storageListPlugins: Map<string, StorageListPlugin> = new Map();
@@ -1401,6 +1430,33 @@ class FeatureRegistryClass {
   /** 모든 admin feature의 route를 flat하게 반환 */
   getAdminRouteComponent(itemId: string): ComponentType<RouteComponentProps> | undefined {
     for (const feature of this.adminFeatures.values()) {
+      if (feature.routes[itemId]) {
+        return feature.routes[itemId];
+      }
+    }
+    return undefined;
+  }
+
+  // ── MypageFeatureModule ──
+  registerMypageFeature(feature: MypageFeatureModule): void {
+    this.mypageFeatures.set(feature.id, feature);
+  }
+
+  getMypageFeature(id: string): MypageFeatureModule | undefined {
+    return this.mypageFeatures.get(id);
+  }
+
+  getMypageFeatures(): MypageFeatureModule[] {
+    return Array.from(this.mypageFeatures.values());
+  }
+
+  getMypageFeaturesBySection(section: MypageSidebarSectionId): MypageFeatureModule[] {
+    return this.getMypageFeatures().filter(f => f.mypageSection === section);
+  }
+
+  /** 모든 mypage feature의 route를 flat하게 반환 */
+  getMypageRouteComponent(itemId: string): ComponentType<RouteComponentProps> | undefined {
+    for (const feature of this.mypageFeatures.values()) {
       if (feature.routes[itemId]) {
         return feature.routes[itemId];
       }

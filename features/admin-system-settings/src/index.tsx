@@ -138,6 +138,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-system-settings',
   name: 'AdminSystemSettingsPage',
   adminSection: 'admin-setting',
+  sidebarItems: [
+    { id: 'admin-system-settings', titleKey: 'admin.sidebar.setting.systemSettings.title', descriptionKey: 'admin.sidebar.setting.systemSettings.description' },
+  ],
   routes: {
     'admin-system-settings': AdminSystemSettingsPage,
   },

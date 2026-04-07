@@ -745,6 +745,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-gov-audit-tracking',
   name: 'AdminGovAuditTrackingPage',
   adminSection: 'admin-governance',
+  sidebarItems: [
+    { id: 'admin-gov-audit-tracking', titleKey: 'admin.sidebar.governance.auditTracking.title', descriptionKey: 'admin.sidebar.governance.auditTracking.description' },
+  ],
   routes: {
     'admin-gov-audit-tracking': AdminGovAuditTrackingPage,
   },

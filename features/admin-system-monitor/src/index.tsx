@@ -155,6 +155,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-system-monitor',
   name: 'AdminSystemMonitorPage',
   adminSection: 'admin-system',
+  sidebarItems: [
+    { id: 'admin-system-monitor', titleKey: 'admin.sidebar.system.systemMonitor.title', descriptionKey: 'admin.sidebar.system.systemMonitor.description' },
+  ],
   routes: {
     'admin-system-monitor': AdminSystemMonitorPage,
   },

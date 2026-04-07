@@ -283,6 +283,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-node-management',
   name: 'AdminNodeManagementPage',
   adminSection: 'admin-workflow',
+  sidebarItems: [
+    { id: 'admin-node-management', titleKey: 'admin.sidebar.workflow.nodeManagement.title', descriptionKey: 'admin.sidebar.workflow.nodeManagement.description' },
+  ],
   routes: {
     'admin-node-management': AdminNodeManagementPage,
   },

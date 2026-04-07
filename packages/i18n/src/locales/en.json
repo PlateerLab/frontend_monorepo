@@ -1872,10 +1872,15 @@
         "noSettings": "No settings found.",
         "categories": {
           "database": "Database",
-          "application": "Application",
+          "app": "Application",
           "workflow": "Workflow",
           "node": "Node",
-          "vectorDatabase": "Vector DB",
+          "vectordb": "Vector DB",
+          "openai": "OpenAI",
+          "gemini": "Gemini",
+          "anthropic": "Anthropic",
+          "aws": "AWS",
+          "vision_language": "Vision/Language",
           "other": "Other"
         }
       },

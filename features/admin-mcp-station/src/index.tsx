@@ -581,6 +581,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-mcp-station',
   name: 'AdminMcpStationPage',
   adminSection: 'admin-mcp',
+  sidebarItems: [
+    { id: 'admin-mcp-station', titleKey: 'admin.sidebar.mcp.mcpStation.title', descriptionKey: 'admin.sidebar.mcp.mcpStation.description' },
+  ],
   routes: {
     'admin-mcp-station': AdminMcpStationPage,
   },

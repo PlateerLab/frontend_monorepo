@@ -1380,6 +1380,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-gov-control-policy',
   name: 'AdminGovControlPolicyPage',
   adminSection: 'admin-governance',
+  sidebarItems: [
+    { id: 'admin-gov-control-policy', titleKey: 'admin.sidebar.governance.controlPolicy.title', descriptionKey: 'admin.sidebar.governance.controlPolicy.description' },
+  ],
   routes: {
     'admin-gov-control-policy': AdminGovControlPolicyPage,
   },

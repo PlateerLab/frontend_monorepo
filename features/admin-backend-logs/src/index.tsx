@@ -236,6 +236,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-backend-logs',
   name: 'AdminBackendLogsPage',
   adminSection: 'admin-system',
+  sidebarItems: [
+    { id: 'admin-backend-logs', titleKey: 'admin.sidebar.system.backendLogs.title', descriptionKey: 'admin.sidebar.system.backendLogs.description' },
+  ],
   routes: {
     'admin-backend-logs': AdminBackendLogsPage,
   },

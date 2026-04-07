@@ -395,6 +395,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-workflow-store',
   name: 'AdminWorkflowStorePage',
   adminSection: 'admin-workflow',
+  sidebarItems: [
+    { id: 'admin-workflow-store', titleKey: 'admin.sidebar.workflow.workflowStore.title', descriptionKey: 'admin.sidebar.workflow.workflowStore.description' },
+  ],
   routes: {
     'admin-workflow-store': AdminWorkflowStorePage,
   },

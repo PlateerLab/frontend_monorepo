@@ -452,6 +452,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-database',
   name: 'AdminDatabasePage',
   adminSection: 'admin-data',
+  sidebarItems: [
+    { id: 'admin-database', titleKey: 'admin.sidebar.data.database.title', descriptionKey: 'admin.sidebar.data.database.description' },
+  ],
   routes: {
     'admin-database': AdminDatabasePage,
   },

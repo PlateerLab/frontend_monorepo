@@ -88,6 +88,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-system-health',
   name: 'AdminSystemHealthPage',
   adminSection: 'admin-system',
+  sidebarItems: [
+    { id: 'admin-system-health', titleKey: 'admin.sidebar.system.systemHealth.title', descriptionKey: 'admin.sidebar.system.systemHealth.description' },
+  ],
   routes: {
     'admin-system-health': AdminSystemHealthPage,
   },

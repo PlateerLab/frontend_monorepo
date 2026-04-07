@@ -1041,6 +1041,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-gov-risk-management',
   name: 'AdminGovRiskManagementPage',
   adminSection: 'admin-governance',
+  sidebarItems: [
+    { id: 'admin-gov-risk-management', titleKey: 'admin.sidebar.governance.riskReview.title', descriptionKey: 'admin.sidebar.governance.riskReview.description' },
+  ],
   routes: {
     'admin-gov-risk-management': AdminGovRiskManagementPage,
   },

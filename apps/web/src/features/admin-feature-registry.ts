@@ -3,10 +3,31 @@
  *
  * Centralizes all admin page features. Follows the same pattern as
  * featureRegistry.ts but for /admin route features.
+ * Feature 중심 동적 빌드 — 각 feature module이 sidebarItems를 선언.
  */
 
-import type { AdminFeatureModule } from '@xgen/types';
+import type { AdminFeatureModule, SidebarItem, AdminSidebarSectionId } from '@xgen/types';
 import { FeatureRegistry as CoreRegistry } from '@xgen/types';
+
+// ─────────────────────────────────────────────────────────────
+// Admin Section Order & Metadata
+// getSidebarSections()에서 섹션 순서 및 titleKey 결정
+// ─────────────────────────────────────────────────────────────
+
+interface AdminSectionMeta {
+  id: AdminSidebarSectionId;
+  titleKey: string;
+}
+
+const ADMIN_SECTION_ORDER: AdminSectionMeta[] = [
+  { id: 'admin-user', titleKey: 'admin.sidebar.sections.user' },
+  { id: 'admin-workflow', titleKey: 'admin.sidebar.sections.workflow' },
+  { id: 'admin-setting', titleKey: 'admin.sidebar.sections.setting' },
+  { id: 'admin-system', titleKey: 'admin.sidebar.sections.system' },
+  { id: 'admin-data', titleKey: 'admin.sidebar.sections.data' },
+  { id: 'admin-mcp', titleKey: 'admin.sidebar.sections.mcp' },
+  { id: 'admin-governance', titleKey: 'admin.sidebar.sections.governance' },
+];
 
 // ─────────────────────────────────────────────────────────────
 // Admin Feature Initialization
@@ -95,4 +116,38 @@ export async function initializeAdminFeatures(): Promise<void> {
  */
 export function getAdminRouteComponent(itemId: string) {
   return CoreRegistry.getAdminRouteComponent(itemId);
+}
+
+/**
+ * Admin 사이드바 섹션을 Feature 기반으로 동적 빌드.
+ * Main의 featureRegistry.getSidebarSections()와 동일한 패턴.
+ * 등록된 AdminFeatureModule들의 sidebarItems를 adminSection별로 그룹핑.
+ */
+export function getAdminSidebarSections(): { id: string; titleKey: string; items: SidebarItem[] }[] {
+  const sectionMap = new Map<string, SidebarItem[]>();
+
+  // 섹션 순서대로 초기화
+  ADMIN_SECTION_ORDER.forEach(({ id }) => {
+    sectionMap.set(id, []);
+  });
+
+  // 등록된 feature들의 sidebarItems를 해당 섹션에 추가
+  CoreRegistry.getAdminFeatures().forEach((feature) => {
+    const items = sectionMap.get(feature.adminSection);
+    if (items && feature.sidebarItems) {
+      items.push(...feature.sidebarItems);
+    }
+  });
+
+  // 빈 섹션 필터링 후 반환
+  return ADMIN_SECTION_ORDER
+    .filter(({ id }) => {
+      const items = sectionMap.get(id);
+      return items && items.length > 0;
+    })
+    .map(({ id, titleKey }) => ({
+      id,
+      titleKey,
+      items: sectionMap.get(id) || [],
+    }));
 }

@@ -436,6 +436,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-group-permissions',
   name: 'AdminGroupPermissionsPage',
   adminSection: 'admin-user',
+  sidebarItems: [
+    { id: 'admin-group-permissions', titleKey: 'admin.sidebar.user.groupPermissions.title', descriptionKey: 'admin.sidebar.user.groupPermissions.description' },
+  ],
   routes: {
     'admin-group-permissions': AdminGroupPermissionsPage,
   },

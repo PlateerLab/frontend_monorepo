@@ -240,6 +240,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-mcp-market',
   name: 'AdminMcpMarketPage',
   adminSection: 'admin-mcp',
+  sidebarItems: [
+    { id: 'admin-mcp-market', titleKey: 'admin.sidebar.mcp.mcpMarket.title', descriptionKey: 'admin.sidebar.mcp.mcpMarket.description' },
+  ],
   routes: {
     'admin-mcp-market': AdminMcpMarketPage,
   },

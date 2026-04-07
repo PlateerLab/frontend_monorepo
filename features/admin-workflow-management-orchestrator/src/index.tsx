@@ -124,6 +124,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-workflow-management-orchestrator',
   name: 'WorkflowManagementOrchestrator',
   adminSection: 'admin-workflow',
+  sidebarItems: [
+    { id: 'admin-workflow-management', titleKey: 'admin.sidebar.workflow.workflowManagement.title', descriptionKey: 'admin.sidebar.workflow.workflowManagement.description' },
+  ],
   routes: {
     'admin-workflow-management': WorkflowManagementOrchestrator,
   },

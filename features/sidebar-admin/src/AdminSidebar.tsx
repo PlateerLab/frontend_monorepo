@@ -21,7 +21,7 @@ import {
   SidebarPopover,
   type PopoverItem,
 } from '@xgen/ui';
-import { adminSidebarConfig, toSidebarSections } from './adminSidebarConfig';
+import type { SidebarSection } from '@xgen/types';
 
 // ─────────────────────────────────────────────────────────────
 // Admin Sidebar Section Icons (원본으로부터 가져옴)
@@ -70,6 +70,8 @@ const SECTION_ICONS: Record<string, React.ReactNode> = {
 // ─────────────────────────────────────────────────────────────
 
 export interface AdminSidebarProps {
+  /** Feature registry에서 동적으로 빌드된 섹션 목록 */
+  sections: SidebarSection[];
   isOpen: boolean;
   onToggle: () => void;
   activeItem: string;
@@ -85,6 +87,7 @@ export interface AdminSidebarProps {
 }
 
 export const AdminSidebar: React.FC<AdminSidebarProps> = ({
+  sections,
   isOpen,
   onToggle,
   activeItem,
@@ -100,8 +103,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 }) => {
   const { t } = useTranslation();
   const [showLangPopover, setShowLangPopover] = React.useState(false);
-
-  const sections = useMemo(() => toSidebarSections(adminSidebarConfig), []);
 
   // Only 1 section open at a time (accordion)
   const [expandedSection, setExpandedSection] = useState<string | null>(null);

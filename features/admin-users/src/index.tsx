@@ -302,6 +302,9 @@ const feature: AdminFeatureModule = {
   id: 'admin-users',
   name: 'AdminUsersPage',
   adminSection: 'admin-user',
+  sidebarItems: [
+    { id: 'admin-users', titleKey: 'admin.sidebar.user.users.title', descriptionKey: 'admin.sidebar.user.users.description' },
+  ],
   routes: {
     'admin-users': AdminUsersPage,
   },

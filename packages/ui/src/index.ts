@@ -150,6 +150,9 @@ export type { SearchInputProps } from './inputs/search-input';
 export { FilterTabs } from './inputs/filter-tabs';
 export type { FilterTabsProps, FilterTab } from './inputs/filter-tabs';
 
+export { ScrollableFilterTabs } from './inputs/scrollable-filter-tabs';
+export type { ScrollableFilterTabsProps } from './inputs/scrollable-filter-tabs';
+
 export { FormField } from './inputs/form-field';
 export type { FormFieldProps } from './inputs/form-field';
 
