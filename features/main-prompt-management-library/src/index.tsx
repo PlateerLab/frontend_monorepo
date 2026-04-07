@@ -271,18 +271,18 @@ export const PromptLibrary: React.FC<PromptLibraryProps> = ({ onNavigate, onSubT
           <Button
             variant="outline"
             size="sm"
-            onClick={fetchPrompts}
-            disabled={loading}
-          >
-            <FiRefreshCw className={loading ? 'animate-spin' : ''} />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
             onClick={() => setUploadModalOpen(true)}
             title={t('promptManagementLibrary.upload.title')}
           >
             <FiUpload />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fetchPrompts}
+            disabled={loading}
+          >
+            <FiRefreshCw className={loading ? 'animate-spin' : ''} />
           </Button>
         </div>
       </div>,

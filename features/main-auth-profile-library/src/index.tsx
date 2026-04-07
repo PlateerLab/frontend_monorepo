@@ -264,11 +264,11 @@ export const AuthProfileLibrary: React.FC<AuthProfileLibraryProps> = ({
             size="sm"
             showClear
           />
-          <Button variant="outline" size="sm" onClick={fetchStoreProfiles} disabled={loading}>
-            <FiRefreshCw className={loading ? 'animate-spin' : ''} />
-          </Button>
           <Button variant="outline" size="sm" onClick={() => setIsUploadModalOpen(true)}>
             <FiUpload />
+          </Button>
+          <Button variant="outline" size="sm" onClick={fetchStoreProfiles} disabled={loading}>
+            <FiRefreshCw className={loading ? 'animate-spin' : ''} />
           </Button>
         </div>
       </div>,
