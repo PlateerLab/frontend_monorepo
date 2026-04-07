@@ -20,6 +20,10 @@ export interface MainSidebarProps {
   onNavigate: (itemId: string, href?: string) => void;
   /** Toggle sidebar */
   onToggle: () => void;
+  /** Current locale */
+  locale?: string;
+  /** Locale change handler */
+  onLocaleChange?: (locale: string) => void;
   /** Logout handler */
   onLogout: () => void;
   /** Admin page click handler (shows admin button when passed) */
@@ -36,6 +40,8 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({
   collapsed,
   userName,
   isAdmin,
+  locale,
+  onLocaleChange,
   onNavigate,
   onToggle,
   onLogout,
@@ -49,6 +55,8 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({
     collapsed,
     userName,
     isAdmin,
+    locale,
+    onLocaleChange,
     onNavigate,
     onToggle,
     onLogout,

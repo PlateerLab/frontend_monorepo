@@ -39,6 +39,8 @@ export const commonKo: TranslationData = {
     share: '공유',
     export: '내보내기',
     import: '가져오기',
+    language: '언어 설정',
+    adminPage: '관리자 페이지',
   },
   toast: {
     logoutSuccess: '로그아웃되었습니다.',

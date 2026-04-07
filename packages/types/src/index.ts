@@ -124,6 +124,10 @@ export interface SidebarConfig {
   support?: SidebarSupport;
   /** 사용자 프로필 */
   user?: SidebarUserProfile;
+  /** 현재 로케일 */
+  locale?: string;
+  /** 로케일 변경 핸들러 */
+  onLocaleChange?: (locale: string) => void;
   /** 로그아웃 핸들러 */
   onLogout?: () => void;
   /** 사용자 프로필 클릭 핸들러 (마이페이지 이동) */

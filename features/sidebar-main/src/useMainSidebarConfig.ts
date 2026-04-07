@@ -21,6 +21,8 @@ interface UseMainSidebarConfigOptions {
   collapsed: boolean;
   userName?: string;
   isAdmin?: boolean;
+  locale?: string;
+  onLocaleChange?: (locale: string) => void;
   onNavigate: (itemId: string, href?: string) => void;
   onToggle: () => void;
   onLogout: () => void;
@@ -40,6 +42,8 @@ export function useMainSidebarConfig({
   collapsed,
   userName,
   isAdmin,
+  locale,
+  onLocaleChange,
   onNavigate,
   onToggle,
   onLogout,
@@ -86,6 +90,8 @@ export function useMainSidebarConfig({
         name: userName || 'User',
         role: isAdmin ? 'Admin' : 'Member',
       },
+      locale,
+      onLocaleChange,
       onNavigate,
       onLogoClick: () => onNavigate('main-dashboard'),
       onLogout,
@@ -95,6 +101,6 @@ export function useMainSidebarConfig({
       activeItemId,
       variant: 'main',
     }),
-    [sidebarSections, activeItemId, collapsed, userName, isAdmin, onNavigate, onToggle, onLogout, onAdminClick, onUserClick],
+    [sidebarSections, activeItemId, collapsed, userName, isAdmin, locale, onLocaleChange, onNavigate, onToggle, onLogout, onAdminClick, onUserClick],
   );
 }
