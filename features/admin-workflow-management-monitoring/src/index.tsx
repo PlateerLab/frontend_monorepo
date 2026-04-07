@@ -104,6 +104,7 @@ const MonitoringTab: React.FC<WorkflowMgmtTabPluginProps> = ({ selectedWorkflow,
           tabs={subTabs}
           activeKey={subTab}
           onChange={(key) => setSubTab(key as SubTab)}
+          variant="underline"
         />
       </div>
     );

@@ -99,7 +99,6 @@ const WorkflowManagementOrchestrator: React.FC<RouteComponentProps> = () => {
           tabs={tabs}
           activeKey={effectiveTab}
           onChange={handleTabChange}
-          variant="underline"
         />
       }
       subToolbar={subToolbarContent}

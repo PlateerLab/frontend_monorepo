@@ -220,6 +220,7 @@ const AdminNodeManagementPage: React.FC<RouteComponentProps> = () => {
               tabs={viewTabs}
               activeKey={viewMode}
               onChange={(key) => setViewMode(key as ViewMode)}
+              variant="underline"
             />
             <SearchInput
               value={search}

@@ -279,6 +279,7 @@ const AdminWorkflowStorePage: React.FC<RouteComponentProps> = () => {
             tabs={filterTabs}
             activeKey={filter}
             onChange={(key) => setFilter(key as FilterMode)}
+            variant="underline"
           />
           <SearchInput
             value={search}

@@ -203,7 +203,7 @@ const AdminSystemConfigPage: React.FC<RouteComponentProps> = () => {
           tabs={filterTabs}
           activeKey={filter}
           onChange={setFilter}
-          variant="pills"
+          variant="underline"
           size="sm"
         />
       }

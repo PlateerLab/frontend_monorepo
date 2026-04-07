@@ -214,7 +214,7 @@ const AdminMcpMarketPage: React.FC<RouteComponentProps> = () => {
           tabs={categoryTabs}
           activeKey={category}
           onChange={setCategory}
-          variant="pills"
+          variant="underline"
         />
       }
       footer={

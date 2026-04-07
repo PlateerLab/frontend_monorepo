@@ -45,7 +45,6 @@ const GovMonitoringPage: React.FC<RouteComponentProps> = () => {
           tabs={tabs}
           activeKey={activeTab}
           onChange={handleTabChange}
-          variant="underline"
         />
       }
       subToolbar={subToolbarContent}

@@ -280,21 +280,21 @@ const AdminPromptStorePage: React.FC<RouteComponentProps> = () => {
               tabs={languageTabs}
               activeKey={languageFilter}
               onChange={(key) => setLanguageFilter(key as LanguageFilter)}
-              variant="pills"
+              variant="underline"
             />
             <div className="h-5 w-px bg-border" />
             <FilterTabs
               tabs={typeTabs}
               activeKey={typeFilter}
               onChange={(key) => setTypeFilter(key as TypeFilter)}
-              variant="pills"
+              variant="underline"
             />
             <div className="h-5 w-px bg-border" />
             <FilterTabs
               tabs={visibilityTabs}
               activeKey={visibilityFilter}
               onChange={(key) => setVisibilityFilter(key as VisibilityFilter)}
-              variant="pills"
+              variant="underline"
             />
           </div>
           <SearchInput
