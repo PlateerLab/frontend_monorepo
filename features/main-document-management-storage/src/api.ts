@@ -67,7 +67,7 @@ function transformStorage(raw: StorageAPIResponse): FileStorageItem {
 // Helpers
 // ─────────────────────────────────────────────────────────────
 
-async function sha256(text: string): Promise<string> {
+export async function sha256(text: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(text);
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
@@ -144,6 +144,19 @@ export function getStorageSessionToken(storageId: number): string | null {
     return null;
   }
   return entry.token;
+}
+
+export async function updateStorage(
+  storageId: number,
+  data: {
+    storage_name?: string;
+    is_shared?: boolean;
+    is_secured?: boolean;
+    password_hash?: string | null;
+  }
+): Promise<void> {
+  const api = createApiClient();
+  await api.put('/api/storage/storages', { storage_id: storageId, ...data });
 }
 
 export async function deleteStorage(storageId: number): Promise<void> {
