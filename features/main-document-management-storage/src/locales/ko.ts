@@ -46,6 +46,7 @@ export const ko: TranslationData = {
       currentPasswordPlaceholder: '현재 비밀번호를 입력하세요',
       currentPasswordRequired: '암호 해제를 위해 현재 비밀번호를 입력해주세요.',
       currentPasswordIncorrect: '현재 비밀번호가 일치하지 않습니다.',
+      changePassword: '비밀번호 변경',
       newPassword: '새 비밀번호',
       newPasswordPlaceholder: '새 비밀번호를 입력하세요',
       confirmPassword: '비밀번호 확인',
