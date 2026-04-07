@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { AdminFeatureModule, RouteComponentProps } from '@xgen/types';
-import { ContentArea, Button, StatCard, ScrollableFilterTabs, useToast } from '@xgen/ui';
-import type { FilterTab } from '@xgen/ui';
+import { ContentArea, Button, StatCard, ScrollableFilterTabs, ConfigCard, useToast } from '@xgen/ui';
+import type { FilterTab, ConfigValueType } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
-import { FiRefreshCw, FiEdit3, FiCheck, FiX } from '@xgen/icons';
+import { FiRefreshCw } from '@xgen/icons';
 
 import { fetchAllConfigs, updateConfig } from './api/config-api';
 import type { ConfigItem } from './types';
@@ -140,11 +140,6 @@ const AdminSystemConfigPage: React.FC<RouteComponentProps> = () => {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent, config: ConfigItem) => {
-    if (e.key === 'Enter') { e.preventDefault(); handleEditSave(config); }
-    else if (e.key === 'Escape') { e.preventDefault(); handleEditCancel(); }
-  };
-
   // ── Loading / Error states ──
 
   if (loading && configs.length === 0) {
@@ -214,111 +209,34 @@ const AdminSystemConfigPage: React.FC<RouteComponentProps> = () => {
       }
     >
       {/* Config List */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2.5">
         {filteredConfigs.map((config) => {
           const category = getConfigCategory(config.config_path);
           const isEditing = editingConfig === config.env_name;
           const isModified = config.is_saved && config.current_value !== config.default_value;
 
           return (
-            <div key={config.env_name} className="rounded-lg border border-border bg-card p-4">
-              {/* Header row */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span style={{ color: getCategoryColor(category) }} className="text-base">
-                    {getCategoryIcon(category)}
-                  </span>
-                  <div>
-                    <h4 className="text-sm font-semibold text-foreground">{config.env_name}</h4>
-                    <span className="text-[11px] text-muted-foreground">{config.config_path}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`rounded px-2 py-0.5 text-[10px] font-medium ${
-                      isModified
-                        ? 'bg-primary/10 text-primary'
-                        : 'bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    {isModified ? t(`${CV}.configured`) : t(`${CV}.defaultValue`)}
-                  </span>
-                  <span className="rounded bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                    {config.type}
-                  </span>
-                </div>
-              </div>
-
-              {/* Value row */}
-              <div className="mt-2">
-                {isEditing ? (
-                  <div className="flex items-center gap-2">
-                    <label className="shrink-0 text-xs text-muted-foreground">
-                      {t(`${CV}.currentValue`)}:
-                    </label>
-                    {config.type.toLowerCase() === 'bool' ? (
-                      <select
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                        disabled={updating}
-                        onKeyDown={(e) => handleKeyPress(e, config)}
-                        autoFocus
-                        className="flex-1 rounded-md border border-border bg-card px-2 py-1 text-sm text-foreground focus:border-primary focus:outline-none"
-                      >
-                        <option value="true">true</option>
-                        <option value="false">false</option>
-                      </select>
-                    ) : (
-                      <input
-                        type={config.type.toLowerCase() === 'num' ? 'number' : 'text'}
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                        disabled={updating}
-                        onKeyDown={(e) => handleKeyPress(e, config)}
-                        autoFocus
-                        className="flex-1 rounded-md border border-border bg-card px-2 py-1 text-sm text-foreground focus:border-primary focus:outline-none"
-                      />
-                    )}
-                    <button
-                      onClick={() => handleEditSave(config)}
-                      disabled={updating}
-                      className="rounded p-1 text-primary hover:bg-primary/10"
-                      title={t(`${CV}.save`)}
-                    >
-                      <FiCheck className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={handleEditCancel}
-                      disabled={updating}
-                      className="rounded p-1 text-muted-foreground hover:bg-muted"
-                      title={t(`${CV}.cancel`)}
-                    >
-                      <FiX className="h-4 w-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">{t(`${CV}.currentValue`)}:</span>
-                    <span className="flex-1 font-mono text-xs text-foreground">
-                      {formatValue(config.current_value, config.env_name)}
-                    </span>
-                    <button
-                      onClick={() => handleEditStart(config)}
-                      className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                      title={t(`${CV}.editCurrentValue`)}
-                    >
-                      <FiEdit3 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                )}
-                <div className="mt-1 flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">{t(`${CV}.defaultValueLabel`)}:</span>
-                  <span className="font-mono text-xs text-muted-foreground/70">
-                    {formatValue(config.default_value, config.env_name)}
-                  </span>
-                </div>
-              </div>
-            </div>
+            <ConfigCard
+              key={config.env_name}
+              envName={config.env_name}
+              configPath={config.config_path}
+              currentValue={formatValue(config.current_value, config.env_name)}
+              defaultValue={formatValue(config.default_value, config.env_name)}
+              valueType={config.type as ConfigValueType}
+              isModified={isModified}
+              icon={getCategoryIcon(category)}
+              accentColor={getCategoryColor(category)}
+              statusLabel={isModified ? t(`${CV}.configured`) : t(`${CV}.defaultValue`)}
+              currentValueLabel={t(`${CV}.currentValue`)}
+              defaultValueLabel={t(`${CV}.defaultValueLabel`)}
+              editing={isEditing}
+              editValue={editValue}
+              saving={updating}
+              onEditStart={() => handleEditStart(config)}
+              onEditChange={setEditValue}
+              onSave={() => handleEditSave(config)}
+              onCancel={handleEditCancel}
+            />
           );
         })}
 

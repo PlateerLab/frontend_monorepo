@@ -137,6 +137,10 @@ export type { StatusBadgeProps, StatusBadgeVariant } from './data-display/status
 export { StatCard } from './data-display/stat-card';
 export type { StatCardProps, StatCardVariant } from './data-display/stat-card';
 
+// ConfigCard - 시스템 설정 항목 표시/편집 카드
+export { ConfigCard } from './data-display/config-card';
+export type { ConfigCardProps, ConfigValueType } from './data-display/config-card';
+
 // Input Components
 export { Button, buttonVariants as inputButtonVariants } from './inputs/button';
 export type { ButtonProps, ButtonVariant, ButtonSize, ButtonPadding } from './inputs/button';
