@@ -56,7 +56,7 @@ apps/       (조립)      → web (Next.js 16.2.1 + Turbopack)
 |------|------|------|
 | `packages/ui/src/styles/_variables.scss` | SCSS 변수 (`$gray-500`) | SCSS import 필요, CSS에서 직접 사용 불가 |
 | `apps/web/src/app/globals.css` | CSS Custom Properties (`--color-gray-500`) | 값이 SCSS와 미묘하게 다름 (gray-100: `#f1f3f5` vs `#f2f4f7`) |
-| `features/main-Dashboard/src/styles/` | 독자적 SCSS 변수 53개 | 위 둘과 별개의 토큰 시스템 |
+| `features/main-dashboard/src/styles/` | 독자적 SCSS 변수 53개 | 위 둘과 별개의 토큰 시스템 |
 | 인라인 스타일 (PromptStorage, ToolStorage, Documents) | 하드코딩 hex 값 | 토큰 미사용 |
 
 ### 1-4. Feature 패키지의 두 세계
@@ -70,7 +70,7 @@ apps/       (조립)      → web (Next.js 16.2.1 + Turbopack)
 
 | 누락 프리미티브 | 자체구현 위치 | 발견 횟수 |
 |----------------|-------------|----------|
-| **Table / DataTable** | main-Dashboard (raw `<table>`) | 1+ |
+| **Table / DataTable** | main-dashboard (raw `<table>`) | 1+ |
 | **Select / Combobox** | canvas-ai-generator, workflow-tester (raw `<select>`) | 2+ |
 | **RadioGroup** | canvas-deploy (raw `<input type="radio">`) | 1+ |
 | **Dialog (headless)** | canvas-node-detail, canvas-deploy, canvas-document-drop, canvas-sidebar-templates (모두 `createPortal` 직접 구현) | 4+ |
@@ -84,7 +84,7 @@ apps/       (조립)      → web (Next.js 16.2.1 + Turbopack)
 ### 1-6. 인라인 SVG 아이콘 중복
 
 `@xgen/icons`가 존재함에도 불구하고:
-- main-ChatCurrent: 11개 인라인 SVG
+- main-chat-current: 11개 인라인 SVG
 - main-PromptStorage: 5개 인라인 SVG
 - main-Documents: 4개 인라인 SVG
 - main-ToolStorage: 4개 인라인 SVG
@@ -465,7 +465,7 @@ Tailwind CSS v4는 PostCSS 플러그인으로 동작하므로 Next.js 설정 변
 현재 (3곳에 분산):
   1. packages/ui/src/styles/_variables.scss  → SCSS 변수
   2. apps/web/src/app/globals.css            → CSS Custom Properties (값 불일치)
-  3. features/main-Dashboard/src/styles/     → 독자적 SCSS 변수 53개
+  3. features/main-dashboard/src/styles/     → 독자적 SCSS 변수 53개
   4. 인라인 스타일 하드코딩                     → #305EEB, #E5E7EB 등
 
 목표 (1곳으로 통합):
@@ -526,7 +526,7 @@ body {
 
 ### 5-4. Dashboard 독자 토큰 제거
 
-`features/main-Dashboard/src/styles/dashboard.module.scss`의 53개 독자 변수를 `@xgen/ui/styles`의 변수로 교체한다.
+`features/main-dashboard/src/styles/dashboard.module.scss`의 53개 독자 변수를 `@xgen/ui/styles`의 변수로 교체한다.
 
 ### 5-5. Phase 1 완료 기준
 
@@ -802,13 +802,13 @@ import { Button } from '@xgen/ui';
 | **1** | **main-PromptStorage** | 인라인 JS 스타일 → Tailwind, 자체 카드 그리드 → ResourceCardGrid 활용 | 중 |
 | **2** | **main-ToolStorage** | PromptStorage와 거의 동일 패턴 | 중 |
 | **3** | **main-Documents** | 동일 패턴 + Badge 프리미티브 적용 | 중 |
-| **4** | **main-Dashboard** | 독자 SCSS 변수 53개 제거, raw Table → Table 프리미티브 | 중 |
-| **5** | **main-ChatCurrent** | 인라인 SVG 11개 → @xgen/icons, Textarea 프리미티브 적용 | 중 |
-| **6** | **main-ChatHistory** | FilterTabs + 리스트 UI 정리 | 하 |
-| **7** | **main-AuthProfile** | 이미 ResourceCard 사용 — Tailwind 전환만 | 하 |
+| **4** | **main-dashboard** | 독자 SCSS 변수 53개 제거, raw Table → Table 프리미티브 | 중 |
+| **5** | **main-chat-current** | 인라인 SVG 11개 → @xgen/icons, Textarea 프리미티브 적용 | 중 |
+| **6** | **main-chat-history** | FilterTabs + 리스트 UI 정리 | 하 |
+| **7** | **main-auth-profile** | 이미 ResourceCard 사용 — Tailwind 전환만 | 하 |
 | **8** | **나머지 main-*** | FAQ, ServiceRequest, Intro 페이지들 | 하 |
-| **9** | **auth-LoginForm** | .module.css → Tailwind, Form 프리미티브 | 하 |
-| **10** | **root-Landing-*** | Landing 페이지 6개 Feature | 하 |
+| **9** | **auth-login-form** | .module.css → Tailwind, Form 프리미티브 | 하 |
+| **10** | **root-landing-*** | Landing 페이지 6개 Feature | 하 |
 
 ### 8-2. Feature 마이그레이션 체크리스트 (Feature당)
 
@@ -1644,13 +1644,13 @@ packages/ui/
 - [ ] main-PromptStorage 전환
 - [ ] main-ToolStorage 전환
 - [ ] main-Documents 전환
-- [ ] main-Dashboard 전환
-- [ ] main-ChatCurrent 전환 (SVG 11개 이관 포함)
-- [ ] main-ChatHistory 전환
-- [ ] main-AuthProfile Tailwind 정리
+- [ ] main-dashboard 전환
+- [ ] main-chat-current 전환 (SVG 11개 이관 포함)
+- [ ] main-chat-history 전환
+- [ ] main-auth-profile Tailwind 정리
 - [ ] 나머지 main-* 전환
-- [ ] auth-LoginForm 전환
-- [ ] root-Landing-* 전환
+- [ ] auth-login-form 전환
+- [ ] root-landing-* 전환
 - [ ] 인라인 SVG 24개+ → @xgen/icons 이관
 
 ### Phase 5: Canvas 마이그레이션

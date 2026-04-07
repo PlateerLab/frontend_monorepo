@@ -26,10 +26,10 @@ features/
 
 ```
 ❌ Feature → Feature 직접 import 절대 금지
-   import { something } from '@xgen/feature-main-Dashboard';  // NEVER
+   import { something } from '@xgen/feature-main-dashboard';  // NEVER
 
 ⭕ Feature 간 통신은 반드시 FeatureRegistry를 통한다
-   const feature = registry.getFeature('main-Dashboard');
+   const feature = registry.getFeature('main-dashboard');
 ```
 
 **이유:** Feature는 플러그인이다. 어떤 Feature가 빠져도 앱은 동작해야 한다.

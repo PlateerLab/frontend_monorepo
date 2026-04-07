@@ -177,7 +177,7 @@ features/
 ├── canvas-node-detail/     ← 노드 상세 모달 + 파라미터 편집 모달
 ├── canvas-document-drop/   ← 문서 드롭 → RAG 노드 생성
 │
-├── main-CanvasIntro/       ← 기존 유지 (캔버스 소개 페이지)
+├── main-canvas-intro/       ← 기존 유지 (캔버스 소개 페이지)
 ```
 
 ### 3-2. 의존성 방향
@@ -199,7 +199,7 @@ apps/web
   │           ├── canvas-node-detail
   │           └── canvas-document-drop
   │
-  └── main-CanvasIntro (소개 페이지, 독립)
+  └── main-canvas-intro (소개 페이지, 독립)
 ```
 
 **핵심 규칙**: Feature 간 직접 import 없음. 모든 조합은 `canvas-core`가 Registry를 통해 수행한다.
@@ -1103,7 +1103,7 @@ registerFeatureTranslations('canvasHeader', {
 3-1    canvas-features.ts 작성  Phase 2 전체
 3-2    apps/web/package.json 업데이트
 3-3    라우팅 연결 (/canvas → canvas-core)
-3-4    기존 main-CanvasIntro 연동 확인
+3-4    기존 main-canvas-intro 연동 확인
 3-5    E2E 통합 테스트
 ```
 

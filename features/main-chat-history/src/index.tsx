@@ -410,7 +410,7 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
 // ─────────────────────────────────────────────────────────────
 
 export const mainChatHistoryFeature: MainFeatureModule = {
-  id: 'main-ChatHistory',
+  id: 'main-chat-history',
   name: 'Chat History',
   sidebarSection: 'chat',
   sidebarItems: [

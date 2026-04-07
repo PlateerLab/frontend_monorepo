@@ -667,7 +667,7 @@ const AuthProfilePage: React.FC<AuthProfilePageProps> = ({
 // ─────────────────────────────────────────────────────────────
 
 export const mainAuthProfileFeature: MainFeatureModule = {
-  id: 'main-AuthProfile',
+  id: 'main-auth-profile',
   name: 'Auth Profile',
   sidebarSection: 'workflow',
   sidebarItems: [

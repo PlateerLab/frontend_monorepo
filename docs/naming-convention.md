@@ -12,7 +12,7 @@
 ### 예시
 
 ```
-main-Dashboard            ← main 페이지의 Dashboard
+main-dashboard            ← main 페이지의 Dashboard
 main-WorkflowIntroduction ← main 페이지의 Workflow Introduction
 main-ExecutionTools       ← main 페이지의 Execution Tools (tool-storage)
 admin-SystemSettings      ← admin 페이지의 System Settings
@@ -95,7 +95,7 @@ features/{page}-{SubPageName}/
 ### package.json 이름
 
 ```json
-{ "name": "@xgen/feature-main-Dashboard" }
+{ "name": "@xgen/feature-main-dashboard" }
 ```
 
 ### 모듈 ID
@@ -104,7 +104,7 @@ features/{page}-{SubPageName}/
 
 ```typescript
 const dashboardFeature: FeatureModule = {
-  id: 'main-Dashboard',   // ← 디렉토리명과 동일
+  id: 'main-dashboard',   // ← 디렉토리명과 동일
   name: 'Dashboard',
   // ...
 };

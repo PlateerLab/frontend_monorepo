@@ -1,5 +1,5 @@
 {
-  "name": "@xgen/mypage-Profile",
+  "name": "@xgen/mypage-profile",
   "version": "0.1.0",
   "private": true,
   "main": "./src/index.tsx",

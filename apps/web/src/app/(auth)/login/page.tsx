@@ -3,7 +3,7 @@
 import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ReverseAuthGuard } from '@xgen/auth-provider';
-import { LoginForm } from '@xgen/feature-auth-LoginForm';
+import { LoginForm } from '@xgen/feature-auth-login-form';
 
 /**
  * 로그인 페이지 — Assembly Only

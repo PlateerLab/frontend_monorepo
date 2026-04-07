@@ -150,7 +150,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
 // ─────────────────────────────────────────────────────────────
 
 export const mainDashboardFeature: MainFeatureModule = {
-  id: 'main-Dashboard',
+  id: 'main-dashboard',
   name: 'Main Dashboard',
   sidebarSection: 'workspace',
   sidebarItems: [

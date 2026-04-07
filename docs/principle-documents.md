@@ -250,7 +250,7 @@ export default myFeature;
   클릭하면 채팅 기록 화면이 나타나야 한다.
 ```
 
-**실제 예시**: `main-ChatHistory`
+**실제 예시**: `main-chat-history`
 - 사이드바 "Chat" 섹션에 "대화 이력" 메뉴 추가
 - 클릭하면 대화 목록 화면 렌더링
 - 독립적 — 이 Feature를 삭제해도 "새 채팅", "현재 채팅"은 정상 동작
@@ -776,7 +776,7 @@ Feature 내부의 컴포넌트 파일:
 // 예: "@xgen/feature-canvas-core"
 // 예: "@xgen/feature-admin-Admin"
 // 예: "@xgen/feature-main-CurrentChat"
-// 예: "@xgen/feature-main-Dashboard"
+// 예: "@xgen/feature-main-dashboard"
 
 // Package의 경우
 "name": "@xgen/{name}"
@@ -1051,7 +1051,7 @@ pnpm dev:web
 ### 실수 1: "Feature 안에서 다른 Feature를 import 했어요"
 
 ```typescript
-// ❌ features/main-ChatHistory/src/index.ts
+// ❌ features/main-chat-history/src/index.ts
 import { formatMessage } from '@xgen/feature-chat-new';  // WRONG!
 ```
 
@@ -1063,7 +1063,7 @@ import { formatMessage } from '@xgen/feature-chat-new';  // WRONG!
 // packages/utils/src/message-formatter.ts
 export function formatMessage(msg: string): string { ... }
 
-// features/main-ChatHistory/src/index.ts
+// features/main-chat-history/src/index.ts
 import { formatMessage } from '@xgen/utils';  // OK!
 ```
 
@@ -1077,15 +1077,15 @@ import { formatMessage } from '@xgen/utils';  // OK!
 
 **왜 안 되나:** web_jeju에서 같은 기능이 필요하면 코드를 복사해야 함
 
-**교정:** `features/main-ChatHistory/src/index.ts` 안에 해당 컴포넌트를 배치
+**교정:** `features/main-chat-history/src/index.ts` 안에 해당 컴포넌트를 배치
 
 ---
 
 ### 실수 3: "PascalCase로 파일을 만들었어요"
 
 ```
-❌ features/main-ChatHistory/src/ChatList.tsx
-⭕ features/main-ChatHistory/src/chat-list.tsx
+❌ features/main-chat-history/src/ChatList.tsx
+⭕ features/main-chat-history/src/chat-list.tsx
 ```
 
 **교정:** 파일명을 kebab-case로 변경. git mv를 사용하여 이력을 보존.
@@ -1098,11 +1098,11 @@ git mv ChatList.tsx chat-list.tsx
 ### 실수 4: "Feature id와 디렉토리 이름이 달라요"
 
 ```
-❌ 디렉토리: features/main-ChatHistory/
+❌ 디렉토리: features/main-chat-history/
    id: 'chatHistory'     // 불일치!
 
-⭕ 디렉토리: features/main-ChatHistory/
-   id: 'main-ChatHistory' // 일치!
+⭕ 디렉토리: features/main-chat-history/
+   id: 'main-chat-history' // 일치!
 ```
 
 **왜 안 되나:** 에러 발생 시 id로 검색하면 해당 파일을 찾을 수 없음

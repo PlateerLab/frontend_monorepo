@@ -9,7 +9,7 @@
 import { FeatureRegistry } from '@xgen/types';
 
 // Feature Modules
-import rootLanding from '@xgen/feature-root-Landing';
+import rootLanding from '@xgen/feature-root-landing';
 
 // Landing Section Plugins
 import rootLandingHeaderPlugin from '@xgen/feature-root-landing-header';

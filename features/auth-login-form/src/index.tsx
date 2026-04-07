@@ -169,7 +169,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 // ─────────────────────────────────────────────────────────────
 
 export const authLoginFormFeature: FeatureModule = {
-  id: 'auth-LoginForm',
+  id: 'auth-login-form',
   name: 'Login Form',
 };
 

@@ -125,9 +125,9 @@ importers:
       '@xgen/feature-admin-workflow-store':
         specifier: workspace:*
         version: link:../../features/admin-workflow-store
-      '@xgen/feature-auth-LoginForm':
+      '@xgen/feature-auth-login-form':
         specifier: workspace:*
-        version: link:../../features/auth-LoginForm
+        version: link:../../features/auth-login-form
       '@xgen/feature-canvas-ai-generator':
         specifier: workspace:*
         version: link:../../features/canvas-ai-generator
@@ -164,15 +164,15 @@ importers:
       '@xgen/feature-deploy-settings':
         specifier: workspace:*
         version: link:../../features/deploy-settings
-      '@xgen/feature-main-ChatHistory':
+      '@xgen/feature-main-chat-history':
         specifier: workspace:*
-        version: link:../../features/main-ChatHistory
-      '@xgen/feature-main-Dashboard':
+        version: link:../../features/main-chat-history
+      '@xgen/feature-main-dashboard':
         specifier: workspace:*
-        version: link:../../features/main-Dashboard
-      '@xgen/feature-root-Landing':
+        version: link:../../features/main-dashboard
+      '@xgen/feature-root-landing':
         specifier: workspace:*
-        version: link:../../features/root-Landing
+        version: link:../../features/root-landing
       '@xgen/feature-root-landing-cta':
         specifier: workspace:*
         version: link:../../features/root-landing-cta
@@ -196,16 +196,16 @@ importers:
         version: link:../../packages/icons
       '@xgen/main-auth-profile':
         specifier: workspace:*
-        version: link:../../features/main-AuthProfile
+        version: link:../../features/main-auth-profile
       '@xgen/main-canvas-intro':
         specifier: workspace:*
-        version: link:../../features/main-CanvasIntro
+        version: link:../../features/main-canvas-intro
       '@xgen/main-chat-current':
         specifier: workspace:*
-        version: link:../../features/main-ChatCurrent
+        version: link:../../features/main-chat-current
       '@xgen/main-chat-new':
         specifier: workspace:*
-        version: link:../../features/main-ChatNew
+        version: link:../../features/main-chat-new
       '@xgen/main-document-management-collection':
         specifier: workspace:*
         version: link:../../features/main-document-management-collection
@@ -254,9 +254,9 @@ importers:
       '@xgen/main-workflow-management-tester':
         specifier: workspace:*
         version: link:../../features/main-workflow-management-tester
-      '@xgen/mypage-Profile':
+      '@xgen/mypage-profile':
         specifier: workspace:*
-        version: link:../../features/mypage-Profile
+        version: link:../../features/mypage-profile
       '@xgen/sidebar-admin':
         specifier: workspace:*
         version: link:../../features/sidebar-admin
@@ -1319,7 +1319,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
 
-  features/auth-LoginForm:
+  features/auth-login-form:
     dependencies:
       '@xgen/auth-provider':
         specifier: workspace:*
@@ -1621,7 +1621,7 @@ importers:
         specifier: ^5
         version: 5.9.3
 
-  features/main-AuthProfile:
+  features/main-auth-profile:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -1652,7 +1652,7 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
-  features/main-CanvasIntro:
+  features/main-canvas-intro:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -1680,7 +1680,7 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
-  features/main-ChatCurrent:
+  features/main-chat-current:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -1705,7 +1705,7 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
-  features/main-ChatHistory:
+  features/main-chat-history:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -1726,7 +1726,7 @@ importers:
         specifier: ^19.0.0
         version: 19.2.4
 
-  features/main-ChatNew:
+  features/main-chat-new:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -1751,7 +1751,7 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
-  features/main-Dashboard:
+  features/main-dashboard:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -2354,7 +2354,7 @@ importers:
         specifier: ^5
         version: 5.9.3
 
-  features/mypage-Profile:
+  features/mypage-profile:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -2378,7 +2378,7 @@ importers:
         specifier: ^19.1.0
         version: 19.2.4
 
-  features/root-Landing:
+  features/root-landing:
     dependencies:
       '@xgen/types':
         specifier: workspace:*

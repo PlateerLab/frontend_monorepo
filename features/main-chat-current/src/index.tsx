@@ -474,7 +474,7 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
 // ─────────────────────────────────────────────────────────────
 
 export const mainChatCurrentFeature: MainFeatureModule = {
-  id: 'main-ChatCurrent',
+  id: 'main-chat-current',
   name: 'Current Chat',
   sidebarSection: 'chat',
   sidebarItems: [

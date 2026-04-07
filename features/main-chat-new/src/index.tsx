@@ -458,7 +458,7 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
 // ─────────────────────────────────────────────────────────────
 
 export const mainChatNewFeature: MainFeatureModule = {
-  id: 'main-ChatNew',
+  id: 'main-chat-new',
   name: 'New Chat',
   sidebarSection: 'chat',
   sidebarItems: [

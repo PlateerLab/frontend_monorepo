@@ -36,7 +36,7 @@
 
 ```ts
 // apps/web/src/app/featureRegistry.ts
-import dashboard from '@xgen/feature-main-Dashboard';
+import dashboard from '@xgen/feature-main-dashboard';
 import documents from '@xgen/feature-main-Documents';
 
 registry.registerMainFeature(dashboard);

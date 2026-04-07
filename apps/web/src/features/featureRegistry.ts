@@ -173,10 +173,10 @@ export async function initializeFeatures(): Promise<void> {
   // Dynamic imports for all feature modules
   const featureModules = await Promise.all([
     // Chat Section
-    import('@xgen/feature-main-Dashboard'),
+    import('@xgen/feature-main-dashboard'),
     import('@xgen/main-chat-new'),
     import('@xgen/main-chat-current'),
-    import('@xgen/feature-main-ChatHistory'),
+    import('@xgen/feature-main-chat-history'),
 
     // Workflow Section
     import('@xgen/main-canvas-intro'),

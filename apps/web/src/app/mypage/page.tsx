@@ -10,11 +10,11 @@ import { ContentArea } from '@xgen/ui';
 import styles from './MypagePage.module.scss';
 
 // Register mypage i18n translations
-import '@xgen/mypage-Profile/src/locales';
+import '@xgen/mypage-profile/src/locales';
 
 // Lazy-loaded content components
-import { ProfileView } from '@xgen/mypage-Profile/src/components/ProfileView';
-import { ProfileEdit } from '@xgen/mypage-Profile/src/components/ProfileEdit';
+import { ProfileView } from '@xgen/mypage-profile/src/components/ProfileView';
+import { ProfileEdit } from '@xgen/mypage-profile/src/components/ProfileEdit';
 
 // ─────────────────────────────────────────────────────────────
 // Valid section IDs

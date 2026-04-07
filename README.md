@@ -549,7 +549,7 @@ id: 'current-chat'       // ❌ 디렉토리명과 다름
 ### package.json name
 
 ```
-features/main-Dashboard/  →  "name": "@xgen/feature-main-Dashboard"
+features/main-dashboard/  →  "name": "@xgen/feature-main-dashboard"
 features/canvas-core/     →  "name": "@xgen/feature-canvas-core"
 packages/api-client/      →  "name": "@xgen/api-client"
 ```

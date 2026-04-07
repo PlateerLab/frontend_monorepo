@@ -34,7 +34,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ plugins }) => {
 };
 
 export const rootLandingFeature: FeatureModule = {
-  id: 'root-Landing',
+  id: 'root-landing',
   name: 'Landing Page',
 };
 

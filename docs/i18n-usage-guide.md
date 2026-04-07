@@ -298,7 +298,7 @@ return <h1>{t('myFeature.title')}</h1>;
 grep -r "loadFailed" packages/i18n/src/locales/ko.json
 
 # 모든 t() 호출에서 사용된 키 추출 (Feature 폴더에서)
-grep -oP "t\('([^']+)'\)" features/main-ChatHistory/src/index.tsx
+grep -oP "t\('([^']+)'\)" features/main-chat-history/src/index.tsx
 ```
 
 ---

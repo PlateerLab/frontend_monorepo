@@ -429,7 +429,7 @@ Step E: 등록 및 확인
 
 > **목표:** 일반 사용자 화면(main) 전체 이전 — 가장 큰 덩어리
 
-### TASK 2-1. main-Dashboard — 메인 대시보드
+### TASK 2-1. main-dashboard — 메인 대시보드
 
 **원본:** `src/app/main/components/MainDashboard.tsx` + `MainDashboard.module.scss`
 
@@ -437,8 +437,8 @@ Step E: 등록 및 확인
 |---|---|
 | 2-1-1 | `MainDashboard.tsx` 분석 — KPI 카드, 최근 업데이트, 워크플로우 요약 |
 | 2-1-2 | `MainDashboard.module.scss` → Tailwind 유틸리티 클래스로 재작성 (SCSS 파일 이전하지 않음) |
-| 2-1-3 | 대시보드 컴포넌트 → `features/main-Dashboard/src/main-dashboard.tsx` |
-| 2-1-4 | KPI 카드 컴포넌트 → 반복 UI를 별도 컴포넌트 `features/main-Dashboard/src/components/kpi-card.tsx`로 분리 |
+| 2-1-3 | 대시보드 컴포넌트 → `features/main-dashboard/src/main-dashboard.tsx` |
+| 2-1-4 | KPI 카드 컴포넌트 → 반복 UI를 별도 컴포넌트 `features/main-dashboard/src/components/kpi-card.tsx`로 분리 |
 | 2-1-5 | API 호출 → `@xgen/api-client` 변환 |
 | 2-1-6 | 목업 데이터 → 실제 API 또는 목업 명시 분리 |
 | 2-1-7 | `index.ts` — FeatureModule export (sidebarSection: 'workspace') |
@@ -490,14 +490,14 @@ Step E: 등록 및 확인
 | 2-4-11 | ChatParser 사용 → `@xgen/ui`의 ChatParser import로 변경 (TASK 0-10-7에서 이전됨) |
 | 2-4-12 | `index.ts` — FeatureModule export (sidebarSection: 'chat') |
 
-### TASK 2-5. main-ChatHistory — 채팅 히스토리
+### TASK 2-5. main-chat-history — 채팅 히스토리
 
 **원본:** `src/app/main/chatSection/components/ChatHistory.tsx`
 
 | 작업 항목 | 세부 내용 |
 |---|---|
 | 2-5-1 | `ChatHistory.tsx` 분석 — 이전 채팅 목록, 검색, 필터 |
-| 2-5-2 | 컴포넌트 → `features/main-ChatHistory/src/chat-history.tsx` |
+| 2-5-2 | 컴포넌트 → `features/main-chat-history/src/chat-history.tsx` |
 | 2-5-3 | 관련 SCSS → Tailwind 유틸리티 클래스로 재작성 (SCSS 파일 이전하지 않음) |
 | 2-5-4 | API 호출 (채팅 목록) → `@xgen/api-client` 변환 |
 | 2-5-5 | `index.ts` — FeatureModule export (sidebarSection: 'chat') |
@@ -1431,13 +1431,13 @@ Step E: 등록 및 확인
 | 5-5-3 | `data/serviceRequestList.ts` → `data/service-request-list.ts` |
 | 5-5-4 | `index.ts` export |
 
-### TASK 5-6. mypage-Profile — 프로필 보기
+### TASK 5-6. mypage-profile — 프로필 보기
 
 **원본:** `src/app/mypage/sections/profile/components/Profile.tsx`
 
 | 작업 항목 | 세부 내용 |
 |---|---|
-| 5-6-1 | `Profile.tsx` → `features/mypage-Profile/src/profile.tsx` |
+| 5-6-1 | `Profile.tsx` → `features/mypage-profile/src/profile.tsx` |
 | 5-6-2 | `Profile.module.scss` → Tailwind 유틸리티 클래스로 재작성 (SCSS 파일 이전하지 않음) |
 | 5-6-3 | user API → `@xgen/api-client` |
 | 5-6-4 | `index.ts` export |
@@ -1692,7 +1692,7 @@ Step E: 등록 및 확인
 | `src/app/(auth)/login/` | `features/auth-Login/src/` | features |
 | `src/app/(auth)/signup/` | `features/auth-Signup/src/` | features |
 | `src/app/(auth)/forgot-password/` | `features/auth-ForgotPassword/src/` | features |
-| `src/app/main/components/MainDashboard.tsx` | `features/main-Dashboard/src/` | features |
+| `src/app/main/components/MainDashboard.tsx` | `features/main-dashboard/src/` | features |
 | `src/app/main/chatSection/` | `features/main-Chat*/src/` (4 Features) | features |
 | `src/app/main/workflowSection/` | `features/main-Workflow*/src/` + `main-Document*/src/` | features |
 | `src/app/main/dataSection/` | `features/main-Data*/src/` (4 Features) | features |

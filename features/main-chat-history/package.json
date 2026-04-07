@@ -1,5 +1,5 @@
 {
-  "name": "@xgen/feature-main-ChatHistory",
+  "name": "@xgen/feature-main-chat-history",
   "version": "0.0.0",
   "private": true,
   "main": "src/index.tsx",

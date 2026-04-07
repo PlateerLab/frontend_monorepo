@@ -1,5 +1,5 @@
 {
-  "name": "@xgen/feature-main-Dashboard",
+  "name": "@xgen/feature-main-dashboard",
   "version": "0.0.0",
   "private": true,
   "main": "src/index.tsx",

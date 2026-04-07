@@ -2,7 +2,7 @@
 // @xgen/ui — Chat Components
 //
 // Shared chat interface used across:
-// - main-ChatCurrent (full-page)
+// - main-chat-current (full-page)
 // - canvas-execution ChatTab (compact, embedded in bottom panel)
 // - Deploy/Embed chat (full, with custom theming — future)
 // ============================================================

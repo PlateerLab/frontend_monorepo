@@ -156,7 +156,7 @@ export const useLocale = (): { locale: Locale; setLocale: (locale: Locale) => vo
  *
  * @example
  * ```ts
- * // features/main-AuthProfile/src/locales/index.ts
+ * // features/main-auth-profile/src/locales/index.ts
  * import { registerFeatureTranslations } from '@xgen/i18n';
  * import { ko } from './ko';
  * import { en } from './en';

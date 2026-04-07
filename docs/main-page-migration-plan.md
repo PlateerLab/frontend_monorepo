@@ -233,26 +233,26 @@ README 원칙에 따라:
 #### Workspace (1개)
 | Feature ID | 디렉토리 | 역할 |
 |------------|----------|------|
-| `main-Dashboard` | `features/main-Dashboard/` | 메인 대시보드 (KPI, 업데이트, 에러) |
+| `main-dashboard` | `features/main-dashboard/` | 메인 대시보드 (KPI, 업데이트, 에러) |
 
 #### Chat (4개)
 | Feature ID | 디렉토리 | 역할 |
 |------------|----------|------|
 | `main-ChatIntro` | `features/main-ChatIntro/` | 채팅 소개 페이지 |
-| `main-ChatNew` | `features/main-ChatNew/` | 새 채팅 시작 |
-| `main-ChatCurrent` | `features/main-ChatCurrent/` | 현재 채팅 인터페이스 |
-| `main-ChatHistory` | `features/main-ChatHistory/` | 채팅 히스토리 |
+| `main-chat-new` | `features/main-chat-new/` | 새 채팅 시작 |
+| `main-chat-current` | `features/main-chat-current/` | 현재 채팅 인터페이스 |
+| `main-chat-history` | `features/main-chat-history/` | 채팅 히스토리 |
 
 #### Workflow (7개)
 | Feature ID | 디렉토리 | 역할 |
 |------------|----------|------|
 | `main-WorkflowIntro` | `features/main-WorkflowIntro/` | 워크플로우 소개 |
-| `main-CanvasIntro` | `features/main-CanvasIntro/` | 캔버스 소개 |
+| `main-canvas-intro` | `features/main-canvas-intro/` | 캔버스 소개 |
 | `main-Workflows` | `features/main-Workflows/` | 워크플로우 목록/관리 |
 | `main-Documents` | `features/main-Documents/` | 문서/컬렉션 관리 |
 | `main-ToolStorage` | `features/main-ToolStorage/` | 도구 저장소 |
 | `main-PromptStorage` | `features/main-PromptStorage/` | 프롬프트 저장소 |
-| `main-AuthProfile` | `features/main-AuthProfile/` | 인증 프로필 |
+| `main-auth-profile` | `features/main-auth-profile/` | 인증 프로필 |
 
 #### Model (5개)
 | Feature ID | 디렉토리 | 역할 |
@@ -466,10 +466,10 @@ interface CardAction {
 
 | 순서 | Feature | 복잡도 | 예상 시간 |
 |------|---------|--------|----------|
-| 2.1 | main-Dashboard | 중 | 1일 |
+| 2.1 | main-dashboard | 중 | 1일 |
 | 2.2 | main-ChatIntro | 저 | 0.5일 |
 | 2.3 | main-WorkflowIntro | 저 | 0.5일 |
-| 2.4 | main-CanvasIntro | 저 | 0.5일 |
+| 2.4 | main-canvas-intro | 저 | 0.5일 |
 | 2.5 | main-ModelIntro | 저 | 0.5일 |
 | 2.6 | main-MlModelIntro | 저 | 0.5일 |
 | 2.7 | main-DataIntro | 저 | 0.5일 |
@@ -487,7 +487,7 @@ interface CardAction {
 | 3.4 | main-PromptStorage | 중 | 1일 |
 | 3.5 | main-ModelStorage | 중 | 1일 |
 | 3.6 | main-DataStorage | 중 | 1일 |
-| 3.7 | main-ChatHistory | 중 | 1일 |
+| 3.7 | main-chat-history | 중 | 1일 |
 | 3.8 | main-ServiceRequest | 중 | 1일 |
 
 ### Phase 4: 복잡 Feature 마이그레이션 (3주)
@@ -497,15 +497,15 @@ interface CardAction {
 | 순서 | Feature | 복잡도 | 예상 시간 |
 |------|---------|--------|----------|
 | 4.1 | main-Documents | 매우 높음 | 3일 |
-| 4.2 | main-ChatNew | 고 | 2일 |
-| 4.3 | main-ChatCurrent | 매우 높음 | 3일 |
+| 4.2 | main-chat-new | 고 | 2일 |
+| 4.3 | main-chat-current | 매우 높음 | 3일 |
 | 4.4 | main-ModelTrain | 고 | 2일 |
 | 4.5 | main-ModelEval | 고 | 2일 |
 | 4.6 | main-ModelMetrics | 중 | 1일 |
 | 4.7 | main-MlTrain | 고 | 2일 |
 | 4.8 | main-MlModelHub | 고 | 2일 |
 | 4.9 | main-DataStation | 고 | 2일 |
-| 4.10 | main-AuthProfile | 중 | 1일 |
+| 4.10 | main-auth-profile | 중 | 1일 |
 
 ### Phase 5: 통합 및 검증 (1주)
 
@@ -539,7 +539,7 @@ frontend_monorepo/
 │       └── package.json
 │
 ├── features/
-│   ├── main-Dashboard/
+│   ├── main-dashboard/
 │   │   ├── package.json
 │   │   ├── tsconfig.json
 │   │   └── src/
@@ -552,7 +552,7 @@ frontend_monorepo/
 │   │       └── styles/
 │   │           └── dashboard.module.scss
 │   │
-│   ├── main-ChatNew/
+│   ├── main-chat-new/
 │   │   ├── package.json
 │   │   ├── tsconfig.json
 │   │   └── src/
@@ -665,7 +665,7 @@ features/main-{FeatureName}/
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                        features/*                           │
-│  (main-Dashboard, main-ChatNew, main-Workflows, ...)       │
+│  (main-dashboard, main-chat-new, main-Workflows, ...)       │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -694,23 +694,23 @@ features/main-{FeatureName}/
 
 ```
 ❌ 금지된 의존:
-features/main-ChatNew → features/main-ChatHistory  (Feature 간 직접 import)
+features/main-chat-new → features/main-chat-history  (Feature 간 직접 import)
 
 ⭕ 허용된 의존:
-features/main-ChatNew → @xgen/ui                   (공유 UI)
-features/main-ChatNew → @xgen/api-client           (공유 API)
-features/main-ChatNew → @xgen/types                (공유 타입)
-features/main-ChatNew → @xgen/i18n                 (다국어)
+features/main-chat-new → @xgen/ui                   (공유 UI)
+features/main-chat-new → @xgen/api-client           (공유 API)
+features/main-chat-new → @xgen/types                (공유 타입)
+features/main-chat-new → @xgen/i18n                 (다국어)
 ```
 
 ### 7.3 Registry를 통한 Feature 조합
 
 ```typescript
 // apps/web/src/features.ts
-import mainDashboard from '@xgen/feature-main-Dashboard';
-import mainChatNew from '@xgen/feature-main-ChatNew';
-import mainChatCurrent from '@xgen/feature-main-ChatCurrent';
-import mainChatHistory from '@xgen/feature-main-ChatHistory';
+import mainDashboard from '@xgen/feature-main-dashboard';
+import mainChatNew from '@xgen/feature-main-chat-new';
+import mainChatCurrent from '@xgen/feature-main-chat-current';
+import mainChatHistory from '@xgen/feature-main-chat-history';
 import mainWorkflows from '@xgen/feature-main-Workflows';
 // ... 모든 Feature import
 

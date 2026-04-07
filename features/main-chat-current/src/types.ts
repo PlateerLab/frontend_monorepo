@@ -1,5 +1,5 @@
 /**
- * @xgen/main-ChatCurrent 타입 정의
+ * @xgen/main-chat-current 타입 정의
  *
  * 현재 진행 중인 채팅 인터페이스를 위한 타입 정의
  */
