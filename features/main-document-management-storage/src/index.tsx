@@ -4,9 +4,9 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { DocumentTabPlugin, DocumentTabPluginProps, CardBadge } from '@xgen/types';
 import { Button, FilterTabs, SearchInput, Modal, Input, Label, Switch, Textarea, ResourceCardGrid, useExternalDrop } from '@xgen/ui';
 import type { ExternalDropResult } from '@xgen/ui';
-import { FiServer, FiFile, FiDatabase, FiClock, FiTrash2, FiLock } from '@xgen/icons';
+import { FiServer, FiFile, FiDatabase, FiClock, FiTrash2, FiLock, FiSettings } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
-import { listStorages, createStorage, deleteStorage, verifyStoragePassword, storeStorageSessionToken, getStorageSessionToken, uploadStorageFile, type FileStorageItem } from './api';
+import { listStorages, createStorage, deleteStorage, updateStorage, verifyStoragePassword, storeStorageSessionToken, getStorageSessionToken, uploadStorageFile, sha256, type FileStorageItem } from './api';
 import { StorageFiles } from './components/StorageFiles';
 import './locales';
 
@@ -78,6 +78,18 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
   const [verifyPassword, setVerifyPassword] = useState('');
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
+
+  // Settings modal state
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [settingsStorage, setSettingsStorage] = useState<FileStorageItem | null>(null);
+  const [settingsName, setSettingsName] = useState('');
+  const [settingsShared, setSettingsShared] = useState(false);
+  const [settingsSecured, setSettingsSecured] = useState(false);
+  const [settingsUpdating, setSettingsUpdating] = useState(false);
+  const [settingsPassword, setSettingsPassword] = useState('');
+  const [settingsPasswordConfirm, setSettingsPasswordConfirm] = useState('');
+  const [settingsCurrentPassword, setSettingsCurrentPassword] = useState('');
+  const [settingsCurrentPasswordError, setSettingsCurrentPasswordError] = useState<string | null>(null);
 
   // External drop state
   const [isDropConfirmOpen, setIsDropConfirmOpen] = useState(false);
@@ -254,6 +266,70 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
     setVerifyError(null);
   }, []);
 
+  // ── Settings ──
+  const handleOpenSettings = useCallback((storage: FileStorageItem) => {
+    setSettingsStorage(storage);
+    setSettingsName(storage.name);
+    setSettingsShared(storage.isShared);
+    setSettingsSecured(storage.isSecured);
+    setIsSettingsModalOpen(true);
+  }, []);
+
+  const handleCloseSettings = useCallback(() => {
+    setIsSettingsModalOpen(false);
+    setSettingsStorage(null);
+    setSettingsPassword('');
+    setSettingsPasswordConfirm('');
+    setSettingsCurrentPassword('');
+    setSettingsCurrentPasswordError(null);
+  }, []);
+
+  const handleUpdateStorage = useCallback(async () => {
+    if (!settingsStorage || !settingsName.trim()) return;
+    if (settingsSecured && settingsPassword && settingsPassword !== settingsPasswordConfirm) return;
+    setSettingsUpdating(true);
+    setSettingsCurrentPasswordError(null);
+    try {
+      // Verify current password before disabling encryption
+      if (!settingsSecured && settingsStorage.isSecured) {
+        if (!settingsCurrentPassword) {
+          setSettingsCurrentPasswordError(t('documents.storage.settingsModal.currentPasswordRequired'));
+          setSettingsUpdating(false);
+          return;
+        }
+        const verifyResult = await verifyStoragePassword(settingsStorage.storageId, settingsCurrentPassword);
+        if (!verifyResult.valid) {
+          setSettingsCurrentPasswordError(t('documents.storage.settingsModal.currentPasswordIncorrect'));
+          setSettingsUpdating(false);
+          return;
+        }
+      }
+      const updateData: Record<string, any> = {
+        storage_name: settingsName.trim(),
+        is_shared: settingsShared,
+        is_secured: settingsSecured,
+      };
+      if (settingsSecured && settingsPassword) {
+        updateData.password_hash = await sha256(settingsPassword);
+      }
+      if (!settingsSecured && settingsStorage.isSecured) {
+        updateData.password_hash = null;
+      }
+      await updateStorage(settingsStorage.storageId, updateData);
+      setIsSettingsModalOpen(false);
+      setSettingsStorage(null);
+      setSettingsPassword('');
+      setSettingsPasswordConfirm('');
+      setSettingsCurrentPassword('');
+      setSettingsCurrentPasswordError(null);
+      await loadData();
+    } catch (err) {
+      console.error('Failed to update storage:', err);
+    } finally {
+      setSettingsUpdating(false);
+    }
+  }, [settingsStorage, settingsName, settingsShared, settingsSecured, settingsPassword, settingsPasswordConfirm, settingsCurrentPassword, loadData, t]);
+
   // ── External Drag & Drop on List View ──
   const handleExternalDrop = useCallback((result: ExternalDropResult) => {
     if (fileStorages.length === 0) return;
@@ -415,6 +491,12 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
         dropdownActions: [],
         primaryActions: [
           {
+            id: 'settings',
+            icon: <FiSettings />,
+            label: t('documents.storage.buttons.settings'),
+            onClick: () => handleOpenSettings(fs),
+          },
+          {
             id: 'delete',
             icon: <FiTrash2 />,
             label: t('common.delete'),
@@ -425,7 +507,7 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
         onClick: () => handleSelectStorage(fs),
       };
     });
-  }, [filteredFileStorages, handleDeleteStorage, handleSelectStorage, t]);
+  }, [filteredFileStorages, handleDeleteStorage, handleOpenSettings, handleSelectStorage, t]);
 
   // ── SubToolbar ──
   useEffect(() => {
@@ -562,6 +644,121 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
                   onChange={(e) => setNewStoragePasswordConfirm(e.target.value)}
                   placeholder={t('documents.storage.createModal.passwordConfirmPlaceholder')}
                 />
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
+
+      {/* Settings Modal */}
+      <Modal
+        isOpen={isSettingsModalOpen}
+        onClose={handleCloseSettings}
+        title={t('documents.storage.settingsModal.title')}
+        size="md"
+        footer={
+          <div className="flex gap-3">
+            <Button variant="outline" className="flex-1" onClick={handleCloseSettings}>
+              {t('documents.storage.settingsModal.cancel')}
+            </Button>
+            <Button
+              className="flex-1"
+              onClick={handleUpdateStorage}
+              disabled={settingsUpdating || !settingsName.trim() || (settingsSecured && settingsPassword !== '' && settingsPassword !== settingsPasswordConfirm) || (!settingsSecured && settingsStorage?.isSecured && !settingsCurrentPassword)}
+            >
+              {settingsUpdating ? t('documents.storage.settingsModal.updating') : t('documents.storage.settingsModal.update')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          {/* Name — editable */}
+          <div className="space-y-1">
+            <Label>{t('documents.storage.settingsModal.name')}</Label>
+            <Input
+              value={settingsName}
+              onChange={(e) => setSettingsName(e.target.value)}
+              placeholder={t('documents.storage.settingsModal.name')}
+            />
+          </div>
+
+          {/* Sharing — toggle button */}
+          <div className="space-y-1">
+            <Label>{t('documents.storage.settingsModal.sharing')}</Label>
+            <button
+              type="button"
+              onClick={() => setSettingsShared(!settingsShared)}
+              className="w-full px-4 py-2.5 text-sm text-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
+            >
+              {settingsShared ? t('documents.storage.settingsModal.sharingShared') : t('documents.storage.settingsModal.sharingPrivate')}
+            </button>
+          </div>
+
+          {/* Encryption — toggle button */}
+          <div className="space-y-1">
+            <Label>{t('documents.storage.settingsModal.encryption')}</Label>
+            <button
+              type="button"
+              onClick={() => {
+                const next = !settingsSecured;
+                setSettingsSecured(next);
+                if (!next) {
+                  setSettingsPassword('');
+                  setSettingsPasswordConfirm('');
+                } else {
+                  setSettingsCurrentPassword('');
+                  setSettingsCurrentPasswordError(null);
+                }
+              }}
+              className={`w-full px-4 py-2.5 text-sm text-center rounded-lg border transition-colors ${
+                settingsSecured
+                  ? 'border-blue-400 bg-blue-50 text-blue-600'
+                  : 'border-gray-200 bg-white text-foreground hover:bg-gray-50'
+              }`}
+            >
+              {settingsSecured ? t('documents.storage.settingsModal.encryptionEnabled') : t('documents.storage.settingsModal.encryptionNone')}
+            </button>
+          </div>
+
+          {/* Current password field — shown when disabling encryption on an encrypted item */}
+          {!settingsSecured && settingsStorage?.isSecured && (
+            <div className="space-y-1">
+              <Label>{t('documents.storage.settingsModal.currentPassword')}</Label>
+              <Input
+                type="password"
+                value={settingsCurrentPassword}
+                onChange={(e) => { setSettingsCurrentPassword(e.target.value); setSettingsCurrentPasswordError(null); }}
+                placeholder={t('documents.storage.settingsModal.currentPasswordPlaceholder')}
+              />
+              {settingsCurrentPasswordError && (
+                <p className="text-xs text-red-500 mt-1">{settingsCurrentPasswordError}</p>
+              )}
+            </div>
+          )}
+
+          {/* Password fields — shown when encryption is enabled */}
+          {settingsSecured && (
+            <>
+              <div className="space-y-1">
+                <Label>{t('documents.storage.settingsModal.newPassword')}</Label>
+                <Input
+                  type="password"
+                  value={settingsPassword}
+                  onChange={(e) => setSettingsPassword(e.target.value)}
+                  placeholder={t('documents.storage.settingsModal.newPasswordPlaceholder')}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>{t('documents.storage.settingsModal.confirmPassword')}</Label>
+                <Input
+                  type="password"
+                  value={settingsPasswordConfirm}
+                  onChange={(e) => setSettingsPasswordConfirm(e.target.value)}
+                  placeholder={t('documents.storage.settingsModal.confirmPasswordPlaceholder')}
+                />
+                {settingsPassword && settingsPasswordConfirm && settingsPassword !== settingsPasswordConfirm && (
+                  <p className="text-xs text-red-500 mt-1">{t('documents.storage.settingsModal.passwordMismatch')}</p>
+                )}
               </div>
             </>
           )}

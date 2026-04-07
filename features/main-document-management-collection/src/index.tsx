@@ -117,6 +117,8 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
   const [settingsUpdating, setSettingsUpdating] = useState(false);
   const [settingsPassword, setSettingsPassword] = useState('');
   const [settingsPasswordConfirm, setSettingsPasswordConfirm] = useState('');
+  const [settingsCurrentPassword, setSettingsCurrentPassword] = useState('');
+  const [settingsCurrentPasswordError, setSettingsCurrentPasswordError] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -307,13 +309,30 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
     setSettingsCollection(null);
     setSettingsPassword('');
     setSettingsPasswordConfirm('');
+    setSettingsCurrentPassword('');
+    setSettingsCurrentPasswordError(null);
   }, []);
 
   const handleUpdateCollection = useCallback(async () => {
     if (!settingsCollection || !settingsName.trim()) return;
     if (settingsSecured && settingsPassword && settingsPassword !== settingsPasswordConfirm) return;
     setSettingsUpdating(true);
+    setSettingsCurrentPasswordError(null);
     try {
+      // Verify current password before disabling encryption
+      if (!settingsSecured && settingsCollection.isSecured) {
+        if (!settingsCurrentPassword) {
+          setSettingsCurrentPasswordError(t('documents.collection.settingsModal.currentPasswordRequired'));
+          setSettingsUpdating(false);
+          return;
+        }
+        const verifyResult = await verifyCollectionPassword(settingsCollection.name, settingsCurrentPassword);
+        if (!verifyResult.valid) {
+          setSettingsCurrentPasswordError(t('documents.collection.settingsModal.currentPasswordIncorrect'));
+          setSettingsUpdating(false);
+          return;
+        }
+      }
       const updateData: Record<string, any> = {
         is_shared: settingsShared,
         is_secured: settingsSecured,
@@ -332,13 +351,15 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
       setSettingsCollection(null);
       setSettingsPassword('');
       setSettingsPasswordConfirm('');
+      setSettingsCurrentPassword('');
+      setSettingsCurrentPasswordError(null);
       await loadData();
     } catch (err) {
       console.error('Failed to update collection:', err);
     } finally {
       setSettingsUpdating(false);
     }
-  }, [settingsCollection, settingsName, settingsShared, settingsSecured, settingsPassword, settingsPasswordConfirm, loadData]);
+  }, [settingsCollection, settingsName, settingsShared, settingsSecured, settingsPassword, settingsPasswordConfirm, settingsCurrentPassword, loadData, t]);
 
   // ── External Drag & Drop on List View ──
   const handleExternalDrop = useCallback((result: ExternalDropResult) => {
@@ -759,7 +780,7 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
             <Button
               className="flex-1"
               onClick={handleUpdateCollection}
-              disabled={settingsUpdating || !settingsName.trim() || (settingsSecured && settingsPassword !== '' && settingsPassword !== settingsPasswordConfirm)}
+              disabled={settingsUpdating || !settingsName.trim() || (settingsSecured && settingsPassword !== '' && settingsPassword !== settingsPasswordConfirm) || (!settingsSecured && settingsCollection?.isSecured && !settingsCurrentPassword)}
             >
               {settingsUpdating ? t('documents.collection.settingsModal.updating') : t('documents.collection.settingsModal.update')}
             </Button>
@@ -767,10 +788,14 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
         }
       >
         <div className="space-y-4">
-          {/* Name — read-only display */}
+          {/* Name — editable */}
           <div className="space-y-1">
             <Label>{t('documents.collection.settingsModal.name')}</Label>
-            <p className="text-sm text-foreground py-1">{settingsName}</p>
+            <Input
+              value={settingsName}
+              onChange={(e) => setSettingsName(e.target.value)}
+              placeholder={t('documents.collection.settingsModal.name')}
+            />
           </div>
 
           {/* Sharing — toggle button */}
@@ -791,10 +816,16 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
             <button
               type="button"
               onClick={() => {
-                setSettingsSecured(!settingsSecured);
-                if (settingsSecured) {
+                const next = !settingsSecured;
+                setSettingsSecured(next);
+                if (!next) {
+                  // Disabling encryption — clear new password fields
                   setSettingsPassword('');
                   setSettingsPasswordConfirm('');
+                } else {
+                  // Re-enabling encryption — clear current password fields
+                  setSettingsCurrentPassword('');
+                  setSettingsCurrentPasswordError(null);
                 }
               }}
               className={`w-full px-4 py-2.5 text-sm text-center rounded-lg border transition-colors ${
@@ -806,6 +837,22 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
               {settingsSecured ? t('documents.collection.settingsModal.encryptionEnabled') : t('documents.collection.settingsModal.encryptionNone')}
             </button>
           </div>
+
+          {/* Current password field — shown when disabling encryption on an encrypted item */}
+          {!settingsSecured && settingsCollection?.isSecured && (
+            <div className="space-y-1">
+              <Label>{t('documents.collection.settingsModal.currentPassword')}</Label>
+              <Input
+                type="password"
+                value={settingsCurrentPassword}
+                onChange={(e) => { setSettingsCurrentPassword(e.target.value); setSettingsCurrentPasswordError(null); }}
+                placeholder={t('documents.collection.settingsModal.currentPasswordPlaceholder')}
+              />
+              {settingsCurrentPasswordError && (
+                <p className="text-xs text-red-500 mt-1">{settingsCurrentPasswordError}</p>
+              )}
+            </div>
+          )}
 
           {/* Password fields — shown when encryption is enabled */}
           {settingsSecured && (
