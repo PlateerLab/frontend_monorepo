@@ -88,6 +88,7 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
   const [settingsUpdating, setSettingsUpdating] = useState(false);
   const [settingsPassword, setSettingsPassword] = useState('');
   const [settingsPasswordConfirm, setSettingsPasswordConfirm] = useState('');
+  const [settingsChangePassword, setSettingsChangePassword] = useState(false);
   const [settingsCurrentPassword, setSettingsCurrentPassword] = useState('');
   const [settingsCurrentPasswordError, setSettingsCurrentPasswordError] = useState<string | null>(null);
 
@@ -272,12 +273,18 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
     setSettingsName(storage.name);
     setSettingsShared(storage.isShared);
     setSettingsSecured(storage.isSecured);
+    setSettingsChangePassword(false);
+    setSettingsPassword('');
+    setSettingsPasswordConfirm('');
+    setSettingsCurrentPassword('');
+    setSettingsCurrentPasswordError(null);
     setIsSettingsModalOpen(true);
   }, []);
 
   const handleCloseSettings = useCallback(() => {
     setIsSettingsModalOpen(false);
     setSettingsStorage(null);
+    setSettingsChangePassword(false);
     setSettingsPassword('');
     setSettingsPasswordConfirm('');
     setSettingsCurrentPassword('');
@@ -286,7 +293,7 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
 
   const handleUpdateStorage = useCallback(async () => {
     if (!settingsStorage || !settingsName.trim()) return;
-    if (settingsSecured && settingsPassword && settingsPassword !== settingsPasswordConfirm) return;
+    if (settingsSecured && settingsChangePassword && settingsPassword && settingsPassword !== settingsPasswordConfirm) return;
     setSettingsUpdating(true);
     setSettingsCurrentPasswordError(null);
     try {
@@ -304,12 +311,26 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
           return;
         }
       }
+      // Verify current password before changing password
+      if (settingsSecured && settingsStorage.isSecured && settingsChangePassword) {
+        if (!settingsCurrentPassword) {
+          setSettingsCurrentPasswordError(t('documents.storage.settingsModal.currentPasswordRequired'));
+          setSettingsUpdating(false);
+          return;
+        }
+        const verifyResult = await verifyStoragePassword(settingsStorage.storageId, settingsCurrentPassword);
+        if (!verifyResult.valid) {
+          setSettingsCurrentPasswordError(t('documents.storage.settingsModal.currentPasswordIncorrect'));
+          setSettingsUpdating(false);
+          return;
+        }
+      }
       const updateData: Record<string, any> = {
         storage_name: settingsName.trim(),
         is_shared: settingsShared,
         is_secured: settingsSecured,
       };
-      if (settingsSecured && settingsPassword) {
+      if (settingsSecured && settingsChangePassword && settingsPassword) {
         updateData.password_hash = await sha256(settingsPassword);
       }
       if (!settingsSecured && settingsStorage.isSecured) {
@@ -318,6 +339,7 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
       await updateStorage(settingsStorage.storageId, updateData);
       setIsSettingsModalOpen(false);
       setSettingsStorage(null);
+      setSettingsChangePassword(false);
       setSettingsPassword('');
       setSettingsPasswordConfirm('');
       setSettingsCurrentPassword('');
@@ -328,7 +350,7 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
     } finally {
       setSettingsUpdating(false);
     }
-  }, [settingsStorage, settingsName, settingsShared, settingsSecured, settingsPassword, settingsPasswordConfirm, settingsCurrentPassword, loadData, t]);
+  }, [settingsStorage, settingsName, settingsShared, settingsSecured, settingsChangePassword, settingsPassword, settingsPasswordConfirm, settingsCurrentPassword, loadData, t]);
 
   // ── External Drag & Drop on List View ──
   const handleExternalDrop = useCallback((result: ExternalDropResult) => {
@@ -664,7 +686,7 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
             <Button
               className="flex-1"
               onClick={handleUpdateStorage}
-              disabled={settingsUpdating || !settingsName.trim() || (settingsSecured && settingsPassword !== '' && settingsPassword !== settingsPasswordConfirm) || (!settingsSecured && settingsStorage?.isSecured && !settingsCurrentPassword)}
+              disabled={settingsUpdating || !settingsName.trim() || (settingsSecured && settingsChangePassword && settingsPassword !== '' && settingsPassword !== settingsPasswordConfirm) || (!settingsSecured && settingsStorage?.isSecured && !settingsCurrentPassword) || (settingsSecured && settingsStorage?.isSecured && settingsChangePassword && !settingsCurrentPassword)}
             >
               {settingsUpdating ? t('documents.storage.settingsModal.updating') : t('documents.storage.settingsModal.update')}
             </Button>
@@ -705,9 +727,11 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
                 if (!next) {
                   setSettingsPassword('');
                   setSettingsPasswordConfirm('');
+                  setSettingsChangePassword(false);
                 } else {
                   setSettingsCurrentPassword('');
                   setSettingsCurrentPasswordError(null);
+                  setSettingsChangePassword(false);
                 }
               }}
               className={`w-full px-4 py-2.5 text-sm text-center rounded-lg border transition-colors ${
@@ -736,30 +760,70 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
             </div>
           )}
 
-          {/* Password fields — shown when encryption is enabled */}
+          {/* Password change — shown when encryption is enabled */}
           {settingsSecured && (
             <>
-              <div className="space-y-1">
-                <Label>{t('documents.storage.settingsModal.newPassword')}</Label>
-                <Input
-                  type="password"
-                  value={settingsPassword}
-                  onChange={(e) => setSettingsPassword(e.target.value)}
-                  placeholder={t('documents.storage.settingsModal.newPasswordPlaceholder')}
-                />
-              </div>
-              <div className="space-y-1">
-                <Label>{t('documents.storage.settingsModal.confirmPassword')}</Label>
-                <Input
-                  type="password"
-                  value={settingsPasswordConfirm}
-                  onChange={(e) => setSettingsPasswordConfirm(e.target.value)}
-                  placeholder={t('documents.storage.settingsModal.confirmPasswordPlaceholder')}
-                />
-                {settingsPassword && settingsPasswordConfirm && settingsPassword !== settingsPasswordConfirm && (
-                  <p className="text-xs text-red-500 mt-1">{t('documents.storage.settingsModal.passwordMismatch')}</p>
-                )}
-              </div>
+              {settingsStorage?.isSecured && (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="settingsChangeStoragePassword"
+                    checked={settingsChangePassword}
+                    onChange={(e) => {
+                      setSettingsChangePassword(e.target.checked);
+                      if (!e.target.checked) {
+                        setSettingsCurrentPassword('');
+                        setSettingsCurrentPasswordError(null);
+                        setSettingsPassword('');
+                        setSettingsPasswordConfirm('');
+                      }
+                    }}
+                    className="rounded border-gray-300"
+                  />
+                  <Label htmlFor="settingsChangeStoragePassword" className="cursor-pointer text-sm">
+                    {t('documents.storage.settingsModal.changePassword')}
+                  </Label>
+                </div>
+              )}
+              {(settingsChangePassword || !settingsStorage?.isSecured) && (
+                <>
+                  {settingsStorage?.isSecured && settingsChangePassword && (
+                    <div className="space-y-1">
+                      <Label>{t('documents.storage.settingsModal.currentPassword')}</Label>
+                      <Input
+                        type="password"
+                        value={settingsCurrentPassword}
+                        onChange={(e) => { setSettingsCurrentPassword(e.target.value); setSettingsCurrentPasswordError(null); }}
+                        placeholder={t('documents.storage.settingsModal.currentPasswordPlaceholder')}
+                      />
+                      {settingsCurrentPasswordError && (
+                        <p className="text-xs text-red-500 mt-1">{settingsCurrentPasswordError}</p>
+                      )}
+                    </div>
+                  )}
+                  <div className="space-y-1">
+                    <Label>{t('documents.storage.settingsModal.newPassword')}</Label>
+                    <Input
+                      type="password"
+                      value={settingsPassword}
+                      onChange={(e) => setSettingsPassword(e.target.value)}
+                      placeholder={t('documents.storage.settingsModal.newPasswordPlaceholder')}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label>{t('documents.storage.settingsModal.confirmPassword')}</Label>
+                    <Input
+                      type="password"
+                      value={settingsPasswordConfirm}
+                      onChange={(e) => setSettingsPasswordConfirm(e.target.value)}
+                      placeholder={t('documents.storage.settingsModal.confirmPasswordPlaceholder')}
+                    />
+                    {settingsPassword && settingsPasswordConfirm && settingsPassword !== settingsPasswordConfirm && (
+                      <p className="text-xs text-red-500 mt-1">{t('documents.storage.settingsModal.passwordMismatch')}</p>
+                    )}
+                  </div>
+                </>
+              )}
             </>
           )}
         </div>

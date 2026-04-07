@@ -52,6 +52,7 @@ export const en: TranslationData = {
       currentPasswordPlaceholder: 'Enter current password',
       currentPasswordRequired: 'Please enter current password to disable encryption.',
       currentPasswordIncorrect: 'Current password is incorrect.',
+      changePassword: 'Change Password',
       newPassword: 'New Password',
       newPasswordPlaceholder: 'Enter new password',
       confirmPassword: 'Confirm Password',
