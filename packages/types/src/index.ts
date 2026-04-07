@@ -82,10 +82,10 @@ export interface SidebarUserProfile {
 
 /** 사이드바 로고 설정 */
 export interface SidebarLogo {
-  /** 확장 상태 로고 텍스트 */
-  expanded: string;
-  /** 축소 상태 로고 텍스트 */
-  collapsed: string;
+  /** 확장 상태 로고 (텍스트 또는 ReactNode) */
+  expanded: React.ReactNode;
+  /** 축소 상태 로고 (텍스트 또는 ReactNode) */
+  collapsed: React.ReactNode;
 }
 
 /** 사이드바 헤더 설정 */

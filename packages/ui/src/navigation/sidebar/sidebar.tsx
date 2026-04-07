@@ -153,9 +153,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ config }) => {
       <SidebarHeader className={collapsed ? 'px-0 flex justify-center' : undefined}>
         <SidebarHeaderTop className={collapsed ? 'justify-center' : undefined}>
           <SidebarLogoButton onClick={handleLogoClick}>
-            <span className="font-pretendard text-[var(--subtitle1-font-size,14px)] font-bold leading-[var(--subtitle1-line-height,20px)]">
-              {collapsed ? (logo?.collapsed || 'X') : (logo?.expanded || 'XGEN')}
-            </span>
+            {collapsed
+              ? (logo?.collapsed || <span className="font-pretendard text-[var(--subtitle1-font-size,14px)] font-bold leading-[var(--subtitle1-line-height,20px)]">X</span>)
+              : (logo?.expanded || <span className="font-pretendard text-[var(--subtitle1-font-size,14px)] font-bold leading-[var(--subtitle1-line-height,20px)]">XGEN</span>)
+            }
           </SidebarLogoButton>
           {!collapsed && header?.modeLabelKey && (
             <SidebarModeLabel className={variant === 'admin' ? 'text-[var(--color-info-200)]' : undefined}>

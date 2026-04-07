@@ -56,6 +56,8 @@ export const commonEn: TranslationData = {
   },
   sidebar: {
     userMode: 'User mode',
+    adminMode: 'Admin',
+    myPageMode: 'My Page',
     openSidebar: 'Open Sidebar',
     closeSidebar: 'Close Sidebar',
     chat: {

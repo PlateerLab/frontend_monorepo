@@ -55,7 +55,9 @@ export const commonKo: TranslationData = {
     downloadError: '다운로드에 실패했습니다.',
   },
   sidebar: {
-    userMode: 'User mode',
+    userMode: '사용자모드',
+    adminMode: '관리자모드',
+    myPageMode: '마이페이지',
     openSidebar: '사이드바 열기',
     closeSidebar: '사이드바 닫기',
     chat: {

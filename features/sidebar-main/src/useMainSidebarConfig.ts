@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from '@xgen/i18n';
 import type { SidebarConfig, SidebarSection, SidebarLabelOverrides } from '@xgen/types';
 
@@ -71,7 +71,10 @@ export function useMainSidebarConfig({
 
   return useMemo(
     (): SidebarConfig => ({
-      logo: { expanded: 'XGEN', collapsed: 'X' },
+      logo: {
+        expanded: React.createElement('img', { src: '/icons/logo/Icon_Logo_M.svg', alt: 'XGEN', height: 30, style: { height: 30, width: 'auto' } }),
+        collapsed: React.createElement('img', { src: '/icons/logo/Icon_Logo_Symbol.svg', alt: 'X', height: 30, style: { height: 30, width: 'auto' } }),
+      },
       header: {
         modeLabelKey: 'sidebar.userMode',
         showAdminButton: Boolean(onAdminClick),

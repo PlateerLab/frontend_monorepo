@@ -152,13 +152,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       <SidebarHeader className={!isOpen ? 'px-0 flex justify-center' : undefined}>
         <SidebarHeaderTop className={!isOpen ? 'justify-center' : undefined}>
           <SidebarLogoButton onClick={onLogoClick || (() => handleItemClick('dashboard'))}>
-            <span className="font-pretendard text-[var(--subtitle1-font-size,14px)] font-bold leading-[var(--subtitle1-line-height,20px)]">
-              {isOpen ? 'XGEN' : 'X'}
-            </span>
+            {isOpen
+              ? <img src="/icons/logo/Icon_Logo_M.svg" alt="XGEN" height={30} style={{ height: 30, width: 'auto' }} />
+              : <img src="/icons/logo/Icon_Logo_Symbol.svg" alt="X" height={30} style={{ height: 30, width: 'auto' }} />
+            }
           </SidebarLogoButton>
           {isOpen && (
             <SidebarModeLabel className="text-[var(--color-info-200)]">
-              Admin
+              {t('sidebar.adminMode')}
             </SidebarModeLabel>
           )}
         </SidebarHeaderTop>
