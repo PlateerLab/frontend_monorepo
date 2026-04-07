@@ -45,7 +45,7 @@ const LoadingSpinner: React.FC = () => (
 function MainPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t } = useTranslation();
+  const { t, locale, setLocale } = useTranslation();
   const { user, logout } = useAuth();
 
   const [initialized, setInitialized] = useState(false);
@@ -128,6 +128,8 @@ function MainPageContent() {
         collapsed={sidebarCollapsed}
         userName={user?.username}
         isAdmin={user?.is_admin}
+        locale={locale}
+        onLocaleChange={(l) => setLocale(l as 'ko' | 'en')}
         onNavigate={handleNavigate}
         onToggle={handleSidebarToggle}
         onLogout={() => logout()}

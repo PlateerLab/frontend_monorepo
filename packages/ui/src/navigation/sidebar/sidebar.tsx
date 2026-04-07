@@ -86,7 +86,7 @@ export interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ config }) => {
   const { t } = useTranslation();
   const {
-    logo, header, sections, user, onLogout, onUserClick, onNavigate, onLogoClick,
+    logo, header, sections, user, locale, onLocaleChange, onLogout, onUserClick, onNavigate, onLogoClick,
     collapsed = false, onToggle, activeItemId = '', variant = 'main', className,
   } = config;
 
@@ -95,6 +95,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ config }) => {
   const [expandedSection, setExpandedSection] = useState<SidebarSectionId | null>(null);
   const [openPopover, setOpenPopover] = useState<SidebarSectionId | null>(null);
   const [popoverAnchor, setPopoverAnchor] = useState<DOMRect | null>(null);
+  const [showLangPopover, setShowLangPopover] = useState(false);
+  const langBtnRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (collapsed) {
@@ -230,6 +232,51 @@ export const Sidebar: React.FC<SidebarProps> = ({ config }) => {
                       </svg>
                     }
                   />
+                )}
+                {onLocaleChange && (
+                  <div className="relative" ref={langBtnRef}>
+                    <SidebarFooterButton
+                      onClick={() => setShowLangPopover((v) => !v)}
+                      title={t('common.language')}
+                      icon={
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10" />
+                          <line x1="2" y1="12" x2="22" y2="12" />
+                          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                        </svg>
+                      }
+                    />
+                    {showLangPopover && (
+                      <>
+                        <div className="fixed inset-0 z-[998]" onClick={() => setShowLangPopover(false)} />
+                        <div className="absolute bottom-full left-0 mb-2 z-[999] bg-white rounded-lg border border-[var(--color-line-50)] shadow-lg py-1 min-w-[100px]">
+                          {[
+                            { value: 'ko', label: 'KOR', sub: '한국어' },
+                            { value: 'en', label: 'ENG', sub: 'English' },
+                          ].map((lang) => (
+                            <button
+                              key={lang.value}
+                              type="button"
+                              className={cn(
+                                'w-full px-3 py-2 text-left text-sm cursor-pointer border-none transition-colors duration-150',
+                                'flex items-center justify-between gap-3',
+                                locale === lang.value
+                                  ? 'bg-[var(--color-primary-w-50,#f0f0ff)] text-[var(--color-secondary-200,#305EEB)] font-semibold'
+                                  : 'bg-transparent text-[var(--color-gray-800)] hover:bg-[var(--color-bg-50)]',
+                              )}
+                              onClick={() => {
+                                onLocaleChange(lang.value);
+                                setShowLangPopover(false);
+                              }}
+                            >
+                              <span className="font-semibold">{lang.label}</span>
+                              <span className="text-xs text-[var(--color-gray-500)]">{lang.sub}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 )}
                 {onLogout && (
                   <SidebarFooterButton

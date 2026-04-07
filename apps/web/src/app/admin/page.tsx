@@ -45,7 +45,7 @@ const DEFAULT_ADMIN_VIEW = 'dashboard';
 function AdminPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t } = useTranslation();
+  const { t, locale, setLocale } = useTranslation();
   const { user, logout } = useAuth();
 
   const [initialized, setInitialized] = useState(false);
@@ -114,6 +114,8 @@ function AdminPageContent() {
         activeItem={activeItemId}
         onItemClick={handleItemClick}
         userName={user?.username}
+        locale={locale}
+        onLocaleChange={(l) => setLocale(l as 'ko' | 'en')}
         onLogout={() => logout()}
         onBackToChat={handleBackToChat}
         onUserClick={() => router.push('/mypage')}

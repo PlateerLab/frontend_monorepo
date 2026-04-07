@@ -39,6 +39,8 @@ export const commonEn: TranslationData = {
     share: 'Share',
     export: 'Export',
     import: 'Import',
+    language: 'Language',
+    adminPage: 'Admin Page',
   },
   toast: {
     logoutSuccess: 'Logged out successfully.',
