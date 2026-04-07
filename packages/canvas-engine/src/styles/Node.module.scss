@@ -1003,12 +1003,26 @@
 }
 
 .expandableWrapper .paramInput {
-    flex: 0 0 calc(var(--param-field-width) - 28px - 4px);
-    width: 100%;
+    flex: 1 1 auto;
+    width: 0;
+    min-width: 0;
     max-width: calc(var(--param-field-width) - 28px - 4px);
     box-sizing: border-box;
+    user-select: text;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+// --- Boolean parameter toggle layout ---
+.booleanParam {
+    flex: 0 0 var(--param-field-width);
+    width: var(--param-field-width);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
     user-select: none;
-    min-width: 0;
 }
 
 .expandButton {

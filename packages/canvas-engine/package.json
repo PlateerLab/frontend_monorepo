@@ -12,6 +12,7 @@
     "@xgen/canvas-layout": "workspace:*",
     "@xgen/i18n": "workspace:*",
     "@xgen/icons": "workspace:*",
+    "@xgen/ui": "workspace:*",
     "react-icons": "^5.4.0"
   },
   "peerDependencies": {

@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { LuPlus, LuRefreshCw, LuCopy, LuTrash2, FiInfo } from '@xgen/icons';
+import { ToggleSwitch } from '@xgen/ui';
 import styles from '../../../styles/Node.module.scss';
 import { separateParameters, detectParameterType, createCustomParameter, duplicateParameter, getLocalizedDescription } from '../utils/parameterUtils';
 import { useApiParameters } from '../../../hooks/node/useApiParameters';
@@ -265,21 +266,26 @@ export const NodeParameters: React.FC<NodeParametersProps & {
                 const boolValue = typeof param.value === 'boolean' ? param.value :
                     typeof param.value === 'string' ? param.value.toLowerCase() === 'true' : false;
                 return (
-                    <label className={styles.booleanParam}>
-                        <input
-                            type="checkbox"
+                    <div
+                        className={styles.booleanParam}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <ToggleSwitch
                             checked={boolValue}
-                            onChange={(e) => {
+                            onChange={(checked) => {
                                 if (onParameterChange) {
-                                    onParameterChange(nodeId, param.id, e.target.checked);
+                                    onParameterChange(nodeId, param.id, checked);
                                 }
                             }}
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onClick={(e) => e.stopPropagation()}
                             disabled={isPreview}
+                            size="sm"
+                            color={boolValue ? 'green' : 'gray'}
+                            showStateLabel
+                            onLabel="True"
+                            offLabel="False"
                         />
-                        <span>{boolValue ? 'True' : 'False'}</span>
-                    </label>
+                    </div>
                 );
             }
 
@@ -317,10 +323,26 @@ export const NodeParameters: React.FC<NodeParametersProps & {
             // Expandable parameter
             if (parameterType === 'expandable') {
                 const displayValue = param.value !== undefined && param.value !== null ? param.value.toString() : '';
-                const truncated = displayValue.length > 50 ? displayValue.substring(0, 50) + '...' : displayValue;
                 return (
-                    <div className={styles.expandableParam}>
-                        <span className={styles.expandableValue}>{truncated || '(empty)'}</span>
+                    <div className={styles.expandableWrapper}>
+                        <input
+                            type="text"
+                            value={displayValue}
+                            onChange={(e) => {
+                                if (onParameterChange) {
+                                    onParameterChange(nodeId, param.id, e.target.value);
+                                }
+                            }}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onClick={(e) => e.stopPropagation()}
+                            onFocus={(e) => { e.stopPropagation(); if (onClearSelection) onClearSelection(); }}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                            draggable={false}
+                            className={`${styles.paramInput} paramInput`}
+                            placeholder="Click expand to edit..."
+                            disabled={isPreview}
+                        />
                         {onOpenNodeModal && (
                             <button
                                 className={styles.expandButton}
@@ -328,6 +350,7 @@ export const NodeParameters: React.FC<NodeParametersProps & {
                                     e.stopPropagation();
                                     onOpenNodeModal(nodeId, param.id, param.name, displayValue);
                                 }}
+                                onMouseDown={(e) => e.stopPropagation()}
                                 type="button"
                                 title="Edit in modal"
                             >

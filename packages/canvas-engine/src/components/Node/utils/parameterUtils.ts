@@ -7,7 +7,7 @@ export const detectParameterType = (param: Parameter): ParameterType => {
     if (param.handle_id === true) return 'handle';
     if (param.type && ['BOOL', 'BOOLEAN', 'TRUE', 'FALSE', 'bool'].includes(param.type)) return 'boolean';
     if (param.id === 'tool_name') return 'tool_name';
-    if ((param as any).expandable) return 'expandable';
+    if (param.expandable) return 'expandable';
     return 'default';
 };
 
