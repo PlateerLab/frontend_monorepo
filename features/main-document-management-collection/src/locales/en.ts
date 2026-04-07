@@ -97,6 +97,7 @@ export const en: TranslationData = {
       },
       buttons: {
         upload: 'Upload Document',
+        uploadFolder: 'Upload Folder',
         createFolder: 'New Folder',
       },
       uploadModal: {

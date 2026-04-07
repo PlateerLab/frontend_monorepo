@@ -95,6 +95,7 @@ export const ko: TranslationData = {
       },
       buttons: {
         upload: '문서 업로드',
+        uploadFolder: '폴더 업로드',
         createFolder: '새 폴더',
       },
       uploadModal: {
