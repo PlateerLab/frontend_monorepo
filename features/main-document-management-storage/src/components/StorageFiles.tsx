@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Button, Modal, Input, Label, DirectoryTree, DocumentCard } from '@xgen/ui';
-import type { TreeFolder, TreeFile } from '@xgen/ui';
+import { Button, Modal, Input, Label, DirectoryTree, DocumentCard, useExternalDrop, isExternalFileDrag, extractFilesFromDataTransfer } from '@xgen/ui';
+import type { TreeFolder, TreeFile, ExternalDropResult } from '@xgen/ui';
 import { FiArrowLeft, FiFile, FiFolder, FiChevronRight, FiClock, FiDownload, FiUpload, FiPlus } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import type { FileStorageItem, StorageFileItem, StorageFolderItem, PaginationInfo } from '../api';
@@ -86,6 +86,13 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
   const [creatingFolder, setCreatingFolder] = useState(false);
+
+  // External drop state
+  const [isDropConfirmOpen, setIsDropConfirmOpen] = useState(false);
+  const [pendingDropFiles, setPendingDropFiles] = useState<File[]>([]);
+  const [pendingDropRelativePaths, setPendingDropRelativePaths] = useState<Map<File, string>>(new Map());
+  const [pendingDropTargetFolderId, setPendingDropTargetFolderId] = useState<number | null>(null);
+  const [pendingDropTargetPath, setPendingDropTargetPath] = useState<string>('');
 
   const loadFolders = useCallback(async () => {
     try {
@@ -300,6 +307,104 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
     }
   }, [newFolderName, storage.storageId, currentFolder, currentPage, loadFiles, loadFolders]);
 
+  // ── External Drop ──
+  const handleExternalDropToFolder = useCallback((result: ExternalDropResult, targetFolderId: number | null, targetPath: string) => {
+    setPendingDropFiles(result.files);
+    setPendingDropRelativePaths(result.relativePaths);
+    setPendingDropTargetFolderId(targetFolderId);
+    setPendingDropTargetPath(targetPath || storage.name);
+    setIsDropConfirmOpen(true);
+  }, [storage.name]);
+
+  const handleConfirmDrop = useCallback(async () => {
+    setIsDropConfirmOpen(false);
+    setUploading(true);
+    try {
+      for (const file of pendingDropFiles) {
+        const relPath = pendingDropRelativePaths.get(file) || '';
+        // Extract folder portion from relative path (remove filename part if it's from traversal)
+        const lastSlash = relPath.lastIndexOf('/');
+        const folderPart = lastSlash !== -1 ? relPath : (relPath || null);
+        await uploadStorageFile({
+          file,
+          storage_id: storage.storageId,
+          folder_id: pendingDropTargetFolderId,
+          relative_path: folderPart,
+        });
+      }
+      await loadFolders();
+      await loadFiles(currentPage, currentFolder?.id ?? null);
+    } catch (err) {
+      console.error('Failed to upload dropped files:', err);
+    } finally {
+      setUploading(false);
+      setPendingDropFiles([]);
+      setPendingDropRelativePaths(new Map());
+    }
+  }, [pendingDropFiles, pendingDropRelativePaths, pendingDropTargetFolderId, storage.storageId, currentPage, currentFolder, loadFiles, loadFolders]);
+
+  const handleCancelDrop = useCallback(() => {
+    setIsDropConfirmOpen(false);
+    setPendingDropFiles([]);
+    setPendingDropRelativePaths(new Map());
+  }, []);
+
+  // Folder card drop highlight state
+  const [dropOverFolderCardId, setDropOverFolderCardId] = useState<number | null>(null);
+  const folderCardDragCounterRef = useRef<Map<number, number>>(new Map());
+
+  const handleFolderCardDragEnter = useCallback((e: React.DragEvent, folderId: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isExternalFileDrag(e)) return;
+    const counter = (folderCardDragCounterRef.current.get(folderId) || 0) + 1;
+    folderCardDragCounterRef.current.set(folderId, counter);
+    if (counter === 1) setDropOverFolderCardId(folderId);
+  }, []);
+
+  const handleFolderCardDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'copy';
+  }, []);
+
+  const handleFolderCardDragLeave = useCallback((e: React.DragEvent, folderId: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const counter = (folderCardDragCounterRef.current.get(folderId) || 1) - 1;
+    folderCardDragCounterRef.current.set(folderId, Math.max(0, counter));
+    if (counter <= 0) {
+      setDropOverFolderCardId(prev => prev === folderId ? null : prev);
+    }
+  }, []);
+
+  const handleFolderCardDrop = useCallback(async (e: React.DragEvent, folder: StorageFolderItem) => {
+    e.preventDefault();
+    e.stopPropagation();
+    folderCardDragCounterRef.current.set(folder.id, 0);
+    setDropOverFolderCardId(null);
+    if (!isExternalFileDrag(e)) return;
+    const result = await extractFilesFromDataTransfer(e.dataTransfer);
+    if (result.files.length > 0) {
+      handleExternalDropToFolder(result, folder.id, folder.fullPath);
+    }
+  }, [handleExternalDropToFolder]);
+
+  // External drop on the right panel (cards area) → current folder
+  const { isDragOver: isCardAreaDragOver, dropHandlers: cardAreaDropHandlers } = useExternalDrop({
+    onDrop: (result) => handleExternalDropToFolder(result, currentFolder?.id ?? null, currentFolder?.fullPath || ''),
+  });
+
+  // External drop handler for DirectoryTree
+  const handleTreeExternalDrop = useCallback((result: ExternalDropResult, targetTreeFolder: TreeFolder | null) => {
+    if (targetTreeFolder) {
+      const original = allFolders.find(f => f.id === targetTreeFolder.id);
+      handleExternalDropToFolder(result, original?.id ?? null, original?.fullPath || '');
+    } else {
+      handleExternalDropToFolder(result, null, '');
+    }
+  }, [allFolders, handleExternalDropToFolder]);
+
   const totalPages = pagination?.totalPages ?? 1;
 
   // ── Render ──
@@ -377,6 +482,7 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
               const original = allFolders.find(f => f.id === tf.id);
               if (original) handleNavigateToFolder(original);
             }}
+            onExternalFileDrop={handleTreeExternalDrop}
             title={t('documents.storage.detail.directoryTree.title', '디렉토리 구조')}
             fileSuffix={t('documents.storage.detail.directoryTree.filesSuffix', ' 파일')}
             searchPlaceholder={t('documents.storage.detail.directoryTree.searchPlaceholder', '파일 검색...')}
@@ -384,7 +490,19 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
         </div>
 
         {/* File Cards (Right Panel) */}
-        <div className="flex-1 min-h-0 overflow-y-auto p-6">
+        <div
+          className={`flex-1 min-h-0 overflow-y-auto p-6 relative transition-colors ${isCardAreaDragOver ? 'bg-primary/5' : ''}`}
+          {...cardAreaDropHandlers}
+        >
+        {/* Drop overlay */}
+        {isCardAreaDragOver && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+            <div className="absolute inset-3 border-2 border-dashed border-primary/50 rounded-xl" />
+            <div className="bg-background/90 px-4 py-2 rounded-lg shadow-sm border border-primary/30">
+              <p className="text-sm font-medium text-primary">{t('documents.storage.detail.dropOverlay', '파일을 여기에 놓아주세요')}</p>
+            </div>
+          </div>
+        )}
         {loading ? (
           <div className="flex items-center justify-center min-h-[300px]">
             <div className="w-10 h-10 border-3 border-border border-t-primary rounded-full animate-spin" />
@@ -415,14 +533,21 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
 
               {/* Folder Cards */}
               {currentFolders.map(folder => (
-                <DocumentCard
+                <div
                   key={`folder-${folder.id}`}
-                  variant="folder"
-                  title={folder.name}
-                  subtitle={`${t('documents.storage.detail.folderPathLabel', '경로')} : ${folder.fullPath}`}
-                  onClick={() => handleNavigateToFolder(folder)}
-                  onDelete={() => handleDeleteFolder(folder)}
-                />
+                  className={`rounded-lg transition-all h-fit ${dropOverFolderCardId === folder.id ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+                  onDragEnter={(e) => handleFolderCardDragEnter(e, folder.id)}
+                  onDragOver={handleFolderCardDragOver}
+                  onDragLeave={(e) => handleFolderCardDragLeave(e, folder.id)}
+                  onDrop={(e) => handleFolderCardDrop(e, folder)}
+                >
+                  <DocumentCard
+                    variant="folder"
+                    title={folder.name || folder.fullPath.split('/').filter(Boolean).pop() || ''}
+                    onClick={() => handleNavigateToFolder(folder)}
+                    onDelete={() => handleDeleteFolder(folder)}
+                  />
+                </div>
               ))}
 
               {/* File Cards */}
@@ -517,6 +642,46 @@ export const StorageFiles: React.FC<StorageFilesProps> = ({ storage, onBack }) =
             onChange={(e) => setNewFolderName(e.target.value)}
             placeholder={t('documents.storage.detail.createFolderModal.namePlaceholder')}
           />
+        </div>
+      </Modal>
+
+      {/* Drop Confirm Modal */}
+      <Modal
+        isOpen={isDropConfirmOpen}
+        onClose={handleCancelDrop}
+        title={t('documents.storage.detail.dropConfirm.title', '파일 업로드 확인')}
+        size="sm"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCancelDrop}>
+              {t('documents.storage.createModal.cancel')}
+            </Button>
+            <Button onClick={handleConfirmDrop}>
+              {t('documents.storage.detail.dropConfirm.upload', '업로드')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-3">
+          <p className="text-sm text-foreground">
+            {pendingDropTargetPath || storage.name} {t('documents.storage.detail.dropConfirm.pathSuffix', '경로에')} {pendingDropFiles.length}{t('documents.storage.detail.dropConfirm.fileCountSuffix', '개의 파일을 업로드합니다.')}
+          </p>
+          {pendingDropFiles.length > 0 && (
+            <div className="max-h-40 overflow-y-auto border border-border rounded-lg p-2 space-y-1">
+              {pendingDropFiles.slice(0, 20).map((file, idx) => (
+                <div key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <FiFile className="w-3 h-3 shrink-0" />
+                  <span className="truncate">{file.name}</span>
+                  <span className="shrink-0 ml-auto">{formatSize(file.size)}</span>
+                </div>
+              ))}
+              {pendingDropFiles.length > 20 && (
+                <p className="text-xs text-muted-foreground text-center pt-1">
+                  ... {t('documents.storage.detail.dropConfirm.moreFiles', { count: pendingDropFiles.length - 20, defaultValue: `외 ${pendingDropFiles.length - 20}개 파일` })}
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </Modal>
     </div>

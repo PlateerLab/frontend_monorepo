@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { DocumentTabPlugin, DocumentTabPluginProps, CardBadge } from '@xgen/types';
-import { Button, FilterTabs, SearchInput, Modal, Input, Label, Switch, Textarea, ResourceCardGrid } from '@xgen/ui';
+import { Button, FilterTabs, SearchInput, Modal, Input, Label, Switch, Textarea, ResourceCardGrid, useExternalDrop } from '@xgen/ui';
+import type { ExternalDropResult } from '@xgen/ui';
 import { FiServer, FiFile, FiDatabase, FiClock, FiTrash2, FiLock } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
-import { listStorages, createStorage, deleteStorage, verifyStoragePassword, storeStorageSessionToken, getStorageSessionToken, type FileStorageItem } from './api';
+import { listStorages, createStorage, deleteStorage, verifyStoragePassword, storeStorageSessionToken, getStorageSessionToken, uploadStorageFile, type FileStorageItem } from './api';
 import { StorageFiles } from './components/StorageFiles';
 import './locales';
 
@@ -78,6 +79,26 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
 
+  // External drop state
+  const [isDropConfirmOpen, setIsDropConfirmOpen] = useState(false);
+  const [pendingDropFiles, setPendingDropFiles] = useState<File[]>([]);
+  const [pendingDropRelativePaths, setPendingDropRelativePaths] = useState<Map<File, string>>(new Map());
+  const [pendingDropStorage, setPendingDropStorage] = useState<FileStorageItem | null>(null);
+  const [dropUploading, setDropUploading] = useState(false);
+
+  // Drop on encrypted storage - need password first
+  const [isDropPasswordModalOpen, setIsDropPasswordModalOpen] = useState(false);
+  const [dropPasswordStorage, setDropPasswordStorage] = useState<FileStorageItem | null>(null);
+  const [dropPassword, setDropPassword] = useState('');
+  const [dropPasswordError, setDropPasswordError] = useState<string | null>(null);
+  const [dropPasswordVerifying, setDropPasswordVerifying] = useState(false);
+  const [pendingDropResult, setPendingDropResult] = useState<ExternalDropResult | null>(null);
+
+  // Drop select storage state (when multiple storages)
+  const [isDropSelectOpen, setIsDropSelectOpen] = useState(false);
+  const [dropSelectResult, setDropSelectResult] = useState<ExternalDropResult | null>(null);
+  const [dropCreateMode, setDropCreateMode] = useState(false);
+
   const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -132,8 +153,9 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
     if (!newStorageName.trim()) return;
     setCreating(true);
     try {
+      const createdName = newStorageName.trim();
       await createStorage({
-        storage_name: newStorageName.trim(),
+        storage_name: createdName,
         description: newStorageDesc.trim() || undefined,
         is_secured: newStorageEncrypt,
         password: newStorageEncrypt ? newStoragePassword : undefined,
@@ -144,13 +166,40 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
       setNewStorageEncrypt(false);
       setNewStoragePassword('');
       setNewStoragePasswordConfirm('');
-      await loadData();
+      const updatedData = await listStorages();
+      setFileStorages(updatedData);
+
+      // If came from drop select flow, auto-proceed with upload
+      if (dropCreateMode && dropSelectResult) {
+        const newStorage = updatedData.find(s => s.name === createdName);
+        if (newStorage) {
+          setIsDropSelectOpen(false);
+          setDropCreateMode(false);
+          if (newStorage.isSecured) {
+            const token = getStorageSessionToken(newStorage.storageId);
+            if (!token) {
+              setDropPasswordStorage(newStorage);
+              setPendingDropResult(dropSelectResult);
+              setDropPassword('');
+              setDropPasswordError(null);
+              setIsDropPasswordModalOpen(true);
+              setDropSelectResult(null);
+              return;
+            }
+          }
+          setPendingDropStorage(newStorage);
+          setPendingDropFiles(dropSelectResult.files);
+          setPendingDropRelativePaths(dropSelectResult.relativePaths);
+          setDropSelectResult(null);
+          setIsDropConfirmOpen(true);
+        }
+      }
     } catch (err) {
       console.error('Failed to create file storage:', err);
     } finally {
       setCreating(false);
     }
-  }, [newStorageName, newStorageDesc, newStorageEncrypt, newStoragePassword, loadData]);
+  }, [newStorageName, newStorageDesc, newStorageEncrypt, newStoragePassword, loadData, dropCreateMode, dropSelectResult]);
 
   const handleDeleteStorage = useCallback(async (item: FileStorageItem) => {
     try {
@@ -163,6 +212,7 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
 
   const handleCloseCreateModal = useCallback(() => {
     setIsCreateModalOpen(false);
+    setDropCreateMode(false);
     setNewStorageName('');
     setNewStorageDesc('');
     setNewStorageEncrypt(false);
@@ -203,6 +253,127 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
     setVerifyPassword('');
     setVerifyError(null);
   }, []);
+
+  // ── External Drag & Drop on List View ──
+  const handleExternalDrop = useCallback((result: ExternalDropResult) => {
+    if (fileStorages.length === 0) return;
+    if (fileStorages.length === 1) {
+      const target = fileStorages[0];
+      if (target.isSecured) {
+        const token = getStorageSessionToken(target.storageId);
+        if (!token) {
+          setDropPasswordStorage(target);
+          setPendingDropResult(result);
+          setDropPassword('');
+          setDropPasswordError(null);
+          setIsDropPasswordModalOpen(true);
+          return;
+        }
+      }
+      setPendingDropStorage(target);
+      setPendingDropFiles(result.files);
+      setPendingDropRelativePaths(result.relativePaths);
+      setIsDropConfirmOpen(true);
+      return;
+    }
+    // Multiple storages: let user select which storage
+    setDropSelectResult(result);
+    setIsDropSelectOpen(true);
+  }, [fileStorages]);
+
+  const handleSelectDropStorage = useCallback((storageItem: FileStorageItem) => {
+    if (!dropSelectResult) return;
+    setIsDropSelectOpen(false);
+    if (storageItem.isSecured) {
+      const token = getStorageSessionToken(storageItem.storageId);
+      if (!token) {
+        setDropPasswordStorage(storageItem);
+        setPendingDropResult(dropSelectResult);
+        setDropPassword('');
+        setDropPasswordError(null);
+        setIsDropPasswordModalOpen(true);
+        setDropSelectResult(null);
+        return;
+      }
+    }
+    setPendingDropStorage(storageItem);
+    setPendingDropFiles(dropSelectResult.files);
+    setPendingDropRelativePaths(dropSelectResult.relativePaths);
+    setDropSelectResult(null);
+    setIsDropConfirmOpen(true);
+  }, [dropSelectResult]);
+
+  const handleDropPasswordVerify = useCallback(async () => {
+    if (!dropPasswordStorage || !dropPassword || !pendingDropResult) return;
+    setDropPasswordVerifying(true);
+    setDropPasswordError(null);
+    try {
+      const result = await verifyStoragePassword(dropPasswordStorage.storageId, dropPassword);
+      if (result.valid && result.session_token) {
+        storeStorageSessionToken(dropPasswordStorage.storageId, result.session_token);
+        setIsDropPasswordModalOpen(false);
+        setPendingDropStorage(dropPasswordStorage);
+        setPendingDropFiles(pendingDropResult.files);
+        setPendingDropRelativePaths(pendingDropResult.relativePaths);
+        setDropPasswordStorage(null);
+        setPendingDropResult(null);
+        setDropPassword('');
+        setIsDropConfirmOpen(true);
+      } else {
+        setDropPasswordError(t('documents.storage.passwordModal.passwordIncorrect'));
+      }
+    } catch {
+      setDropPasswordError(t('documents.storage.passwordModal.passwordIncorrect'));
+    } finally {
+      setDropPasswordVerifying(false);
+    }
+  }, [dropPasswordStorage, dropPassword, pendingDropResult, t]);
+
+  const handleCloseDropPasswordModal = useCallback(() => {
+    setIsDropPasswordModalOpen(false);
+    setDropPasswordStorage(null);
+    setPendingDropResult(null);
+    setDropPassword('');
+    setDropPasswordError(null);
+  }, []);
+
+  const handleConfirmDrop = useCallback(async () => {
+    if (!pendingDropStorage) return;
+    setIsDropConfirmOpen(false);
+    setDropUploading(true);
+    try {
+      for (const file of pendingDropFiles) {
+        const relPath = pendingDropRelativePaths.get(file) || '';
+        const lastSlash = relPath.lastIndexOf('/');
+        const folderPart = lastSlash !== -1 ? relPath : (relPath || null);
+        await uploadStorageFile({
+          file,
+          storage_id: pendingDropStorage.storageId,
+          relative_path: folderPart,
+        });
+      }
+      await loadData();
+    } catch (err) {
+      console.error('Failed to upload dropped files:', err);
+    } finally {
+      setDropUploading(false);
+      setPendingDropFiles([]);
+      setPendingDropRelativePaths(new Map());
+      setPendingDropStorage(null);
+    }
+  }, [pendingDropFiles, pendingDropRelativePaths, pendingDropStorage, loadData]);
+
+  const handleCancelDrop = useCallback(() => {
+    setIsDropConfirmOpen(false);
+    setPendingDropFiles([]);
+    setPendingDropRelativePaths(new Map());
+    setPendingDropStorage(null);
+  }, []);
+
+  const { isDragOver: isListDragOver, dropHandlers: listDropHandlers } = useExternalDrop({
+    onDrop: handleExternalDrop,
+    disabled: viewMode !== 'list',
+  });
 
   const filteredFileStorages = useMemo(() => {
     return fileStorages.filter(fs => {
@@ -304,7 +475,16 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
 
   // List View (default)
   return (
-    <div className="flex flex-col flex-1 min-h-0 p-6">
+    <div className={`flex flex-col flex-1 min-h-0 p-6 relative transition-colors ${isListDragOver ? 'bg-primary/5' : ''}`} {...listDropHandlers}>
+      {/* Drop overlay */}
+      {isListDragOver && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+          <div className="absolute inset-3 border-2 border-dashed border-primary/50 rounded-xl" />
+          <div className="bg-background/90 px-4 py-2 rounded-lg shadow-sm border border-primary/30">
+            <p className="text-sm font-medium text-primary">{t('documents.storage.dropOverlay', '파일 저장소에 파일을 놓아주세요')}</p>
+          </div>
+        </div>
+      )}
       <div className="flex-1 min-h-0 overflow-y-auto">
         <ResourceCardGrid
           items={cardItems}
@@ -424,6 +604,127 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
               onChange={(e) => setVerifyPassword(e.target.value)}
               placeholder={t('documents.storage.passwordModal.passwordPlaceholder')}
               onKeyDown={(e) => { if (e.key === 'Enter' && !verifying) handleVerifyStoragePassword(); }}
+              autoFocus
+            />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Drop Confirm Modal */}
+      <Modal
+        isOpen={isDropConfirmOpen}
+        onClose={handleCancelDrop}
+        title={t('documents.storage.dropConfirm.title', '파일 업로드 확인')}
+        size="sm"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCancelDrop}>
+              {t('documents.storage.createModal.cancel')}
+            </Button>
+            <Button onClick={handleConfirmDrop} disabled={dropUploading}>
+              {dropUploading ? t('documents.storage.dropConfirm.uploading', '업로드 중...') : t('documents.storage.dropConfirm.upload', '업로드')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-3">
+          <p className="text-sm text-foreground">
+            {pendingDropStorage?.name} {t('documents.storage.dropConfirm.storageSuffix', '저장소')}에 {pendingDropFiles.length}{t('documents.storage.dropConfirm.fileCountSuffix', '개의 파일을 업로드합니다.')}
+          </p>
+          {pendingDropFiles.length > 0 && (
+            <div className="max-h-40 overflow-y-auto border border-border rounded-lg p-2 space-y-1">
+              {pendingDropFiles.slice(0, 20).map((file, idx) => (
+                <div key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <FiFile className="w-3 h-3 shrink-0" />
+                  <span className="truncate">{file.name}</span>
+                  <span className="shrink-0 ml-auto">{formatSize(file.size)}</span>
+                </div>
+              ))}
+              {pendingDropFiles.length > 20 && (
+                <p className="text-xs text-muted-foreground text-center pt-1">
+                  ... 외 {pendingDropFiles.length - 20}개 파일
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </Modal>
+
+      {/* Drop Storage Select Modal */}
+      <Modal
+        isOpen={isDropSelectOpen}
+        onClose={() => { setIsDropSelectOpen(false); setDropSelectResult(null); }}
+        title={t('documents.storage.dropSelect.title', '업로드할 저장소 선택')}
+        size="sm"
+      >
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground mb-3">
+            {t('documents.storage.dropSelect.description', '파일을 업로드할 저장소를 선택해주세요.')}
+          </p>
+          {fileStorages.map(fs => (
+            <button
+              key={fs.id}
+              className="w-full flex items-center gap-3 p-3 border border-border rounded-lg hover:bg-accent/50 transition-colors text-left"
+              onClick={() => handleSelectDropStorage(fs)}
+            >
+              <FiServer className="w-5 h-5 text-green-500 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{fs.name}</p>
+                <p className="text-xs text-muted-foreground">{fs.fileCount} {t('documents.storage.files')}</p>
+              </div>
+              {fs.isSecured && <FiLock className="w-4 h-4 text-muted-foreground shrink-0" />}
+            </button>
+          ))}
+
+          {/* Create new storage */}
+          <div className="pt-3 mt-2 border-t border-border">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => { setDropCreateMode(true); setIsCreateModalOpen(true); }}
+            >
+              {t('documents.storage.dropSelect.createNew')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Drop Password Modal */}
+      <Modal
+        isOpen={isDropPasswordModalOpen}
+        onClose={handleCloseDropPasswordModal}
+        title={t('documents.storage.passwordModal.title')}
+        size="sm"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCloseDropPasswordModal}>
+              {t('documents.storage.createModal.cancel')}
+            </Button>
+            <Button onClick={handleDropPasswordVerify} disabled={dropPasswordVerifying || !dropPassword}>
+              {dropPasswordVerifying ? t('documents.storage.passwordModal.verifying') : t('documents.storage.passwordModal.verify')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="flex flex-col items-center gap-2 py-2">
+            <FiLock className="w-10 h-10 text-muted-foreground" />
+            <p className="text-sm font-medium">{dropPasswordStorage?.name}</p>
+            <p className="text-xs text-muted-foreground text-center">
+              {t('documents.storage.passwordModal.description')}
+            </p>
+          </div>
+          {dropPasswordError && (
+            <p className="text-sm text-destructive text-center">{dropPasswordError}</p>
+          )}
+          <div className="space-y-2">
+            <Label>{t('documents.storage.passwordModal.passwordLabel')}</Label>
+            <Input
+              type="password"
+              value={dropPassword}
+              onChange={(e) => setDropPassword(e.target.value)}
+              placeholder={t('documents.storage.passwordModal.passwordPlaceholder')}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !dropPasswordVerifying) handleDropPasswordVerify(); }}
               autoFocus
             />
           </div>

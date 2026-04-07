@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { isExternalFileDrag, extractFilesFromDataTransfer } from '../hooks/use-external-drop';
+import type { ExternalDropResult } from '../hooks/use-external-drop'; // used in onExternalFileDrop prop
 
 // ─────────────────────────────────────────────────────────────
 // Generic Types
@@ -63,6 +65,8 @@ export interface DirectoryTreeProps {
   onMoveFile?: (file: TreeFile, targetFolder: TreeFolder | null) => void;
   /** Called when a folder is dropped onto another folder */
   onMoveFolder?: (folder: TreeFolder, targetFolder: TreeFolder | null) => void;
+  /** Called when external files (from OS) are dropped onto a folder node */
+  onExternalFileDrop?: (result: ExternalDropResult, targetFolder: TreeFolder | null) => void;
   /** Header title */
   title?: string;
   /** File count suffix (e.g. " files") */
@@ -117,6 +121,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
   onSelectFile,
   onMoveFile,
   onMoveFolder,
+  onExternalFileDrop,
   title = 'Directory Structure',
   fileSuffix = ' files',
   searchPlaceholder = 'Search files...',
@@ -271,15 +276,16 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
   }, []);
 
   const handleFolderDragOver = useCallback((e: React.DragEvent, folderPath: string, folderData?: TreeFolder) => {
-    if (!draggedFile && !draggedFolder) return;
+    const isExternal = isExternalFileDrag(e) && !draggedFile && !draggedFolder;
+    if (!draggedFile && !draggedFolder && !(isExternal && onExternalFileDrop)) return;
     if (draggedFolder && folderData) {
       if (folderPath === draggedFolder.fullPath || folderPath.startsWith(draggedFolder.fullPath + '/')) return;
     }
     e.preventDefault();
     e.stopPropagation();
-    e.dataTransfer.dropEffect = 'move';
+    e.dataTransfer.dropEffect = isExternal ? 'copy' : 'move';
     setDragOverFolderPath(folderPath);
-  }, [draggedFile, draggedFolder]);
+  }, [draggedFile, draggedFolder, onExternalFileDrop]);
 
   const handleFolderDragLeave = useCallback((e: React.DragEvent, folderPath: string) => {
     e.preventDefault();
@@ -296,7 +302,17 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
 
     const targetFolder = targetNode.id === 'root' ? null : (targetNode.folderData ?? null);
 
-    // Folder drop
+    // External file drop (from OS)
+    const isExternal = isExternalFileDrag(e) && !draggedFile && !draggedFolder;
+    if (isExternal && onExternalFileDrop) {
+      const result = await extractFilesFromDataTransfer(e.dataTransfer);
+      if (result.files.length > 0) {
+        onExternalFileDrop(result, targetFolder);
+      }
+      return;
+    }
+
+    // Internal folder drop
     if (draggedFolder) {
       const targetPath = targetNode.path;
       if (targetPath === draggedFolder.fullPath || targetPath.startsWith(draggedFolder.fullPath + '/')) {
@@ -308,14 +324,15 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
       return;
     }
 
-    // File drop
+    // Internal file drop
     if (draggedFile) {
       onMoveFile?.(draggedFile, targetFolder);
       setDraggedFile(null);
     }
-  }, [draggedFolder, draggedFile, onMoveFolder, onMoveFile]);
+  }, [draggedFolder, draggedFile, onMoveFolder, onMoveFile, onExternalFileDrop]);
 
   const hasDragSupport = !!(onMoveFile || onMoveFolder);
+  const hasAnyDropSupport = hasDragSupport || !!onExternalFileDrop;
 
   // ── Render Tree Node ──
   const renderNode = (node: TreeNode, level: number = 0): React.ReactNode => {
@@ -324,7 +341,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
     const isCurrentFolder = currentFolder
       ? (node.type === 'folder' && node.folderData && node.folderData.id === currentFolder.id)
       : node.id === 'root';
-    const isDragOver = (draggedFile || draggedFolder) && node.type === 'folder' && dragOverFolderPath === node.path;
+    const isDragOver = node.type === 'folder' && dragOverFolderPath === node.path;
     const isFolderDraggable = hasDragSupport && node.type === 'folder' && node.id !== 'root';
     const isFileDraggable = hasDragSupport && node.type === 'file';
 
@@ -356,9 +373,9 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
                 : undefined
           }
           onDragEnd={(isFileDraggable || isFolderDraggable) ? handleDragEnd : undefined}
-          onDragOver={node.type === 'folder' ? (e) => handleFolderDragOver(e, node.path, node.folderData) : undefined}
-          onDragLeave={node.type === 'folder' ? (e) => handleFolderDragLeave(e, node.path) : undefined}
-          onDrop={node.type === 'folder' ? (e) => handleFolderDrop(e, node) : undefined}
+          onDragOver={node.type === 'folder' && hasAnyDropSupport ? (e) => handleFolderDragOver(e, node.path, node.folderData) : undefined}
+          onDragLeave={node.type === 'folder' && hasAnyDropSupport ? (e) => handleFolderDragLeave(e, node.path) : undefined}
+          onDrop={node.type === 'folder' && hasAnyDropSupport ? (e) => handleFolderDrop(e, node) : undefined}
         >
           {/* Expand/Collapse icon */}
           {node.type === 'folder' ? (

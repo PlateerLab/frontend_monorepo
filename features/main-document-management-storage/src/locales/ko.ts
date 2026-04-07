@@ -42,8 +42,29 @@ export const ko: TranslationData = {
       verify: '확인',
       verifying: '확인 중...',
     },
+    dropOverlay: '파일 저장소에 파일을 놓아주세요',
+    dropConfirm: {
+      title: '파일 업로드 확인',
+      upload: '업로드',
+      uploading: '업로드 중...',
+      storageSuffix: '저장소',
+      fileCountSuffix: '개의 파일을 업로드합니다.',
+    },
+    dropSelect: {
+      title: '업로드할 저장소 선택',
+      description: '파일을 업로드할 저장소를 선택해주세요.',
+      createNew: '새 저장소 생성',
+    },
     detail: {
       empty: '파일이 없습니다',
+      dropOverlay: '파일을 여기에 놓아주세요',
+      dropConfirm: {
+        title: '파일 업로드 확인',
+        upload: '업로드',
+        pathSuffix: '경로에',
+        fileCountSuffix: '개의 파일을 업로드합니다.',
+        moreFiles: '개 파일 더',
+      },
       error: {
         loadFailed: '파일 목록을 불러오지 못했습니다',
       },

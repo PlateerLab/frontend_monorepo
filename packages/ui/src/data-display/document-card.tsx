@@ -170,7 +170,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
     return (
       <div
         className={cn(
-          'group flex items-center gap-3 p-4 bg-card border border-border rounded-lg',
+          'group flex items-center gap-3 p-4 bg-card border border-border rounded-lg min-h-[92px]',
           'cursor-pointer hover:shadow-sm hover:bg-accent/30 transition-all',
           className,
         )}
@@ -187,55 +187,59 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
     );
   }
 
-  // ── Folder variant: single-row with hover delete ──
+  // ── Folder variant: two-row card (matches file card height) ──
   if (variant === 'folder') {
     return (
       <div
         className={cn(
-          'group flex items-center gap-3 p-4 bg-card border border-border rounded-lg',
-          onClick && 'cursor-pointer hover:shadow-sm transition-all',
+          'group flex flex-col p-4 bg-card border border-border rounded-lg transition-all',
+          onClick && 'cursor-pointer hover:shadow-sm',
           className,
         )}
         onClick={onClick}
       >
-        <div
-          className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-          style={{
-            backgroundColor: iconBg || config.bg,
-            color: iconColor || config.color,
-          }}
-        >
-          {icon || config.icon}
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-foreground truncate">{title}</p>
-          {subtitle && (
-            <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{subtitle}</p>
+        {/* Row 1: Icon + Title + Delete */}
+        <div className="flex items-start gap-3 mb-2">
+          <div
+            className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+            style={{
+              backgroundColor: iconBg || config.bg,
+              color: iconColor || config.color,
+            }}
+          >
+            {icon || config.icon}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-foreground truncate">{title}</p>
+            {subtitle && (
+              <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{subtitle}</p>
+            )}
+          </div>
+          {onDelete && (
+            <button
+              className="opacity-0 group-hover:opacity-100 p-1 text-muted-foreground hover:text-destructive transition-all"
+              onClick={handleDelete}
+            >
+              <TrashIcon />
+            </button>
+          )}
+          {!onDelete && actions && actions.length > 0 && (
+            <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all">
+              {actions.map((action) => (
+                <button
+                  key={action.id}
+                  type="button"
+                  className="p-1 text-muted-foreground hover:text-destructive transition-colors"
+                  onClick={(e) => handleActionClick(action, e)}
+                >
+                  {action.icon || <TrashIcon />}
+                </button>
+              ))}
+            </div>
           )}
         </div>
-        {onDelete && (
-          <button
-            className="opacity-0 group-hover:opacity-100 p-1 text-muted-foreground hover:text-destructive transition-all"
-            onClick={handleDelete}
-          >
-            <TrashIcon />
-          </button>
-        )}
-        {/* Fallback: actions as bottom bar (if no onDelete) */}
-        {!onDelete && actions && actions.length > 0 && (
-          <div className="flex items-center gap-1.5">
-            {actions.map((action) => (
-              <button
-                key={action.id}
-                type="button"
-                className="opacity-0 group-hover:opacity-100 p-1 text-muted-foreground hover:text-destructive transition-all"
-                onClick={(e) => handleActionClick(action, e)}
-              >
-                {action.icon || <TrashIcon />}
-              </button>
-            ))}
-          </div>
-        )}
+        {/* Row 2: Empty spacer to match file card height */}
+        <div className="text-[11px] mt-auto">&nbsp;</div>
       </div>
     );
   }

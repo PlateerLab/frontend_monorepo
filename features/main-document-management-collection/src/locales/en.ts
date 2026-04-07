@@ -67,8 +67,29 @@ export const en: TranslationData = {
       verify: 'Verify',
       verifying: 'Verifying...',
     },
+    dropOverlay: 'Drop files to upload to collection',
+    dropConfirm: {
+      title: 'Upload Confirmation',
+      confirm: 'Embedding Settings',
+      collectionSuffix: 'collection:',
+      fileCountSuffix: ' file(s) will be uploaded.',
+      hint: 'Press confirm to configure embedding options.',
+    },
+    dropSelect: {
+      title: 'Select Collection',
+      description: 'Select a collection to upload the files to.',
+      createNew: 'Create New Collection',
+    },
     detail: {
       empty: 'No documents',
+      dropOverlay: 'Drop files here',
+      dropConfirm: {
+        title: 'Upload Confirmation',
+        confirm: 'Embedding Settings',
+        pathSuffix: 'path:',
+        fileCountSuffix: ' file(s) will be uploaded.',
+        hint: 'Press confirm to configure embedding options.',
+      },
       noChunks: 'No chunks',
       error: {
         loadFailed: 'Failed to load documents',
@@ -86,6 +107,7 @@ export const en: TranslationData = {
         chunkOverlap: 'Chunk Overlap',
         upload: 'Upload',
         uploading: 'Uploading...',
+        fileCount: ' files',
       },
       createFolderModal: {
         title: 'Create Folder',

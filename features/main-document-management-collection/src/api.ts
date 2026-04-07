@@ -404,6 +404,91 @@ export async function updateDocumentFolder(
   });
 }
 
+/**
+ * Ensure folder structure exists for drag-and-drop uploads.
+ * Creates any missing folders from the relative paths.
+ * Returns updated folders list.
+ */
+export async function ensureFolderStructure(
+  relativePaths: Map<File, string>,
+  collectionId: number,
+  collectionName: string,
+  collectionDisplayName: string,
+  baseFolderPath?: string,
+): Promise<FolderItem[]> {
+  // Collect unique folder paths from relativePaths
+  const folderPathsSet = new Set<string>();
+  for (const relPath of relativePaths.values()) {
+    if (!relPath) continue;
+    // relPath can be "folder1" or "folder1/subfolder2"
+    // We need to create each level
+    const parts = relPath.split('/').filter(Boolean);
+    for (let i = 0; i < parts.length; i++) {
+      folderPathsSet.add(parts.slice(0, i + 1).join('/'));
+    }
+  }
+  if (folderPathsSet.size === 0) {
+    const summary = await listDocumentsSummary(collectionName);
+    return summary.folders;
+  }
+
+  // Sort by depth (shallowest first)
+  const sortedPaths = Array.from(folderPathsSet).sort((a, b) => {
+    return a.split('/').length - b.split('/').length;
+  });
+
+  // Fetch current folders
+  let summary = await listDocumentsSummary(collectionName);
+  let existingFolders = summary.folders;
+
+  for (const relFolderPath of sortedPaths) {
+    const parts = relFolderPath.split('/');
+    const folderName = parts[parts.length - 1];
+
+    // Compute the expected full path
+    const fullPath = baseFolderPath
+      ? `${baseFolderPath}/${relFolderPath}`
+      : `/${collectionDisplayName}/${relFolderPath}`;
+
+    // Check if folder already exists
+    const existing = existingFolders.find(
+      f => f.fullPath.replace(/\/+$/, '') === fullPath.replace(/\/+$/, '')
+    );
+    if (existing) continue;
+
+    // Find parent folder
+    let parentFolderId: number | null = null;
+    let parentFolderName: string | null = null;
+    if (parts.length > 1) {
+      const parentRelPath = parts.slice(0, -1).join('/');
+      const parentFullPath = baseFolderPath
+        ? `${baseFolderPath}/${parentRelPath}`
+        : `/${collectionDisplayName}/${parentRelPath}`;
+      const parentFolder = existingFolders.find(
+        f => f.fullPath.replace(/\/+$/, '') === parentFullPath.replace(/\/+$/, '')
+      );
+      if (parentFolder) {
+        parentFolderId = parentFolder.id;
+        parentFolderName = parentFolder.folderName;
+      }
+    }
+
+    await createFolder({
+      folder_name: folderName,
+      parent_collection_id: collectionId,
+      parent_folder_id: parentFolderId,
+      parent_folder_name: parentFolderName,
+      collection_name: collectionName,
+    });
+
+    // Re-fetch folders to get the new folder's ID
+    summary = await listDocumentsSummary(collectionName);
+    existingFolders = summary.folders;
+  }
+
+  return existingFolders;
+}
+
 function generateSessionId(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
