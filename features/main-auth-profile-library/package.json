@@ -1,0 +1,26 @@
+{
+  "name": "@xgen/main-auth-profile-library",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@xgen/api-client": "workspace:*",
+    "@xgen/auth-provider": "workspace:*",
+    "@xgen/i18n": "workspace:*",
+    "@xgen/icons": "workspace:*",
+    "@xgen/types": "workspace:*",
+    "@xgen/ui": "workspace:*",
+    "next": "^15.1.0",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "typescript": "^5"
+  }
+}

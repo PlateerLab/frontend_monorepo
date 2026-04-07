@@ -1,3 +1,11 @@
+# Usage
+bash
+```
+pnpm install && npm run build && npm run start -- -p 3000
+```
+
+---
+
 # XGEN Frontend Monorepo — 작업 규칙
 
 ---

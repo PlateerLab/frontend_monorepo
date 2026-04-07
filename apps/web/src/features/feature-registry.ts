@@ -183,7 +183,7 @@ export async function initializeFeatures(): Promise<void> {
     import('@xgen/main-workflow-management-orchestrator'),
     import('@xgen/main-tool-management-orchestrator'),
     import('@xgen/main-prompt-management-orchestrator'),
-    import('@xgen/main-auth-profile'),
+    import('@xgen/main-auth-profile-orchestrator'),
 
     // Knowledge Section
     import('@xgen/main-document-management-orchestrator'),
@@ -251,6 +251,18 @@ export async function initializeFeatures(): Promise<void> {
 
   CoreRegistry.registerPromptTabPlugin(promptStorageMod.promptStoragePlugin);
   CoreRegistry.registerPromptTabPlugin(promptLibraryMod.promptLibraryPlugin);
+
+  // Register Auth Profile Tab Plugins (순서 = 탭 순서)
+  const [
+    authProfileStorageMod,
+    authProfileLibraryMod,
+  ] = await Promise.all([
+    import('@xgen/main-auth-profile-storage'),
+    import('@xgen/main-auth-profile-library'),
+  ]);
+
+  CoreRegistry.registerAuthProfileTabPlugin(authProfileStorageMod.authProfileStoragePlugin);
+  CoreRegistry.registerAuthProfileTabPlugin(authProfileLibraryMod.authProfileLibraryPlugin);
 
   // Register Canvas Page Plugins
   registerCanvasPlugins();

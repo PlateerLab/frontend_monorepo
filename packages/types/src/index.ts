@@ -1109,6 +1109,30 @@ export interface PromptTabPluginProps {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Auth Profile Tab Plugin
+// 인증 프로필 관리 페이지에 탭으로 끼워지는 플러그인 인터페이스
+// ─────────────────────────────────────────────────────────────
+export interface AuthProfileTabPlugin {
+  /** 플러그인 고유 ID (탭 key로도 사용) */
+  id: string;
+  /** 플러그인 이름 */
+  name: string;
+  /** 탭 라벨 i18n 키 */
+  tabLabelKey: string;
+  /** 탭 순서 (작을수록 앞) */
+  order: number;
+  /** 탭 컨텐츠 컴포넌트 */
+  component: ComponentType<AuthProfileTabPluginProps>;
+}
+
+export interface AuthProfileTabPluginProps {
+  /** 다른 섹션으로 이동 */
+  onNavigate?: (sectionId: string) => void;
+  /** 서브 툴바 콘텐츠를 상위로 전달 */
+  onSubToolbarChange?: (content: React.ReactNode) => void;
+}
+
+// ─────────────────────────────────────────────────────────────
 // Document Tab Plugin
 // 지식 관리 페이지에 탭으로 끼워지는 플러그인 인터페이스
 // ─────────────────────────────────────────────────────────────
@@ -1318,6 +1342,7 @@ class FeatureRegistryClass {
   private toolTabPlugins: Map<string, ToolTabPlugin> = new Map();
   private documentTabPlugins: Map<string, DocumentTabPlugin> = new Map();
   private promptTabPlugins: Map<string, PromptTabPlugin> = new Map();
+  private authProfileTabPlugins: Map<string, AuthProfileTabPlugin> = new Map();
   private canvasPagePlugins: Map<string, CanvasPagePlugin> = new Map();
   private govMonitoringTabPlugins: Map<string, GovMonitoringTabPlugin> = new Map();
   private workflowMgmtTabPlugins: Map<string, WorkflowMgmtTabPlugin> = new Map();
@@ -1451,6 +1476,16 @@ class FeatureRegistryClass {
 
   getPromptTabPlugins(): PromptTabPlugin[] {
     return Array.from(this.promptTabPlugins.values())
+      .sort((a, b) => a.order - b.order);
+  }
+
+  // ── AuthProfileTabPlugin ──
+  registerAuthProfileTabPlugin(plugin: AuthProfileTabPlugin): void {
+    this.authProfileTabPlugins.set(plugin.id, plugin);
+  }
+
+  getAuthProfileTabPlugins(): AuthProfileTabPlugin[] {
+    return Array.from(this.authProfileTabPlugins.values())
       .sort((a, b) => a.order - b.order);
   }
 
