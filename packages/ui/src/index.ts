@@ -124,6 +124,7 @@ export { DataTable } from './data-display/data-table';
 export type {
   DataTableProps,
   DataTableColumn,
+  DataTablePaginationConfig,
   SortRule,
   SortDirection,
 } from './data-display/data-table';

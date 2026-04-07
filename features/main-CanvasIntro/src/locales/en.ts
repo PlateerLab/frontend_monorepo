@@ -8,17 +8,8 @@ export const en: TranslationData = {
       title: 'AI Canvas Editor',
       description: 'Design AI workflows visually',
       createBlank: 'Start with Blank Canvas',
-      browseWorkflows: 'Browse Workflows'
-    },
-    templates: {
-      title: 'Templates',
-      recommended: 'Recommended',
-      popular: 'Popular',
-      advanced: 'Advanced',
-      blank: { title: 'Blank Canvas', description: 'Start from scratch' },
-      chatbot: { title: 'Chatbot', description: 'Create conversational AI bot' },
-      rag: { title: 'RAG Pipeline', description: 'Retrieval Augmented Generation' },
-      agent: { title: 'AI Agent', description: 'Autonomous AI agent' }
+      continue: 'Continue',
+      noDataError: 'No saved workflow data to continue.'
     }
   }
 };

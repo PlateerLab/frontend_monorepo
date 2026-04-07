@@ -415,7 +415,7 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
             {t('admin.workflowManagement.chatMonitoring.prev')}
           </Button>
           <span className="text-sm text-muted-foreground">
-            {t('admin.workflowManagement.chatMonitoring.page')} {page}
+            {t('admin.workflowManagement.chatMonitoring.page', { page })}
           </span>
           <Button
             variant="outline"

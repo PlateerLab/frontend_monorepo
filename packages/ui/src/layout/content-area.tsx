@@ -99,7 +99,7 @@ export const ContentArea: React.FC<ContentAreaProps> = ({
       {/* ── Main: 스크롤 영역 ── */}
       <div
         className={cn(
-          'flex-1 overflow-y-auto overflow-x-hidden min-h-0',
+          'flex-1 overflow-y-auto overflow-x-hidden min-h-0 flex flex-col',
           contentPadding && 'p-6',
           contentClassName,
         )}
