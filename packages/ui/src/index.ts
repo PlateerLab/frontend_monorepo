@@ -227,6 +227,10 @@ export type {
   SidebarVariant,
 } from './navigation/sidebar';
 
+// ─── Hooks ───
+export { useExternalDrop, extractFilesFromDataTransfer, isExternalFileDrag } from './hooks';
+export type { ExternalDropResult, UseExternalDropOptions, UseExternalDropReturn } from './hooks';
+
 // ─── shadcn Primitives (Radix UI 기반) ───
 // Feature에서 @radix-ui/* 직접 import 금지. 아래를 통해 사용한다.
 

@@ -65,8 +65,29 @@ export const ko: TranslationData = {
       verify: '확인',
       verifying: '확인 중...',
     },
+    dropOverlay: '컬렉션에 파일을 놓아주세요',
+    dropConfirm: {
+      title: '파일 업로드 확인',
+      confirm: '임베딩 설정',
+      collectionSuffix: '컬렉션에',
+      fileCountSuffix: '개의 파일을 업로드합니다.',
+      hint: '확인 버튼을 누르면 임베딩 옵션을 설정할 수 있습니다.',
+    },
+    dropSelect: {
+      title: '업로드할 컬렉션 선택',
+      description: '파일을 업로드할 컬렉션을 선택해주세요.',
+      createNew: '새 컬렉션 생성',
+    },
     detail: {
       empty: '문서가 없습니다',
+      dropOverlay: '파일을 여기에 놓아주세요',
+      dropConfirm: {
+        title: '파일 업로드 확인',
+        confirm: '임베딩 설정',
+        pathSuffix: '경로에',
+        fileCountSuffix: '개의 파일을 업로드합니다.',
+        hint: '확인 버튼을 누르면 임베딩 옵션을 설정할 수 있습니다.',
+      },
       noChunks: '청크가 없습니다',
       error: {
         loadFailed: '문서 목록을 불러오지 못했습니다',
@@ -84,6 +105,7 @@ export const ko: TranslationData = {
         chunkOverlap: '청크 오버랩',
         upload: '업로드',
         uploading: '업로드 중...',
+        fileCount: '개 파일',
       },
       createFolderModal: {
         title: '폴더 생성',

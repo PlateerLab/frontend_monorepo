@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { DocumentTabPlugin, DocumentTabPluginProps, CardBadge } from '@xgen/types';
-import { Button, FilterTabs, SearchInput, Modal, Input, Label, Switch, Textarea, ResourceCardGrid } from '@xgen/ui';
+import { Button, FilterTabs, SearchInput, Modal, Input, Label, Switch, Textarea, ResourceCardGrid, useExternalDrop, useUploadStatus } from '@xgen/ui';
+import type { ExternalDropResult } from '@xgen/ui';
 import { FiFolder, FiFileText, FiClock, FiTrash2, FiLock, FiSettings } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
-import { listCollections, createCollection, deleteCollection, updateCollection, verifyCollectionPassword, storeCollectionSessionToken, getCollectionSessionToken, sha256, type CollectionItem, type DocumentItem } from './api';
+import { listCollections, createCollection, deleteCollection, updateCollection, verifyCollectionPassword, storeCollectionSessionToken, getCollectionSessionToken, sha256, uploadDocument, ensureFolderStructure, type CollectionItem, type DocumentItem, type UploadProgressEvent } from './api';
+import { useAuth } from '@xgen/auth-provider';
 import { CollectionDocuments } from './components/CollectionDocuments';
 import { DocumentDetail } from './components/DocumentDetail';
 import './locales';
@@ -46,6 +48,8 @@ export interface DocumentCollectionProps extends DocumentTabPluginProps {}
 
 export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToolbarChange }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const { addSession, updateSession } = useUploadStatus();
 
   // ── View Mode ──
   const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -74,6 +78,35 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
   const [verifyPassword, setVerifyPassword] = useState('');
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
+
+  // External drop state
+  const [isDropConfirmOpen, setIsDropConfirmOpen] = useState(false);
+  const [pendingDropFiles, setPendingDropFiles] = useState<File[]>([]);
+  const [pendingDropRelativePaths, setPendingDropRelativePaths] = useState<Map<File, string>>(new Map());
+  const [pendingDropCollection, setPendingDropCollection] = useState<CollectionItem | null>(null);
+  const [dropUploading, setDropUploading] = useState(false);
+
+  // Drop on encrypted collection - need password first
+  const [isDropPasswordModalOpen, setIsDropPasswordModalOpen] = useState(false);
+  const [dropPasswordCollection, setDropPasswordCollection] = useState<CollectionItem | null>(null);
+  const [dropPassword, setDropPassword] = useState('');
+  const [dropPasswordError, setDropPasswordError] = useState<string | null>(null);
+  const [dropPasswordVerifying, setDropPasswordVerifying] = useState(false);
+  const [pendingDropResult, setPendingDropResult] = useState<ExternalDropResult | null>(null);
+
+  // Drop select collection (when multiple)
+  const [isDropSelectOpen, setIsDropSelectOpen] = useState(false);
+  const [dropSelectResult, setDropSelectResult] = useState<ExternalDropResult | null>(null);
+  const [dropCreateMode, setDropCreateMode] = useState(false);
+
+  // Drop upload modal (embedding options)
+  const [isDropUploadModalOpen, setIsDropUploadModalOpen] = useState(false);
+  const [dropChunkSize, setDropChunkSize] = useState('1000');
+  const [dropChunkOverlap, setDropChunkOverlap] = useState('150');
+  const [dropUseOcr, setDropUseOcr] = useState(false);
+  const [dropUseLlm, setDropUseLlm] = useState(false);
+  const [dropUseMeta, setDropUseMeta] = useState(true);
+  const [dropForceChunk, setDropForceChunk] = useState(false);
 
   // Settings modal state
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -153,8 +186,9 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
     if (!newCollectionName.trim()) return;
     setCreating(true);
     try {
+      const createdName = newCollectionName.trim();
       await createCollection({
-        collection_make_name: newCollectionName.trim(),
+        collection_make_name: createdName,
         description: newCollectionDesc.trim() || undefined,
         enable_sparse_vector: newCollectionSparse,
         enable_full_text: newCollectionFullText,
@@ -169,13 +203,40 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
       setNewCollectionEncrypt(false);
       setNewCollectionPassword('');
       setNewCollectionPasswordConfirm('');
-      await loadData();
+      const updatedData = await listCollections();
+      setCollections(updatedData);
+
+      // If came from drop select flow, auto-proceed with upload
+      if (dropCreateMode && dropSelectResult) {
+        const newCol = updatedData.find(c => c.name === createdName);
+        if (newCol) {
+          setIsDropSelectOpen(false);
+          setDropCreateMode(false);
+          if (newCol.isSecured) {
+            const token = getCollectionSessionToken(newCol.name);
+            if (!token) {
+              setDropPasswordCollection(newCol);
+              setPendingDropResult(dropSelectResult);
+              setDropPassword('');
+              setDropPasswordError(null);
+              setIsDropPasswordModalOpen(true);
+              setDropSelectResult(null);
+              return;
+            }
+          }
+          setPendingDropCollection(newCol);
+          setPendingDropFiles(dropSelectResult.files);
+          setPendingDropRelativePaths(dropSelectResult.relativePaths);
+          setDropSelectResult(null);
+          setIsDropConfirmOpen(true);
+        }
+      }
     } catch (err) {
       console.error('Failed to create collection:', err);
     } finally {
       setCreating(false);
     }
-  }, [newCollectionName, newCollectionDesc, newCollectionSparse, newCollectionFullText, newCollectionEncrypt, newCollectionPassword, loadData]);
+  }, [newCollectionName, newCollectionDesc, newCollectionSparse, newCollectionFullText, newCollectionEncrypt, newCollectionPassword, loadData, dropCreateMode, dropSelectResult]);
 
   const handleDeleteCollection = useCallback(async (col: CollectionItem) => {
     try {
@@ -188,6 +249,7 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
 
   const handleCloseCreateModal = useCallback(() => {
     setIsCreateModalOpen(false);
+    setDropCreateMode(false);
     setNewCollectionName('');
     setNewCollectionDesc('');
     setNewCollectionSparse(false);
@@ -277,6 +339,188 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
       setSettingsUpdating(false);
     }
   }, [settingsCollection, settingsName, settingsShared, settingsSecured, settingsPassword, settingsPasswordConfirm, loadData]);
+
+  // ── External Drag & Drop on List View ──
+  const handleExternalDrop = useCallback((result: ExternalDropResult) => {
+    if (collections.length === 0) return;
+    if (collections.length === 1) {
+      const target = collections[0];
+      if (target.isSecured) {
+        const token = getCollectionSessionToken(target.name);
+        if (!token) {
+          setDropPasswordCollection(target);
+          setPendingDropResult(result);
+          setDropPassword('');
+          setDropPasswordError(null);
+          setIsDropPasswordModalOpen(true);
+          return;
+        }
+      }
+      setPendingDropCollection(target);
+      setPendingDropFiles(result.files);
+      setPendingDropRelativePaths(result.relativePaths);
+      setIsDropConfirmOpen(true);
+      return;
+    }
+    setDropSelectResult(result);
+    setIsDropSelectOpen(true);
+  }, [collections]);
+
+  const handleSelectDropCollection = useCallback((col: CollectionItem) => {
+    if (!dropSelectResult) return;
+    setIsDropSelectOpen(false);
+    if (col.isSecured) {
+      const token = getCollectionSessionToken(col.name);
+      if (!token) {
+        setDropPasswordCollection(col);
+        setPendingDropResult(dropSelectResult);
+        setDropPassword('');
+        setDropPasswordError(null);
+        setIsDropPasswordModalOpen(true);
+        setDropSelectResult(null);
+        return;
+      }
+    }
+    setPendingDropCollection(col);
+    setPendingDropFiles(dropSelectResult.files);
+    setPendingDropRelativePaths(dropSelectResult.relativePaths);
+    setDropSelectResult(null);
+    setIsDropConfirmOpen(true);
+  }, [dropSelectResult]);
+
+  const handleDropPasswordVerify = useCallback(async () => {
+    if (!dropPasswordCollection || !dropPassword || !pendingDropResult) return;
+    setDropPasswordVerifying(true);
+    setDropPasswordError(null);
+    try {
+      const result = await verifyCollectionPassword(dropPasswordCollection.name, dropPassword);
+      if (result.valid && result.session_token) {
+        storeCollectionSessionToken(dropPasswordCollection.name, result.session_token);
+        setIsDropPasswordModalOpen(false);
+        setPendingDropCollection(dropPasswordCollection);
+        setPendingDropFiles(pendingDropResult.files);
+        setPendingDropRelativePaths(pendingDropResult.relativePaths);
+        setDropPasswordCollection(null);
+        setPendingDropResult(null);
+        setDropPassword('');
+        setIsDropConfirmOpen(true);
+      } else {
+        setDropPasswordError(t('documents.collection.passwordModal.passwordIncorrect'));
+      }
+    } catch {
+      setDropPasswordError(t('documents.collection.passwordModal.passwordIncorrect'));
+    } finally {
+      setDropPasswordVerifying(false);
+    }
+  }, [dropPasswordCollection, dropPassword, pendingDropResult, t]);
+
+  const handleCloseDropPasswordModal = useCallback(() => {
+    setIsDropPasswordModalOpen(false);
+    setDropPasswordCollection(null);
+    setPendingDropResult(null);
+    setDropPassword('');
+    setDropPasswordError(null);
+  }, []);
+
+  const handleConfirmDrop = useCallback(() => {
+    // Show embedding options modal
+    setIsDropConfirmOpen(false);
+    setIsDropUploadModalOpen(true);
+  }, []);
+
+  const handleCancelDrop = useCallback(() => {
+    setIsDropConfirmOpen(false);
+    setPendingDropFiles([]);
+    setPendingDropRelativePaths(new Map());
+    setPendingDropCollection(null);
+  }, []);
+
+  const handleDropUpload = useCallback(async () => {
+    if (!pendingDropCollection || pendingDropFiles.length === 0) return;
+    setDropUploading(true);
+    // Auto-close modal immediately — progress shown in status panel
+    setIsDropUploadModalOpen(false);
+    const filesToUpload = [...pendingDropFiles];
+    const pathsMap = new Map(pendingDropRelativePaths);
+    const targetCollection = pendingDropCollection;
+    setPendingDropFiles([]);
+    setPendingDropRelativePaths(new Map());
+    setPendingDropCollection(null);
+    try {
+      // Create folder structure before uploading
+      await ensureFolderStructure(
+        pathsMap,
+        targetCollection.collectionId,
+        targetCollection.name,
+        targetCollection.displayName,
+      );
+
+      for (const file of filesToUpload) {
+        const relPath = pathsMap.get(file) || '';
+        let targetFolderPath: string | undefined;
+        if (relPath) {
+          targetFolderPath = `/${targetCollection.displayName}/${relPath}`;
+        }
+
+        const sessionId = `drop-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        addSession({
+          id: sessionId,
+          fileName: file.name,
+          targetName: targetCollection.displayName,
+          status: 'uploading',
+          totalChunks: 0,
+          processedChunks: 0,
+        });
+
+        await uploadDocument(
+          {
+            file,
+            collection_name: targetCollection.name,
+            user_id: user?.user_id,
+            chunk_size: parseInt(dropChunkSize, 10) || 1000,
+            chunk_overlap: parseInt(dropChunkOverlap, 10) || 150,
+            use_ocr: dropUseOcr,
+            use_llm_metadata: dropUseLlm,
+            extract_default_metadata: dropUseMeta,
+            force_chunking: dropForceChunk,
+            folder_path: targetFolderPath,
+          },
+          (evt) => {
+            const statusMap: Record<string, 'uploading' | 'processing' | 'embedding' | 'complete' | 'error'> = {
+              uploading: 'uploading', processing: 'processing', embedding: 'embedding', complete: 'complete', error: 'error',
+            };
+            const mappedStatus = statusMap[evt.event];
+            if (mappedStatus) {
+              updateSession(sessionId, {
+                status: mappedStatus,
+                totalChunks: evt.totalChunks ?? 0,
+                processedChunks: evt.processedChunks ?? 0,
+                ...(evt.message ? { errorMessage: evt.message } : {}),
+              });
+            }
+          },
+        );
+        updateSession(sessionId, { status: 'complete' });
+      }
+      await loadData();
+    } catch (err) {
+      console.error('Failed to upload dropped documents:', err);
+    } finally {
+      setDropUploading(false);
+    }
+  }, [pendingDropCollection, pendingDropFiles, pendingDropRelativePaths, user, dropChunkSize, dropChunkOverlap, dropUseOcr, dropUseLlm, dropUseMeta, dropForceChunk, addSession, updateSession, loadData]);
+
+  const handleCancelDropUpload = useCallback(() => {
+    setIsDropUploadModalOpen(false);
+    setPendingDropFiles([]);
+    setPendingDropRelativePaths(new Map());
+    setPendingDropCollection(null);
+  }, []);
+
+  const { isDragOver: isListDragOver, dropHandlers: listDropHandlers } = useExternalDrop({
+    onDrop: handleExternalDrop,
+    disabled: viewMode !== 'list',
+  });
 
   const filteredCollections = useMemo(() => {
     return collections.filter(c => {
@@ -394,7 +638,16 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
 
   // List View (default)
   return (
-    <div className="flex flex-col flex-1 min-h-0 p-6">
+    <div className={`flex flex-col flex-1 min-h-0 p-6 relative transition-colors ${isListDragOver ? 'bg-primary/5' : ''}`} {...listDropHandlers}>
+      {/* Drop overlay */}
+      {isListDragOver && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+          <div className="absolute inset-3 border-2 border-dashed border-primary/50 rounded-xl" />
+          <div className="bg-background/90 px-4 py-2 rounded-lg shadow-sm border border-primary/30">
+            <p className="text-sm font-medium text-primary">{t('documents.collection.dropOverlay', '컬렉션에 파일을 놓아주세요')}</p>
+          </div>
+        </div>
+      )}
       <div className="flex-1 min-h-0 overflow-y-auto">
         <ResourceCardGrid
           items={cardItems}
@@ -621,6 +874,195 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
               onKeyDown={(e) => { if (e.key === 'Enter' && !verifying) handleVerifyCollectionPassword(); }}
               autoFocus
             />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Drop Confirm Modal */}
+      <Modal
+        isOpen={isDropConfirmOpen}
+        onClose={handleCancelDrop}
+        title={t('documents.collection.dropConfirm.title', '파일 업로드 확인')}
+        size="sm"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCancelDrop}>
+              {t('documents.collection.createModal.cancel')}
+            </Button>
+            <Button onClick={handleConfirmDrop}>
+              {t('documents.collection.dropConfirm.confirm', '임베딩 설정')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-3">
+          <p className="text-sm text-foreground">
+            {pendingDropCollection?.displayName} {t('documents.collection.dropConfirm.collectionSuffix', '컬렉션에')} {pendingDropFiles.length}{t('documents.collection.dropConfirm.fileCountSuffix', '개의 파일을 업로드합니다.')}
+          </p>
+          {pendingDropFiles.length > 0 && (
+            <div className="max-h-40 overflow-y-auto border border-border rounded-lg p-2 space-y-1">
+              {pendingDropFiles.slice(0, 20).map((file, idx) => (
+                <div key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <FiFileText className="w-3 h-3 shrink-0" />
+                  <span className="truncate">{file.name}</span>
+                </div>
+              ))}
+              {pendingDropFiles.length > 20 && (
+                <p className="text-xs text-muted-foreground text-center pt-1">
+                  ... 외 {pendingDropFiles.length - 20}개 파일
+                </p>
+              )}
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">
+            {t('documents.collection.dropConfirm.hint', '확인 버튼을 누르면 임베딩 옵션을 설정할 수 있습니다.')}
+          </p>
+        </div>
+      </Modal>
+
+      {/* Drop Collection Select Modal */}
+      <Modal
+        isOpen={isDropSelectOpen}
+        onClose={() => { setIsDropSelectOpen(false); setDropSelectResult(null); }}
+        title={t('documents.collection.dropSelect.title', '업로드할 컬렉션 선택')}
+        size="sm"
+      >
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground mb-3">
+            {t('documents.collection.dropSelect.description', '파일을 업로드할 컬렉션을 선택해주세요.')}
+          </p>
+          {collections.map(col => (
+            <button
+              key={col.id}
+              className="w-full flex items-center gap-3 p-3 border border-border rounded-lg hover:bg-accent/50 transition-colors text-left"
+              onClick={() => handleSelectDropCollection(col)}
+            >
+              <FiFolder className="w-5 h-5 text-blue-500 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{col.displayName}</p>
+                <p className="text-xs text-muted-foreground">{col.documentCount} {t('documents.collection.documents')}</p>
+              </div>
+              {col.isSecured && <FiLock className="w-4 h-4 text-muted-foreground shrink-0" />}
+            </button>
+          ))}
+
+          {/* Create new collection */}
+          <div className="pt-3 mt-2 border-t border-border">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => { setDropCreateMode(true); setIsCreateModalOpen(true); }}
+            >
+              {t('documents.collection.dropSelect.createNew')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Drop Password Modal */}
+      <Modal
+        isOpen={isDropPasswordModalOpen}
+        onClose={handleCloseDropPasswordModal}
+        title={t('documents.collection.passwordModal.title')}
+        size="sm"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCloseDropPasswordModal}>
+              {t('documents.collection.createModal.cancel')}
+            </Button>
+            <Button onClick={handleDropPasswordVerify} disabled={dropPasswordVerifying || !dropPassword}>
+              {dropPasswordVerifying ? t('documents.collection.passwordModal.verifying') : t('documents.collection.passwordModal.verify')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="flex flex-col items-center gap-2 py-2">
+            <FiLock className="w-10 h-10 text-muted-foreground" />
+            <p className="text-sm font-medium">{dropPasswordCollection?.displayName}</p>
+            <p className="text-xs text-muted-foreground text-center">
+              {t('documents.collection.passwordModal.description')}
+            </p>
+          </div>
+          {dropPasswordError && (
+            <p className="text-sm text-destructive text-center">{dropPasswordError}</p>
+          )}
+          <div className="space-y-2">
+            <Label>{t('documents.collection.passwordModal.passwordLabel')}</Label>
+            <Input
+              type="password"
+              value={dropPassword}
+              onChange={(e) => setDropPassword(e.target.value)}
+              placeholder={t('documents.collection.passwordModal.passwordPlaceholder')}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !dropPasswordVerifying) handleDropPasswordVerify(); }}
+              autoFocus
+            />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Drop Upload Modal (Embedding Options) */}
+      <Modal
+        isOpen={isDropUploadModalOpen}
+        onClose={handleCancelDropUpload}
+        title={t('documents.collection.detail.uploadModal.title', '문서 업로드')}
+        size="md"
+        footer={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCancelDropUpload}>
+              {t('documents.collection.createModal.cancel')}
+            </Button>
+            <Button onClick={handleDropUpload} disabled={dropUploading || pendingDropFiles.length === 0}>
+              {dropUploading ? t('documents.collection.detail.uploadModal.uploading', '업로드 중...') : t('documents.collection.detail.uploadModal.upload', '업로드')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          {/* File list */}
+          <div className="space-y-2">
+            <Label>{t('documents.collection.detail.uploadModal.file', '파일')}</Label>
+            <div className="max-h-32 overflow-y-auto border border-border rounded-lg p-2 space-y-1">
+              {pendingDropFiles.map((file, idx) => (
+                <div key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <FiFileText className="w-3 h-3 shrink-0" />
+                  <span className="truncate flex-1">{file.name}</span>
+                </div>
+              ))}
+              <p className="text-xs text-muted-foreground text-center pt-1">{pendingDropFiles.length}개 파일</p>
+            </div>
+          </div>
+
+          {/* Chunk Size & Overlap */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label>{t('documents.collection.detail.uploadModal.chunkSize', '청크 크기')}</Label>
+              <Input type="number" value={dropChunkSize} onChange={(e) => setDropChunkSize(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>{t('documents.collection.detail.uploadModal.chunkOverlap', '청크 오버랩')}</Label>
+              <Input type="number" value={dropChunkOverlap} onChange={(e) => setDropChunkOverlap(e.target.value)} />
+            </div>
+          </div>
+
+          {/* Toggles */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between py-1">
+              <Label>OCR</Label>
+              <Switch checked={dropUseOcr} onCheckedChange={setDropUseOcr} />
+            </div>
+            <div className="flex items-center justify-between py-1">
+              <Label>LLM Metadata</Label>
+              <Switch checked={dropUseLlm} onCheckedChange={setDropUseLlm} />
+            </div>
+            <div className="flex items-center justify-between py-1">
+              <Label>META</Label>
+              <Switch checked={dropUseMeta} onCheckedChange={setDropUseMeta} />
+            </div>
+            <div className="flex items-center justify-between py-1">
+              <Label>FORCE CHUNK</Label>
+              <Switch checked={dropForceChunk} onCheckedChange={setDropForceChunk} />
+            </div>
           </div>
         </div>
       </Modal>
