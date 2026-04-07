@@ -11,7 +11,7 @@
 ┌─────────────────────────────────────────────────────────┐
 │  apps/web                                               │
 │  ├─ 조립만 (assembly only)                                │
-│  ├─ adminFeatureRegistry.ts → 이미 19개 import 완료       │
+│  ├─ admin-feature-registry.ts → 이미 19개 import 완료       │
 │  └─ sidebar-admin → 이미 9개 섹션 config 완료              │
 ├─────────────────────────────────────────────────────────┤
 │  features/admin-*                                       │

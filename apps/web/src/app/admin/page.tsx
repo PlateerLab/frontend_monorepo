@@ -6,7 +6,7 @@ import { AdminSidebar } from '@xgen/sidebar-admin';
 import { useTranslation } from '@xgen/i18n';
 import { AuthGuard, useAuth } from '@xgen/auth-provider';
 import { ContentArea } from '@xgen/ui';
-import { initializeAdminFeatures, getAdminRouteComponent } from '@/features/adminFeatureRegistry';
+import { initializeAdminFeatures, getAdminRouteComponent } from '@/features/admin-feature-registry';
 import styles from './AdminPage.module.scss';
 
 // ─────────────────────────────────────────────────────────────

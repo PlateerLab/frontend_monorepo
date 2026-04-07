@@ -7,7 +7,7 @@
 
 import type { MainFeatureModule, SidebarItem } from '@xgen/types';
 import { FeatureRegistry as CoreRegistry } from '@xgen/types';
-import { registerCanvasPlugins } from './canvas-features';
+import { registerCanvasPlugins } from './canvas-features-registry';
 
 // ─────────────────────────────────────────────────────────────
 // Types

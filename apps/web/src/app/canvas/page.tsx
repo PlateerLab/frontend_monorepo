@@ -56,7 +56,7 @@ function CanvasPageContent() {
             const sidebarSections = featureRegistry.getSidebarSections();
             setSections(sidebarSections);
 
-            const { registerCanvasPlugins } = await import('@/features/canvas-features');
+            const { registerCanvasPlugins } = await import('@/features/canvas-features-registry');
             registerCanvasPlugins();
             setPluginsReady(true);
         }

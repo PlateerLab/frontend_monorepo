@@ -5,5 +5,5 @@
  */
 
 export type { MainFeatureModule, SidebarItem, RouteComponentProps } from '@xgen/types';
-export { featureRegistry, initializeFeatures } from './featureRegistry';
-export type { SidebarSection, RouteConfig, FeatureRegistryConfig } from './featureRegistry';
+export { featureRegistry, initializeFeatures } from './feature-registry';
+export type { SidebarSection, RouteConfig, FeatureRegistryConfig } from './feature-registry';
