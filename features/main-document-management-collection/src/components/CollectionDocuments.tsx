@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Button, Modal, Input, Label, Switch, DirectoryTree, DocumentCard, useUploadStatus, useExternalDrop, isExternalFileDrag, extractFilesFromDataTransfer } from '@xgen/ui';
 import type { TreeFolder, TreeFile, ExternalDropResult } from '@xgen/ui';
-import { FiArrowLeft, FiFileText, FiChevronRight, FiClock, FiUpload, FiPlus } from '@xgen/icons';
+import { FiArrowLeft, FiFileText, FiChevronRight, FiClock, FiUpload, FiPlus, FiFolder } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { useAuth } from '@xgen/auth-provider';
 import type { CollectionItem, DocumentItem, FolderItem, UploadProgressEvent } from '../api';
@@ -138,6 +138,7 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadProgressEvent | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const folderInputRef = useRef<HTMLInputElement>(null);
   const uploadSessionIdRef = useRef<string | null>(null);
 
   // External drop confirm state
@@ -432,6 +433,23 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
     }
   }, [uploadFiles, uploadFilesRelativePaths, pendingDropTargetFolder, currentFolder, collection, user, chunkSize, chunkOverlap, useOcr, useLlm, useMeta, forceChunk, loadData, addSession, updateSession]);
 
+  const handleFolderUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const fileArray = Array.from(files);
+    const paths = new Map<File, string>();
+    for (const file of fileArray) {
+      const fullPath = (file as any).webkitRelativePath || '';
+      const lastSlash = fullPath.lastIndexOf('/');
+      const relPath = lastSlash !== -1 ? fullPath.substring(0, lastSlash) : '';
+      paths.set(file, relPath);
+    }
+    setUploadFiles(fileArray);
+    setUploadFilesRelativePaths(paths);
+    setIsUploadModalOpen(true);
+    if (folderInputRef.current) folderInputRef.current.value = '';
+  }, []);
+
   // ── External Drop Handlers ──
   const handleExternalDropToFolder = useCallback((result: ExternalDropResult, targetFolder: FolderItem | null, targetPath: string) => {
     setPendingDropFiles(result.files);
@@ -576,6 +594,18 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
             <FiUpload className="w-3.5 h-3.5 mr-1" />
             {t('documents.collection.detail.buttons.upload')}
           </Button>
+          <Button size="sm" onClick={() => folderInputRef.current?.click()}>
+            <FiFolder className="w-3.5 h-3.5 mr-1" />
+            {t('documents.collection.detail.buttons.uploadFolder', '폴더 업로드')}
+          </Button>
+          <input
+            ref={folderInputRef}
+            type="file"
+            className="hidden"
+            {...({ webkitdirectory: '', directory: '' } as any)}
+            multiple
+            onChange={handleFolderUpload}
+          />
         </div>
       </div>
 

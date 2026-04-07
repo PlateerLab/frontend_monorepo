@@ -183,7 +183,7 @@ export const UploadHistoryPage: React.FC<UploadHistoryPageProps> = () => {
   // ── Toolbar ──
   const toolbar = (
     <div className="flex items-center gap-3">
-      <FilterTabs tabs={tabs} activeKey={statusFilter} onChange={handleTabChange} />
+      <FilterTabs tabs={tabs} activeKey={statusFilter} onChange={handleTabChange} variant="underline" />
       <select
         className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground"
         value={collectionFilter}

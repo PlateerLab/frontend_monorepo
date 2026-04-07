@@ -181,7 +181,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
     folders.forEach(folder => {
       const node: TreeNode = {
         id: `folder-${folder.id}`,
-        name: folder.name,
+        name: folder.name || folder.fullPath?.split('/').filter(Boolean).pop() || `folder-${folder.id}`,
         type: 'folder',
         path: folder.fullPath,
         children: [],
@@ -237,7 +237,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
     const sortChildren = (node: TreeNode) => {
       node.children.sort((a, b) => {
         if (a.type !== b.type) return a.type === 'folder' ? -1 : 1;
-        if (a.type === 'folder') return a.name.localeCompare(b.name);
+        if (a.type === 'folder') return (a.name || '').localeCompare(b.name || '');
         return 0; // files already sorted
       });
       node.children.forEach(sortChildren);
