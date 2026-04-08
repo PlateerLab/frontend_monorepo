@@ -11,8 +11,8 @@ export interface StorageAPIResponse {
   storage_id?: number;
   storage_name: string;
   description?: string;
-  file_count: number;
-  total_size: number;
+  file_count?: number;
+  total_size?: number;
   is_shared: boolean;
   is_secured: boolean;
   share_group?: string | null;
@@ -84,7 +84,24 @@ export async function listStorages(): Promise<FileStorageItem[]> {
   const raw = Array.isArray(response.data)
     ? response.data
     : (response.data as any).storages || [];
-  return raw.map(transformStorage);
+  const storages = raw.map(transformStorage);
+
+  // 각 저장소의 파일 수/용량을 /info 엔드포인트에서 보강
+  const enriched = await Promise.all(
+    storages.map(async (s: FileStorageItem) => {
+      try {
+        const info = await api.get<any>(`/api/storage/storages/${s.storageId}/info`, {
+          headers: storageAuthHeaders(s.storageId),
+        });
+        const stats = info.data?.statistics;
+        if (stats) {
+          return { ...s, fileCount: stats.file_count ?? 0, totalSize: stats.total_size_bytes ?? 0 };
+        }
+      } catch { /* info 실패 시 기본값 유지 */ }
+      return s;
+    })
+  );
+  return enriched;
 }
 
 export async function createStorage(data: {
@@ -196,7 +213,8 @@ export interface StorageFileAPIResponse {
 
 export interface StorageFolderAPIResponse {
   id: number;
-  name: string;
+  name?: string;
+  folder_name?: string;
   full_path: string;
   parent_folder_id: number | null;
   is_root: boolean;
@@ -260,7 +278,7 @@ function transformStorageFile(raw: StorageFileAPIResponse): StorageFileItem {
 function transformStorageFolder(raw: StorageFolderAPIResponse): StorageFolderItem {
   return {
     id: raw.id,
-    name: raw.name,
+    name: raw.name || raw.folder_name || raw.full_path.split('/').filter(Boolean).pop() || '',
     fullPath: raw.full_path,
     parentFolderId: raw.parent_folder_id,
     isRoot: raw.is_root,

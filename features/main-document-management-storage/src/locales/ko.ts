@@ -89,6 +89,16 @@ export const ko: TranslationData = {
         fileCountSuffix: '개의 파일을 업로드합니다.',
         moreFiles: '개 파일 더',
       },
+      duplicateFolder: {
+        title: '동일한 폴더가 이미 존재합니다',
+        description: '이미 같은 이름의 폴더가 존재합니다. 어떻게 처리할까요?',
+        folderNames: '중복 폴더',
+        merge: '기존 폴더에 추가',
+        mergeDesc: '기존 폴더에 파일을 추가합니다',
+        createNew: '새 폴더로 업로드',
+        createNewDesc: '번호가 붙은 새 폴더를 생성합니다',
+        cancel: '취소',
+      },
       error: {
         loadFailed: '파일 목록을 불러오지 못했습니다',
       },
