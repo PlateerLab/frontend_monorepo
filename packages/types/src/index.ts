@@ -1344,6 +1344,7 @@ export interface CanvasHeaderProps extends CanvasPluginContext {
   onImportAgentflow?: () => void;
   onAgentflowNameChange?: (name: string) => void;
   onDuplicate?: () => void;
+  onTutorialClick?: () => void;
   isOwner?: boolean;
   sidebarLayout?: { isOpen: boolean };
   renameAgentflow?: (oldName: string, newName: string, workflowId: string) => Promise<void>;

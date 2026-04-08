@@ -161,6 +161,9 @@ importers:
       '@xgen/feature-canvas-sidebar-templates':
         specifier: workspace:*
         version: link:../../features/canvas-sidebar-templates
+      '@xgen/feature-canvas-tutorial':
+        specifier: workspace:*
+        version: link:../../features/canvas-tutorial
       '@xgen/feature-deploy-settings':
         specifier: workspace:*
         version: link:../../features/deploy-settings
@@ -1592,6 +1595,27 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.4(react@19.2.4)
+
+  features/canvas-tutorial:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/canvas-types':
+        specifier: workspace:*
+        version: link:../../packages/canvas-types
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
 
   features/deploy-settings:
     dependencies:

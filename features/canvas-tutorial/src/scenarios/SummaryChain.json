@@ -1,0 +1,434 @@
+{
+  "tutorial_id": "summary_chain",
+  "tutorial_name": "요약 & 번역 체인",
+  "tutorial_description": "두 개의 Agent를 연결하여 텍스트를 요약한 후 영어로 번역하는 멀티스텝 워크플로우를 만들어봅니다.",
+  "tags": ["중급", "체이닝", "멀티 에이전트"],
+  "view": {
+    "x": -36528,
+    "y": -15535,
+    "scale": 0.73
+  },
+  "tutorial_steps": [
+    {
+      "step": 1,
+      "title": "긴 텍스트 입력",
+      "message": "요약할 긴 텍스트를 입력받는 Input String 노드를 생성합니다.\n예시로 긴 한국어 문단이 설정되어 있습니다.",
+      "nodes": [
+        {
+          "id": "input_string-tut-1",
+          "data": {
+            "functionId": "startnode",
+            "id": "input_string",
+            "nodeName": "Input String",
+            "description": "사용자가 설정한 문자열 값을 출력하는 입력 노드입니다.",
+            "tags": ["input", "string", "text", "start_node"],
+            "inputs": [
+              {
+                "id": "args_schema",
+                "name": "ArgsSchema",
+                "type": "InputSchema",
+                "required": false
+              }
+            ],
+            "outputs": [
+              {
+                "id": "text",
+                "name": "Text",
+                "type": "STR"
+              }
+            ],
+            "parameters": [
+              {
+                "id": "input_str",
+                "name": "INPUT",
+                "type": "STR",
+                "value": "인공지능(AI)은 컴퓨터 과학의 한 분야로, 인간의 학습 능력, 추론 능력, 자연어 이해 능력 등을 컴퓨터 프로그램으로 실현하는 기술입니다. 최근 딥러닝과 대규모 언어 모델(LLM)의 발전으로 AI는 텍스트 생성, 이미지 인식, 자율주행, 의료 진단 등 다양한 분야에서 혁신적인 성과를 이루고 있습니다. 특히 ChatGPT, Claude 등의 대화형 AI는 사람과 자연스러운 대화가 가능해져 업무 자동화, 교육, 창작 등의 영역에서 활발하게 활용되고 있습니다. 그러나 AI 기술의 발전과 함께 데이터 편향, 프라이버시 침해, 일자리 대체 등의 윤리적 문제도 대두되고 있어, 기술 발전과 사회적 책임 사이의 균형이 중요한 과제로 남아 있습니다.",
+                "required": false
+              }
+            ]
+          },
+          "position": {
+            "x": 49800,
+            "y": 21803
+          }
+        }
+      ],
+      "edges": []
+    },
+    {
+      "step": 2,
+      "title": "요약 Agent 추가",
+      "message": "첫 번째 Agent는 텍스트를 3줄로 요약하는 역할을 합니다.\n\n핵심: Streaming을 False로 설정하여 요약 결과를 완성된 텍스트로 출력합니다.\n다음 Agent에게 완성된 텍스트를 전달하기 위해서입니다.",
+      "nodes": [
+        {
+          "id": "agents/xgen-tut-2",
+          "data": {
+            "functionId": "agents",
+            "id": "agents/xgen",
+            "nodeName": "Agent Xgen",
+            "description": "워크플로우의 핵심 AI 두뇌입니다.",
+            "tags": ["agent", "chat", "rag", "public_model", "stream", "xgen"],
+            "inputs": [
+              {
+                "id": "text",
+                "name": "Text",
+                "type": "STREAM STR|STR",
+                "multi": true,
+                "required": false
+              },
+              {
+                "id": "files",
+                "name": "Files",
+                "type": "FILE",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "images",
+                "name": "Images",
+                "type": "LIST",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "tools",
+                "name": "Tools",
+                "type": "TOOL",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "memory",
+                "name": "Memory",
+                "type": "OBJECT",
+                "multi": false,
+                "required": false
+              },
+              {
+                "id": "rag_context",
+                "name": "RAG Context",
+                "type": "DocsContext",
+                "multi": false,
+                "required": false
+              },
+              {
+                "id": "args_schema",
+                "name": "ArgsSchema",
+                "type": "OutputSchema"
+              },
+              {
+                "id": "plan",
+                "name": "Plan",
+                "type": "PLAN",
+                "required": false
+              }
+            ],
+            "outputs": [
+              {
+                "id": "result",
+                "name": "Result",
+                "type": "STR"
+              }
+            ],
+            "parameters": [
+              {
+                "id": "provider",
+                "name": "Provider",
+                "type": "STR",
+                "value": "openai",
+                "required": true,
+                "options": [
+                  { "value": "openai", "label": "OpenAI" },
+                  { "value": "anthropic", "label": "Anthropic" },
+                  { "value": "google", "label": "Google" }
+                ]
+              },
+              {
+                "id": "openai_model",
+                "name": "OpenAI Model",
+                "type": "STR",
+                "value": "gpt-4o",
+                "required": true,
+                "options": [
+                  { "value": "gpt-4o", "label": "GPT-4o" },
+                  { "value": "gpt-4.1", "label": "GPT-4.1" },
+                  { "value": "gpt-4.1-mini", "label": "GPT-4.1 Mini" }
+                ],
+                "dependency": "provider",
+                "dependencyValue": "openai"
+              },
+              {
+                "id": "temperature",
+                "name": "Temperature",
+                "type": "FLOAT",
+                "value": 0.3,
+                "min": 0,
+                "max": 2,
+                "step": 0.1
+              },
+              {
+                "id": "max_tokens",
+                "name": "Max Tokens",
+                "type": "INT",
+                "value": 8192,
+                "min": 1,
+                "max": 65536,
+                "step": 1
+              },
+              {
+                "id": "system_prompt",
+                "name": "System Prompt",
+                "type": "STR",
+                "value": "당신은 전문 요약가입니다. 주어진 텍스트를 핵심 내용만 추출하여 정확히 3줄로 요약하세요. 불필요한 부연 설명 없이 요약만 출력하세요.",
+                "required": false,
+                "expandable": true
+              },
+              {
+                "id": "streaming",
+                "name": "Streaming",
+                "type": "BOOL",
+                "value": false,
+                "required": false
+              }
+            ]
+          },
+          "position": {
+            "x": 50550,
+            "y": 21773
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "edge-tut-input-to-summarizer",
+          "source": {
+            "nodeId": "input_string-tut-1",
+            "portId": "text",
+            "portType": "output",
+            "type": "STR"
+          },
+          "target": {
+            "nodeId": "agents/xgen-tut-2",
+            "portId": "text",
+            "portType": "input"
+          }
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "title": "번역 Agent 체이닝",
+      "message": "두 번째 Agent를 추가하여 요약 결과를 영어로 번역합니다.\n\n이것이 Agent 체이닝입니다!\n첫 번째 Agent의 출력이 두 번째 Agent의 입력으로 연결되어 순차적으로 처리됩니다.\n\n이 패턴을 활용하면 복잡한 작업을 단계별로 분리하여 처리할 수 있습니다.",
+      "nodes": [
+        {
+          "id": "agents/xgen-tut-3",
+          "data": {
+            "functionId": "agents",
+            "id": "agents/xgen",
+            "nodeName": "Agent Xgen",
+            "description": "워크플로우의 핵심 AI 두뇌입니다.",
+            "tags": ["agent", "chat", "rag", "public_model", "stream", "xgen"],
+            "inputs": [
+              {
+                "id": "text",
+                "name": "Text",
+                "type": "STREAM STR|STR",
+                "multi": true,
+                "required": false
+              },
+              {
+                "id": "files",
+                "name": "Files",
+                "type": "FILE",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "images",
+                "name": "Images",
+                "type": "LIST",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "tools",
+                "name": "Tools",
+                "type": "TOOL",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "memory",
+                "name": "Memory",
+                "type": "OBJECT",
+                "multi": false,
+                "required": false
+              },
+              {
+                "id": "rag_context",
+                "name": "RAG Context",
+                "type": "DocsContext",
+                "multi": false,
+                "required": false
+              },
+              {
+                "id": "args_schema",
+                "name": "ArgsSchema",
+                "type": "OutputSchema"
+              },
+              {
+                "id": "plan",
+                "name": "Plan",
+                "type": "PLAN",
+                "required": false
+              }
+            ],
+            "outputs": [
+              {
+                "id": "stream",
+                "name": "Stream",
+                "type": "STREAM STR",
+                "stream": true
+              }
+            ],
+            "parameters": [
+              {
+                "id": "provider",
+                "name": "Provider",
+                "type": "STR",
+                "value": "openai",
+                "required": true,
+                "options": [
+                  { "value": "openai", "label": "OpenAI" },
+                  { "value": "anthropic", "label": "Anthropic" },
+                  { "value": "google", "label": "Google" }
+                ]
+              },
+              {
+                "id": "openai_model",
+                "name": "OpenAI Model",
+                "type": "STR",
+                "value": "gpt-4o",
+                "required": true,
+                "options": [
+                  { "value": "gpt-4o", "label": "GPT-4o" },
+                  { "value": "gpt-4.1", "label": "GPT-4.1" },
+                  { "value": "gpt-4.1-mini", "label": "GPT-4.1 Mini" }
+                ],
+                "dependency": "provider",
+                "dependencyValue": "openai"
+              },
+              {
+                "id": "temperature",
+                "name": "Temperature",
+                "type": "FLOAT",
+                "value": 0.3,
+                "min": 0,
+                "max": 2,
+                "step": 0.1
+              },
+              {
+                "id": "max_tokens",
+                "name": "Max Tokens",
+                "type": "INT",
+                "value": 8192,
+                "min": 1,
+                "max": 65536,
+                "step": 1
+              },
+              {
+                "id": "system_prompt",
+                "name": "System Prompt",
+                "type": "STR",
+                "value": "You are a professional Korean to English translator. Translate the given Korean text into natural, fluent English. Only output the translated text.",
+                "required": false,
+                "expandable": true
+              },
+              {
+                "id": "streaming",
+                "name": "Streaming",
+                "type": "BOOL",
+                "value": true,
+                "required": false
+              }
+            ]
+          },
+          "position": {
+            "x": 51350,
+            "y": 21773
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "edge-tut-summarizer-to-translator",
+          "source": {
+            "nodeId": "agents/xgen-tut-2",
+            "portId": "result",
+            "portType": "output",
+            "type": "STR"
+          },
+          "target": {
+            "nodeId": "agents/xgen-tut-3",
+            "portId": "text",
+            "portType": "input"
+          }
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "title": "최종 출력으로 완성",
+      "message": "Print Agent Output 노드를 추가하여 번역된 요약 결과를 확인합니다.\n\n완성된 워크플로우 흐름:\n입력 텍스트 → 3줄 요약 → 영어 번역 → 출력\n\n실행 버튼을 눌러 결과를 확인해보세요!",
+      "nodes": [
+        {
+          "id": "tools/print_agent_output-tut-4",
+          "data": {
+            "functionId": "endnode",
+            "id": "tools/print_agent_output",
+            "nodeName": "Print Agent Output",
+            "description": "Agent의 출력을 화면에 표시하는 출력 노드입니다.",
+            "tags": ["output", "print", "end_node", "utility", "any_type"],
+            "inputs": [
+              {
+                "id": "input_print",
+                "name": "Print",
+                "type": "STREAM STR|STR",
+                "multi": true,
+                "required": true
+              }
+            ],
+            "outputs": [],
+            "parameters": []
+          },
+          "position": {
+            "x": 52100,
+            "y": 21821
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "edge-tut-translator-to-print",
+          "source": {
+            "nodeId": "agents/xgen-tut-3",
+            "portId": "stream",
+            "portType": "output",
+            "type": "STREAM STR"
+          },
+          "target": {
+            "nodeId": "tools/print_agent_output-tut-4",
+            "portId": "input_print",
+            "portType": "input"
+          }
+        }
+      ]
+    }
+  ]
+}

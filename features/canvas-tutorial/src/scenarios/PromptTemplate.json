@@ -1,0 +1,352 @@
+{
+  "tutorial_id": "prompt_template",
+  "tutorial_name": "프롬프트 템플릿 활용",
+  "tutorial_description": "Input Template 노드를 사용하여 동적 프롬프트를 만들어봅니다. 변수를 활용한 재사용 가능한 워크플로우를 구성합니다.",
+  "tags": ["초급", "템플릿", "프롬프트"],
+  "view": {
+    "x": -36528,
+    "y": -15535,
+    "scale": 0.73
+  },
+  "tutorial_steps": [
+    {
+      "step": 1,
+      "title": "주제 입력 노드 생성",
+      "message": "사용자가 원하는 주제를 입력하는 Input String 노드를 생성합니다.\n이 값은 프롬프트 템플릿의 변수로 사용됩니다.",
+      "nodes": [
+        {
+          "id": "input_string-tut-1",
+          "data": {
+            "functionId": "startnode",
+            "id": "input_string",
+            "nodeName": "Input String",
+            "description": "사용자가 설정한 문자열 값을 출력하는 입력 노드입니다.",
+            "tags": ["input", "string", "text", "start_node"],
+            "inputs": [
+              {
+                "id": "args_schema",
+                "name": "ArgsSchema",
+                "type": "InputSchema",
+                "required": false
+              }
+            ],
+            "outputs": [
+              {
+                "id": "text",
+                "name": "Text",
+                "type": "STR"
+              }
+            ],
+            "parameters": [
+              {
+                "id": "input_str",
+                "name": "INPUT",
+                "type": "STR",
+                "value": "양자 컴퓨팅",
+                "required": false
+              }
+            ]
+          },
+          "position": {
+            "x": 50100,
+            "y": 21803
+          }
+        }
+      ],
+      "edges": []
+    },
+    {
+      "step": 2,
+      "title": "프롬프트 템플릿 설정",
+      "message": "Input Template 노드를 추가합니다.\n\n이 노드는 Jinja2 템플릿 문법을 사용하여 동적 프롬프트를 생성합니다.\n입력된 주제가 {{variables}} 위치에 자동으로 삽입됩니다.\n\n같은 템플릿으로 주제만 바꿔가며 재사용할 수 있는 것이 핵심입니다!",
+      "nodes": [
+        {
+          "id": "input_template-tut-2",
+          "data": {
+            "functionId": "tools",
+            "id": "input_template",
+            "nodeName": "Input Template",
+            "description": "변수가 포함된 템플릿으로 동적 프롬프트를 만듭니다.",
+            "tags": ["prompt", "template", "jinja2", "format", "string", "llm"],
+            "inputs": [
+              {
+                "id": "variables",
+                "name": "Variables",
+                "type": "STR",
+                "required": false,
+                "multi": true
+              }
+            ],
+            "outputs": [
+              {
+                "id": "prompt",
+                "name": "Prompt",
+                "type": "STR"
+              }
+            ],
+            "parameters": [
+              {
+                "id": "prompt_source",
+                "name": "Prompt Source",
+                "type": "STR",
+                "value": "direct",
+                "required": false,
+                "options": [
+                  { "value": "direct", "label": "Direct Input" },
+                  { "value": "template", "label": "Select Template" }
+                ]
+              },
+              {
+                "id": "template",
+                "name": "Template",
+                "type": "STR",
+                "value": "다음 주제에 대해 초등학생도 이해할 수 있도록 쉽게 설명해주세요.\n\n주제: {{variables}}\n\n다음 형식으로 작성해주세요:\n1. 한 줄 요약\n2. 쉬운 설명 (비유 포함)\n3. 실생활 예시",
+                "required": true,
+                "expandable": true
+              },
+              {
+                "id": "strict_mode",
+                "name": "Strict Mode",
+                "type": "BOOL",
+                "value": false,
+                "required": false
+              }
+            ]
+          },
+          "position": {
+            "x": 50750,
+            "y": 21773
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "edge-tut-input-to-template",
+          "source": {
+            "nodeId": "input_string-tut-1",
+            "portId": "text",
+            "portType": "output",
+            "type": "STR"
+          },
+          "target": {
+            "nodeId": "input_template-tut-2",
+            "portId": "variables",
+            "portType": "input"
+          }
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "title": "AI Agent 연결",
+      "message": "Agent Xgen 노드를 추가합니다.\n템플릿에서 생성된 프롬프트가 Agent의 입력으로 전달됩니다.\n\nAgent는 템플릿이 만든 형식에 따라 체계적인 답변을 생성합니다.",
+      "nodes": [
+        {
+          "id": "agents/xgen-tut-3",
+          "data": {
+            "functionId": "agents",
+            "id": "agents/xgen",
+            "nodeName": "Agent Xgen",
+            "description": "워크플로우의 핵심 AI 두뇌입니다.",
+            "tags": ["agent", "chat", "rag", "public_model", "stream", "xgen"],
+            "inputs": [
+              {
+                "id": "text",
+                "name": "Text",
+                "type": "STREAM STR|STR",
+                "multi": true,
+                "required": false
+              },
+              {
+                "id": "files",
+                "name": "Files",
+                "type": "FILE",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "images",
+                "name": "Images",
+                "type": "LIST",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "tools",
+                "name": "Tools",
+                "type": "TOOL",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "memory",
+                "name": "Memory",
+                "type": "OBJECT",
+                "multi": false,
+                "required": false
+              },
+              {
+                "id": "rag_context",
+                "name": "RAG Context",
+                "type": "DocsContext",
+                "multi": false,
+                "required": false
+              },
+              {
+                "id": "args_schema",
+                "name": "ArgsSchema",
+                "type": "OutputSchema"
+              },
+              {
+                "id": "plan",
+                "name": "Plan",
+                "type": "PLAN",
+                "required": false
+              }
+            ],
+            "outputs": [
+              {
+                "id": "stream",
+                "name": "Stream",
+                "type": "STREAM STR",
+                "stream": true
+              }
+            ],
+            "parameters": [
+              {
+                "id": "provider",
+                "name": "Provider",
+                "type": "STR",
+                "value": "openai",
+                "required": true,
+                "options": [
+                  { "value": "openai", "label": "OpenAI" },
+                  { "value": "anthropic", "label": "Anthropic" },
+                  { "value": "google", "label": "Google" }
+                ]
+              },
+              {
+                "id": "openai_model",
+                "name": "OpenAI Model",
+                "type": "STR",
+                "value": "gpt-4o",
+                "required": true,
+                "options": [
+                  { "value": "gpt-4o", "label": "GPT-4o" },
+                  { "value": "gpt-4.1", "label": "GPT-4.1" },
+                  { "value": "gpt-4.1-mini", "label": "GPT-4.1 Mini" }
+                ],
+                "dependency": "provider",
+                "dependencyValue": "openai"
+              },
+              {
+                "id": "temperature",
+                "name": "Temperature",
+                "type": "FLOAT",
+                "value": 0.7,
+                "min": 0,
+                "max": 2,
+                "step": 0.1
+              },
+              {
+                "id": "max_tokens",
+                "name": "Max Tokens",
+                "type": "INT",
+                "value": 8192,
+                "min": 1,
+                "max": 65536,
+                "step": 1
+              },
+              {
+                "id": "system_prompt",
+                "name": "System Prompt",
+                "type": "STR",
+                "value": "You are a helpful educational assistant. Always provide clear, accurate, and easy-to-understand explanations in Korean.",
+                "required": false,
+                "expandable": true
+              },
+              {
+                "id": "streaming",
+                "name": "Streaming",
+                "type": "BOOL",
+                "value": true,
+                "required": false
+              }
+            ]
+          },
+          "position": {
+            "x": 51450,
+            "y": 21773
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "edge-tut-template-to-agent",
+          "source": {
+            "nodeId": "input_template-tut-2",
+            "portId": "prompt",
+            "portType": "output",
+            "type": "STR"
+          },
+          "target": {
+            "nodeId": "agents/xgen-tut-3",
+            "portId": "text",
+            "portType": "input"
+          }
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "title": "결과 출력으로 완성",
+      "message": "Print Agent Output 노드를 추가하여 워크플로우를 완성합니다.\n\n이제 실행 버튼을 눌러보세요!\nInput String의 주제를 바꿔가며 같은 템플릿으로 다양한 설명을 생성해보세요.",
+      "nodes": [
+        {
+          "id": "tools/print_agent_output-tut-4",
+          "data": {
+            "functionId": "endnode",
+            "id": "tools/print_agent_output",
+            "nodeName": "Print Agent Output",
+            "description": "Agent의 출력을 화면에 표시하는 출력 노드입니다.",
+            "tags": ["output", "print", "end_node", "utility", "any_type"],
+            "inputs": [
+              {
+                "id": "input_print",
+                "name": "Print",
+                "type": "STREAM STR|STR",
+                "multi": true,
+                "required": true
+              }
+            ],
+            "outputs": [],
+            "parameters": []
+          },
+          "position": {
+            "x": 52100,
+            "y": 21821
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "edge-tut-agent-to-print",
+          "source": {
+            "nodeId": "agents/xgen-tut-3",
+            "portId": "stream",
+            "portType": "output",
+            "type": "STREAM STR"
+          },
+          "target": {
+            "nodeId": "tools/print_agent_output-tut-4",
+            "portId": "input_print",
+            "portType": "input"
+          }
+        }
+      ]
+    }
+  ]
+}

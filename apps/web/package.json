@@ -52,6 +52,7 @@
     "@xgen/feature-canvas-ai-generator": "workspace:*",
     "@xgen/feature-canvas-core": "workspace:*",
     "@xgen/feature-canvas-deploy": "workspace:*",
+    "@xgen/feature-canvas-tutorial": "workspace:*",
     "@xgen/feature-canvas-document-drop": "workspace:*",
     "@xgen/feature-canvas-execution": "workspace:*",
     "@xgen/feature-canvas-header": "workspace:*",

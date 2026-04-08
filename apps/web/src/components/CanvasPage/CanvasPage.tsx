@@ -42,6 +42,8 @@ import { AddNodePanel } from '@xgen/feature-canvas-sidebar-nodes';
 import { TemplatePanel } from '@xgen/feature-canvas-sidebar-templates';
 import { AgentflowPanel } from '@xgen/feature-canvas-sidebar-agentflows';
 import { DeploymentModal } from '@xgen/feature-canvas-deploy';
+import { TutorialOverlay, TutorialPanel as TutorialPanelComponent } from '@xgen/feature-canvas-tutorial';
+import type { TutorialData } from '@xgen/feature-canvas-tutorial';
 
 import styles from './CanvasPage.module.scss';
 
@@ -172,6 +174,11 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         isOpen: boolean; file: File; dropX: number; dropY: number;
         targetNodeId?: string; defaultCollectionName?: string;
     } | null>(null);
+
+    // ── Tutorial state ──
+    const [tutorialData, setTutorialData] = useState<TutorialData | null>(null);
+    const [tutorialStep, setTutorialStep] = useState(0);
+    const [isTutorialAnimating, setIsTutorialAnimating] = useState(false);
 
     // ── Plugin context ──
     const pluginContext: CanvasPluginContext = useMemo(() => ({
@@ -861,6 +868,71 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
     const handleClearOutput = useCallback(() => setExecutionOutput(null), []);
     const handleClearLogs = useCallback(() => setExecutionLogs([]), []);
 
+    // ── Tutorial handlers ──
+    const tutorialDelay = useCallback((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)), []);
+
+    const handleStartTutorial = useCallback(async (tutorial: TutorialData) => {
+        if (!canvasRef.current) return;
+
+        // Clear canvas and set tutorial's view so nodes are visible
+        const tutorialView = tutorial.view || canvasRef.current.getCenteredView();
+        canvasRef.current.loadAgentflow({ nodes: [], edges: [], memos: [], view: tutorialView });
+
+        // Set tutorial state
+        setTutorialData(tutorial);
+        setTutorialStep(0);
+        setIsTutorialAnimating(false);
+
+        // Close side menu
+        setDirectPanel(null);
+
+        toast.info(t('canvas.tutorial.started', { name: tutorial.tutorial_name }));
+    }, [toast, t]);
+
+    const handleTutorialNext = useCallback(async () => {
+        if (!tutorialData || !canvasRef.current || isTutorialAnimating) return;
+
+        const steps = tutorialData.tutorial_steps;
+        const currentStepData = steps[tutorialStep];
+
+        if (!currentStepData) return;
+
+        setIsTutorialAnimating(true);
+
+        try {
+            // Add nodes one by one with delay
+            for (const node of currentStepData.nodes) {
+                canvasRef.current.addNode(node);
+                await tutorialDelay(500);
+            }
+
+            // Add edges one by one with delay
+            for (const edge of currentStepData.edges) {
+                canvasRef.current.addEdge(edge);
+                await tutorialDelay(350);
+            }
+
+            // Advance to next step or complete
+            if (tutorialStep >= steps.length - 1) {
+                // Tutorial complete
+                setTutorialData(null);
+                setTutorialStep(0);
+                toast.success(t('canvas.tutorial.completed', '튜토리얼을 완료했습니다!'));
+            } else {
+                setTutorialStep((prev) => prev + 1);
+            }
+        } finally {
+            setIsTutorialAnimating(false);
+        }
+    }, [tutorialData, tutorialStep, isTutorialAnimating, tutorialDelay, toast, t]);
+
+    const handleTutorialExit = useCallback(() => {
+        setTutorialData(null);
+        setTutorialStep(0);
+        setIsTutorialAnimating(false);
+        toast.info(t('canvas.tutorial.exited', '튜토리얼을 종료했습니다.'));
+    }, [toast, t]);
+
     // ── Sidebar node panel handlers ──
     const handleAddNodeToCenter = useCallback((nodeData: any) => {
         if (!canvasRef.current) return;
@@ -1030,6 +1102,17 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         return Wrapped;
     }, [handleFileInputClick, handleExport, handleLoadAgentflow]);
 
+    const TutorialPanelWrapped = useMemo(() => {
+        const Wrapped: React.FC<{ onBack: () => void }> = ({ onBack }) => (
+            <TutorialPanelComponent
+                onBack={onBack}
+                onSelectTutorial={handleStartTutorial}
+            />
+        );
+        Wrapped.displayName = 'TutorialPanelWrapped';
+        return Wrapped;
+    }, [handleStartTutorial]);
+
     // ── Deploy handler ──
     const handleDeploy = useCallback(() => {
         if (!canvasRef.current) return;
@@ -1115,6 +1198,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                     onHistoryClick={handleHistoryClick}
                     onImportAgentflow={handleImportAgentflow}
                     onAgentflowNameChange={handleAgentflowNameChange}
+                    onTutorialClick={() => setDirectPanel((prev) => prev === 'tutorial' ? null : 'tutorial')}
                     isOwner={isOwner}
                     renameAgentflow={apiRenameAgentflow}
                     checkAgentflowExistence={checkAgentflowExistence}
@@ -1194,6 +1278,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                         AddNodePanel={AddNodePanelWrapped}
                         TemplatePanel={TemplatePanelWrapped}
                         AgentflowPanel={AgentflowPanelWrapped}
+                        TutorialPanel={TutorialPanelWrapped}
                     />
                 )}
 
@@ -1320,6 +1405,17 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                 workflow={{ id: workflowId, name: workflowName, user_id: workflowOriginUserId || user?.user_id }}
                 workflowDetail={workflowDetailData}
             />
+
+            {/* Tutorial Overlay */}
+            {tutorialData && (
+                <TutorialOverlay
+                    tutorialData={tutorialData}
+                    currentStep={tutorialStep}
+                    onNext={handleTutorialNext}
+                    onExit={handleTutorialExit}
+                    isAnimating={isTutorialAnimating}
+                />
+            )}
 
             <input
                 ref={fileInputRef}

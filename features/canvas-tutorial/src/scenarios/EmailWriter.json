@@ -1,0 +1,412 @@
+{
+  "tutorial_id": "email_writer",
+  "tutorial_name": "이메일 자동 작성기",
+  "tutorial_description": "두 개의 입력(받는 사람, 용건)을 조합하여 비즈니스 이메일을 자동 생성하는 실용적인 워크플로우를 만들어봅니다.",
+  "tags": ["초급", "실용", "비즈니스"],
+  "view": {
+    "x": -36528,
+    "y": -15535,
+    "scale": 0.73
+  },
+  "tutorial_steps": [
+    {
+      "step": 1,
+      "title": "받는 사람 입력",
+      "message": "이메일을 받을 상대방의 이름과 직책을 입력하는 노드를 생성합니다.\n\n이 워크플로우에서는 두 개의 Input을 사용하여 다양한 정보를 조합하는 방법을 배웁니다.",
+      "nodes": [
+        {
+          "id": "input_string-tut-1",
+          "data": {
+            "functionId": "startnode",
+            "id": "input_string",
+            "nodeName": "Input String",
+            "description": "사용자가 설정한 문자열 값을 출력하는 입력 노드입니다.",
+            "tags": ["input", "string", "text", "start_node"],
+            "inputs": [
+              {
+                "id": "args_schema",
+                "name": "ArgsSchema",
+                "type": "InputSchema",
+                "required": false
+              }
+            ],
+            "outputs": [
+              {
+                "id": "text",
+                "name": "Text",
+                "type": "STR"
+              }
+            ],
+            "parameters": [
+              {
+                "id": "input_str",
+                "name": "INPUT",
+                "type": "STR",
+                "value": "김철수 팀장님",
+                "required": false
+              }
+            ]
+          },
+          "position": {
+            "x": 49800,
+            "y": 21600
+          }
+        }
+      ],
+      "edges": []
+    },
+    {
+      "step": 2,
+      "title": "이메일 용건 입력",
+      "message": "이메일에 담을 핵심 용건을 입력하는 두 번째 Input String 노드를 추가합니다.\n\n하나의 워크플로우에 여러 개의 Input 노드를 사용할 수 있습니다.\n각각 다른 정보를 입력받아 하나의 결과로 조합합니다.",
+      "nodes": [
+        {
+          "id": "input_string-tut-2",
+          "data": {
+            "functionId": "startnode",
+            "id": "input_string",
+            "nodeName": "Input String",
+            "description": "사용자가 설정한 문자열 값을 출력하는 입력 노드입니다.",
+            "tags": ["input", "string", "text", "start_node"],
+            "inputs": [
+              {
+                "id": "args_schema",
+                "name": "ArgsSchema",
+                "type": "InputSchema",
+                "required": false
+              }
+            ],
+            "outputs": [
+              {
+                "id": "text",
+                "name": "Text",
+                "type": "STR"
+              }
+            ],
+            "parameters": [
+              {
+                "id": "input_str",
+                "name": "INPUT",
+                "type": "STR",
+                "value": "다음 주 수요일 오후 2시에 프로젝트 진행 상황 공유를 위한 회의를 요청드립니다. 장소는 3층 회의실을 사용하고 싶습니다.",
+                "required": false
+              }
+            ]
+          },
+          "position": {
+            "x": 49800,
+            "y": 22100
+          }
+        }
+      ],
+      "edges": []
+    },
+    {
+      "step": 3,
+      "title": "이메일 템플릿 설정",
+      "message": "Input Template 노드를 추가하여 두 입력을 하나의 프롬프트로 조합합니다.\n\n템플릿에 {{variables}}를 사용하면 연결된 입력값들이 자동으로 삽입됩니다.\n여러 입력을 받아 하나의 구조화된 프롬프트를 만드는 것이 핵심입니다.",
+      "nodes": [
+        {
+          "id": "input_template-tut-3",
+          "data": {
+            "functionId": "tools",
+            "id": "input_template",
+            "nodeName": "Input Template",
+            "description": "변수가 포함된 템플릿으로 동적 프롬프트를 만듭니다.",
+            "tags": ["prompt", "template", "jinja2", "format", "string", "llm"],
+            "inputs": [
+              {
+                "id": "variables",
+                "name": "Variables",
+                "type": "STR",
+                "required": false,
+                "multi": true
+              }
+            ],
+            "outputs": [
+              {
+                "id": "prompt",
+                "name": "Prompt",
+                "type": "STR"
+              }
+            ],
+            "parameters": [
+              {
+                "id": "prompt_source",
+                "name": "Prompt Source",
+                "type": "STR",
+                "value": "direct",
+                "required": false,
+                "options": [
+                  { "value": "direct", "label": "Direct Input" },
+                  { "value": "template", "label": "Select Template" }
+                ]
+              },
+              {
+                "id": "template",
+                "name": "Template",
+                "type": "STR",
+                "value": "다음 정보를 바탕으로 정중하고 전문적인 비즈니스 이메일을 작성해주세요.\n\n입력 정보:\n{{variables}}\n\n작성 규칙:\n- 한국어 경어체 사용\n- 인사말로 시작\n- 본문에 용건을 명확하게 전달\n- 정중한 마무리 인사\n- 발신자 이름은 '홍길동 드림'으로 마무리",
+                "required": true,
+                "expandable": true
+              },
+              {
+                "id": "strict_mode",
+                "name": "Strict Mode",
+                "type": "BOOL",
+                "value": false,
+                "required": false
+              }
+            ]
+          },
+          "position": {
+            "x": 50600,
+            "y": 21850
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "edge-tut-recipient-to-template",
+          "source": {
+            "nodeId": "input_string-tut-1",
+            "portId": "text",
+            "portType": "output",
+            "type": "STR"
+          },
+          "target": {
+            "nodeId": "input_template-tut-3",
+            "portId": "variables",
+            "portType": "input"
+          }
+        },
+        {
+          "id": "edge-tut-content-to-template",
+          "source": {
+            "nodeId": "input_string-tut-2",
+            "portId": "text",
+            "portType": "output",
+            "type": "STR"
+          },
+          "target": {
+            "nodeId": "input_template-tut-3",
+            "portId": "variables",
+            "portType": "input"
+          }
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "title": "AI Agent로 이메일 생성",
+      "message": "Agent Xgen 노드를 추가하여 템플릿 프롬프트를 기반으로 이메일을 생성합니다.\n\n템플릿의 출력이 Agent의 입력으로 연결됩니다.\nAgent는 템플릿이 만든 지시사항에 따라 이메일을 작성합니다.",
+      "nodes": [
+        {
+          "id": "agents/xgen-tut-4",
+          "data": {
+            "functionId": "agents",
+            "id": "agents/xgen",
+            "nodeName": "Agent Xgen",
+            "description": "워크플로우의 핵심 AI 두뇌입니다.",
+            "tags": ["agent", "chat", "rag", "public_model", "stream", "xgen"],
+            "inputs": [
+              {
+                "id": "text",
+                "name": "Text",
+                "type": "STREAM STR|STR",
+                "multi": true,
+                "required": false
+              },
+              {
+                "id": "files",
+                "name": "Files",
+                "type": "FILE",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "images",
+                "name": "Images",
+                "type": "LIST",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "tools",
+                "name": "Tools",
+                "type": "TOOL",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "memory",
+                "name": "Memory",
+                "type": "OBJECT",
+                "multi": false,
+                "required": false
+              },
+              {
+                "id": "rag_context",
+                "name": "RAG Context",
+                "type": "DocsContext",
+                "multi": false,
+                "required": false
+              },
+              {
+                "id": "args_schema",
+                "name": "ArgsSchema",
+                "type": "OutputSchema"
+              },
+              {
+                "id": "plan",
+                "name": "Plan",
+                "type": "PLAN",
+                "required": false
+              }
+            ],
+            "outputs": [
+              {
+                "id": "stream",
+                "name": "Stream",
+                "type": "STREAM STR",
+                "stream": true
+              }
+            ],
+            "parameters": [
+              {
+                "id": "provider",
+                "name": "Provider",
+                "type": "STR",
+                "value": "openai",
+                "required": true,
+                "options": [
+                  { "value": "openai", "label": "OpenAI" },
+                  { "value": "anthropic", "label": "Anthropic" },
+                  { "value": "google", "label": "Google" }
+                ]
+              },
+              {
+                "id": "openai_model",
+                "name": "OpenAI Model",
+                "type": "STR",
+                "value": "gpt-4o",
+                "required": true,
+                "options": [
+                  { "value": "gpt-4o", "label": "GPT-4o" },
+                  { "value": "gpt-4.1", "label": "GPT-4.1" },
+                  { "value": "gpt-4.1-mini", "label": "GPT-4.1 Mini" }
+                ],
+                "dependency": "provider",
+                "dependencyValue": "openai"
+              },
+              {
+                "id": "temperature",
+                "name": "Temperature",
+                "type": "FLOAT",
+                "value": 0.7,
+                "min": 0,
+                "max": 2,
+                "step": 0.1
+              },
+              {
+                "id": "max_tokens",
+                "name": "Max Tokens",
+                "type": "INT",
+                "value": 8192,
+                "min": 1,
+                "max": 65536,
+                "step": 1
+              },
+              {
+                "id": "system_prompt",
+                "name": "System Prompt",
+                "type": "STR",
+                "value": "You are a professional business email writer. Write polished, professional Korean business emails based on the given instructions.",
+                "required": false,
+                "expandable": true
+              },
+              {
+                "id": "streaming",
+                "name": "Streaming",
+                "type": "BOOL",
+                "value": true,
+                "required": false
+              }
+            ]
+          },
+          "position": {
+            "x": 51400,
+            "y": 21850
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "edge-tut-template-to-agent",
+          "source": {
+            "nodeId": "input_template-tut-3",
+            "portId": "prompt",
+            "portType": "output",
+            "type": "STR"
+          },
+          "target": {
+            "nodeId": "agents/xgen-tut-4",
+            "portId": "text",
+            "portType": "input"
+          }
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "title": "이메일 출력으로 완성",
+      "message": "Print Agent Output 노드를 추가하여 생성된 이메일을 확인합니다.\n\n완성된 워크플로우 흐름:\n받는 사람 + 용건 → 템플릿 조합 → AI 이메일 작성 → 출력\n\n실행 후 Input의 값을 바꿔가며 다양한 이메일을 생성해보세요!",
+      "nodes": [
+        {
+          "id": "tools/print_agent_output-tut-5",
+          "data": {
+            "functionId": "endnode",
+            "id": "tools/print_agent_output",
+            "nodeName": "Print Agent Output",
+            "description": "Agent의 출력을 화면에 표시하는 출력 노드입니다.",
+            "tags": ["output", "print", "end_node", "utility", "any_type"],
+            "inputs": [
+              {
+                "id": "input_print",
+                "name": "Print",
+                "type": "STREAM STR|STR",
+                "multi": true,
+                "required": true
+              }
+            ],
+            "outputs": [],
+            "parameters": []
+          },
+          "position": {
+            "x": 52100,
+            "y": 21850
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "edge-tut-agent-to-print",
+          "source": {
+            "nodeId": "agents/xgen-tut-4",
+            "portId": "stream",
+            "portType": "output",
+            "type": "STREAM STR"
+          },
+          "target": {
+            "nodeId": "tools/print_agent_output-tut-5",
+            "portId": "input_print",
+            "portType": "input"
+          }
+        }
+      ]
+    }
+  ]
+}

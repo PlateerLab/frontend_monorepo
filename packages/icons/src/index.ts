@@ -150,6 +150,7 @@ export {
   LuShare2,
   LuLoader,
   LuHistory,
+  LuBookOpen,
 } from 'react-icons/lu';
 
 // -----------------------------------------------------------------------------

@@ -1,0 +1,14 @@
+{
+  "name": "@xgen/feature-canvas-tutorial",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.tsx",
+  "dependencies": {
+    "@xgen/canvas-types": "workspace:*",
+    "@xgen/types": "workspace:*",
+    "@xgen/ui": "workspace:*",
+    "@xgen/i18n": "workspace:*",
+    "@xgen/icons": "workspace:*",
+    "@xgen/api-client": "workspace:*"
+  }
+}

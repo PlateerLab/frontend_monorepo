@@ -24,6 +24,7 @@ export const ko: Record<string, unknown> = {
     deploySettings: '배포설정',
     addNode: '노드 추가',
     history: '작업 히스토리',
+    tutorial: '튜토리얼',
   },
   toast: {
     saving: '에이전트플로우 저장 중...',
