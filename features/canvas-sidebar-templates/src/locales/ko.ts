@@ -16,7 +16,7 @@ export const ko: Record<string, unknown> = {
     templateLoadError: '템플릿 로드 중 오류가 발생했습니다',
   },
   messages: {
-    workflowLoadTitle: '에이전트플로우 로드',
-    workflowLoadMessage: '현재 저장되지 않은 변경사항이 있는 에이전트플로우가 있습니다.\n로드 시 현재 작업이 대체됩니다.',
+    agentflowLoadTitle: '에이전트플로우 로드',
+    agentflowLoadMessage: '현재 저장되지 않은 변경사항이 있는 에이전트플로우가 있습니다.\n로드 시 현재 작업이 대체됩니다.',
   },
 };

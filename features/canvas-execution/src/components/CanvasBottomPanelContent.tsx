@@ -299,7 +299,7 @@ const CanvasBottomPanelContent: React.FC<CanvasBottomPanelContentProps> = ({
                         <div className="flex-1 overflow-y-auto py-3 px-4 flex flex-col gap-2 text-xs font-normal leading-4 text-[#40444d]" ref={chatScrollRef}>
                             {chatMessages.length === 0 ? (
                                 <span className="text-[#7a7f89]">
-                                    {t('canvas.executionPanel.chatPlaceholder', 'Send a message to execute the workflow')}
+                                    {t('canvas.executionPanel.chatPlaceholder', 'Send a message to execute the agentflow')}
                                 </span>
                             ) : (
                                 chatMessages.map((msg) => (
@@ -353,7 +353,7 @@ const CanvasBottomPanelContent: React.FC<CanvasBottomPanelContentProps> = ({
                     <div className="flex-1 overflow-y-auto py-3 px-4 text-xs font-normal leading-4 text-[#40444d]">
                         {!buttonResultText && !(executionSource === 'button' && isExecuting) ? (
                             <span className="text-[#7a7f89]">
-                                {t('canvas.executionPanel.placeholder', 'Run workflow to see results')}
+                                {t('canvas.executionPanel.placeholder', 'Run agentflow to see results')}
                             </span>
                         ) : (
                             <>

@@ -150,7 +150,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                                 onChange={(e) => setEditValue(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 className="h-7 text-sm font-bold text-[var(--color-gray-800)] border border-[var(--color-secondary-200)] rounded-md px-2 bg-white outline-none min-w-[120px] shadow-[0_0_0_2px_rgba(48,94,235,0.1)] focus:border-[var(--color-secondary-200)]"
-                                placeholder={t('canvas.header.workflowNamePlaceholder', 'Agentflow name')}
+                                placeholder={t('canvas.header.agentflowNamePlaceholder', 'Agentflow name')}
                             />
                             <button
                                 onClick={handleSaveClick}

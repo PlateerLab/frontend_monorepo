@@ -8,12 +8,12 @@ export const en: TranslationData = {
     latestUpdates: 'Latest Updates',
     noUpdates: 'No recent updates',
     topAgentflows: 'Top Agentflows',
-    noAgentflows: 'No workflows',
+    noAgentflows: 'No agentflows',
     recentErrors: 'Recent Errors',
     noErrors: 'No errors',
     lastUpdated: 'Last Updated',
     errors: {
-      workflow: 'Agentflow',
+      agentflow: 'Agentflow',
       time: 'Time',
       message: 'Message'
     },

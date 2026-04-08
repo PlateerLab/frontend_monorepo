@@ -39,7 +39,7 @@ export const ErrorsSection: React.FC<ErrorsSectionProps> = ({
         <thead className="bg-muted">
           <tr>
             <th style={{ width: 40 }} className="px-4 py-2 text-xs font-semibold text-muted-foreground text-left uppercase tracking-wider"></th>
-            <th className="px-4 py-2 text-xs font-semibold text-muted-foreground text-left uppercase tracking-wider">{t('dashboard.errors.workflow')}</th>
+            <th className="px-4 py-2 text-xs font-semibold text-muted-foreground text-left uppercase tracking-wider">{t('dashboard.errors.agentflow')}</th>
             <th className="px-4 py-2 text-xs font-semibold text-muted-foreground text-left uppercase tracking-wider">{t('dashboard.errors.time')}</th>
             <th className="px-4 py-2 text-xs font-semibold text-muted-foreground text-left uppercase tracking-wider">{t('dashboard.errors.message')}</th>
           </tr>

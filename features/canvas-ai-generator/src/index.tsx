@@ -137,7 +137,7 @@ const AutoAgentflowSidebar: React.FC<AutoAgentflowSidebarProps> = ({
         if (!generateAgentflow) return;
 
         const finalAgentflowName = workflowName?.trim() || 'workflow';
-        const toastId = showLoading?.(t('canvas.toasts.autoAgentflowGenerating', 'Generating workflow...'));
+        const toastId = showLoading?.(t('canvas.toasts.autoAgentflowGenerating', 'Generating agentflow...'));
         setIsGenerating(true);
 
         try {
@@ -276,7 +276,7 @@ const AutoAgentflowSidebar: React.FC<AutoAgentflowSidebarProps> = ({
                         <h3>{t('canvas.autoAgentflow.requirements', '요구사항 입력')}</h3>
                         <textarea
                             className={styles.requirementsInput}
-                            placeholder={t('canvas.autoAgentflow.requirementsPlaceholder', 'Describe the workflow you want...')}
+                            placeholder={t('canvas.autoAgentflow.requirementsPlaceholder', 'Describe the agentflow you want...')}
                             value={userRequirements}
                             onChange={(e) => setUserRequirements(e.target.value)}
                             rows={4}
@@ -285,11 +285,11 @@ const AutoAgentflowSidebar: React.FC<AutoAgentflowSidebarProps> = ({
 
                     {/* Agentflow name */}
                     <div className={styles.section}>
-                        <h3>{t('canvas.autoAgentflow.workflowName', '에이전트플로우 이름')}</h3>
+                        <h3>{t('canvas.autoAgentflow.agentflowName', '에이전트플로우 이름')}</h3>
                         <input
                             type="text"
                             className={styles.agentflowNameInput}
-                            placeholder={t('canvas.autoAgentflow.workflowNamePlaceholder', 'Enter workflow name')}
+                            placeholder={t('canvas.autoAgentflow.agentflowNamePlaceholder', 'Enter agentflow name')}
                             value={workflowName}
                             onChange={(e) => setAgentflowName(e.target.value)}
                         />

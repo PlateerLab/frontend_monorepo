@@ -9,7 +9,7 @@ export const en: Record<string, unknown> = {
   },
   sideMenu: {
     addNode: 'Add Node',
-    workflow: 'Agentflow',
+    agentflow: 'Agentflow',
     template: 'Template',
     settings: 'Settings',
     help: 'Help',

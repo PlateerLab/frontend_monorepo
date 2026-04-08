@@ -607,7 +607,7 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
   return (
     <ContentArea
       title={t('admin.pages.govAuditTracking.title', 'Audit Tracking')}
-      description={t('admin.pages.govAuditTracking.description', 'Comprehensive audit trail and workflow tracking for AI governance')}
+      description={t('admin.pages.govAuditTracking.description', 'Comprehensive audit trail and agentflow tracking for AI governance')}
       headerActions={
         !selectedAgentflow ? (
           <Button variant="outline" size="sm" onClick={loadData}>
@@ -620,7 +620,7 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
           <SearchInput
             value={search}
             onChange={handleSearchChange}
-            placeholder={t('admin.governance.auditTracking.trackedSearchPlaceholder', 'Search workflows...')}
+            placeholder={t('admin.governance.auditTracking.trackedSearchPlaceholder', 'Search agentflows...')}
           />
         ) : undefined
       }
@@ -663,7 +663,7 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
                     <th className="py-2.5 px-4 text-left font-semibold text-xs text-muted-foreground tracking-wide">
-                      {t('admin.governance.auditTracking.workflowName', 'Agentflow Name')}
+                      {t('admin.governance.auditTracking.agentflowName', 'Agentflow Name')}
                     </th>
                     <th className="py-2.5 px-4 text-left font-semibold text-xs text-muted-foreground tracking-wide">
                       {t('admin.governance.auditTracking.owner', 'Owner')}
@@ -695,7 +695,7 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
                   ) : filteredAgentflows.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="py-10 text-center text-muted-foreground">
-                        {t('admin.governance.auditTracking.noTrackedAgentflows', 'No tracked workflows found')}
+                        {t('admin.governance.auditTracking.noTrackedAgentflows', 'No tracked agentflows found')}
                       </td>
                     </tr>
                   ) : (

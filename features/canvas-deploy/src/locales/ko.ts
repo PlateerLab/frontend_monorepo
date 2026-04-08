@@ -1,6 +1,6 @@
 export const ko: Record<string, unknown> = {
   deploy: {
-    title: '배포 설정 — {{workflowName}}',
+    title: '배포 설정 — {{agentflowName}}',
     tabWebpage: '웹페이지',
     tabApi: 'API',
     tabCurl: 'cURL',

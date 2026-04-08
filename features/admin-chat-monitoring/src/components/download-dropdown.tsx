@@ -102,7 +102,7 @@ export const DownloadDropdown: React.FC = () => {
 
             <div>
               <label className={labelClass}>
-                {t('admin.agentflowManagement.chatMonitoring.workflowIdOptional')}
+                {t('admin.agentflowManagement.chatMonitoring.agentflowIdOptional')}
               </label>
               <input
                 type="text"

@@ -105,8 +105,8 @@ const TemplatePanel: React.FC<TemplatePanelProps> = ({
 
         if (hasExistingWork && showWarningConfirm) {
             showWarningConfirm({
-                title: t('canvas.messages.workflowLoadTitle', 'Load Agentflow'),
-                message: t('canvas.messages.workflowLoadMessage', 'This will replace the current workflow. Continue?'),
+                title: t('canvas.messages.agentflowLoadTitle', 'Load Agentflow'),
+                message: t('canvas.messages.agentflowLoadMessage', 'This will replace the current agentflow. Continue?'),
                 onConfirm: () => performLoadTemplate(workflow),
                 confirmText: t('common.confirm', 'Confirm'),
                 cancelText: t('common.cancel', 'Cancel'),

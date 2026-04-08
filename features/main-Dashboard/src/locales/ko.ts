@@ -13,7 +13,7 @@ export const ko: TranslationData = {
     noErrors: '오류가 없습니다',
     lastUpdated: '마지막 업데이트',
     errors: {
-      workflow: '에이전트플로우',
+      agentflow: '에이전트플로우',
       time: '시간',
       message: '메시지'
     },

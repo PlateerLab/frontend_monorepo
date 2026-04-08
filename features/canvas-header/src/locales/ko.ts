@@ -9,7 +9,7 @@ export const ko: Record<string, unknown> = {
     saveAgentflow: '에이전트플로우 저장',
     copyAgentflow: '에이전트플로우 복사',
     workHistory: '작업 히스토리',
-    workflowNamePlaceholder: '에이전트플로우 이름...',
+    agentflowNamePlaceholder: '에이전트플로우 이름...',
     saveName: '이름 저장',
     cancel: '취소',
     editAgentflowName: '에이전트플로우 이름 편집',

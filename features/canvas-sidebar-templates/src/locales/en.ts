@@ -10,13 +10,13 @@ export const en: Record<string, unknown> = {
     closePreview: 'Close Preview',
   },
   toasts: {
-    templateParseFailed: 'Failed to parse workflow data from template.',
+    templateParseFailed: 'Failed to parse agentflow data from template.',
     templateLoadSuccess: 'Template has been loaded successfully!',
     templateLoadFailed: 'Failed to load template.',
     templateLoadError: 'An error occurred while loading the template.',
   },
   messages: {
-    workflowLoadTitle: 'Load Agentflow',
-    workflowLoadMessage: 'There is a workflow with unsaved changes.\nLoading will replace the current work.',
+    agentflowLoadTitle: 'Load Agentflow',
+    agentflowLoadMessage: 'There is a agentflow with unsaved changes.\nLoading will replace the current work.',
   },
 };

@@ -161,7 +161,7 @@ const GovMonitoringPlan: React.FC<GovMonitoringTabPluginProps> = () => {
   return (
     <div className="p-6">
       <p className="text-sm text-muted-foreground mb-4">
-        {t('admin.governance.monitoring.planDescription', 'Agentflow inspection plan overview by workflow.')}
+        {t('admin.governance.monitoring.planDescription', 'Agentflow inspection plan overview.')}
       </p>
       <div className="overflow-x-auto rounded-xl border border-border">
         <table className="w-full text-sm">

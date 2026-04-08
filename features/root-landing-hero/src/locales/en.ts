@@ -6,7 +6,7 @@ export const en: TranslationData = {
     title: 'Powering Enterprise AX Innovation',
     titleHighlight: 'Hybrid AI Platform',
     titleWith: 'with XGEN',
-    description: 'GEN AI Platform is an all-in-one AI platform that enables model training, intelligent workflow design with drag and drop, and easy API serving.',
+    description: 'GEN AI Platform is an all-in-one AI platform that enables model training, intelligent agentflow design with drag and drop, and easy API serving.',
     stat1Value: '5+',
     stat1Label: 'AI Node Types',
     stat2Value: 'Real-time',

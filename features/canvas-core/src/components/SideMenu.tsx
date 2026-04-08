@@ -40,7 +40,7 @@ const MainMenu: React.FC<MainMenuProps> = ({ onNavigate }) => {
             </button>
             <button className="flex items-center gap-2 w-full py-2 px-6 text-sm font-normal leading-5 text-left bg-transparent border-none cursor-pointer text-[#7a7f89] select-none hover:bg-[#f0f3fd] hover:text-[#305eeb]" onClick={() => onNavigate('workflow')} type="button">
                 <LuLayoutGrid />
-                <span>{t('canvas.sideMenu.workflow', '에이전트플로우')}</span>
+                <span>{t('canvas.sideMenu.agentflow', '에이전트플로우')}</span>
             </button>
             <button className="flex items-center gap-2 w-full py-2 px-6 text-sm font-normal leading-5 text-left bg-transparent border-none cursor-pointer text-[#7a7f89] select-none hover:bg-[#f0f3fd] hover:text-[#305eeb]" onClick={() => onNavigate('template')} type="button">
                 <LuLayoutTemplate />

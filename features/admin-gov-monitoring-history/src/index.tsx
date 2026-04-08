@@ -393,7 +393,7 @@ const GovMonitoringHistory: React.FC<GovMonitoringTabPluginProps> = ({ onSubTool
               </select>
             )}
             <p className="text-xs text-muted-foreground mt-1">
-              {t('admin.governance.monitoring.selectAgentflowHelp', 'Select the workflow to inspect.')}
+              {t('admin.governance.monitoring.selectAgentflowHelp', 'Select the agentflow to inspect.')}
             </p>
           </div>
 
@@ -529,7 +529,7 @@ const GovMonitoringHistory: React.FC<GovMonitoringTabPluginProps> = ({ onSubTool
           <SearchInput
             value={searchQuery}
             onChange={(val: string) => setSearchQuery(val)}
-            placeholder={t('admin.governance.monitoring.searchPlaceholder', 'Search by workflow, manager...')}
+            placeholder={t('admin.governance.monitoring.searchPlaceholder', 'Search by agentflow, manager...')}
           />
         </div>
         <select

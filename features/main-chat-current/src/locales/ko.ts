@@ -15,7 +15,7 @@ export const ko: TranslationData = {
     startNewChat: '새 채팅 시작',
     stop: '중지',
     cancelled: '취소됨',
-    sessionStarted: '{{workflowName}} 에이전트플로우가 시작되었습니다',
+    sessionStarted: '{{agentflowName}} 에이전트플로우가 시작되었습니다',
     emptyState: {
       title: '첫 대화를 시작해보세요!',
       ready: '에이전트플로우가 준비되었습니다'

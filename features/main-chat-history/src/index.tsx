@@ -208,7 +208,7 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
   const handleContinueChat = async (chat: ChatHistoryItem) => {
     // 삭제된 에이전트플로우는 계속 불가
     if (chat.isAgentflowDeleted) {
-      alert(t('chatHistory.error.workflowDeleted'));
+      alert(t('chatHistory.error.agentflowDeleted'));
       return;
     }
 

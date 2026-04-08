@@ -76,7 +76,7 @@ export const AgentflowEditModal: React.FC<AgentflowEditModalProps> = ({
         {/* Agentflow name (readonly) */}
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-foreground">
-            {t('admin.agentflowManagement.editModal.workflowName')}
+            {t('admin.agentflowManagement.editModal.agentflowName')}
           </label>
           <input
             type="text"
@@ -85,7 +85,7 @@ export const AgentflowEditModal: React.FC<AgentflowEditModalProps> = ({
             className="rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground"
           />
           <span className="text-xs text-muted-foreground">
-            {t('admin.agentflowManagement.editModal.workflowNameReadonly')}
+            {t('admin.agentflowManagement.editModal.agentflowNameReadonly')}
           </span>
         </div>
 
