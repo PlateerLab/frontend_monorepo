@@ -600,7 +600,7 @@ const AdminGovRiskManagementPage: React.FC<RouteComponentProps> = () => {
               <thead>
                 <tr className="bg-muted/30 text-left">
                   <th className="px-4 py-3 font-semibold text-xs text-muted-foreground tracking-wide cursor-pointer select-none" onClick={() => handleSort('workflowName')}>
-                    {t('admin.governance.common.workflow')}
+                    {t('admin.governance.common.agentflow')}
                     {sortField === 'workflowName' && <span className="ml-1">{sortDirection === 'asc' ? '▲' : '▼'}</span>}
                   </th>
                   <th className="px-4 py-3 font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.common.creator')}</th>

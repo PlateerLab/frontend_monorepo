@@ -239,7 +239,7 @@ const AdminGovAgentflowApprovalPage: React.FC<RouteComponentProps> = () => {
                     className="px-4 py-3 font-semibold text-xs text-muted-foreground tracking-wide cursor-pointer select-none"
                     onClick={() => handleSort('workflowName')}
                   >
-                    {t('admin.governance.common.workflow')} {renderSortIcon('workflowName')}
+                    {t('admin.governance.common.agentflow')} {renderSortIcon('workflowName')}
                   </th>
                   <th
                     className="px-4 py-3 font-semibold text-xs text-muted-foreground tracking-wide cursor-pointer select-none"
@@ -353,7 +353,7 @@ const AdminGovAgentflowApprovalPage: React.FC<RouteComponentProps> = () => {
                   {/* Basic info grid */}
                   <div className="grid grid-cols-2 gap-x-8 gap-y-3">
                     {([
-                      { label: t('admin.governance.common.workflow'), value: detail.workflow_name },
+                      { label: t('admin.governance.common.agentflow'), value: detail.workflow_name },
                       {
                         label: t('admin.governance.common.creator'),
                         value: `${detail.owner_name}${detail.owner_department ? ` (${detail.owner_department})` : ''}`,
@@ -588,7 +588,7 @@ const AdminGovAgentflowApprovalPage: React.FC<RouteComponentProps> = () => {
             <div className="flex flex-col gap-4 p-4" style={{ maxWidth: 480 }}>
               <div className="grid grid-cols-2 gap-x-8 gap-y-3">
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-xs text-muted-foreground">{t('admin.governance.common.workflow')}</span>
+                  <span className="text-xs text-muted-foreground">{t('admin.governance.common.agentflow')}</span>
                   <span className="text-sm text-foreground">{reviewTarget.workflow_name}</span>
                 </div>
                 <div className="flex flex-col gap-0.5">

@@ -567,7 +567,7 @@ const GovMonitoringHistory: React.FC<GovMonitoringTabPluginProps> = ({ onSubTool
                 className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide cursor-pointer hover:text-foreground"
                 onClick={() => handleSort('workflowName')}
               >
-                {t('admin.governance.common.workflow', 'Agentflow')}
+                {t('admin.governance.common.agentflow', 'Agentflow')}
                 {sortField === 'workflowName' && <span className="ml-1">{sortDirection === 'asc' ? '▲' : '▼'}</span>}
               </th>
               <th

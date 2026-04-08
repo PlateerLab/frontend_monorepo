@@ -380,7 +380,7 @@ const AdminGovOperationHistoryPage: React.FC<RouteComponentProps> = () => {
                     {t('admin.governance.operationHistory.detail', '상세')}
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-xs text-muted-foreground tracking-wide">
-                    {t('admin.governance.common.workflow', '에이전트플로우')}
+                    {t('admin.governance.common.agentflow', '에이전트플로우')}
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-xs text-muted-foreground tracking-wide">
                     {t('admin.governance.auditTracking.performer', '수행자')}

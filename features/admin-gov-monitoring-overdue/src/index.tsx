@@ -332,7 +332,7 @@ const GovMonitoringOverdue: React.FC<GovMonitoringTabPluginProps> = ({ onSubTool
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/30">
-              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.common.workflow', 'Agentflow')}</th>
+              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.common.agentflow', 'Agentflow')}</th>
               <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.inspectionCycle', 'Cycle')}</th>
               <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.expectedDate', 'Expected Date')}</th>
               <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.overdueDays', 'Overdue Days')}</th>
