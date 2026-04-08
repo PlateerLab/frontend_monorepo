@@ -6,7 +6,7 @@ import { Button, FilterTabs, SearchInput, Modal, Input, Label, Switch, Textarea,
 import type { ExternalDropResult } from '@xgen/ui';
 import { FiFolder, FiFileText, FiClock, FiTrash2, FiLock, FiSettings } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
-import { listCollections, createCollection, deleteCollection, updateCollection, verifyCollectionPassword, storeCollectionSessionToken, getCollectionSessionToken, sha256, uploadDocument, ensureFolderStructure, type CollectionItem, type DocumentItem, type UploadProgressEvent } from './api';
+import { listCollections, createCollection, deleteCollection, updateCollection, verifyCollectionPassword, storeCollectionSessionToken, getCollectionSessionToken, clearCollectionSessionToken, sha256, uploadDocument, ensureFolderStructure, type CollectionItem, type DocumentItem, type UploadProgressEvent } from './api';
 import { useAuth } from '@xgen/auth-provider';
 import { CollectionDocuments } from './components/CollectionDocuments';
 import { DocumentDetail } from './components/DocumentDetail';
@@ -368,6 +368,10 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
         updateData.password_hash = null;
       }
       await updateCollection(settingsCollection.name, updateData);
+      // 비밀번호 변경 또는 암호화 해제 시 기존 세션 토큰 삭제
+      if ((settingsSecured && settingsChangePassword && settingsPassword) || (!settingsSecured && settingsCollection.isSecured)) {
+        clearCollectionSessionToken(settingsCollection.name);
+      }
       setIsSettingsModalOpen(false);
       setSettingsCollection(null);
       setSettingsChangePassword(false);
@@ -849,7 +853,7 @@ export const DocumentCollection: React.FC<DocumentCollectionProps> = ({ onSubToo
                   // Re-enabling encryption — clear current password fields
                   setSettingsCurrentPassword('');
                   setSettingsCurrentPasswordError(null);
-                  setSettingsChangePassword(false);
+                  setSettingsChangePassword(true);
                 }
               }}
               className={`w-full px-4 py-2.5 text-sm text-center rounded-lg border transition-colors ${

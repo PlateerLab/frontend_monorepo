@@ -135,6 +135,12 @@ export function storeCollectionSessionToken(collectionName: string, token: strin
   sessionStorage.setItem('securedCollectionTokens', JSON.stringify(tokens));
 }
 
+export function clearCollectionSessionToken(collectionName: string): void {
+  const tokens = JSON.parse(sessionStorage.getItem('securedCollectionTokens') || '{}');
+  delete tokens[collectionName];
+  sessionStorage.setItem('securedCollectionTokens', JSON.stringify(tokens));
+}
+
 export function getCollectionSessionToken(collectionName: string): string | null {
   const tokens = JSON.parse(sessionStorage.getItem('securedCollectionTokens') || '{}');
   const entry = tokens[collectionName];
