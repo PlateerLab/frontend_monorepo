@@ -73,7 +73,7 @@ const ToolsPage: React.FC<ToolsPageProps> = ({ onNavigate }) => {
 export const mainToolStorageFeature: MainFeatureModule = {
   id: 'main-tool-management-orchestrator',
   name: 'Tool Management',
-  sidebarSection: 'workflow',
+  sidebarSection: 'agentflow',
   sidebarItems: [
     {
       id: 'tool-storage',

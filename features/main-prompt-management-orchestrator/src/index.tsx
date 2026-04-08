@@ -73,7 +73,7 @@ const PromptsPage: React.FC<PromptsPageProps> = ({ onNavigate }) => {
 export const mainPromptManagementFeature: MainFeatureModule = {
   id: 'main-prompt-management-orchestrator',
   name: 'Prompt Management',
-  sidebarSection: 'workflow',
+  sidebarSection: 'agentflow',
   sidebarItems: [
     {
       id: 'prompt-storage',

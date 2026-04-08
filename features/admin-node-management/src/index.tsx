@@ -283,7 +283,7 @@ const AdminNodeManagementPage: React.FC<RouteComponentProps> = () => {
 const feature: AdminFeatureModule = {
   id: 'admin-node-management',
   name: 'AdminNodeManagementPage',
-  adminSection: 'admin-workflow',
+  adminSection: 'admin-agentflow',
   sidebarItems: [
     { id: 'admin-node-management', titleKey: 'admin.sidebar.workflow.nodeManagement.title', descriptionKey: 'admin.sidebar.workflow.nodeManagement.description' },
   ],

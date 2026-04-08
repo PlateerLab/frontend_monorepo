@@ -455,7 +455,7 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
 const feature: AdminFeatureModule = {
   id: 'admin-chat-monitoring',
   name: 'AdminChatMonitoringPage',
-  adminSection: 'admin-workflow',
+  adminSection: 'admin-agentflow',
   sidebarItems: [
     { id: 'admin-chat-monitoring', titleKey: 'admin.sidebar.workflow.chatMonitoring.title', descriptionKey: 'admin.sidebar.workflow.chatMonitoring.description' },
   ],

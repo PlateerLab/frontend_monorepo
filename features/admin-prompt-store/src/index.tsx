@@ -353,7 +353,7 @@ const AdminPromptStorePage: React.FC<RouteComponentProps> = () => {
 const feature: AdminFeatureModule = {
   id: 'admin-prompt-store',
   name: 'AdminPromptStorePage',
-  adminSection: 'admin-workflow',
+  adminSection: 'admin-agentflow',
   sidebarItems: [
     { id: 'admin-prompt-store', titleKey: 'admin.sidebar.workflow.promptStore.title', descriptionKey: 'admin.sidebar.workflow.promptStore.description' },
   ],

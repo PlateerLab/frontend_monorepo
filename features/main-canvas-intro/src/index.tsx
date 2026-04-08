@@ -172,7 +172,7 @@ const CanvasIntroPage: React.FC<CanvasIntroPageProps> = ({ onNavigate }) => {
 export const mainCanvasIntroFeature: MainFeatureModule = {
   id: 'main-CanvasIntro',
   name: 'Canvas Introduction',
-  sidebarSection: 'workflow',
+  sidebarSection: 'agentflow',
   sidebarItems: [
     {
       id: 'canvas-intro',

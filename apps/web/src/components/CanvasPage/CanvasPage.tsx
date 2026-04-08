@@ -1337,7 +1337,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
 export const canvasEditorFeature: MainFeatureModule = {
     id: 'canvas-editor',
     name: 'Canvas Editor',
-    sidebarSection: 'workflow',
+    sidebarSection: 'agentflow',
     sidebarItems: [],
     routes: {
         'canvas-editor': CanvasPage,
