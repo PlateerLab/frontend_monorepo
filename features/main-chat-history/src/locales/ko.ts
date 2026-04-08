@@ -19,7 +19,7 @@ export const ko: TranslationData = {
     },
     error: {
       loadFailed: '채팅 기록을 불러오지 못했습니다',
-      workflowDeleted: '삭제된 워크플로우입니다',
+      agentflowDeleted: '삭제된 에이전트플로우입니다',
       saveFailed: '저장에 실패했습니다',
       deleteFailed: '삭제에 실패했습니다'
     }

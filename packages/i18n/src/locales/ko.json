@@ -21,13 +21,13 @@
     "title": "기업의 AX 혁신을 돕는",
     "titleHighlight": "하이브리드 AI Platform",
     "titleWith": "with XGEN",
-    "description": "GEN AI Platform은 모델 학습, 드래그 앤 드롭으로 지능형 워크플로우 설계, API 서빙을 손쉽게 할 수 있는 올인원 AI 플랫폼입니다.",
+    "description": "GEN AI Platform은 모델 학습, 드래그 앤 드롭으로 지능형 에이전트플로우 설계, API 서빙을 손쉽게 할 수 있는 올인원 AI 플랫폼입니다.",
     "stat1Value": "5+",
     "stat1Label": "AI 노드 타입",
     "stat2Value": "실시간",
     "stat2Label": "채팅 인터페이스",
     "stat3Value": "무제한",
-    "stat3Label": "워크플로우 생성",
+    "stat3Label": "에이전트플로우 생성",
     "cta": "XGEN과 함께 더 생산적으로"
   },
   "mockup": {
@@ -38,38 +38,38 @@
   },
   "features": {
     "title": "왜 XGEN인가요?",
-    "subtitle": "AI 워크플로우 구축의 새로운 표준을 제시하는 혁신적인 기능들",
+    "subtitle": "AI 에이전트플로우 구축의 새로운 표준을 제시하는 혁신적인 기능들",
     "visualCanvas": {
       "title": "비주얼 캔버스 에디터",
-      "description": "직관적인 드래그 앤 드롭으로 복잡한 AI 워크플로우를 시각적으로 구성하고 실시간으로 미리보기할 수 있습니다.",
+      "description": "직관적인 드래그 앤 드롭으로 복잡한 AI 에이전트플로우를 시각적으로 구성하고 실시간으로 미리보기할 수 있습니다.",
       "feature1": "5+ AI 노드 타입",
       "feature2": "실시간 미리보기",
       "feature3": "자동 유효성 검사"
     },
     "realtimeChat": {
       "title": "실시간 AI 채팅",
-      "description": "완성된 워크플로우와 자연스럽게 대화하며 AI의 응답을 실시간으로 확인할 수 있습니다.",
+      "description": "완성된 에이전트플로우와 자연스럽게 대화하며 AI의 응답을 실시간으로 확인할 수 있습니다.",
       "feature1": "실시간 응답",
       "feature2": "대화 기록 저장",
-      "feature3": "다중 워크플로우 선택"
+      "feature3": "다중 에이전트플로우 선택"
     },
     "smartManagement": {
       "title": "스마트 관리센터",
-      "description": "워크플로우 성능 모니터링, 실행 로그 분석, 그리고 팀 협업을 위한 통합 관리 환경을 제공합니다.",
+      "description": "에이전트플로우 성능 모니터링, 실행 로그 분석, 그리고 팀 협업을 위한 통합 관리 환경을 제공합니다.",
       "feature1": "성능 대시보드",
       "feature2": "실행 로그 분석",
       "feature3": "팀 협업 도구"
     },
     "highPerformance": {
       "title": "고성능 실행 엔진",
-      "description": "최적화된 실행 엔진으로 대규모 워크플로우도 빠르고 안정적으로 처리합니다.",
+      "description": "최적화된 실행 엔진으로 대규모 에이전트플로우도 빠르고 안정적으로 처리합니다.",
       "feature1": "병렬 처리 지원",
       "feature2": "자동 스케일링",
       "feature3": "에러 복구 시스템"
     },
     "security": {
       "title": "엔터프라이즈 보안",
-      "description": "기업급 보안과 데이터 보호 기능으로 안전한 AI 워크플로우 환경을 보장합니다.",
+      "description": "기업급 보안과 데이터 보호 기능으로 안전한 AI 에이전트플로우 환경을 보장합니다.",
       "feature1": "데이터 암호화",
       "feature2": "접근 권한 제어",
       "feature3": "감사 로그"
@@ -83,16 +83,16 @@
     }
   },
   "cta": {
-    "label": "AI 워크플로우를 혁신할 준비가 되셨나요?",
+    "label": "AI 에이전트플로우를 혁신할 준비가 되셨나요?",
     "title": "지금 바로 시작해보세요",
-    "description": "몇 분 안에 첫 번째 AI 워크플로우를 만들고 실행해보세요",
+    "description": "몇 분 안에 첫 번째 AI 에이전트플로우를 만들고 실행해보세요",
     "startFree": "무료로 시작하기",
     "exploreManagement": "관리센터 둘러보기",
     "note": "시작하기"
   },
   "footer": {
     "brand": "XGEN",
-    "tagline": "차세대 AI 워크플로우",
+    "tagline": "차세대 AI 에이전트플로우",
     "copyright": "© 2025 Plateer AI-LAB. All rights reserved."
   },
   "toast": {
@@ -118,16 +118,16 @@
         "title": "현재 채팅"
       }
     },
-    "workflow": {
-      "title": "워크플로우",
+    "agentflow": {
+      "title": "에이전트플로우",
       "intro": {
-        "title": "워크플로우 소개"
+        "title": "에이전트플로우 소개"
       },
       "canvas": {
         "title": "캔버스"
       },
-      "workflows": {
-        "title": "워크플로우 목록"
+      "agentflows": {
+        "title": "에이전트플로우 목록"
       },
       "documents": {
         "title": "문서"
@@ -162,16 +162,16 @@
   "dashboard": {
     "welcome": "환영합니다",
     "welcomeSubtitle": "오늘도 생산적인 하루 되세요",
-    "workplaceOverview": "워크플로우 현황",
+    "workplaceOverview": "에이전트플로우 현황",
     "latestUpdates": "최근 업데이트",
     "noUpdates": "최근 업데이트가 없습니다",
-    "topWorkflows": "인기 워크플로우",
-    "noWorkflows": "워크플로우가 없습니다",
+    "topAgentflows": "인기 에이전트플로우",
+    "noAgentflows": "에이전트플로우가 없습니다",
     "recentErrors": "최근 오류",
     "noErrors": "오류가 없습니다",
     "lastUpdated": "마지막 업데이트",
     "errors": {
-      "workflow": "워크플로우",
+      "agentflow": "에이전트플로우",
       "time": "시간",
       "message": "메시지"
     }
@@ -198,8 +198,8 @@
     "quickStart": {
       "title": "빠른 시작",
       "step1": {
-        "title": "워크플로우 선택",
-        "description": "사용할 AI 워크플로우를 선택하세요"
+        "title": "에이전트플로우 선택",
+        "description": "사용할 AI 에이전트플로우를 선택하세요"
       },
       "step2": {
         "title": "질문하기",
@@ -220,9 +220,9 @@
         "title": "멀티모달",
         "description": "텍스트, 이미지, 파일을 함께 사용하세요"
       },
-      "workflow": {
-        "title": "워크플로우 연동",
-        "description": "채팅에서 바로 워크플로우를 실행하세요"
+      "agentflow": {
+        "title": "에이전트플로우 연동",
+        "description": "채팅에서 바로 에이전트플로우를 실행하세요"
       }
     }
   },
@@ -248,7 +248,7 @@
     },
     "error": {
       "loadFailed": "채팅 기록을 불러오지 못했습니다",
-      "workflowDeleted": "삭제된 워크플로우입니다",
+      "agentflowDeleted": "삭제된 에이전트플로우입니다",
       "saveFailed": "저장에 실패했습니다",
       "deleteFailed": "삭제에 실패했습니다"
     }
@@ -256,13 +256,13 @@
   "chatNew": {
     "title": "새 채팅",
     "header": {
-      "title": "워크플로우 선택",
-      "subtitle": "대화를 시작할 워크플로우를 선택하세요"
+      "title": "에이전트플로우 선택",
+      "subtitle": "대화를 시작할 에이전트플로우를 선택하세요"
     },
-    "searchPlaceholder": "워크플로우 검색...",
+    "searchPlaceholder": "에이전트플로우 검색...",
     "sections": {
       "favorites": "즐겨찾기",
-      "all": "전체 워크플로우"
+      "all": "전체 에이전트플로우"
     },
     "filter": {
       "all": "전체",
@@ -289,12 +289,12 @@
     "yesterday": "어제",
     "daysAgo": "일 전",
     "empty": {
-      "title": "워크플로우가 없습니다",
-      "description": "먼저 워크플로우를 생성하세요"
+      "title": "에이전트플로우가 없습니다",
+      "description": "먼저 에이전트플로우를 생성하세요"
     },
     "error": {
-      "loadFailed": "워크플로우를 불러오지 못했습니다",
-      "draftWorkflow": "초안 상태의 워크플로우는 사용할 수 없습니다",
+      "loadFailed": "에이전트플로우를 불러오지 못했습니다",
+      "draftAgentflow": "초안 상태의 에이전트플로우는 사용할 수 없습니다",
       "saveFailed": "저장에 실패했습니다"
     }
   },
@@ -312,19 +312,19 @@
     "startNewChat": "새 채팅 시작",
     "stop": "중지",
     "cancelled": "취소됨",
-    "sessionStarted": "{{workflowName}} 워크플로우가 시작되었습니다",
+    "sessionStarted": "{{workflowName}} 에이전트플로우가 시작되었습니다",
     "error": {
       "noSession": "진행 중인 채팅이 없습니다",
       "executionFailed": "실행 중 오류가 발생했습니다"
     }
   },
-  "workflowIntro": {
-    "title": "워크플로우",
+  "agentflowIntro": {
+    "title": "에이전트플로우",
     "hero": {
-      "title": "AI 워크플로우 빌더",
+      "title": "AI 에이전트플로우 빌더",
       "description": "드래그 앤 드롭으로 강력한 AI 파이프라인을 구축하세요",
       "primaryAction": "캔버스로 이동",
-      "secondaryAction": "워크플로우 탐색"
+      "secondaryAction": "에이전트플로우 탐색"
     },
     "features": {
       "title": "주요 기능",
@@ -355,16 +355,16 @@
       "editPrompts": "프롬프트 편집"
     },
     "stats": {
-      "workflows": "워크플로우",
+      "agentflows": "에이전트플로우",
       "nodeTypes": "노드 타입",
       "executions": "실행",
       "uptime": "가동률"
     }
   },
-  "workflows": {
-    "title": "워크플로우",
-    "searchPlaceholder": "워크플로우 검색...",
-    "createNew": "새 워크플로우",
+  "agentflows": {
+    "title": "에이전트플로우",
+    "searchPlaceholder": "에이전트플로우 검색...",
+    "createNew": "새 에이전트플로우",
     "filter": {
       "all": "전체",
       "published": "배포됨",
@@ -377,17 +377,17 @@
     "delete": "삭제",
     "nodeCount": "노드 수",
     "empty": {
-      "title": "워크플로우가 없습니다",
-      "description": "새 워크플로우를 만들어보세요",
-      "action": "워크플로우 생성"
+      "title": "에이전트플로우가 없습니다",
+      "description": "새 에이전트플로우를 만들어보세요",
+      "action": "에이전트플로우 생성"
     }
   },
   "canvasIntro": {
     "title": "캔버스",
-    "description": "시각적으로 AI 워크플로우를 설계하세요",
+    "description": "시각적으로 AI 에이전트플로우를 설계하세요",
     "hero": {
       "title": "AI 캔버스 에디터",
-      "description": "시각적으로 AI 워크플로우를 설계하세요",
+      "description": "시각적으로 AI 에이전트플로우를 설계하세요",
       "createBlank": "빈 캔버스로 시작",
       "continue": "이어하기",
       "noDataError": "이어할 작업 데이터가 없습니다."
@@ -436,8 +436,8 @@
     "notifications": "알림 설정",
     "emailNotifications": "이메일 알림",
     "emailNotificationsDesc": "중요한 업데이트를 이메일로 받습니다",
-    "workflowAlerts": "워크플로우 알림",
-    "workflowAlertsDesc": "워크플로우 오류 발생 시 알림을 받습니다",
+    "agentflowAlerts": "에이전트플로우 알림",
+    "agentflowAlertsDesc": "에이전트플로우 오류 발생 시 알림을 받습니다",
     "security": "보안",
     "twoFactor": "2단계 인증",
     "twoFactorDesc": "계정 보안을 강화합니다",
@@ -501,7 +501,7 @@
       "backToChat": "채팅으로 돌아가기",
       "sections": {
         "user": "사용자 & 조직",
-        "workflow": "워크플로우 리소스",
+        "agentflow": "에이전트플로우 리소스",
         "setting": "환경 설정",
         "system": "시스템 상태",
         "data": "데이터 관리",
@@ -524,13 +524,13 @@
           "description": "그룹별 권한 설정"
         }
       },
-      "workflow": {
-        "workflowManagement": {
-          "title": "워크플로우 관리",
-          "description": "워크플로우 생성 및 관리"
+      "agentflow": {
+        "agentflowManagement": {
+          "title": "에이전트플로우 관리",
+          "description": "에이전트플로우 생성 및 관리"
         },
-        "workflowMonitoring": {
-          "title": "워크플로우 모니터링",
+        "agentflowMonitoring": {
+          "title": "에이전트플로우 모니터링",
           "description": "실행 상태 모니터링"
         },
         "testMonitoring": {
@@ -551,11 +551,11 @@
         },
         "nodeManagement": {
           "title": "노드 관리",
-          "description": "워크플로우 노드 관리"
+          "description": "에이전트플로우 노드 관리"
         },
-        "workflowStore": {
-          "title": "워크플로우 스토어",
-          "description": "공유 워크플로우 탐색"
+        "agentflowStore": {
+          "title": "에이전트플로우 스토어",
+          "description": "공유 에이전트플로우 탐색"
         },
         "promptStore": {
           "title": "프롬프트 스토어",
@@ -667,9 +667,9 @@
         }
       },
       "governance": {
-        "workflowApproval": {
-          "title": "워크플로우 승인",
-          "description": "워크플로우 배포 승인"
+        "agentflowApproval": {
+          "title": "에이전트플로우 승인",
+          "description": "에이전트플로우 배포 승인"
         },
         "riskManagement": {
           "title": "리스크 관리",
@@ -710,13 +710,13 @@
         "title": "그룹 권한",
         "description": "그룹별 권한을 설정합니다."
       },
-      "workflowManagement": {
-        "title": "워크플로우 관리",
-        "description": "워크플로우를 생성하고 관리합니다."
+      "agentflowManagement": {
+        "title": "에이전트플로우 관리",
+        "description": "에이전트플로우를 생성하고 관리합니다."
       },
-      "workflowMonitoring": {
-        "title": "워크플로우 모니터링",
-        "description": "워크플로우 실행 상태를 모니터링합니다."
+      "agentflowMonitoring": {
+        "title": "에이전트플로우 모니터링",
+        "description": "에이전트플로우 실행 상태를 모니터링합니다."
       },
       "testMonitoring": {
         "title": "테스트 모니터링",
@@ -728,7 +728,7 @@
       },
       "nodeManagement": {
         "title": "노드 관리",
-        "description": "워크플로우 노드를 관리합니다."
+        "description": "에이전트플로우 노드를 관리합니다."
       },
       "chatMonitoring": {
         "title": "채팅 모니터링",
@@ -738,9 +738,9 @@
         "title": "사용자 토큰 대시보드",
         "description": "토큰 사용량을 확인합니다."
       },
-      "workflowStore": {
-        "title": "워크플로우 스토어",
-        "description": "공유 워크플로우를 탐색합니다."
+      "agentflowStore": {
+        "title": "에이전트플로우 스토어",
+        "description": "공유 에이전트플로우를 탐색합니다."
       },
       "promptStore": {
         "title": "프롬프트 스토어",
@@ -806,9 +806,9 @@
         "title": "ML 모델 관리",
         "description": "ML 모델 워크스페이스를 관리합니다."
       },
-      "govWorkflowApproval": {
-        "title": "워크플로우 승인",
-        "description": "워크플로우 배포를 승인합니다."
+      "govAgentflowApproval": {
+        "title": "에이전트플로우 승인",
+        "description": "에이전트플로우 배포를 승인합니다."
       },
       "govRiskManagement": {
         "title": "리스크 관리",
@@ -835,7 +835,7 @@
       "common": {
         "allLevels": "전체 등급",
         "refresh": "새로고침",
-        "workflow": "워크플로우",
+        "agentflow": "에이전트플로우",
         "creator": "생성자",
         "department": "부서",
         "lastModified": "최근 수정",
@@ -860,7 +860,7 @@
         "riskLevel": "위험등급",
         "impactScope": "영향범위",
         "totalCount": "전체",
-        "searchPlaceholder": "워크플로우 이름, 생성자, 부서로 검색...",
+        "searchPlaceholder": "에이전트플로우 이름, 생성자, 부서로 검색...",
         "editRiskLevel": "위험등급 변경",
         "rationale": "변경 사유",
         "noHistory": "기록 없음",
@@ -888,7 +888,7 @@
         },
         "deleteConfirm": "이 점검 기록을 삭제하시겠습니까?",
         "cases": "건",
-        "searchPlaceholder": "워크플로우, 담당자로 검색...",
+        "searchPlaceholder": "에이전트플로우, 담당자로 검색...",
         "allResults": "전체 결과",
         "allTypes": "전체 유형",
         "addInspection": "점검 등록",
@@ -897,7 +897,7 @@
         "manager": "담당자",
         "result": "결과",
         "viewDetail": "상세 보기",
-        "planDescription": "워크플로우별 점검 계획 현황입니다.",
+        "planDescription": "에이전트플로우별 점검 계획 현황입니다.",
         "inspectionCount": "점검 횟수",
         "noInspection": "점검 없음",
         "overdueDescription": "즉각적인 조치가 필요한 점검 초과 목록입니다.",
@@ -907,9 +907,9 @@
         "days": "일",
         "inspectionDetail": "점검 상세",
         "editInspection": "점검 수정",
-        "selectWorkflow": "워크플로우",
-        "workflowPlaceholder": "워크플로우 선택...",
-        "selectWorkflowHelp": "점검할 워크플로우를 선택하세요.",
+        "selectAgentflow": "에이전트플로우",
+        "agentflowPlaceholder": "에이전트플로우 선택...",
+        "selectAgentflowHelp": "점검할 에이전트플로우를 선택하세요.",
         "inspectionDate": "점검일",
         "inspectionType": "점검 유형",
         "inspectionItems": "점검 항목",
@@ -980,13 +980,13 @@
         "governanceReviewer": "검토자",
         "lastUpdated": "최근 감사",
         "totalLogs": "전체 로그",
-        "trackedWorkflowCount": "추적 워크플로우",
+        "trackedAgentflowCount": "추적 에이전트플로우",
         "fullApprovalCount": "완전 승인",
         "revokedCount": "취소됨",
-        "trackedSearchPlaceholder": "워크플로우 검색...",
-        "workflowName": "워크플로우명",
+        "trackedSearchPlaceholder": "에이전트플로우 검색...",
+        "agentflowName": "에이전트플로우명",
         "department": "부서",
-        "noTrackedWorkflows": "추적된 워크플로우가 없습니다",
+        "noTrackedAgentflows": "추적된 에이전트플로우가 없습니다",
         "usageLogCount": "{{count}}건의 사용 로그",
         "noExecutionLogs": "사용 로그가 없습니다",
         "governanceLogCount": "{{count}}건의 거버넌스 로그",
@@ -1233,12 +1233,12 @@
         "viewUsers": "사용자 보기"
       }
     },
-    "workflowManagement": {
-      "workflowControl": {
-        "loadError": "워크플로우 목록을 불러오는데 실패했습니다.",
+    "agentflowManagement": {
+      "agentflowControl": {
+        "loadError": "에이전트플로우 목록을 불러오는데 실패했습니다.",
         "total": "총",
         "unit": "개",
-        "searchPlaceholder": "워크플로우명, 작성자로 검색",
+        "searchPlaceholder": "에이전트플로우명, 작성자로 검색",
         "filterAll": "전체",
         "statusActive": "활성",
         "statusInactive": "비활성",
@@ -1253,18 +1253,18 @@
         "delete": "삭제",
         "approve": "승인",
         "reject": "거부",
-        "noWorkflows": "등록된 워크플로우가 없습니다.",
+        "noAgentflows": "등록된 에이전트플로우가 없습니다.",
         "noSearchResults": "\"{{query}}\" 에 대한 검색 결과가 없습니다.",
-        "deleteTitle": "워크플로우 삭제",
-        "deleteMessage": "정말로 \"{{name}}\" 워크플로우를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.",
-        "deleteSuccess": "워크플로우가 삭제되었습니다.",
-        "deleteError": "워크플로우 삭제에 실패했습니다.",
-        "deployApproveSuccess": "\"{{name}}\" 워크플로우 배포가 승인되었습니다.",
-        "deployApproveError": "\"{{name}}\" 워크플로우 배포 승인에 실패했습니다.",
-        "deployRejectSuccess": "\"{{name}}\" 워크플로우 배포가 거부되었습니다.",
-        "deployRejectError": "\"{{name}}\" 워크플로우 배포 거부에 실패했습니다.",
+        "deleteTitle": "에이전트플로우 삭제",
+        "deleteMessage": "정말로 \"{{name}}\" 에이전트플로우를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.",
+        "deleteSuccess": "에이전트플로우가 삭제되었습니다.",
+        "deleteError": "에이전트플로우 삭제에 실패했습니다.",
+        "deployApproveSuccess": "\"{{name}}\" 에이전트플로우 배포가 승인되었습니다.",
+        "deployApproveError": "\"{{name}}\" 에이전트플로우 배포 승인에 실패했습니다.",
+        "deployRejectSuccess": "\"{{name}}\" 에이전트플로우 배포가 거부되었습니다.",
+        "deployRejectError": "\"{{name}}\" 에이전트플로우 배포 거부에 실패했습니다.",
         "tableHeaders": {
-          "name": "워크플로우명",
+          "name": "에이전트플로우명",
           "author": "작성자",
           "status": "상태",
           "sharing": "공유",
@@ -1275,16 +1275,16 @@
         }
       },
       "editModal": {
-        "title": "워크플로우 설정",
-        "workflowName": "워크플로우명",
-        "workflowNameReadonly": "워크플로우명은 변경할 수 없습니다.",
+        "title": "에이전트플로우 설정",
+        "agentflowName": "에이전트플로우명",
+        "agentflowNameReadonly": "에이전트플로우명은 변경할 수 없습니다.",
         "deploy": "배포",
         "deploying": "배포중",
         "private": "비공개",
         "approvalStatus": "승인 상태",
         "approved": "승인됨",
         "disabled": "비활성",
-        "disabledDescription": "비활성 시 워크플로우가 실행되지 않습니다.",
+        "disabledDescription": "비활성 시 에이전트플로우가 실행되지 않습니다.",
         "share": "공유",
         "sharing": "공유중",
         "shareGroup": "공유 그룹",
@@ -1296,15 +1296,15 @@
         "cancel": "취소",
         "update": "저장",
         "updating": "저장 중...",
-        "updateSuccess": "워크플로우 설정이 업데이트되었습니다.",
-        "updateError": "워크플로우 설정 업데이트에 실패했습니다."
+        "updateSuccess": "에이전트플로우 설정이 업데이트되었습니다.",
+        "updateError": "에이전트플로우 설정 업데이트에 실패했습니다."
       },
       "monitoring": {
-        "loadWorkflowError": "워크플로우 목록을 불러오는데 실패했습니다.",
-        "selectWorkflowHint": "모니터링할 워크플로우를 선택하세요.",
-        "searchPlaceholder": "워크플로우명, 작성자로 검색",
+        "loadAgentflowError": "에이전트플로우 목록을 불러오는데 실패했습니다.",
+        "selectAgentflowHint": "모니터링할 에이전트플로우를 선택하세요.",
+        "searchPlaceholder": "에이전트플로우명, 작성자로 검색",
         "loading": "불러오는 중...",
-        "noWorkflows": "워크플로우가 없습니다.",
+        "noAgentflows": "에이전트플로우가 없습니다.",
         "nodes": "노드",
         "back": "← 목록으로",
         "tabIOLogs": "실행 로그",
@@ -1314,7 +1314,7 @@
         "noPerformanceData": "성능 데이터가 없습니다.",
         "deletePerformance": "성능 데이터 삭제",
         "deletePerformanceTitle": "성능 데이터 삭제",
-        "deletePerformanceMessage": "이 워크플로우의 성능 데이터를 모두 삭제하시겠습니까?",
+        "deletePerformanceMessage": "이 에이전트플로우의 성능 데이터를 모두 삭제하시겠습니까?",
         "deletePerformanceSuccess": "성능 데이터가 삭제되었습니다.",
         "deletePerformanceError": "성능 데이터 삭제에 실패했습니다.",
         "columns": {
@@ -1403,7 +1403,7 @@
         "noSpanData": "Span 데이터가 없습니다.",
         "columns": {
           "time": "시간",
-          "workflow": "워크플로우",
+          "agentflow": "에이전트플로우",
           "status": "상태",
           "duration": "소요시간",
           "llm": "LLM",
@@ -1440,12 +1440,12 @@
       },
       "chatMonitoring": {
         "title": "채팅 모니터링",
-        "subtitle": "워크플로우 채팅 로그 및 인터랙션을 모니터링합니다.",
+        "subtitle": "에이전트플로우 채팅 로그 및 인터랙션을 모니터링합니다.",
         "loadError": "채팅 로그를 불러오는데 실패했습니다.",
         "loading": "채팅 로그 로딩 중...",
         "errorOccurred": "오류가 발생했습니다",
         "retry": "재시도",
-        "filterPlaceholder": "워크플로우 ID, 이름, 인터랙션 ID, 사용자 ID 검색...",
+        "filterPlaceholder": "에이전트플로우 ID, 이름, 인터랙션 ID, 사용자 ID 검색...",
         "totalLogsLoaded": "총 {{count}}건 로드",
         "userId": "사용자 ID",
         "searchCount": "검색: {{count}}건",
@@ -1470,7 +1470,7 @@
         "excelDownloadOptions": "Excel 다운로드 옵션",
         "userIdOptional": "사용자 ID (선택)",
         "searchAllPlaceholder": "전체",
-        "workflowIdOptional": "워크플로우 ID (선택)",
+        "agentflowIdOptional": "에이전트플로우 ID (선택)",
         "startDateOptional": "시작 날짜 (선택)",
         "endDateOptional": "종료 날짜 (선택)",
         "applyDataProcessing": "데이터 가공",
@@ -1481,8 +1481,8 @@
         "columns": {
           "id": "ID",
           "userId": "사용자",
-          "workflowName": "워크플로우 이름",
-          "workflowId": "워크플로우 ID",
+          "agentflowName": "에이전트플로우 이름",
+          "agentflowId": "에이전트플로우 ID",
           "interactionId": "인터랙션 ID",
           "inputData": "입력",
           "outputData": "출력",
@@ -1499,7 +1499,7 @@
         "loading": "토큰 사용량 로딩 중...",
         "errorOccurred": "오류가 발생했습니다",
         "retry": "재시도",
-        "searchPlaceholder": "사용자명, 사용자 ID, 워크플로우 이름 검색...",
+        "searchPlaceholder": "사용자명, 사용자 ID, 에이전트플로우 이름 검색...",
         "totalUsers": "총 사용자: {{count}}명",
         "searchCount": "검색: {{count}}건",
         "pageInfo": "페이지 {{page}} / {{totalPages}}",
@@ -1513,7 +1513,7 @@
         "noSearchResults": "검색 결과가 없습니다.",
         "noTokenData": "토큰 사용량 데이터가 없습니다.",
         "times": "{{count}}회",
-        "viewWorkflowDetails": "워크플로우 상세 보기",
+        "viewAgentflowDetails": "에이전트플로우 상세 보기",
         "inputTokens": "입력 토큰",
         "outputTokens": "출력 토큰",
         "stats": {
@@ -1529,23 +1529,23 @@
           "inputTokens": "입력 토큰",
           "outputTokens": "출력 토큰",
           "tokenDistribution": "토큰 분포",
-          "mainWorkflow": "주 워크플로우",
+          "mainAgentflow": "주 에이전트플로우",
           "lastActivity": "최근 활동"
         },
         "modal": {
-          "title": "워크플로우 사용 상세",
-          "workflowName": "워크플로우 이름",
+          "title": "에이전트플로우 사용 상세",
+          "agentflowName": "에이전트플로우 이름",
           "usageCount": "사용 횟수",
           "totalInteractions": "총 인터랙션",
           "totalTokens": "총 토큰",
           "inputTokens": "입력 토큰",
           "outputTokens": "출력 토큰",
           "avgTokensPerInteraction": "평균 토큰/인터랙션",
-          "count": "{{count}}개 워크플로우",
+          "count": "{{count}}개 에이전트플로우",
           "times": "{{count}}회",
           "summary": {
             "title": "요약",
-            "totalWorkflows": "총 워크플로우",
+            "totalAgentflows": "총 에이전트플로우",
             "totalUsageCount": "총 사용 횟수",
             "totalInteractions": "총 인터랙션",
             "totalTokens": "총 토큰",
@@ -1556,7 +1556,7 @@
       },
       "nodeManagement": {
         "title": "노드 관리",
-        "subtitle": "워크플로우 노드를 관리하고 탐색합니다.",
+        "subtitle": "에이전트플로우 노드를 관리하고 탐색합니다.",
         "loadError": "노드를 불러오는데 실패했습니다.",
         "refreshError": "노드 새로고침에 실패했습니다.",
         "loading": "노드 로딩 중...",
@@ -1595,16 +1595,16 @@
           "parameters": "파라미터"
         }
       },
-      "workflowStore": {
-        "title": "워크플로우 스토어",
-        "subtitle": "공유 워크플로우를 관리합니다.",
-        "loadError": "워크플로우를 불러오는데 실패했습니다.",
-        "loading": "워크플로우 로딩 중...",
-        "error": "워크플로우 로딩 오류",
-        "noResults": "워크플로우가 없습니다",
-        "noResultsSearch": "'{{searchTerm}}'에 해당하는 워크플로우가 없습니다.",
-        "noResultsFilter": "현재 필터에 해당하는 워크플로우가 없습니다.",
-        "searchPlaceholder": "워크플로우 이름, 설명, 소유자, 태그 검색...",
+      "agentflowStore": {
+        "title": "에이전트플로우 스토어",
+        "subtitle": "공유 에이전트플로우를 관리합니다.",
+        "loadError": "에이전트플로우를 불러오는데 실패했습니다.",
+        "loading": "에이전트플로우 로딩 중...",
+        "error": "에이전트플로우 로딩 오류",
+        "noResults": "에이전트플로우가 없습니다",
+        "noResultsSearch": "'{{searchTerm}}'에 해당하는 에이전트플로우가 없습니다.",
+        "noResultsFilter": "현재 필터에 해당하는 에이전트플로우가 없습니다.",
+        "searchPlaceholder": "에이전트플로우 이름, 설명, 소유자, 태그 검색...",
         "refresh": "새로고침",
         "upload": "업로드",
         "uploadComingSoon": "업로드 기능은 곧 제공됩니다.",
@@ -1633,14 +1633,14 @@
           "reject": "거부"
         },
         "toast": {
-          "deleteConfirmTitle": "워크플로우 삭제",
+          "deleteConfirmTitle": "에이전트플로우 삭제",
           "deleteConfirmMessage": "'{{name}}'을(를) 삭제하시겠습니까?",
-          "itemType": "워크플로우",
+          "itemType": "에이전트플로우",
           "cancel": "취소",
-          "approveSuccess": "워크플로우 배포가 승인되었습니다.",
-          "rejectSuccess": "워크플로우 배포가 거부되었습니다.",
-          "approveError": "워크플로우 배포 승인에 실패했습니다.",
-          "rejectError": "워크플로우 배포 거부에 실패했습니다."
+          "approveSuccess": "에이전트플로우 배포가 승인되었습니다.",
+          "rejectSuccess": "에이전트플로우 배포가 거부되었습니다.",
+          "approveError": "에이전트플로우 배포 승인에 실패했습니다.",
+          "rejectError": "에이전트플로우 배포 거부에 실패했습니다."
         }
       },
       "promptStore": {
@@ -1752,7 +1752,10 @@
           "promptContentPlaceholder": "프롬프트 내용을 입력하세요 (최대 5000자)",
           "language": "언어",
           "korean": "한국어",
+          "english": "English",
           "promptType": "프롬프트 타입",
+          "userPrompt": "User Prompt",
+          "systemPrompt": "System Prompt",
           "systemPromptDescription": "System Prompt는 AI 모델의 답변 형식과 동작을 정의합니다.",
           "userPromptDescription": "User Prompt는 AI 모델에 특정 작업, 질문 또는 명령 입력을 정의합니다.",
           "setAsPublic": "공개 프롬프트로 설정",
@@ -1873,7 +1876,7 @@
         "categories": {
           "database": "데이터베이스",
           "app": "애플리케이션",
-          "workflow": "워크플로우",
+          "agentflow": "에이전트플로우",
           "node": "노드",
           "vectordb": "벡터 DB",
           "openai": "OpenAI",

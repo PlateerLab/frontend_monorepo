@@ -5,6 +5,6 @@ export const en: Record<string, unknown> = {
     searchPlaceholder: 'Search nodes',
     refreshTooltip: 'Refresh Node List',
     noResults: 'No matching nodes',
-    subtitle: 'Configure nodes to execute the workflow',
+    subtitle: 'Configure nodes to execute the agentflow',
   },
 };

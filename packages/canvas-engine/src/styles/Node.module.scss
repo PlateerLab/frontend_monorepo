@@ -1144,7 +1144,7 @@
 
 // --- 공통 Dropdown(선택 필드) 레이아웃 ---
 // common Dropdown 컴포넌트의 border/background/height는 Dropdown.module.scss가 담당.
-// 여기서는 워크플로우 파라미터 레이아웃(폭/정렬)만 맞춘다.
+// 여기서는 에이전트플로우 파라미터 레이아웃(폭/정렬)만 맞춘다.
 .paramDropdownLayout {
     height: 28px;
     flex: 0 0 var(--param-field-width);

@@ -8,10 +8,10 @@ import './locales';
 import { useAuth } from '@xgen/auth-provider';
 import { createApiClient } from '@xgen/api-client';
 
-import type { DashboardData, DashboardOverview, LatestUpdateItem, TopWorkflowItem, DashboardErrorItem } from './types';
+import type { DashboardData, DashboardOverview, LatestUpdateItem, TopAgentflowItem, DashboardErrorItem } from './types';
 import { KpiSection } from './components/kpi-section';
 import { LatestUpdatesSection } from './components/latest-updates-section';
-import { TopWorkflowsSection } from './components/top-workflows-section';
+import { TopAgentflowsSection } from './components/top-agentflows-section';
 import { ErrorsSection } from './components/errors-section';
 
 // ─────────────────────────────────────────────────────────────
@@ -28,10 +28,10 @@ const MOCK_OVERVIEW: DashboardOverview = {
 const MOCK_UPDATES: LatestUpdateItem[] = [
   { id: '1', prefix: '배포', text: '이커머스 법률챗 v2.1', isLink: true },
   { id: '2', prefix: '수정', text: '고객지원 자동응답 플로우 업데이트' },
-  { id: '3', prefix: '생성', text: '신규 FAQ 워크플로우 생성', isLink: true },
+  { id: '3', prefix: '생성', text: '신규 FAQ 에이전트플로우 생성', isLink: true },
 ];
 
-const MOCK_WORKFLOWS: TopWorkflowItem[] = [
+const MOCK_WORKFLOWS: TopAgentflowItem[] = [
   { id: '1', name: '이커머스 법률챗', isLink: true },
   { id: '2', name: '고객지원 자동응답', isLink: true },
   { id: '3', name: 'HR 문서 검색 어시스턴트', isLink: true },
@@ -58,7 +58,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
   const [data, setData] = useState<DashboardData>({
     overview: MOCK_OVERVIEW,
     latestUpdates: MOCK_UPDATES,
-    topWorkflows: MOCK_WORKFLOWS,
+    topAgentflows: MOCK_WORKFLOWS,
     errors: MOCK_ERRORS,
   });
 
@@ -75,7 +75,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
       setData({
         overview: MOCK_OVERVIEW,
         latestUpdates: MOCK_UPDATES,
-        topWorkflows: MOCK_WORKFLOWS,
+        topAgentflows: MOCK_WORKFLOWS,
         errors: MOCK_ERRORS,
       });
     } catch (error) {
@@ -93,7 +93,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
     onNavigate?.('workflows');
   }, [onNavigate]);
 
-  const handleViewAllWorkflows = useCallback(() => {
+  const handleViewAllAgentflows = useCallback(() => {
     onNavigate?.('workflows');
   }, [onNavigate]);
 
@@ -129,9 +129,9 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             updates={data.latestUpdates}
             onViewAll={handleViewAllUpdates}
           />
-          <TopWorkflowsSection
-            workflows={data.topWorkflows}
-            onViewAll={handleViewAllWorkflows}
+          <TopAgentflowsSection
+            workflows={data.topAgentflows}
+            onViewAll={handleViewAllAgentflows}
           />
         </div>
 
@@ -169,4 +169,4 @@ export const mainDashboardFeature: MainFeatureModule = {
 export default mainDashboardFeature;
 
 // Re-export types
-export type { DashboardData, DashboardOverview, LatestUpdateItem, TopWorkflowItem, DashboardErrorItem } from './types';
+export type { DashboardData, DashboardOverview, LatestUpdateItem, TopAgentflowItem, DashboardErrorItem } from './types';

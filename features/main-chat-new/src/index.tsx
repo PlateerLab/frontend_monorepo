@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import type { RouteComponentProps, MainFeatureModule, WorkflowOption } from '@xgen/types';
+import type { RouteComponentProps, MainFeatureModule, AgentflowOption } from '@xgen/types';
 import { SearchInput, EmptyState, FilterTabs, ContentArea } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import './locales';
-import { listWorkflowsDetail } from '@xgen/api-client';
-import type { WorkflowListItem } from '@xgen/api-client';
+import { listAgentflowsDetail } from '@xgen/api-client';
+import type { AgentflowListItem } from '@xgen/api-client';
 
-import type { ChatNewPageProps, WorkflowOwnerFilter } from './types';
+import type { ChatNewPageProps, AgentflowOwnerFilter } from './types';
 
 // ─────────────────────────────────────────────────────────────
 // Constants
@@ -21,7 +21,7 @@ const STORAGE_KEY_FAVORITES = 'xgen_workflow_favorites';
 // Icons
 // ─────────────────────────────────────────────────────────────
 
-const WorkflowIcon: React.FC<{ className?: string }> = ({ className }) => (
+const AgentflowIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="2.5" y="2.5" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
     <rect x="11.5" y="2.5" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
@@ -130,17 +130,17 @@ const toggleFavorite = (workflowId: string): string[] => {
 };
 
 // ─────────────────────────────────────────────────────────────
-// Workflow Card Component
+// Agentflow Card Component
 // ─────────────────────────────────────────────────────────────
 
-interface WorkflowCardProps {
-  workflow: WorkflowOption;
+interface AgentflowCardProps {
+  workflow: AgentflowOption;
   isFavorite: boolean;
   onSelect: () => void;
   onToggleFavorite: () => void;
 }
 
-const WorkflowCard: React.FC<WorkflowCardProps> = ({
+const AgentflowCard: React.FC<AgentflowCardProps> = ({
   workflow,
   isFavorite,
   onSelect,
@@ -165,7 +165,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
       {/* Top row: Icon + Name + Favorite */}
       <div className="flex items-start gap-3 mb-2">
         <div className="flex items-center justify-center w-9 h-9 bg-primary/8 rounded-lg text-primary shrink-0">
-          <WorkflowIcon />
+          <AgentflowIcon />
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="m-0 text-sm font-semibold text-foreground truncate">{workflow.name}</h3>
@@ -218,31 +218,31 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
 
 const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
   onNavigate,
-  onSelectWorkflow,
+  onSelectAgentflow,
 }) => {
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [workflows, setWorkflows] = useState<WorkflowOption[]>([]);
+  const [workflows, setAgentflows] = useState<AgentflowOption[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [search, setSearch] = useState('');
-  const [ownerFilter, setOwnerFilter] = useState<WorkflowOwnerFilter>('all');
+  const [ownerFilter, setOwnerFilter] = useState<AgentflowOwnerFilter>('all');
 
   // ─────────────────────────────────────────────────────────────
   // API
   // ─────────────────────────────────────────────────────────────
 
-  const loadWorkflows = useCallback(async () => {
+  const loadAgentflows = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const workflowList = await listWorkflowsDetail();
+      const workflowList = await listAgentflowsDetail();
 
-      const transformed: WorkflowOption[] = workflowList
-        .filter((detail: WorkflowListItem) => detail.is_accepted !== false)
-        .map((detail: WorkflowListItem) => ({
+      const transformed: AgentflowOption[] = workflowList
+        .filter((detail: AgentflowListItem) => detail.is_accepted !== false)
+        .map((detail: AgentflowListItem) => ({
           id: detail.workflow_id,
           name: detail.workflow_name.replace('.json', '') || detail.workflow_id,
           description: detail.metadata?.description as string | undefined,
@@ -254,7 +254,7 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
           lastModified: detail.updated_at,
         }));
 
-      setWorkflows(transformed);
+      setAgentflows(transformed);
       setFavorites(getFavorites());
     } catch (err) {
       console.error('Failed to load workflows:', err);
@@ -265,14 +265,14 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
   }, [t]);
 
   useEffect(() => {
-    loadWorkflows();
-  }, [loadWorkflows]);
+    loadAgentflows();
+  }, [loadAgentflows]);
 
   // ─────────────────────────────────────────────────────────────
   // Filtering
   // ─────────────────────────────────────────────────────────────
 
-  const filteredWorkflows = useMemo(() => {
+  const filteredAgentflows = useMemo(() => {
     return workflows.filter((workflow) => {
       if (search) {
         const searchLower = search.toLowerCase();
@@ -288,13 +288,13 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
     });
   }, [workflows, search, ownerFilter]);
 
-  const favoriteWorkflows = useMemo(() => {
-    return filteredWorkflows.filter((w) => favorites.includes(w.id));
-  }, [filteredWorkflows, favorites]);
+  const favoriteAgentflows = useMemo(() => {
+    return filteredAgentflows.filter((w) => favorites.includes(w.id));
+  }, [filteredAgentflows, favorites]);
 
-  const regularWorkflows = useMemo(() => {
-    return filteredWorkflows.filter((w) => !favorites.includes(w.id));
-  }, [filteredWorkflows, favorites]);
+  const regularAgentflows = useMemo(() => {
+    return filteredAgentflows.filter((w) => !favorites.includes(w.id));
+  }, [filteredAgentflows, favorites]);
 
   const ownerCounts = useMemo(() => ({
     all: workflows.length,
@@ -312,7 +312,7 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
   // Event Handlers
   // ─────────────────────────────────────────────────────────────
 
-  const handleSelectWorkflow = (workflow: WorkflowOption) => {
+  const handleSelectAgentflow = (workflow: AgentflowOption) => {
     const interactionId = generateInteractionId();
 
     const saved = saveCurrentChatData({
@@ -327,7 +327,7 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
       return;
     }
 
-    onSelectWorkflow?.({
+    onSelectAgentflow?.({
       workflowId: workflow.id,
       workflowName: workflow.name,
       userId: workflow.userId,
@@ -351,7 +351,7 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
       description={t('chatNew.description')}
       headerActions={
         <button
-          onClick={loadWorkflows}
+          onClick={loadAgentflows}
           className={`inline-flex items-center justify-center w-9 h-9 border border-border rounded-lg bg-white text-muted-foreground cursor-pointer transition-all hover:border-primary hover:text-primary hover:bg-primary/5 disabled:opacity-60 disabled:cursor-not-allowed ${loading ? '[&_svg]:animate-spin' : ''}`}
           disabled={loading}
           aria-label={t('common.refresh')}
@@ -364,7 +364,7 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
           <FilterTabs
             tabs={ownerTabs}
             activeKey={ownerFilter}
-            onChange={(key) => setOwnerFilter(key as WorkflowOwnerFilter)}
+            onChange={(key) => setOwnerFilter(key as AgentflowOwnerFilter)}
             variant="underline"
           />
           <div className="w-72">
@@ -383,7 +383,7 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
           <div className="flex items-center justify-between gap-3 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
             <span>{error}</span>
             <button
-              onClick={loadWorkflows}
+              onClick={loadAgentflows}
               className="px-3 py-1 text-xs font-medium text-red-600 bg-white border border-red-300 rounded-md cursor-pointer transition-colors hover:bg-red-600 hover:text-white hover:border-red-600"
             >
               {t('common.retry')}
@@ -397,29 +397,29 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
             <div className="w-8 h-8 border-[3px] border-border border-t-primary rounded-full animate-spin" />
             <p className="m-0 text-sm">{t('common.loading')}</p>
           </div>
-        ) : filteredWorkflows.length === 0 ? (
+        ) : filteredAgentflows.length === 0 ? (
           <EmptyState
-            icon={<WorkflowIcon />}
+            icon={<AgentflowIcon />}
             title={t('chatNew.empty.title')}
             description={t('chatNew.empty.description')}
           />
         ) : (
           <div className="flex flex-col gap-6">
             {/* Favorites */}
-            {favoriteWorkflows.length > 0 && (
+            {favoriteAgentflows.length > 0 && (
               <section className="flex flex-col gap-3">
                 <h2 className="flex items-center gap-2 m-0 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                   <StarIcon filled className="text-yellow-500" />
                   {t('chatNew.sections.favorites')}
-                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-semibold text-muted-foreground bg-muted rounded-full">{favoriteWorkflows.length}</span>
+                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-semibold text-muted-foreground bg-muted rounded-full">{favoriteAgentflows.length}</span>
                 </h2>
                 <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3">
-                  {favoriteWorkflows.map((workflow) => (
-                    <WorkflowCard
+                  {favoriteAgentflows.map((workflow) => (
+                    <AgentflowCard
                       key={workflow.id}
                       workflow={workflow}
                       isFavorite={true}
-                      onSelect={() => handleSelectWorkflow(workflow)}
+                      onSelect={() => handleSelectAgentflow(workflow)}
                       onToggleFavorite={() => handleToggleFavorite(workflow.id)}
                     />
                   ))}
@@ -427,21 +427,21 @@ const ChatNewPage: React.FC<RouteComponentProps & ChatNewPageProps> = ({
               </section>
             )}
 
-            {/* All Workflows */}
+            {/* All Agentflows */}
             <section className="flex flex-col gap-3">
-              {favoriteWorkflows.length > 0 && (
+              {favoriteAgentflows.length > 0 && (
                 <h2 className="flex items-center gap-2 m-0 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                   {t('chatNew.sections.all')}
-                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-semibold text-muted-foreground bg-muted rounded-full">{regularWorkflows.length}</span>
+                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-semibold text-muted-foreground bg-muted rounded-full">{regularAgentflows.length}</span>
                 </h2>
               )}
               <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3">
-                {regularWorkflows.map((workflow) => (
-                  <WorkflowCard
+                {regularAgentflows.map((workflow) => (
+                  <AgentflowCard
                     key={workflow.id}
                     workflow={workflow}
                     isFavorite={false}
-                    onSelect={() => handleSelectWorkflow(workflow)}
+                    onSelect={() => handleSelectAgentflow(workflow)}
                     onToggleFavorite={() => handleToggleFavorite(workflow.id)}
                   />
                 ))}
@@ -475,4 +475,4 @@ export const mainChatNewFeature: MainFeatureModule = {
 };
 
 export default mainChatNewFeature;
-export type { WorkflowOption } from '@xgen/types';
+export type { AgentflowOption } from '@xgen/types';

@@ -6,7 +6,7 @@ import { useTranslation } from '@xgen/i18n';
 import { FiCopy } from '@xgen/icons';
 import type { Prompt } from '../types';
 
-const PS = 'admin.workflowManagement.promptStore';
+const PS = 'admin.agentflowManagement.promptStore';
 const EX = `${PS}.expandModal`;
 
 function formatDateTime(dateStr: string | null): string {

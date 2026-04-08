@@ -419,7 +419,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
         },
         findAutoConnection,
         getCanvasState: () => ({ view, nodes, edges, memos }),
-        loadWorkflow: (state) => {
+        loadAgentflow: (state) => {
             if (state.nodes) setNodes(state.nodes);
             if (state.edges) setEdges(state.edges);
             if (state.memos) setMemos(state.memos);

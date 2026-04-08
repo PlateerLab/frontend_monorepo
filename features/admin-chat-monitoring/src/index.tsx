@@ -13,7 +13,7 @@ import {
 import type { DataTableColumn } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import { FiRefreshCw, FiSearch, FiX } from '@xgen/icons';
-import type { WorkflowLog } from './types';
+import type { AgentflowLog } from './types';
 import { getChatLogs } from './api/chat-log-api';
 import { ChatLogDetailModal } from './components/chat-log-detail-modal';
 import { DownloadDropdown } from './components/download-dropdown';
@@ -31,7 +31,7 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
   const { toast } = useToast();
 
   // ── Data state ──
-  const [logs, setLogs] = useState<WorkflowLog[]>([]);
+  const [logs, setLogs] = useState<AgentflowLog[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +65,7 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
         setHasMore(newLogs.length >= PAGE_SIZE);
       } catch (err) {
         const msg =
-          err instanceof Error ? err.message : t('admin.workflowManagement.chatMonitoring.loadError');
+          err instanceof Error ? err.message : t('admin.agentflowManagement.chatMonitoring.loadError');
         setError(msg);
         toast.error(msg);
       } finally {
@@ -107,7 +107,7 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
     }
     const parsed = Number(trimmed);
     if (Number.isNaN(parsed) || !Number.isInteger(parsed)) {
-      toast.error(t('admin.workflowManagement.chatMonitoring.invalidUserId'));
+      toast.error(t('admin.agentflowManagement.chatMonitoring.invalidUserId'));
       return;
     }
     setActiveUserId(parsed);
@@ -155,11 +155,11 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
 
   // ── Mode badge ──
   const renderMode = useCallback(
-    (log: WorkflowLog) => {
+    (log: AgentflowLog) => {
       if (log.test_mode) {
         return (
           <StatusBadge variant="warning">
-            {t('admin.workflowManagement.chatMonitoring.modeTest')}
+            {t('admin.agentflowManagement.chatMonitoring.modeTest')}
           </StatusBadge>
         );
       }
@@ -167,13 +167,13 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
       if (log.user_id == null) {
         return (
           <StatusBadge variant="info">
-            {t('admin.workflowManagement.chatMonitoring.modeDeploy')}
+            {t('admin.agentflowManagement.chatMonitoring.modeDeploy')}
           </StatusBadge>
         );
       }
       return (
         <StatusBadge variant="success">
-          {t('admin.workflowManagement.chatMonitoring.modeProduction')}
+          {t('admin.agentflowManagement.chatMonitoring.modeProduction')}
         </StatusBadge>
       );
     },
@@ -192,7 +192,7 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
           type="button"
           className="cursor-pointer text-left text-sm text-primary hover:underline"
           onClick={() => openDetail(header, value)}
-          title={t('admin.workflowManagement.chatMonitoring.viewFullContent')}
+          title={t('admin.agentflowManagement.chatMonitoring.viewFullContent')}
         >
           {truncate(value)}
         </button>
@@ -202,20 +202,20 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
   );
 
   // ── Columns ──
-  const columns: DataTableColumn<WorkflowLog>[] = useMemo(
+  const columns: DataTableColumn<AgentflowLog>[] = useMemo(
     () => [
       {
         id: 'id',
-        header: t('admin.workflowManagement.chatMonitoring.columns.id'),
-        field: 'id' as keyof WorkflowLog,
+        header: t('admin.agentflowManagement.chatMonitoring.columns.id'),
+        field: 'id' as keyof AgentflowLog,
         sortable: true,
         minWidth: '60px',
         cell: (row) => <span className="text-sm font-mono">{row.id}</span>,
       },
       {
         id: 'user_id',
-        header: t('admin.workflowManagement.chatMonitoring.columns.userId'),
-        field: 'user_id' as keyof WorkflowLog,
+        header: t('admin.agentflowManagement.chatMonitoring.columns.userId'),
+        field: 'user_id' as keyof AgentflowLog,
         sortable: true,
         minWidth: '80px',
         cell: (row) => (
@@ -224,8 +224,8 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
       },
       {
         id: 'workflow_name',
-        header: t('admin.workflowManagement.chatMonitoring.columns.workflowName'),
-        field: 'workflow_name' as keyof WorkflowLog,
+        header: t('admin.agentflowManagement.chatMonitoring.columns.agentflowName'),
+        field: 'workflow_name' as keyof AgentflowLog,
         sortable: true,
         minWidth: '140px',
         cell: (row) => (
@@ -234,8 +234,8 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
       },
       {
         id: 'workflow_id',
-        header: t('admin.workflowManagement.chatMonitoring.columns.workflowId'),
-        field: 'workflow_id' as keyof WorkflowLog,
+        header: t('admin.agentflowManagement.chatMonitoring.columns.agentflowId'),
+        field: 'workflow_id' as keyof AgentflowLog,
         sortable: true,
         minWidth: '140px',
         cell: (row) => (
@@ -246,8 +246,8 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
       },
       {
         id: 'interaction_id',
-        header: t('admin.workflowManagement.chatMonitoring.columns.interactionId'),
-        field: 'interaction_id' as keyof WorkflowLog,
+        header: t('admin.agentflowManagement.chatMonitoring.columns.interactionId'),
+        field: 'interaction_id' as keyof AgentflowLog,
         sortable: true,
         minWidth: '140px',
         cell: (row) => (
@@ -258,28 +258,28 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
       },
       {
         id: 'input_data',
-        header: t('admin.workflowManagement.chatMonitoring.columns.inputData'),
+        header: t('admin.agentflowManagement.chatMonitoring.columns.inputData'),
         minWidth: '180px',
         cell: (row) =>
           renderTruncatedCell(
             row.input_data,
-            t('admin.workflowManagement.chatMonitoring.columns.inputData'),
+            t('admin.agentflowManagement.chatMonitoring.columns.inputData'),
           ),
       },
       {
         id: 'output_data',
-        header: t('admin.workflowManagement.chatMonitoring.columns.outputData'),
+        header: t('admin.agentflowManagement.chatMonitoring.columns.outputData'),
         minWidth: '180px',
         cell: (row) =>
           renderTruncatedCell(
             row.output_data,
-            t('admin.workflowManagement.chatMonitoring.columns.outputData'),
+            t('admin.agentflowManagement.chatMonitoring.columns.outputData'),
           ),
       },
       {
         id: 'llm_eval_score',
-        header: t('admin.workflowManagement.chatMonitoring.columns.llmEvalScore'),
-        field: 'llm_eval_score' as keyof WorkflowLog,
+        header: t('admin.agentflowManagement.chatMonitoring.columns.llmEvalScore'),
+        field: 'llm_eval_score' as keyof AgentflowLog,
         sortable: true,
         minWidth: '90px',
         cell: (row) => (
@@ -290,24 +290,24 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
       },
       {
         id: 'user_score',
-        header: t('admin.workflowManagement.chatMonitoring.columns.userScore'),
-        field: 'user_score' as keyof WorkflowLog,
+        header: t('admin.agentflowManagement.chatMonitoring.columns.userScore'),
+        field: 'user_score' as keyof AgentflowLog,
         sortable: true,
         minWidth: '80px',
         cell: (row) => <span className="text-sm">{row.user_score}</span>,
       },
       {
         id: 'mode',
-        header: t('admin.workflowManagement.chatMonitoring.columns.mode'),
+        header: t('admin.agentflowManagement.chatMonitoring.columns.mode'),
         minWidth: '100px',
         sortable: true,
-        field: 'test_mode' as keyof WorkflowLog,
+        field: 'test_mode' as keyof AgentflowLog,
         cell: (row) => renderMode(row),
       },
       {
         id: 'created_at',
-        header: t('admin.workflowManagement.chatMonitoring.columns.createdAt'),
-        field: 'created_at' as keyof WorkflowLog,
+        header: t('admin.agentflowManagement.chatMonitoring.columns.createdAt'),
+        field: 'created_at' as keyof AgentflowLog,
         sortable: true,
         minWidth: '150px',
         cell: (row) => (
@@ -324,15 +324,15 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
   if (error && logs.length === 0) {
     return (
       <ContentArea
-        title={t('admin.workflowManagement.chatMonitoring.title')}
-        description={t('admin.workflowManagement.chatMonitoring.subtitle')}
+        title={t('admin.agentflowManagement.chatMonitoring.title')}
+        description={t('admin.agentflowManagement.chatMonitoring.subtitle')}
       >
         <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
           <p className="text-sm text-muted-foreground">
-            {t('admin.workflowManagement.chatMonitoring.errorOccurred')}
+            {t('admin.agentflowManagement.chatMonitoring.errorOccurred')}
           </p>
           <Button variant="outline" size="sm" onClick={handleRefresh}>
-            {t('admin.workflowManagement.chatMonitoring.retry')}
+            {t('admin.agentflowManagement.chatMonitoring.retry')}
           </Button>
         </div>
       </ContentArea>
@@ -341,13 +341,13 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
 
   // ── Pagination info ──
   const paginationInfo = activeUserId != null
-    ? `${t('admin.workflowManagement.chatMonitoring.userId')}: ${activeUserId} · ${t('admin.workflowManagement.chatMonitoring.totalLogsLoaded', { count: filteredLogs.length })}`
-    : t('admin.workflowManagement.chatMonitoring.totalLogsLoaded', { count: filteredLogs.length });
+    ? `${t('admin.agentflowManagement.chatMonitoring.userId')}: ${activeUserId} · ${t('admin.agentflowManagement.chatMonitoring.totalLogsLoaded', { count: filteredLogs.length })}`
+    : t('admin.agentflowManagement.chatMonitoring.totalLogsLoaded', { count: filteredLogs.length });
 
   return (
     <ContentArea
-      title={t('admin.workflowManagement.chatMonitoring.title')}
-      description={t('admin.workflowManagement.chatMonitoring.subtitle')}
+      title={t('admin.agentflowManagement.chatMonitoring.title')}
+      description={t('admin.agentflowManagement.chatMonitoring.subtitle')}
       headerActions={
         <div className="flex items-center gap-2">
           <DownloadDropdown />
@@ -358,7 +358,7 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
             onClick={handleRefresh}
             loading={loading}
           >
-            {t('admin.workflowManagement.chatMonitoring.refresh')}
+            {t('admin.agentflowManagement.chatMonitoring.refresh')}
           </Button>
         </div>
       }
@@ -368,7 +368,7 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
             <input
               type="text"
               className="h-8 w-36 rounded-md border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              placeholder={t('admin.workflowManagement.chatMonitoring.userIdPlaceholder')}
+              placeholder={t('admin.agentflowManagement.chatMonitoring.userIdPlaceholder')}
               value={userIdInput}
               onChange={(e) => setUserIdInput(e.target.value)}
               onKeyDown={(e) => {
@@ -381,7 +381,7 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
               leftIcon={<FiSearch className="h-3.5 w-3.5" />}
               onClick={handleUserSearch}
             >
-              {t('admin.workflowManagement.chatMonitoring.search')}
+              {t('admin.agentflowManagement.chatMonitoring.search')}
             </Button>
             {activeUserId != null && (
               <Button
@@ -390,7 +390,7 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
                 leftIcon={<FiX className="h-3.5 w-3.5" />}
                 onClick={handleUserReset}
               >
-                {t('admin.workflowManagement.chatMonitoring.reset')}
+                {t('admin.agentflowManagement.chatMonitoring.reset')}
               </Button>
             )}
             <span className="text-xs text-muted-foreground ml-2">{paginationInfo}</span>
@@ -398,7 +398,7 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
           <SearchInput
             value={textFilter}
             onChange={setTextFilter}
-            placeholder={t('admin.workflowManagement.chatMonitoring.filterPlaceholder')}
+            placeholder={t('admin.agentflowManagement.chatMonitoring.filterPlaceholder')}
             size="sm"
             className="w-72"
           />
@@ -412,10 +412,10 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
             disabled={page <= 1 || loading}
             onClick={handlePrev}
           >
-            {t('admin.workflowManagement.chatMonitoring.prev')}
+            {t('admin.agentflowManagement.chatMonitoring.prev')}
           </Button>
           <span className="text-sm text-muted-foreground">
-            {t('admin.workflowManagement.chatMonitoring.page', { page })}
+            {t('admin.agentflowManagement.chatMonitoring.page', { page })}
           </span>
           <Button
             variant="outline"
@@ -423,21 +423,21 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
             disabled={!hasMore || loading}
             onClick={handleNext}
           >
-            {t('admin.workflowManagement.chatMonitoring.next')}
+            {t('admin.agentflowManagement.chatMonitoring.next')}
           </Button>
         </div>
       }
     >
-      <DataTable<WorkflowLog>
+      <DataTable<AgentflowLog>
         data={filteredLogs}
         columns={columns}
         rowKey={(row) => row.id}
         loading={loading && logs.length === 0}
-        loadingMessage={t('admin.workflowManagement.chatMonitoring.loading')}
+        loadingMessage={t('admin.agentflowManagement.chatMonitoring.loading')}
         emptyMessage={
           textFilter
-            ? t('admin.workflowManagement.chatMonitoring.noSearchResults')
-            : t('admin.workflowManagement.chatMonitoring.noLogs')
+            ? t('admin.agentflowManagement.chatMonitoring.noSearchResults')
+            : t('admin.agentflowManagement.chatMonitoring.noLogs')
         }
       />
 
@@ -455,9 +455,9 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
 const feature: AdminFeatureModule = {
   id: 'admin-chat-monitoring',
   name: 'AdminChatMonitoringPage',
-  adminSection: 'admin-workflow',
+  adminSection: 'admin-agentflow',
   sidebarItems: [
-    { id: 'admin-chat-monitoring', titleKey: 'admin.sidebar.workflow.chatMonitoring.title', descriptionKey: 'admin.sidebar.workflow.chatMonitoring.description' },
+    { id: 'admin-chat-monitoring', titleKey: 'admin.sidebar.agentflow.chatMonitoring.title', descriptionKey: 'admin.sidebar.agentflow.chatMonitoring.description' },
   ],
   routes: {
     'admin-chat-monitoring': AdminChatMonitoringPage,

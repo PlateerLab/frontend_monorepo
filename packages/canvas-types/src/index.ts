@@ -116,8 +116,8 @@ export type MemoColor = typeof MEMO_COLORS[number];
 export const MEMO_DEFAULT_COLOR: MemoColor = 'yellow';
 export const MEMO_DEFAULT_SIZE = { width: 200, height: 150 };
 
-// ========== Workflow Types ==========
-export interface WorkflowData {
+// ========== Agentflow Types ==========
+export interface AgentflowData {
     workflow_name?: string;
     workflow_id?: string;
     nodes?: CanvasNode[];
@@ -127,7 +127,7 @@ export interface WorkflowData {
     interaction_id?: string;
 }
 
-export interface WorkflowState {
+export interface AgentflowState {
     workflow_name?: string;
     workflow_id?: string;
     nodes?: CanvasNode[];
@@ -143,7 +143,7 @@ export interface RawTemplate {
     workflow_name: string;
     description?: string;
     tags?: string[];
-    contents?: WorkflowData;
+    contents?: AgentflowData;
 }
 
 export interface Template {
@@ -152,7 +152,7 @@ export interface Template {
     description: string;
     tags: string[];
     nodes: number;
-    data?: WorkflowData;
+    data?: AgentflowData;
 }
 
 // ========== Canvas State Types ==========

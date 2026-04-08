@@ -11,7 +11,7 @@ interface NodeTableViewProps {
 
 const NodeTableView: React.FC<NodeTableViewProps> = ({ nodes }) => {
   const { t } = useTranslation();
-  const prefix = 'admin.workflowManagement.nodeManagement';
+  const prefix = 'admin.agentflowManagement.nodeManagement';
 
   return (
     <div className="overflow-x-auto rounded-lg border border-border">

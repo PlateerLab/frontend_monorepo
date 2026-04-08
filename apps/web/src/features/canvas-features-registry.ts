@@ -16,7 +16,7 @@ import { canvasHeaderPlugin } from '@xgen/feature-canvas-header';
 import { canvasHistoryPlugin } from '@xgen/feature-canvas-history';
 import { canvasSidebarNodesPlugin } from '@xgen/feature-canvas-sidebar-nodes';
 import { canvasSidebarTemplatesPlugin } from '@xgen/feature-canvas-sidebar-templates';
-import { canvasSidebarWorkflowsPlugin } from '@xgen/feature-canvas-sidebar-workflows';
+import { canvasSidebarAgentflowsPlugin } from '@xgen/feature-canvas-sidebar-agentflows';
 import { canvasExecutionPlugin } from '@xgen/feature-canvas-execution';
 import { canvasAiGeneratorPlugin } from '@xgen/feature-canvas-ai-generator';
 import { canvasNodeDetailPlugin } from '@xgen/feature-canvas-node-detail';
@@ -29,7 +29,7 @@ export function registerCanvasPlugins(): void {
     // Side panels
     FeatureRegistry.registerCanvasPagePlugin(canvasSidebarNodesPlugin);
     FeatureRegistry.registerCanvasPagePlugin(canvasSidebarTemplatesPlugin);
-    FeatureRegistry.registerCanvasPagePlugin(canvasSidebarWorkflowsPlugin);
+    FeatureRegistry.registerCanvasPagePlugin(canvasSidebarAgentflowsPlugin);
 
     // Bottom panels
     FeatureRegistry.registerCanvasPagePlugin(canvasExecutionPlugin);

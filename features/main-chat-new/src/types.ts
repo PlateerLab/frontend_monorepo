@@ -1,13 +1,13 @@
 // Chat New Types
-// API에서 받아오는 워크플로우 데이터와 컴포넌트 타입 정의
+// API에서 받아오는 에이전트플로우 데이터와 컴포넌트 타입 정의
 
-export type { WorkflowOption, WorkflowDetailResponse } from '@xgen/types';
+export type { AgentflowOption, AgentflowDetailResponse } from '@xgen/types';
 
 // ─────────────────────────────────────────────────────────────
 // API Response Types
 // ─────────────────────────────────────────────────────────────
 
-export interface WorkflowDetailFromAPI {
+export interface AgentflowDetailFromAPI {
   id: number;
   workflow_name: string;
   workflow_id: string;
@@ -33,11 +33,11 @@ export interface WorkflowDetailFromAPI {
 // Component Types
 // ─────────────────────────────────────────────────────────────
 
-export type WorkflowOwnerFilter = 'all' | 'personal' | 'shared';
+export type AgentflowOwnerFilter = 'all' | 'personal' | 'shared';
 
 export interface ChatNewPageProps {
   onNavigate?: (sectionId: string) => void;
-  onSelectWorkflow?: (workflow: {
+  onSelectAgentflow?: (workflow: {
     workflowId: string;
     workflowName: string;
     userId?: number;

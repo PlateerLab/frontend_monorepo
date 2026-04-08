@@ -22,7 +22,7 @@ const NodeTreeView: React.FC<NodeTreeViewProps> = ({
   onToggleFunction,
 }) => {
   const { t } = useTranslation();
-  const prefix = 'admin.workflowManagement.nodeManagement';
+  const prefix = 'admin.agentflowManagement.nodeManagement';
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
 
   const handleSelectNode = useCallback((node: Node) => {

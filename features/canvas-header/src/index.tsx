@@ -9,36 +9,36 @@ import type { CanvasPagePlugin, CanvasHeaderProps } from '@xgen/types';
 export type CanvasMode = 'edit' | 'run';
 
 const CanvasHeader: React.FC<CanvasHeaderProps> = ({
-    workflowName: externalWorkflowName,
+    workflowName: externalAgentflowName,
     workflowId,
     onSave,
-    onNewWorkflow,
+    onNewAgentflow,
     onDeploy,
     onAddNodeClick,
-    onAutoWorkflowClick,
+    onAutoAgentflowClick,
     onHistoryClick,
     onTemplateStart,
-    onImportWorkflow,
-    onWorkflowNameChange,
+    onImportAgentflow,
+    onAgentflowNameChange,
     onDuplicate,
     isOwner = true,
     sidebarLayout,
-    renameWorkflow,
-    checkWorkflowExistence,
-    listWorkflows,
+    renameAgentflow,
+    checkAgentflowExistence,
+    listAgentflows,
 }) => {
-    const [workflowName, setWorkflowName] = useState<string>('Workflow');
+    const [workflowName, setAgentflowName] = useState<string>('Agentflow');
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [editValue, setEditValue] = useState<string>('');
-    const [oldWorkflowName, setOldWorkflowName] = useState<string>('');
+    const [oldAgentflowName, setOldAgentflowName] = useState<string>('');
     const inputRef = useRef<HTMLInputElement>(null);
     const { t } = useTranslation();
 
     useEffect(() => {
-        if (externalWorkflowName) {
-            setWorkflowName(externalWorkflowName);
+        if (externalAgentflowName) {
+            setAgentflowName(externalAgentflowName);
         }
-    }, [externalWorkflowName]);
+    }, [externalAgentflowName]);
 
     useEffect(() => {
         if (isEditing && inputRef.current) {
@@ -48,49 +48,49 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
     }, [isEditing]);
 
     const handleEditClick = useCallback((): void => {
-        setOldWorkflowName(workflowName);
+        setOldAgentflowName(workflowName);
         setEditValue(workflowName);
         setIsEditing(true);
     }, [workflowName]);
 
     const handleSaveClick = useCallback(async (): Promise<void> => {
         const trimmedValue = editValue.trim();
-        const finalValue = trimmedValue || 'Workflow';
+        const finalValue = trimmedValue || 'Agentflow';
 
-        if (finalValue === oldWorkflowName) {
+        if (finalValue === oldAgentflowName) {
             setIsEditing(false);
             return;
         }
 
         try {
-            if (renameWorkflow && checkWorkflowExistence && workflowId) {
-                const checkResult = await checkWorkflowExistence(oldWorkflowName);
+            if (renameAgentflow && checkAgentflowExistence && workflowId) {
+                const checkResult = await checkAgentflowExistence(oldAgentflowName);
                 if (checkResult.exists) {
-                    await renameWorkflow(oldWorkflowName, finalValue, workflowId);
-                } else if (listWorkflows) {
-                    const existingWorkflows = await listWorkflows();
+                    await renameAgentflow(oldAgentflowName, finalValue, workflowId);
+                } else if (listAgentflows) {
+                    const existingAgentflows = await listAgentflows();
                     const workflowNames = new Set(
-                        existingWorkflows.map((item: any) => {
+                        existingAgentflows.map((item: any) => {
                             const name = typeof item === 'string' ? item :
                                 (item?.workflow_name || item?.name || '');
                             return name.replace(/\.json$/i, '').trim();
                         })
                     );
                     if (workflowNames.has(finalValue)) {
-                        setEditValue(oldWorkflowName);
+                        setEditValue(oldAgentflowName);
                         return;
                     }
                 }
             }
 
-            setWorkflowName(finalValue);
-            onWorkflowNameChange?.(finalValue);
+            setAgentflowName(finalValue);
+            onAgentflowNameChange?.(finalValue);
             setIsEditing(false);
         } catch (error) {
             console.error('Failed to rename workflow:', error);
-            setEditValue(oldWorkflowName);
+            setEditValue(oldAgentflowName);
         }
-    }, [editValue, oldWorkflowName, workflowId, renameWorkflow, checkWorkflowExistence, listWorkflows, onWorkflowNameChange]);
+    }, [editValue, oldAgentflowName, workflowId, renameAgentflow, checkAgentflowExistence, listAgentflows, onAgentflowNameChange]);
 
     const handleCancelClick = useCallback((): void => {
         setEditValue(workflowName);
@@ -107,24 +107,24 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
 
     const dropdownItems = useMemo<DropdownMenuItem[]>(() => {
         const items: DropdownMenuItem[] = [
-            { key: 'empty', label: t('canvas.header.emptyWorkflow', 'Empty Workflow') },
+            { key: 'empty', label: t('canvas.header.emptyAgentflow', 'Empty Agentflow') },
         ];
         if (onTemplateStart) {
             items.push({ key: 'template', label: t('canvas.header.startFromTemplate', 'Start from Template') });
         }
-        if (onImportWorkflow) {
-            items.push({ key: 'import', label: t('canvas.header.importWorkflow', 'Import Workflow') });
+        if (onImportAgentflow) {
+            items.push({ key: 'import', label: t('canvas.header.importAgentflow', 'Import Agentflow') });
         }
         return items;
-    }, [t, onTemplateStart, onImportWorkflow]);
+    }, [t, onTemplateStart, onImportAgentflow]);
 
     const handleDropdownSelect = useCallback((key: string) => {
         switch (key) {
-            case 'empty': onNewWorkflow(); break;
+            case 'empty': onNewAgentflow(); break;
             case 'template': onTemplateStart?.(); break;
-            case 'import': onImportWorkflow?.(); break;
+            case 'import': onImportAgentflow?.(); break;
         }
-    }, [onNewWorkflow, onTemplateStart, onImportWorkflow]);
+    }, [onNewAgentflow, onTemplateStart, onImportAgentflow]);
 
     return (
         <header
@@ -138,7 +138,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                     : undefined
             }
         >
-            {/* Left — Workflow name */}
+            {/* Left — Agentflow name */}
             <div className="flex items-center gap-4 min-w-0 flex-1">
                 <div className="min-w-[120px] max-w-[360px]">
                     {isEditing ? (
@@ -150,7 +150,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                                 onChange={(e) => setEditValue(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 className="h-7 text-sm font-bold text-[var(--color-gray-800)] border border-[var(--color-secondary-200)] rounded-md px-2 bg-white outline-none min-w-[120px] shadow-[0_0_0_2px_rgba(48,94,235,0.1)] focus:border-[var(--color-secondary-200)]"
-                                placeholder={t('canvas.header.workflowNamePlaceholder', 'Workflow name')}
+                                placeholder={t('canvas.header.agentflowNamePlaceholder', 'Agentflow name')}
                             />
                             <button
                                 onClick={handleSaveClick}
@@ -177,7 +177,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                             {!isOwner && (
                                 <span
                                     className="flex items-center justify-center text-[0.9rem] text-[var(--color-gray-500)] p-1 rounded min-w-6 min-h-6 shrink-0 cursor-help transition-all hover:bg-black/[0.06] hover:text-[var(--color-gray-600)] hover:scale-110"
-                                    title={t('canvas.header.sharedWorkflowTooltip', 'Shared')}
+                                    title={t('canvas.header.sharedAgentflowTooltip', 'Shared')}
                                 >
                                     <LuUsers />
                                 </span>
@@ -186,7 +186,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                                 <button
                                     onClick={handleEditClick}
                                     className="inline-flex items-center justify-center w-6 h-6 min-w-6 min-h-6 shrink-0 text-base rounded cursor-pointer bg-transparent border-none p-0 text-[var(--color-gray-500)] transition-colors hover:bg-black/[0.06]"
-                                    title={t('canvas.header.editWorkflowName', 'Edit name')}
+                                    title={t('canvas.header.editAgentflowName', 'Edit name')}
                                     type="button"
                                 >
                                     <LuPencil className="w-[1em] h-[1em] shrink-0" />
@@ -208,7 +208,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                             className="h-7 rounded-lg text-sm font-medium"
                             rightIcon={<LuChevronDown className="w-4 h-4 shrink-0 opacity-90" />}
                         >
-                            {t('canvas.header.newWorkflow', 'New Workflow')}
+                            {t('canvas.header.newAgentflow', 'New Agentflow')}
                         </Button>
                     }
                     items={dropdownItems}
@@ -222,7 +222,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                     padding="compact"
                     className="h-7 rounded-lg text-sm font-medium text-[var(--color-gray-800)] border-[var(--color-line-50)]"
                     onClick={onSave}
-                    title={t('canvas.header.saveWorkflow', 'Save')}
+                    title={t('canvas.header.saveAgentflow', 'Save')}
                 >
                     {t('canvas.header.save', 'Save')}
                 </Button>
@@ -233,7 +233,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                         padding="compact"
                         className="h-7 rounded-lg text-sm font-medium text-[var(--color-gray-800)] border-[var(--color-line-50)]"
                         onClick={onDuplicate}
-                        title={t('canvas.header.copyWorkflow', 'Copy')}
+                        title={t('canvas.header.copyAgentflow', 'Copy')}
                     >
                         {t('canvas.header.copy', 'Copy')}
                     </Button>
@@ -268,12 +268,12 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                         <LuHistory />
                     </button>
                 )}
-                {onAutoWorkflowClick && (
+                {onAutoAgentflowClick && (
                     <button
                         type="button"
                         className="flex items-center justify-center w-7 h-7 min-w-7 min-h-7 p-0 bg-transparent border-none text-[var(--color-gray-600)] cursor-pointer rounded-lg select-none transition-colors hover:bg-black/[0.04]"
-                        onClick={onAutoWorkflowClick}
-                        title={t('canvas.header.autoWorkflow', 'Auto Workflow')}
+                        onClick={onAutoAgentflowClick}
+                        title={t('canvas.header.autoAgentflow', 'Auto Agentflow')}
                     >
                         <LuSparkles />
                     </button>

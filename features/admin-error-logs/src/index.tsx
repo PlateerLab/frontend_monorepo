@@ -44,7 +44,7 @@ function generateErrors(): ErrorLogEntry[] {
     { msg: 'Connection refused to database', trace: 'Error: ECONNREFUSED\n    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1141:16)\n    at Protocol._enqueue (protocol.js:144:48)' },
     { msg: 'JWT token expired during refresh', trace: 'TokenExpiredError: jwt expired\n    at Object.module.exports [as verify] (index.js:33:17)\n    at AuthMiddleware.verify (auth.ts:45:12)' },
     { msg: 'Out of memory in model inference', trace: 'RuntimeError: CUDA out of memory\n    at torch.cuda.mem_alloc (memory.py:234)\n    at InferenceEngine.run (engine.py:89:5)' },
-    { msg: 'Failed to parse workflow JSON', trace: 'SyntaxError: Unexpected token } in JSON at position 1205\n    at JSON.parse (<anonymous>)\n    at WorkflowParser.parse (parser.ts:67:20)' },
+    { msg: 'Failed to parse workflow JSON', trace: 'SyntaxError: Unexpected token } in JSON at position 1205\n    at JSON.parse (<anonymous>)\n    at AgentflowParser.parse (parser.ts:67:20)' },
     { msg: 'S3 bucket access denied', trace: 'AccessDenied: Access Denied\n    at Request.extractError (s3.js:700:35)\n    at StorageClient.upload (storage.ts:122:8)' },
     { msg: 'MCP session handshake timeout', trace: 'TimeoutError: MCP handshake timeout after 30000ms\n    at MCPClient.connect (client.ts:56:11)\n    at SessionManager.create (manager.ts:89:5)' },
     { msg: 'Rate limit exceeded for user', trace: 'RateLimitError: Too many requests\n    at RateLimiter.check (limiter.ts:34:15)\n    at APIGateway.handle (gateway.ts:78:12)' },

@@ -9,7 +9,7 @@ interface TokenUsageBarProps {
   maxTokens: number;
 }
 
-const i18nPrefix = 'admin.workflowManagement.userTokenDashboard';
+const i18nPrefix = 'admin.agentflowManagement.userTokenDashboard';
 
 const TokenUsageBar: React.FC<TokenUsageBarProps> = ({
   inputTokens,

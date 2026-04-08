@@ -15,10 +15,10 @@ export const en: TranslationData = {
     startNewChat: 'Start New Chat',
     stop: 'Stop',
     cancelled: 'Cancelled',
-    sessionStarted: '{{workflowName}} workflow has started',
+    sessionStarted: '{{agentflowName}} agentflow has started',
     emptyState: {
       title: 'Start your first conversation!',
-      ready: 'workflow is ready'
+      ready: 'agentflow is ready'
     },
     suggestions: {
       hello: 'Hello!',

@@ -289,7 +289,7 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {['admin-user', 'admin-workflow', 'admin-setting', 'admin-system', 'admin-data', 'admin-security', 'admin-mcp', 'admin-ml', 'admin-governance'].map(
+              {['admin-user', 'admin-agentflow', 'admin-setting', 'admin-system', 'admin-data', 'admin-security', 'admin-mcp', 'admin-ml', 'admin-governance'].map(
                 (section) => (
                   <Button
                     key={section}

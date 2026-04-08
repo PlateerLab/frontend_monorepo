@@ -69,11 +69,11 @@ export const commonKo: TranslationData = {
       new: { title: '새 채팅' },
       current: { title: '현재 채팅' },
     },
-    workflow: {
-      title: '워크플로우',
-      intro: { title: '워크플로우 소개' },
+    agentflow: {
+      title: '에이전트플로우',
+      intro: { title: '에이전트플로우 소개' },
       canvas: { title: '캔버스' },
-      workflows: { title: '워크플로우 목록' },
+      agentflows: { title: '에이전트플로우 목록' },
       tools: { title: 'API Tool' },
       prompts: { title: '프롬프트' },
       authProfile: { title: '인증 프로필', description: 'API 인증 정보 관리' },

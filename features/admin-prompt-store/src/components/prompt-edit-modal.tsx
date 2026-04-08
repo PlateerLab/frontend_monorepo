@@ -7,7 +7,7 @@ import { FiUser } from '@xgen/icons';
 import { updatePrompt } from '../api/prompt-api';
 import type { Prompt } from '../types';
 
-const PS = 'admin.workflowManagement.promptStore';
+const PS = 'admin.agentflowManagement.promptStore';
 const EM = `${PS}.editModal`;
 
 interface PromptEditModalProps {

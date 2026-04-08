@@ -16,7 +16,7 @@ type ViewMode = 'table' | 'tree';
 const AdminNodeManagementPage: React.FC<RouteComponentProps> = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const prefix = 'admin.workflowManagement.nodeManagement';
+  const prefix = 'admin.agentflowManagement.nodeManagement';
 
   const [categories, setCategories] = useState<NodeCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -283,9 +283,9 @@ const AdminNodeManagementPage: React.FC<RouteComponentProps> = () => {
 const feature: AdminFeatureModule = {
   id: 'admin-node-management',
   name: 'AdminNodeManagementPage',
-  adminSection: 'admin-workflow',
+  adminSection: 'admin-agentflow',
   sidebarItems: [
-    { id: 'admin-node-management', titleKey: 'admin.sidebar.workflow.nodeManagement.title', descriptionKey: 'admin.sidebar.workflow.nodeManagement.description' },
+    { id: 'admin-node-management', titleKey: 'admin.sidebar.agentflow.nodeManagement.title', descriptionKey: 'admin.sidebar.agentflow.nodeManagement.description' },
   ],
   routes: {
     'admin-node-management': AdminNodeManagementPage,

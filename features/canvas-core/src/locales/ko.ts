@@ -9,7 +9,7 @@ export const ko: Record<string, unknown> = {
   },
   sideMenu: {
     addNode: '노드 추가',
-    workflow: '워크플로우',
+    agentflow: '에이전트플로우',
     template: '템플릿',
     settings: '설정',
     help: '도움말',

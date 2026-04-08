@@ -1,4 +1,4 @@
-export interface WorkflowUsageDetail {
+export interface AgentflowUsageDetail {
   usage_count: number;
   total_tokens: number;
   interactions: number;
@@ -19,7 +19,7 @@ export interface UserTokenUsage {
   last_interaction: string;
   most_used_workflow: string | null;
   workflow_usage_count: number;
-  workflow_usage?: Record<string, WorkflowUsageDetail>;
+  workflow_usage?: Record<string, AgentflowUsageDetail>;
 }
 
 export interface PaginationInfo {

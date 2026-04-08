@@ -31,7 +31,7 @@ export const en: TranslationData = {
   },
   empty: {
     title: 'No auth profiles',
-    description: 'Register API authentication to use in workflows',
+    description: 'Register API authentication to use in agentflows',
   },
   store: {
     empty: {

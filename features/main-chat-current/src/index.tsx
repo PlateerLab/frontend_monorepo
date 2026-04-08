@@ -6,7 +6,7 @@ import { ChatPanel, ChatEmptyState, ChatBubbleIcon, ContentArea } from '@xgen/ui
 import type { ChatPanelMessage } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import './locales';
-import { getWorkflowIOLogs, executeWorkflowStream as executeWorkflowStreamApi } from '@xgen/api-client';
+import { getAgentflowIOLogs, executeAgentflowStream as executeAgentflowStreamApi } from '@xgen/api-client';
 
 import type {
   ChatCurrentPageProps,
@@ -24,7 +24,7 @@ const STORAGE_KEY_CURRENT_CHAT = 'xgen_current_chat';
 // Page-level Icons (header, workflow info — NOT shared)
 // ─────────────────────────────────────────────────────────────
 
-const WorkflowIcon: React.FC<{ size?: number }> = ({ size = 20 }) => (
+const AgentflowIcon: React.FC<{ size?: number }> = ({ size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="2" y="2" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
     <rect x="12" y="2" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
@@ -79,15 +79,15 @@ const generateMessageId = (): string => {
 };
 
 // ─────────────────────────────────────────────────────────────
-// Workflow Info Toolbar — page-specific subheader
+// Agentflow Info Toolbar — page-specific subheader
 // ─────────────────────────────────────────────────────────────
 
-interface WorkflowInfoToolbarProps {
+interface AgentflowInfoToolbarProps {
   workflowName: string;
   interactionId: string;
 }
 
-const WorkflowInfoToolbar: React.FC<WorkflowInfoToolbarProps> = ({ workflowName, interactionId }) => {
+const AgentflowInfoToolbar: React.FC<AgentflowInfoToolbarProps> = ({ workflowName, interactionId }) => {
   return (
     <div className="flex items-center justify-between w-full">
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -154,7 +154,7 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
 
   const loadChatHistory = useCallback(async (data: StoredChatData) => {
     try {
-      const result = await getWorkflowIOLogs(
+      const result = await getAgentflowIOLogs(
         data.workflowName,
         data.workflowId,
         data.interactionId,
@@ -217,9 +217,9 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
     loadChatHistory(data).finally(() => setLoading(false));
   }, [loadChatHistory, t]);
 
-  // ── Workflow Execution (Streaming) ────────────────────────
+  // ── Agentflow Execution (Streaming) ────────────────────────
 
-  const executeWorkflow = useCallback(
+  const executeAgentflow = useCallback(
     async (message: string) => {
       if (!chatData) return;
 
@@ -256,7 +256,7 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
       let accumulatedContent = '';
 
       try {
-        await executeWorkflowStreamApi({
+        await executeAgentflowStreamApi({
           workflowName: chatData.workflowName,
           workflowId: chatData.workflowId,
           inputData: message,
@@ -280,7 +280,7 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
             );
           },
           onError: (err) => {
-            console.error('Workflow execution failed:', err);
+            console.error('Agentflow execution failed:', err);
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === assistantMessageId
@@ -301,7 +301,7 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
           );
         }
       } catch (err: unknown) {
-        console.error('Workflow execution failed:', err);
+        console.error('Agentflow execution failed:', err);
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === assistantMessageId
@@ -321,8 +321,8 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
   // ── Event Handlers ────────────────────────────────────────
 
   const handleSend = useCallback(
-    (text: string) => { executeWorkflow(text); },
-    [executeWorkflow],
+    (text: string) => { executeAgentflow(text); },
+    [executeAgentflow],
   );
 
   const handleStop = useCallback(() => {
@@ -334,10 +334,10 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
       const msg = messages.find((m) => m.id === messageId);
       if (msg && msg.sender === 'user') {
         setMessages((prev) => prev.filter((m) => m.id !== messageId));
-        executeWorkflow(msg.content);
+        executeAgentflow(msg.content);
       }
     },
-    [messages, executeWorkflow],
+    [messages, executeAgentflow],
   );
 
   const handleNewChat = useCallback(() => {
@@ -392,7 +392,7 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
         { key: 'help', label: t('chat.suggestions.help') },
         { key: 'features', label: t('chat.suggestions.features') },
       ]}
-      onSuggestionClick={(label) => !isExecuting && executeWorkflow(label)}
+      onSuggestionClick={(label) => !isExecuting && executeAgentflow(label)}
     />
   );
 
@@ -404,7 +404,7 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
         <>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center shrink-0 text-white [&_svg]:w-5 [&_svg]:h-5">
-              <WorkflowIcon />
+              <AgentflowIcon />
             </div>
             <div className="flex flex-col">
               <h1 className="text-sm font-bold text-foreground m-0 leading-tight">{chatData.workflowName}</h1>
@@ -437,7 +437,7 @@ const ChatCurrentPage: React.FC<RouteComponentProps & ChatCurrentPageProps> = ({
         </>
       }
       toolbar={
-        <WorkflowInfoToolbar
+        <AgentflowInfoToolbar
           workflowName={chatData.workflowName}
           interactionId={chatData.interactionId}
         />

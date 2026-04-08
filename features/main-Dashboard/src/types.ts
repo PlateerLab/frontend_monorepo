@@ -15,7 +15,7 @@ export interface LatestUpdateItem {
   onClick?: () => void;
 }
 
-export interface TopWorkflowItem {
+export interface TopAgentflowItem {
   id: string;
   name: string;
   isLink?: boolean;
@@ -33,6 +33,6 @@ export interface DashboardErrorItem {
 export interface DashboardData {
   overview: DashboardOverview;
   latestUpdates: LatestUpdateItem[];
-  topWorkflows: TopWorkflowItem[];
+  topAgentflows: TopAgentflowItem[];
   errors: DashboardErrorItem[];
 }
