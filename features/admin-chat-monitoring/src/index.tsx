@@ -457,7 +457,7 @@ const feature: AdminFeatureModule = {
   name: 'AdminChatMonitoringPage',
   adminSection: 'admin-agentflow',
   sidebarItems: [
-    { id: 'admin-chat-monitoring', titleKey: 'admin.sidebar.workflow.chatMonitoring.title', descriptionKey: 'admin.sidebar.workflow.chatMonitoring.description' },
+    { id: 'admin-chat-monitoring', titleKey: 'admin.sidebar.agentflow.chatMonitoring.title', descriptionKey: 'admin.sidebar.agentflow.chatMonitoring.description' },
   ],
   routes: {
     'admin-chat-monitoring': AdminChatMonitoringPage,

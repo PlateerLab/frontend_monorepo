@@ -176,8 +176,8 @@ export const mainCanvasIntroFeature: MainFeatureModule = {
   sidebarItems: [
     {
       id: 'canvas-intro',
-      titleKey: 'sidebar.workflow.canvas.title',
-      descriptionKey: 'sidebar.workflow.canvas.description',
+      titleKey: 'sidebar.agentflow.canvas.title',
+      descriptionKey: 'sidebar.agentflow.canvas.description',
       href: '/canvas',
     },
   ],

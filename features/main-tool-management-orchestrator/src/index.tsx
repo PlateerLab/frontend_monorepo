@@ -77,8 +77,8 @@ export const mainToolStorageFeature: MainFeatureModule = {
   sidebarItems: [
     {
       id: 'tool-storage',
-      titleKey: 'sidebar.workflow.tools.title',
-      descriptionKey: 'sidebar.workflow.tools.description',
+      titleKey: 'sidebar.agentflow.tools.title',
+      descriptionKey: 'sidebar.agentflow.tools.description',
     },
   ],
   routes: {

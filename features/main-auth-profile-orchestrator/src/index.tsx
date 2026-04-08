@@ -65,8 +65,8 @@ export const mainAuthProfileOrchestratorFeature: MainFeatureModule = {
   sidebarItems: [
     {
       id: 'auth-profile',
-      titleKey: 'sidebar.workflow.authProfile.title',
-      descriptionKey: 'sidebar.workflow.authProfile.description',
+      titleKey: 'sidebar.agentflow.authProfile.title',
+      descriptionKey: 'sidebar.agentflow.authProfile.description',
     },
   ],
   routes: {

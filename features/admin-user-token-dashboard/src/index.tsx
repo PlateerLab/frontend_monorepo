@@ -473,7 +473,7 @@ const feature: AdminFeatureModule = {
   name: 'AdminUserTokenDashboardPage',
   adminSection: 'admin-agentflow',
   sidebarItems: [
-    { id: 'admin-user-token-dashboard', titleKey: 'admin.sidebar.workflow.userTokenDashboard.title', descriptionKey: 'admin.sidebar.workflow.userTokenDashboard.description' },
+    { id: 'admin-user-token-dashboard', titleKey: 'admin.sidebar.agentflow.userTokenDashboard.title', descriptionKey: 'admin.sidebar.agentflow.userTokenDashboard.description' },
   ],
   routes: {
     'admin-user-token-dashboard': AdminUserTokenDashboardPage,

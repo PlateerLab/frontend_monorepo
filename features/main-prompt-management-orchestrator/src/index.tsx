@@ -77,8 +77,8 @@ export const mainPromptManagementFeature: MainFeatureModule = {
   sidebarItems: [
     {
       id: 'prompt-storage',
-      titleKey: 'sidebar.workflow.prompts.title',
-      descriptionKey: 'sidebar.workflow.prompts.description',
+      titleKey: 'sidebar.agentflow.prompts.title',
+      descriptionKey: 'sidebar.agentflow.prompts.description',
     },
   ],
   routes: {
