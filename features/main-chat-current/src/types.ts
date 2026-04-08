@@ -10,7 +10,7 @@ export type {
   ChatMessageSender,
   ChatMessageStatus,
   ChatAttachment,
-  ChatWorkflow,
+  ChatAgentflow,
   ChatSession,
   CurrentChatData,
   ChatInputState,
@@ -65,9 +65,9 @@ export interface ToolEvent {
 }
 
 /**
- * 워크플로우 실행 요청
+ * 에이전트플로우 실행 요청
  */
-export interface WorkflowExecutionRequest {
+export interface AgentflowExecutionRequest {
   workflow_id: string;
   workflow_name?: string;
   input_data: string;

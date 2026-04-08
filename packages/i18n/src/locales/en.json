@@ -21,13 +21,13 @@
     "title": "Driving AX Innovation",
     "titleHighlight": "Hybrid AI Platform for Enterprises",
     "titleWith": "with XGEN",
-    "description": "GEN AI Platform is the all-in-one AI platform where you can train models, design intelligent workflows with drag & drop, and serve them as APIs — effortlessly.",
+    "description": "GEN AI Platform is the all-in-one AI platform where you can train models, design intelligent agentflows with drag & drop, and serve them as APIs — effortlessly.",
     "stat1Value": "5+",
     "stat1Label": "AI Node Types",
     "stat2Value": "Real-time",
     "stat2Label": "Chat Interface",
     "stat3Value": "Unlimited",
-    "stat3Label": "Workflow Creation",
+    "stat3Label": "Agentflow Creation",
     "cta": "Be More Productive with XGEN"
   },
   "mockup": {
@@ -38,38 +38,38 @@
   },
   "features": {
     "title": "Why XGEN?",
-    "subtitle": "Innovative features that set a new standard for AI workflow development",
+    "subtitle": "Innovative features that set a new standard for AI agentflow development",
     "visualCanvas": {
       "title": "Visual Canvas Editor",
-      "description": "Compose complex AI workflows visually with intuitive drag and drop, and preview them in real-time.",
+      "description": "Compose complex AI agentflows visually with intuitive drag and drop, and preview them in real-time.",
       "feature1": "5+ AI Node Types",
       "feature2": "Real-time Preview",
       "feature3": "Auto Validation"
     },
     "realtimeChat": {
       "title": "Real-time AI Chat",
-      "description": "Have natural conversations with your completed workflows and see AI responses in real-time.",
+      "description": "Have natural conversations with your completed agentflows and see AI responses in real-time.",
       "feature1": "Real-time Response",
       "feature2": "Chat History",
-      "feature3": "Multi-workflow Selection"
+      "feature3": "Multi-agentflow Selection"
     },
     "smartManagement": {
       "title": "Smart Management Center",
-      "description": "Provides an integrated management environment for workflow performance monitoring, execution log analysis, and team collaboration.",
+      "description": "Provides an integrated management environment for agentflow performance monitoring, execution log analysis, and team collaboration.",
       "feature1": "Performance Dashboard",
       "feature2": "Execution Log Analysis",
       "feature3": "Team Collaboration Tools"
     },
     "highPerformance": {
       "title": "High-Performance Engine",
-      "description": "Optimized execution engine processes even large-scale workflows quickly and reliably.",
+      "description": "Optimized execution engine processes even large-scale agentflows quickly and reliably.",
       "feature1": "Parallel Processing",
       "feature2": "Auto Scaling",
       "feature3": "Error Recovery System"
     },
     "security": {
       "title": "Enterprise Security",
-      "description": "Enterprise-grade security and data protection features ensure a safe AI workflow environment.",
+      "description": "Enterprise-grade security and data protection features ensure a safe AI agentflow environment.",
       "feature1": "Data Encryption",
       "feature2": "Access Control",
       "feature3": "Audit Logs"
@@ -83,16 +83,16 @@
     }
   },
   "cta": {
-    "label": "Ready to Transform Your AI Workflow?",
+    "label": "Ready to Transform Your AI Agentflow?",
     "title": "Get Started Now",
-    "description": "Create and run your first AI workflow in minutes",
+    "description": "Create and run your first AI agentflow in minutes",
     "startFree": "Start for Free",
     "exploreManagement": "Explore Management Center",
     "note": "Let's Start"
   },
   "footer": {
     "brand": "XGEN",
-    "tagline": "Next Generation AI Workflow",
+    "tagline": "Next Generation AI Agentflow",
     "copyright": "© 2025 Plateer AI-LAB. All rights reserved."
   },
   "toast": {
@@ -118,16 +118,16 @@
         "title": "Current Chat"
       }
     },
-    "workflow": {
-      "title": "Workflow",
+    "agentflow": {
+      "title": "Agentflow",
       "intro": {
-        "title": "Workflow Introduction"
+        "title": "Agentflow Introduction"
       },
       "canvas": {
         "title": "Canvas"
       },
-      "workflows": {
-        "title": "Workflows"
+      "agentflows": {
+        "title": "Agentflows"
       },
       "documents": {
         "title": "Documents"
@@ -162,16 +162,16 @@
   "dashboard": {
     "welcome": "Welcome",
     "welcomeSubtitle": "Have a productive day",
-    "workplaceOverview": "Workflow Overview",
+    "workplaceOverview": "Agentflow Overview",
     "latestUpdates": "Latest Updates",
     "noUpdates": "No recent updates",
-    "topWorkflows": "Top Workflows",
-    "noWorkflows": "No workflows",
+    "topAgentflows": "Top Agentflows",
+    "noAgentflows": "No agentflows",
     "recentErrors": "Recent Errors",
     "noErrors": "No errors",
     "lastUpdated": "Last Updated",
     "errors": {
-      "workflow": "Workflow",
+      "agentflow": "Agentflow",
       "time": "Time",
       "message": "Message"
     }
@@ -198,8 +198,8 @@
     "quickStart": {
       "title": "Quick Start",
       "step1": {
-        "title": "Select Workflow",
-        "description": "Choose an AI workflow to use"
+        "title": "Select Agentflow",
+        "description": "Choose an AI agentflow to use"
       },
       "step2": {
         "title": "Ask Question",
@@ -220,9 +220,9 @@
         "title": "Multimodal",
         "description": "Use text, images, and files together"
       },
-      "workflow": {
-        "title": "Workflow Integration",
-        "description": "Execute workflows directly from chat"
+      "agentflow": {
+        "title": "Agentflow Integration",
+        "description": "Execute agentflows directly from chat"
       }
     }
   },
@@ -248,7 +248,7 @@
     },
     "error": {
       "loadFailed": "Failed to load chat history",
-      "workflowDeleted": "This workflow has been deleted",
+      "agentflowDeleted": "This agentflow has been deleted",
       "saveFailed": "Failed to save",
       "deleteFailed": "Failed to delete"
     }
@@ -256,13 +256,13 @@
   "chatNew": {
     "title": "New Chat",
     "header": {
-      "title": "Select Workflow",
-      "subtitle": "Choose a workflow to start the conversation"
+      "title": "Select Agentflow",
+      "subtitle": "Choose a agentflow to start the conversation"
     },
-    "searchPlaceholder": "Search workflows...",
+    "searchPlaceholder": "Search agentflows...",
     "sections": {
       "favorites": "Favorites",
-      "all": "All Workflows"
+      "all": "All Agentflows"
     },
     "filter": {
       "all": "All",
@@ -289,12 +289,12 @@
     "yesterday": "Yesterday",
     "daysAgo": "days ago",
     "empty": {
-      "title": "No workflows",
-      "description": "Create a workflow first"
+      "title": "No agentflows",
+      "description": "Create a agentflow first"
     },
     "error": {
-      "loadFailed": "Failed to load workflows",
-      "draftWorkflow": "Draft workflows cannot be used",
+      "loadFailed": "Failed to load agentflows",
+      "draftAgentflow": "Draft agentflows cannot be used",
       "saveFailed": "Failed to save"
     }
   },
@@ -312,19 +312,19 @@
     "startNewChat": "Start New Chat",
     "stop": "Stop",
     "cancelled": "Cancelled",
-    "sessionStarted": "{{workflowName}} workflow has started",
+    "sessionStarted": "{{agentflowName}} agentflow has started",
     "error": {
       "noSession": "No active chat session",
       "executionFailed": "Execution failed"
     }
   },
-  "workflowIntro": {
-    "title": "Workflow",
+  "agentflowIntro": {
+    "title": "Agentflow",
     "hero": {
-      "title": "AI Workflow Builder",
+      "title": "AI Agentflow Builder",
       "description": "Build powerful AI pipelines with drag and drop",
       "primaryAction": "Go to Canvas",
-      "secondaryAction": "Explore Workflows"
+      "secondaryAction": "Explore Agentflows"
     },
     "features": {
       "title": "Key Features",
@@ -355,16 +355,16 @@
       "editPrompts": "Edit Prompts"
     },
     "stats": {
-      "workflows": "Workflows",
+      "agentflows": "Agentflows",
       "nodeTypes": "Node Types",
       "executions": "Executions",
       "uptime": "Uptime"
     }
   },
-  "workflows": {
-    "title": "Workflows",
-    "searchPlaceholder": "Search workflows...",
-    "createNew": "New Workflow",
+  "agentflows": {
+    "title": "Agentflows",
+    "searchPlaceholder": "Search agentflows...",
+    "createNew": "New Agentflow",
     "filter": {
       "all": "All",
       "published": "Published",
@@ -377,20 +377,20 @@
     "delete": "Delete",
     "nodeCount": "Node Count",
     "empty": {
-      "title": "No workflows",
-      "description": "Create a new workflow",
-      "action": "Create Workflow"
+      "title": "No agentflows",
+      "description": "Create a new agentflow",
+      "action": "Create Agentflow"
     }
   },
   "canvasIntro": {
     "title": "Canvas",
-    "description": "Design AI workflows visually",
+    "description": "Design AI agentflows visually",
     "hero": {
       "title": "AI Canvas Editor",
-      "description": "Design AI workflows visually",
+      "description": "Design AI agentflows visually",
       "createBlank": "Start with Blank Canvas",
       "continue": "Continue",
-      "noDataError": "No saved workflow data to continue."
+      "noDataError": "No saved agentflow data to continue."
     }
   },
   "documents": {
@@ -436,8 +436,8 @@
     "notifications": "Notification Settings",
     "emailNotifications": "Email Notifications",
     "emailNotificationsDesc": "Receive important updates via email",
-    "workflowAlerts": "Workflow Alerts",
-    "workflowAlertsDesc": "Get notified when workflow errors occur",
+    "agentflowAlerts": "Agentflow Alerts",
+    "agentflowAlertsDesc": "Get notified when agentflow errors occur",
     "security": "Security",
     "twoFactor": "Two-Factor Authentication",
     "twoFactorDesc": "Enhance account security",
@@ -501,7 +501,7 @@
       "backToChat": "Back to Chat",
       "sections": {
         "user": "Users & Organizations",
-        "workflow": "Workflow Resources",
+        "agentflow": "Agentflow Resources",
         "setting": "Settings",
         "system": "System Status",
         "data": "Data Management",
@@ -524,13 +524,13 @@
           "description": "Configure group permissions"
         }
       },
-      "workflow": {
-        "workflowManagement": {
-          "title": "Workflow Management",
-          "description": "Create and manage workflows"
+      "agentflow": {
+        "agentflowManagement": {
+          "title": "Agentflow Management",
+          "description": "Create and manage agentflows"
         },
-        "workflowMonitoring": {
-          "title": "Workflow Monitoring",
+        "agentflowMonitoring": {
+          "title": "Agentflow Monitoring",
           "description": "Monitor execution status"
         },
         "testMonitoring": {
@@ -551,11 +551,11 @@
         },
         "nodeManagement": {
           "title": "Node Management",
-          "description": "Manage workflow nodes"
+          "description": "Manage agentflow nodes"
         },
-        "workflowStore": {
-          "title": "Workflow Store",
-          "description": "Browse shared workflows"
+        "agentflowStore": {
+          "title": "Agentflow Store",
+          "description": "Browse shared agentflows"
         },
         "promptStore": {
           "title": "Prompt Store",
@@ -667,9 +667,9 @@
         }
       },
       "governance": {
-        "workflowApproval": {
-          "title": "Workflow Approval",
-          "description": "Workflow deployment approval"
+        "agentflowApproval": {
+          "title": "Agentflow Approval",
+          "description": "Agentflow deployment approval"
         },
         "riskManagement": {
           "title": "Risk Management",
@@ -710,13 +710,13 @@
         "title": "Group Permissions",
         "description": "Configure permissions by group."
       },
-      "workflowManagement": {
-        "title": "Workflow Management",
-        "description": "Create and manage workflows."
+      "agentflowManagement": {
+        "title": "Agentflow Management",
+        "description": "Create and manage agentflows."
       },
-      "workflowMonitoring": {
-        "title": "Workflow Monitoring",
-        "description": "Monitor workflow execution status."
+      "agentflowMonitoring": {
+        "title": "Agentflow Monitoring",
+        "description": "Monitor agentflow execution status."
       },
       "testMonitoring": {
         "title": "Test Monitoring",
@@ -728,7 +728,7 @@
       },
       "nodeManagement": {
         "title": "Node Management",
-        "description": "Manage workflow nodes."
+        "description": "Manage agentflow nodes."
       },
       "chatMonitoring": {
         "title": "Chat Monitoring",
@@ -738,9 +738,9 @@
         "title": "User Token Dashboard",
         "description": "View token usage."
       },
-      "workflowStore": {
-        "title": "Workflow Store",
-        "description": "Browse shared workflows."
+      "agentflowStore": {
+        "title": "Agentflow Store",
+        "description": "Browse shared agentflows."
       },
       "promptStore": {
         "title": "Prompt Store",
@@ -806,9 +806,9 @@
         "title": "ML Model Control",
         "description": "Manage ML model workspace."
       },
-      "govWorkflowApproval": {
-        "title": "Workflow Approval",
-        "description": "Approve workflow deployments."
+      "govAgentflowApproval": {
+        "title": "Agentflow Approval",
+        "description": "Approve agentflow deployments."
       },
       "govRiskManagement": {
         "title": "Risk Management",
@@ -835,7 +835,7 @@
       "common": {
         "allLevels": "All Levels",
         "refresh": "Refresh",
-        "workflow": "Workflow",
+        "agentflow": "Agentflow",
         "creator": "Creator",
         "department": "Department",
         "lastModified": "Last Modified",
@@ -860,7 +860,7 @@
         "riskLevel": "Risk Level",
         "impactScope": "Impact Scope",
         "totalCount": "total",
-        "searchPlaceholder": "Search by workflow name, creator, department...",
+        "searchPlaceholder": "Search by agentflow name, creator, department...",
         "editRiskLevel": "Edit Risk Level",
         "rationale": "Rationale",
         "noHistory": "No history available",
@@ -888,7 +888,7 @@
         },
         "deleteConfirm": "Are you sure you want to delete this inspection record?",
         "cases": "cases",
-        "searchPlaceholder": "Search by workflow, manager...",
+        "searchPlaceholder": "Search by agentflow, manager...",
         "allResults": "All Results",
         "allTypes": "All Types",
         "addInspection": "Add Inspection",
@@ -897,7 +897,7 @@
         "manager": "Manager",
         "result": "Result",
         "viewDetail": "View Detail",
-        "planDescription": "Workflow inspection plan overview by workflow.",
+        "planDescription": "Agentflow inspection plan overview by agentflow.",
         "inspectionCount": "Inspection Count",
         "noInspection": "No inspection",
         "overdueDescription": "List of overdue inspections requiring immediate attention.",
@@ -907,9 +907,9 @@
         "days": " days",
         "inspectionDetail": "Inspection Detail",
         "editInspection": "Edit Inspection",
-        "selectWorkflow": "Workflow",
-        "workflowPlaceholder": "Select workflow...",
-        "selectWorkflowHelp": "Select the workflow to inspect.",
+        "selectAgentflow": "Agentflow",
+        "agentflowPlaceholder": "Select agentflow...",
+        "selectAgentflowHelp": "Select the agentflow to inspect.",
         "inspectionDate": "Inspection Date",
         "inspectionType": "Type",
         "inspectionItems": "Inspection Items",
@@ -980,13 +980,13 @@
         "governanceReviewer": "Reviewer",
         "lastUpdated": "Last Audit",
         "totalLogs": "Total Logs",
-        "trackedWorkflowCount": "Tracked Workflows",
+        "trackedAgentflowCount": "Tracked Agentflows",
         "fullApprovalCount": "Full Approvals",
         "revokedCount": "Revoked",
-        "trackedSearchPlaceholder": "Search workflows...",
-        "workflowName": "Workflow Name",
+        "trackedSearchPlaceholder": "Search agentflows...",
+        "agentflowName": "Agentflow Name",
         "department": "Department",
-        "noTrackedWorkflows": "No tracked workflows found",
+        "noTrackedAgentflows": "No tracked agentflows found",
         "usageLogCount": "{{count}} usage logs",
         "noExecutionLogs": "No usage logs found",
         "governanceLogCount": "{{count}} governance logs",
@@ -1233,12 +1233,12 @@
         "viewUsers": "View Users"
       }
     },
-    "workflowManagement": {
-      "workflowControl": {
-        "loadError": "Failed to load workflow list.",
+    "agentflowManagement": {
+      "agentflowControl": {
+        "loadError": "Failed to load agentflow list.",
         "total": "Total",
         "unit": "",
-        "searchPlaceholder": "Search by workflow name or author",
+        "searchPlaceholder": "Search by agentflow name or author",
         "filterAll": "All",
         "statusActive": "Active",
         "statusInactive": "Inactive",
@@ -1253,12 +1253,12 @@
         "delete": "Delete",
         "approve": "Approve",
         "reject": "Reject",
-        "noWorkflows": "No workflows found.",
+        "noAgentflows": "No agentflows found.",
         "noSearchResults": "No results for \"{{query}}\".",
-        "deleteTitle": "Delete Workflow",
+        "deleteTitle": "Delete Agentflow",
         "deleteMessage": "Are you sure you want to delete \"{{name}}\"?\nThis action cannot be undone.",
-        "deleteSuccess": "Workflow deleted.",
-        "deleteError": "Failed to delete workflow.",
+        "deleteSuccess": "Agentflow deleted.",
+        "deleteError": "Failed to delete agentflow.",
         "deployApproveSuccess": "Deployment of \"{{name}}\" has been approved.",
         "deployApproveError": "Failed to approve deployment of \"{{name}}\".",
         "deployRejectSuccess": "Deployment of \"{{name}}\" has been rejected.",
@@ -1275,16 +1275,16 @@
         }
       },
       "editModal": {
-        "title": "Workflow Settings",
-        "workflowName": "Workflow Name",
-        "workflowNameReadonly": "Workflow name cannot be changed.",
+        "title": "Agentflow Settings",
+        "agentflowName": "Agentflow Name",
+        "agentflowNameReadonly": "Agentflow name cannot be changed.",
         "deploy": "Deploy",
         "deploying": "Deployed",
         "private": "Private",
         "approvalStatus": "Approval Status",
         "approved": "Approved",
         "disabled": "Disabled",
-        "disabledDescription": "When disabled, the workflow will not execute.",
+        "disabledDescription": "When disabled, the agentflow will not execute.",
         "share": "Sharing",
         "sharing": "Shared",
         "shareGroup": "Share Group",
@@ -1296,15 +1296,15 @@
         "cancel": "Cancel",
         "update": "Save",
         "updating": "Saving...",
-        "updateSuccess": "Workflow settings updated.",
-        "updateError": "Failed to update workflow settings."
+        "updateSuccess": "Agentflow settings updated.",
+        "updateError": "Failed to update agentflow settings."
       },
       "monitoring": {
-        "loadWorkflowError": "Failed to load workflow list.",
-        "selectWorkflowHint": "Select a workflow to monitor.",
-        "searchPlaceholder": "Search by workflow name or author",
+        "loadAgentflowError": "Failed to load agentflow list.",
+        "selectAgentflowHint": "Select a agentflow to monitor.",
+        "searchPlaceholder": "Search by agentflow name or author",
         "loading": "Loading...",
-        "noWorkflows": "No workflows found.",
+        "noAgentflows": "No agentflows found.",
         "nodes": "Nodes",
         "back": "← Back to list",
         "tabIOLogs": "Execution Logs",
@@ -1314,7 +1314,7 @@
         "noPerformanceData": "No performance data available.",
         "deletePerformance": "Delete Performance Data",
         "deletePerformanceTitle": "Delete Performance Data",
-        "deletePerformanceMessage": "Delete all performance data for this workflow?",
+        "deletePerformanceMessage": "Delete all performance data for this agentflow?",
         "deletePerformanceSuccess": "Performance data deleted.",
         "deletePerformanceError": "Failed to delete performance data.",
         "columns": {
@@ -1403,7 +1403,7 @@
         "noSpanData": "No span data available.",
         "columns": {
           "time": "Time",
-          "workflow": "Workflow",
+          "agentflow": "Agentflow",
           "status": "Status",
           "duration": "Duration",
           "llm": "LLM",
@@ -1440,12 +1440,12 @@
       },
       "chatMonitoring": {
         "title": "Chat Monitoring",
-        "subtitle": "Monitor workflow chat logs and interactions.",
+        "subtitle": "Monitor agentflow chat logs and interactions.",
         "loadError": "Failed to load chat logs.",
         "loading": "Loading chat logs...",
         "errorOccurred": "An error occurred",
         "retry": "Retry",
-        "filterPlaceholder": "Search workflow ID, name, interaction ID, user ID...",
+        "filterPlaceholder": "Search agentflow ID, name, interaction ID, user ID...",
         "totalLogsLoaded": "Total: {{count}} loaded",
         "userId": "User ID",
         "searchCount": "Search: {{count}}",
@@ -1470,7 +1470,7 @@
         "excelDownloadOptions": "Excel Download Options",
         "userIdOptional": "User ID (optional)",
         "searchAllPlaceholder": "All",
-        "workflowIdOptional": "Workflow ID (optional)",
+        "agentflowIdOptional": "Agentflow ID (optional)",
         "startDateOptional": "Start Date (optional)",
         "endDateOptional": "End Date (optional)",
         "applyDataProcessing": "Data Processing",
@@ -1481,8 +1481,8 @@
         "columns": {
           "id": "ID",
           "userId": "User",
-          "workflowName": "Workflow Name",
-          "workflowId": "Workflow ID",
+          "agentflowName": "Agentflow Name",
+          "agentflowId": "Agentflow ID",
           "interactionId": "Interaction ID",
           "inputData": "Input",
           "outputData": "Output",
@@ -1499,7 +1499,7 @@
         "loading": "Loading token usage...",
         "errorOccurred": "An error occurred",
         "retry": "Retry",
-        "searchPlaceholder": "Search username, user ID, workflow name...",
+        "searchPlaceholder": "Search username, user ID, agentflow name...",
         "totalUsers": "Total Users: {{count}}",
         "searchCount": "Search: {{count}}",
         "pageInfo": "Page {{page}} / {{totalPages}}",
@@ -1513,7 +1513,7 @@
         "noSearchResults": "No users match your search.",
         "noTokenData": "No token usage data available.",
         "times": "{{count}} times",
-        "viewWorkflowDetails": "View workflow details",
+        "viewAgentflowDetails": "View agentflow details",
         "inputTokens": "Input Tokens",
         "outputTokens": "Output Tokens",
         "stats": {
@@ -1529,23 +1529,23 @@
           "inputTokens": "Input Tokens",
           "outputTokens": "Output Tokens",
           "tokenDistribution": "Token Distribution",
-          "mainWorkflow": "Main Workflow",
+          "mainAgentflow": "Main Agentflow",
           "lastActivity": "Last Activity"
         },
         "modal": {
-          "title": "Workflow Usage Details",
-          "workflowName": "Workflow Name",
+          "title": "Agentflow Usage Details",
+          "agentflowName": "Agentflow Name",
           "usageCount": "Usage Count",
           "totalInteractions": "Total Interactions",
           "totalTokens": "Total Tokens",
           "inputTokens": "Input Tokens",
           "outputTokens": "Output Tokens",
           "avgTokensPerInteraction": "Avg Tokens / Interaction",
-          "count": "{{count}} workflows",
+          "count": "{{count}} agentflows",
           "times": "{{count}} times",
           "summary": {
             "title": "Summary",
-            "totalWorkflows": "Total Workflows",
+            "totalAgentflows": "Total Agentflows",
             "totalUsageCount": "Total Usage",
             "totalInteractions": "Total Interactions",
             "totalTokens": "Total Tokens",
@@ -1556,7 +1556,7 @@
       },
       "nodeManagement": {
         "title": "Node Management",
-        "subtitle": "Manage and browse workflow nodes.",
+        "subtitle": "Manage and browse agentflow nodes.",
         "loadError": "Failed to load nodes.",
         "refreshError": "Failed to refresh nodes.",
         "loading": "Loading nodes...",
@@ -1595,16 +1595,16 @@
           "parameters": "Parameters"
         }
       },
-      "workflowStore": {
-        "title": "Workflow Store",
-        "subtitle": "Manage shared workflows.",
-        "loadError": "Failed to load workflows.",
-        "loading": "Loading workflows...",
-        "error": "Error loading workflows",
-        "noResults": "No workflows found",
-        "noResultsSearch": "No workflows match '{{searchTerm}}'.",
-        "noResultsFilter": "No workflows match the current filter.",
-        "searchPlaceholder": "Search workflow name, description, owner, tag...",
+      "agentflowStore": {
+        "title": "Agentflow Store",
+        "subtitle": "Manage shared agentflows.",
+        "loadError": "Failed to load agentflows.",
+        "loading": "Loading agentflows...",
+        "error": "Error loading agentflows",
+        "noResults": "No agentflows found",
+        "noResultsSearch": "No agentflows match '{{searchTerm}}'.",
+        "noResultsFilter": "No agentflows match the current filter.",
+        "searchPlaceholder": "Search agentflow name, description, owner, tag...",
         "refresh": "Refresh",
         "upload": "Upload",
         "uploadComingSoon": "Upload feature coming soon.",
@@ -1633,14 +1633,14 @@
           "reject": "Reject"
         },
         "toast": {
-          "deleteConfirmTitle": "Delete Workflow",
+          "deleteConfirmTitle": "Delete Agentflow",
           "deleteConfirmMessage": "Are you sure you want to delete '{{name}}'?",
-          "itemType": "Workflow",
+          "itemType": "Agentflow",
           "cancel": "Cancel",
-          "approveSuccess": "Workflow deploy approved.",
-          "rejectSuccess": "Workflow deploy rejected.",
-          "approveError": "Failed to approve workflow deploy.",
-          "rejectError": "Failed to reject workflow deploy."
+          "approveSuccess": "Agentflow deploy approved.",
+          "rejectSuccess": "Agentflow deploy rejected.",
+          "approveError": "Failed to approve agentflow deploy.",
+          "rejectError": "Failed to reject agentflow deploy."
         }
       },
       "promptStore": {
@@ -1873,7 +1873,7 @@
         "categories": {
           "database": "Database",
           "app": "Application",
-          "workflow": "Workflow",
+          "agentflow": "Agentflow",
           "node": "Node",
           "vectordb": "Vector DB",
           "openai": "OpenAI",

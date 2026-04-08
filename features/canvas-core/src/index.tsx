@@ -6,7 +6,7 @@
  * and the empty-state CTA overlay.
  *
  * This package does NOT depend on any other canvas feature packages;
- * sub-panels (AddNodePanel, WorkflowPanel, TemplatePanel) are injected
+ * sub-panels (AddNodePanel, AgentflowPanel, TemplatePanel) are injected
  * as render props by the app-level page component.
  */
 import './locales';

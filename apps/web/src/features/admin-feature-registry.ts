@@ -21,7 +21,7 @@ interface AdminSectionMeta {
 
 const ADMIN_SECTION_ORDER: AdminSectionMeta[] = [
   { id: 'admin-user', titleKey: 'admin.sidebar.sections.user' },
-  { id: 'admin-workflow', titleKey: 'admin.sidebar.sections.workflow' },
+  { id: 'admin-agentflow', titleKey: 'admin.sidebar.sections.agentflow' },
   { id: 'admin-setting', titleKey: 'admin.sidebar.sections.setting' },
   { id: 'admin-system', titleKey: 'admin.sidebar.sections.system' },
   { id: 'admin-data', titleKey: 'admin.sidebar.sections.data' },
@@ -48,12 +48,12 @@ export async function initializeAdminFeatures(): Promise<void> {
       import('@xgen/feature-admin-users'),
       import('@xgen/feature-admin-user-create'),
       import('@xgen/feature-admin-group-permissions'),
-      // 워크플로우 리소스 (admin-workflow)
-      import('@xgen/feature-admin-workflow-management-orchestrator'),
+      // 에이전트플로우 리소스 (admin-agentflow)
+      import('@xgen/feature-admin-agentflow-management-orchestrator'),
       import('@xgen/feature-admin-chat-monitoring'),
       import('@xgen/feature-admin-user-token-dashboard'),
       import('@xgen/feature-admin-node-management'),
-      import('@xgen/feature-admin-workflow-store'),
+      import('@xgen/feature-admin-agentflow-store'),
       import('@xgen/feature-admin-prompt-store'),
       // 환경 설정 (admin-setting)
       import('@xgen/feature-admin-system-settings'),
@@ -88,19 +88,19 @@ export async function initializeAdminFeatures(): Promise<void> {
     CoreRegistry.registerGovMonitoringTabPlugin(planMod.govMonitoringPlanPlugin);
     CoreRegistry.registerGovMonitoringTabPlugin(overdueMod.govMonitoringOverduePlugin);
 
-    // Workflow Management Tab Plugins
+    // Agentflow Management Tab Plugins
     const [viewMod, executorMod, monitoringMod, testMod, logMod] = await Promise.all([
-      import('@xgen/feature-admin-workflow-management-view'),
-      import('@xgen/feature-admin-workflow-management-executor'),
-      import('@xgen/feature-admin-workflow-management-monitoring'),
-      import('@xgen/feature-admin-workflow-management-test'),
-      import('@xgen/feature-admin-workflow-management-log'),
+      import('@xgen/feature-admin-agentflow-management-view'),
+      import('@xgen/feature-admin-agentflow-management-executor'),
+      import('@xgen/feature-admin-agentflow-management-monitoring'),
+      import('@xgen/feature-admin-agentflow-management-test'),
+      import('@xgen/feature-admin-agentflow-management-log'),
     ]);
-    CoreRegistry.registerWorkflowMgmtTabPlugin(viewMod.workflowMgmtViewPlugin);
-    CoreRegistry.registerWorkflowMgmtTabPlugin(executorMod.workflowMgmtExecutorPlugin);
-    CoreRegistry.registerWorkflowMgmtTabPlugin(monitoringMod.workflowMgmtMonitoringPlugin);
-    CoreRegistry.registerWorkflowMgmtTabPlugin(testMod.workflowMgmtTestPlugin);
-    CoreRegistry.registerWorkflowMgmtTabPlugin(logMod.workflowMgmtLogPlugin);
+    CoreRegistry.registerAgentflowMgmtTabPlugin(viewMod.agentflowMgmtViewPlugin);
+    CoreRegistry.registerAgentflowMgmtTabPlugin(executorMod.agentflowMgmtExecutorPlugin);
+    CoreRegistry.registerAgentflowMgmtTabPlugin(monitoringMod.agentflowMgmtMonitoringPlugin);
+    CoreRegistry.registerAgentflowMgmtTabPlugin(testMod.agentflowMgmtTestPlugin);
+    CoreRegistry.registerAgentflowMgmtTabPlugin(logMod.agentflowMgmtLogPlugin);
 
     adminInitialized = true;
   } catch (error) {

@@ -6,7 +6,7 @@ export type {
   ChatHistoryFilter,
   CurrentChatData,
   ListInteractionsResponse,
-  WorkflowDetailResponse,
+  AgentflowDetailResponse,
 } from '@xgen/types';
 
 // ─────────────────────────────────────────────────────────────
@@ -24,7 +24,7 @@ export interface ExecutionMeta {
   updated_at: string;
 }
 
-export interface WorkflowDetail {
+export interface AgentflowDetail {
   user_id?: number;
   workflow_id: string;
   workflow_name: string;

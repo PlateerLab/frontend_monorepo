@@ -19,7 +19,7 @@ export interface SideMenuProps {
     /** Rendered when view === 'addNodes' */
     AddNodePanel?: React.ComponentType<{ onBack: () => void }>;
     /** Rendered when view === 'workflow' */
-    WorkflowPanel?: React.ComponentType<{ onBack: () => void }>;
+    AgentflowPanel?: React.ComponentType<{ onBack: () => void }>;
     /** Rendered when view === 'template' */
     TemplatePanel?: React.ComponentType<{ onBack: () => void }>;
     /** Initial view to display when opened (e.g. 'template' from empty state) */
@@ -40,7 +40,7 @@ const MainMenu: React.FC<MainMenuProps> = ({ onNavigate }) => {
             </button>
             <button className="flex items-center gap-2 w-full py-2 px-6 text-sm font-normal leading-5 text-left bg-transparent border-none cursor-pointer text-[#7a7f89] select-none hover:bg-[#f0f3fd] hover:text-[#305eeb]" onClick={() => onNavigate('workflow')} type="button">
                 <LuLayoutGrid />
-                <span>{t('canvas.sideMenu.workflow', '워크플로우')}</span>
+                <span>{t('canvas.sideMenu.workflow', '에이전트플로우')}</span>
             </button>
             <button className="flex items-center gap-2 w-full py-2 px-6 text-sm font-normal leading-5 text-left bg-transparent border-none cursor-pointer text-[#7a7f89] select-none hover:bg-[#f0f3fd] hover:text-[#305eeb]" onClick={() => onNavigate('template')} type="button">
                 <LuLayoutTemplate />
@@ -63,7 +63,7 @@ const MainMenu: React.FC<MainMenuProps> = ({ onNavigate }) => {
 const SideMenu: React.FC<SideMenuProps> = ({
     menuRef,
     AddNodePanel,
-    WorkflowPanel,
+    AgentflowPanel,
     TemplatePanel,
     initialView = null,
     onClose,
@@ -97,7 +97,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
         >
             {view === 'main' && <MainMenu onNavigate={handleNavigate} />}
             {view === 'addNodes' && AddNodePanel && <AddNodePanel onBack={handleBackToMain} />}
-            {view === 'workflow' && WorkflowPanel && <WorkflowPanel onBack={handleBackToMain} />}
+            {view === 'workflow' && AgentflowPanel && <AgentflowPanel onBack={handleBackToMain} />}
             {view === 'template' && TemplatePanel && <TemplatePanel onBack={handleBackToMain} />}
         </aside>
     );

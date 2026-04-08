@@ -13,7 +13,7 @@ export const ko: Record<string, unknown> = {
     // ── Chat Tab ───────────────────────────────────────────────
     chat: {
       title: 'Chat',
-      placeholder: '메시지를 입력하여 워크플로우를 실행하세요.',
+      placeholder: '메시지를 입력하여 에이전트플로우를 실행하세요.',
       inputHint: '메시지를 입력하세요...',
       send: '보내기',
     },
@@ -21,7 +21,7 @@ export const ko: Record<string, unknown> = {
     // ── Executor Tab ───────────────────────────────────────────
     executor: {
       title: 'Executor',
-      placeholder: "'실행'을 클릭하여 워크플로우를 실행하세요.",
+      placeholder: "'실행'을 클릭하여 에이전트플로우를 실행하세요.",
       running: '실행 중...',
     },
 
@@ -60,8 +60,8 @@ export const ko: Record<string, unknown> = {
   // ── Legacy keys (backward compat — will be removed) ──────────
   executionPanel: {
     title: '실행',
-    placeholder: "'실행'을 클릭하여 워크플로우를 실행하세요.",
-    chatPlaceholder: '메시지를 입력하여 워크플로우를 실행하세요.',
+    placeholder: "'실행'을 클릭하여 에이전트플로우를 실행하세요.",
+    chatPlaceholder: '메시지를 입력하여 에이전트플로우를 실행하세요.',
     chatInputPlaceholder: '메시지를 입력하세요...',
     send: '보내기',
     tabChat: 'Chat',
@@ -71,7 +71,7 @@ export const ko: Record<string, unknown> = {
     clearOutput: '출력 지우기',
     copyOutput: '출력 복사',
     copied: '복사됨!',
-    runWorkflow: '워크플로우 실행',
+    runAgentflow: '에이전트플로우 실행',
     saveAndRun: '저장 및 실행',
   },
   detailPanel: {

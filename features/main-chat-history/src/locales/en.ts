@@ -19,7 +19,7 @@ export const en: TranslationData = {
     },
     error: {
       loadFailed: 'Failed to load chat history',
-      workflowDeleted: 'Workflow has been deleted',
+      workflowDeleted: 'Agentflow has been deleted',
       saveFailed: 'Failed to save',
       deleteFailed: 'Failed to delete'
     }

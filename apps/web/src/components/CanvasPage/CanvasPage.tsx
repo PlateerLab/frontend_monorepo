@@ -15,16 +15,16 @@ import type { CanvasRef, CanvasHistoryState } from '@xgen/canvas-engine';
 // API
 import {
     useNodes,
-    saveWorkflow as apiSaveWorkflow,
-    loadWorkflow as apiLoadWorkflow,
-    checkWorkflowExistence,
-    listWorkflows as apiListWorkflows,
-    listWorkflowsDetail as apiListWorkflowsDetail,
-    renameWorkflow as apiRenameWorkflow,
-    duplicateWorkflow as apiDuplicateWorkflow,
-    deleteWorkflow as apiDeleteWorkflow,
-    executeWorkflowStream,
-    getWorkflowExecutionOrderByData,
+    saveAgentflow as apiSaveAgentflow,
+    loadAgentflow as apiLoadAgentflow,
+    checkAgentflowExistence,
+    listAgentflows as apiListAgentflows,
+    listAgentflowsDetail as apiListAgentflowsDetail,
+    renameAgentflow as apiRenameAgentflow,
+    duplicateAgentflow as apiDuplicateAgentflow,
+    deleteAgentflow as apiDeleteAgentflow,
+    executeAgentflowStream,
+    getAgentflowExecutionOrderByData,
 } from '@xgen/api-client';
 
 // Canvas core UI
@@ -40,7 +40,7 @@ import type { CanvasMode, MenuView } from '@xgen/feature-canvas-core';
 // Sidebar panels
 import { AddNodePanel } from '@xgen/feature-canvas-sidebar-nodes';
 import { TemplatePanel } from '@xgen/feature-canvas-sidebar-templates';
-import { WorkflowPanel } from '@xgen/feature-canvas-sidebar-workflows';
+import { AgentflowPanel } from '@xgen/feature-canvas-sidebar-agentflows';
 import { DeploymentModal } from '@xgen/feature-canvas-deploy';
 
 import styles from './CanvasPage.module.scss';
@@ -90,13 +90,13 @@ function setStoredState(key: string, value: any): void {
     } catch { /* quota exceeded — silent */ }
 }
 
-function generateWorkflowId(): string {
+function generateAgentflowId(): string {
     return `wf_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 }
 
-function validateWorkflowName(name: string): string {
-    if (!name || typeof name !== 'string') return 'Workflow';
-    return name.trim().replace(/[<>:"/\\|?*]/g, '_') || 'Workflow';
+function validateAgentflowName(name: string): string {
+    if (!name || typeof name !== 'string') return 'Agentflow';
+    return name.trim().replace(/[<>:"/\\|?*]/g, '_') || 'Agentflow';
 }
 
 // ── Component ──────────────────────────────────────────────────
@@ -116,7 +116,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
     const uiUpdateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const executionAbortRef = useRef<AbortController | null>(null);
     const isRestorationComplete = useRef(false);
-    const pendingWorkflowLoadRef = useRef<{ workflowData: any; workflowName: string; workflowId: string } | null>(null);
+    const pendingAgentflowLoadRef = useRef<{ workflowData: any; workflowName: string; workflowId: string } | null>(null);
     const draggingNodeDataRef = useRef<any>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -125,21 +125,21 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
 
     // ── Core state ──
     const [canvasMode, setCanvasMode] = useState<CanvasMode>('edit');
-    const [workflowId, setWorkflowId] = useState('None');
-    const [workflowName, setWorkflowName] = useState('Workflow');
+    const [workflowId, setAgentflowId] = useState('None');
+    const [workflowName, setAgentflowName] = useState('Agentflow');
     const [isExecuting, setIsExecuting] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isCanvasReady, setIsCanvasReady] = useState(false);
     const [loadingCanvas, setLoadingCanvas] = useState(true);
-    const [isCreatingNewWorkflow, setIsCreatingNewWorkflow] = useState(false);
+    const [isCreatingNewAgentflow, setIsCreatingNewAgentflow] = useState(false);
 
     // ── Auth / ownership state ──
     const [isOwner, setIsOwner] = useState(true);
-    const [workflowOriginUserId, setWorkflowOriginUserId] = useState<string | null>(null);
+    const [workflowOriginUserId, setAgentflowOriginUserId] = useState<string | null>(null);
 
     // ── Deploy state ──
     const [showDeploymentModal, setShowDeploymentModal] = useState(false);
-    const [workflowDetailData, setWorkflowDetailData] = useState<any>(null);
+    const [workflowDetailData, setAgentflowDetailData] = useState<any>(null);
 
     // ── Canvas state tracking ──
     const [currentCanvasState, setCurrentCanvasState] = useState<any>(null);
@@ -150,7 +150,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
     const [bottomPanelExpanded, setBottomPanelExpanded] = useState(false);
     const [activeSidePanel, setActiveSidePanel] = useState<string | null>(null);
     const [isHistoryPanelOpen, setIsHistoryPanelOpen] = useState(false);
-    const [isAutoWorkflowOpen, setIsAutoWorkflowOpen] = useState(false);
+    const [isAutoAgentflowOpen, setIsAutoAgentflowOpen] = useState(false);
     const [historyState, setHistoryState] = useState<CanvasHistoryState>({
         history: [], currentHistoryIndex: -1, canUndo: false, canRedo: false,
     });
@@ -225,9 +225,9 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         const loadParam = searchParams?.get('load');
         if (!loadParam) {
             const savedId = getStoredState(STORAGE_KEYS.WORKFLOW_ID);
-            if (savedId && savedId !== 'None') setWorkflowId(savedId);
+            if (savedId && savedId !== 'None') setAgentflowId(savedId);
             const savedName = getStoredState(STORAGE_KEYS.WORKFLOW_NAME);
-            if (savedName) setWorkflowName(savedName);
+            if (savedName) setAgentflowName(savedName);
         }
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -249,24 +249,24 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         // Determine ownership
         if (userId && user?.user_id != null && String(userId) !== String(user.user_id)) {
             setIsOwner(false);
-            setWorkflowOriginUserId(userId);
+            setAgentflowOriginUserId(userId);
         } else {
             setIsOwner(true);
-            setWorkflowOriginUserId(null);
+            setAgentflowOriginUserId(null);
         }
 
         const loadFromServer = async () => {
             try {
-                const result = await apiLoadWorkflow(workflowIdToLoad, userId);
+                const result = await apiLoadAgentflow(workflowIdToLoad, userId);
                 const loadedName = result.workflow_name || 'Untitled';
-                setWorkflowName(loadedName);
+                setAgentflowName(loadedName);
                 setStoredState(STORAGE_KEYS.WORKFLOW_NAME, loadedName);
-                setWorkflowId(workflowIdToLoad);
+                setAgentflowId(workflowIdToLoad);
 
                 if (canvasRef.current) {
                     canvasRef.current.loadCanvasState(result.content || result as any);
                 } else {
-                    pendingWorkflowLoadRef.current = {
+                    pendingAgentflowLoadRef.current = {
                         workflowData: result.content || result,
                         workflowName: loadedName,
                         workflowId: workflowIdToLoad,
@@ -284,9 +284,9 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
 
     // ── Deferred workflow load (if canvas wasn't ready) ──
     useEffect(() => {
-        if (loadingCanvas || !canvasRef.current || !pendingWorkflowLoadRef.current) return;
-        const pending = pendingWorkflowLoadRef.current;
-        pendingWorkflowLoadRef.current = null;
+        if (loadingCanvas || !canvasRef.current || !pendingAgentflowLoadRef.current) return;
+        const pending = pendingAgentflowLoadRef.current;
+        pendingAgentflowLoadRef.current = null;
         canvasRef.current.loadCanvasState(pending.workflowData);
     }, [loadingCanvas]);
 
@@ -383,16 +383,16 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
 
         const canvasState = canvasRef.current.getCanvasState();
         if (!canvasState.nodes || canvasState.nodes.length === 0) {
-            toast.warning(t('canvas.toast.emptyWorkflow'));
+            toast.warning(t('canvas.toast.emptyAgentflow'));
             setIsSaving(false);
             return;
         }
 
         try {
-            const name = validateWorkflowName(workflowName);
+            const name = validateAgentflowName(workflowName);
 
             // Always check existence before saving
-            const checkResult = await checkWorkflowExistence(name);
+            const checkResult = await checkAgentflowExistence(name);
             if (checkResult.exists) {
                 const overwrite = await toast.confirm({
                     title: t('canvas.toast.overwriteTitle'),
@@ -411,13 +411,13 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
 
             let currentId = workflowId;
             if (!currentId || currentId === 'None') {
-                currentId = generateWorkflowId();
-                setWorkflowId(currentId);
+                currentId = generateAgentflowId();
+                setAgentflowId(currentId);
             }
 
             const loadingId = toast.loading(t('canvas.toast.saving'));
             const content = { ...canvasState, workflow_id: currentId, workflow_name: name };
-            await apiSaveWorkflow(name, content, currentId, workflowOriginUserId || undefined);
+            await apiSaveAgentflow(name, content, currentId, workflowOriginUserId || undefined);
             setStoredState(STORAGE_KEYS.WORKFLOW_NAME, name);
 
             toast.update(loadingId, 'success', t('canvas.toast.saveSuccess'));
@@ -434,17 +434,17 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         setActiveSidePanel((prev) => (prev === panelId ? null : panelId));
     }, []);
 
-    const handleNewWorkflow = useCallback(async () => {
-        if (isCreatingNewWorkflow) return;
+    const handleNewAgentflow = useCallback(async () => {
+        if (isCreatingNewAgentflow) return;
 
         const hasCurrentWork = canvasRef.current &&
             (canvasRef.current.getCanvasState().nodes.length > 0 || canvasRef.current.getCanvasState().edges.length > 0);
 
         if (hasCurrentWork) {
             const confirmed = await toast.confirm({
-                title: t('canvas.toast.newWorkflowTitle'),
-                message: t('canvas.toast.newWorkflowMessage'),
-                confirmText: t('canvas.toast.newWorkflowConfirm'),
+                title: t('canvas.toast.newAgentflowTitle'),
+                message: t('canvas.toast.newAgentflowMessage'),
+                confirmText: t('canvas.toast.newAgentflowConfirm'),
                 cancelText: t('canvas.toast.cancel'),
                 variant: 'warning',
                 enableKeyboard: true,
@@ -453,23 +453,23 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
             if (!confirmed) return;
         }
 
-        setIsCreatingNewWorkflow(true);
+        setIsCreatingNewAgentflow(true);
         try {
-            let newName = 'Workflow';
+            let newName = 'Agentflow';
             try {
-                const existing = await apiListWorkflows();
+                const existing = await apiListAgentflows();
                 let index = 1;
                 while (existing.includes(newName)) {
                     index += 1;
-                    newName = `Workflow ${index}`;
+                    newName = `Agentflow ${index}`;
                 }
             } catch {
                 // Keep default name on API failure
             }
 
-            const newId = generateWorkflowId();
-            setWorkflowId(newId);
-            setWorkflowName(newName);
+            const newId = generateAgentflowId();
+            setAgentflowId(newId);
+            setAgentflowName(newName);
             setStoredState(STORAGE_KEYS.WORKFLOW_ID, newId);
             setStoredState(STORAGE_KEYS.WORKFLOW_NAME, newName);
             setStoredState(STORAGE_KEYS.WORKFLOW_STATE, null);
@@ -477,27 +477,27 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
 
             // Reset ownership
             setIsOwner(true);
-            setWorkflowOriginUserId(null);
+            setAgentflowOriginUserId(null);
 
             if (canvasRef.current) {
                 const centeredView = canvasRef.current.getCenteredView();
-                canvasRef.current.loadWorkflow({ nodes: [], edges: [], memos: [], view: centeredView });
+                canvasRef.current.loadAgentflow({ nodes: [], edges: [], memos: [], view: centeredView });
             }
 
-            toast.success(t('canvas.toast.newWorkflowCreated'));
+            toast.success(t('canvas.toast.newAgentflowCreated'));
         } finally {
-            setIsCreatingNewWorkflow(false);
+            setIsCreatingNewAgentflow(false);
         }
-    }, [t, isCreatingNewWorkflow, toast]);
+    }, [t, isCreatingNewAgentflow, toast]);
 
     const handleExport = useCallback(() => {
         if (!canvasRef.current) return;
         try {
             const canvasState = canvasRef.current.getCanvasState();
-            const name = validateWorkflowName(workflowName);
+            const name = validateAgentflowName(workflowName);
             const exportData = {
                 workflow_name: name,
-                workflow_id: workflowId !== 'None' ? workflowId : generateWorkflowId(),
+                workflow_id: workflowId !== 'None' ? workflowId : generateAgentflowId(),
                 view: canvasState.view || { x: 0, y: 0, scale: 1 },
                 nodes: canvasState.nodes || [],
                 edges: canvasState.edges || [],
@@ -525,8 +525,8 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         try {
             const text = await file.text();
             const parsed = JSON.parse(text);
-            const importedName = validateWorkflowName(parsed.workflow_name || file.name.replace(/\.json$/i, ''));
-            const newId = generateWorkflowId();
+            const importedName = validateAgentflowName(parsed.workflow_name || file.name.replace(/\.json$/i, ''));
+            const newId = generateAgentflowId();
             const nextState = {
                 ...parsed,
                 workflow_id: newId,
@@ -535,8 +535,8 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
             if (canvasRef.current) {
                 canvasRef.current.loadCanvasState(nextState);
             }
-            setWorkflowId(newId);
-            setWorkflowName(importedName);
+            setAgentflowId(newId);
+            setAgentflowName(importedName);
             setStoredState(STORAGE_KEYS.WORKFLOW_ID, newId);
             setStoredState(STORAGE_KEYS.WORKFLOW_NAME, importedName);
             setStoredState(STORAGE_KEYS.WORKFLOW_STATE, nextState);
@@ -566,8 +566,8 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         setDirectPanel((prev) => prev === 'template' ? null : 'template');
     }, []);
 
-    const handleAutoWorkflowClick = useCallback(() => {
-        setIsAutoWorkflowOpen(true);
+    const handleAutoAgentflowClick = useCallback(() => {
+        setIsAutoAgentflowOpen(true);
     }, []);
 
     const handleHistoryClick = useCallback(() => {
@@ -578,7 +578,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         setHistoryState(state);
     }, []);
 
-    const handleImportWorkflow = useCallback(() => {
+    const handleImportAgentflow = useCallback(() => {
         setDirectPanel((prev) => prev === 'workflow' ? null : 'workflow');
     }, []);
 
@@ -586,8 +586,8 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         fileInputRef.current?.click();
     }, []);
 
-    const handleWorkflowNameChange = useCallback((name: string) => {
-        setWorkflowName(name);
+    const handleAgentflowNameChange = useCallback((name: string) => {
+        setAgentflowName(name);
         setStoredState(STORAGE_KEYS.WORKFLOW_NAME, name);
     }, []);
 
@@ -599,11 +599,11 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
             : (workflowOriginUserId || undefined);
 
         try {
-            const checkResult = await checkWorkflowExistence(workflowName);
+            const checkResult = await checkAgentflowExistence(workflowName);
             const isSavedInDB = checkResult.exists && workflowId !== 'None';
 
             if (!isSavedInDB) {
-                // Workflow not saved — must save before copying
+                // Agentflow not saved — must save before copying
                 const userConfirmed = await toast.confirm({
                     title: t('canvas.toast.saveBeforeCopyTitle'),
                     message: t('canvas.toast.saveBeforeCopyMessage'),
@@ -621,33 +621,33 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                 const canvasState = canvasRef.current.getCanvasState();
                 let currentId = workflowId;
                 if (!currentId || currentId === 'None') {
-                    currentId = generateWorkflowId();
-                    setWorkflowId(currentId);
+                    currentId = generateAgentflowId();
+                    setAgentflowId(currentId);
                 }
-                const name = validateWorkflowName(workflowName);
+                const name = validateAgentflowName(workflowName);
                 const content = { ...canvasState, workflow_id: currentId, workflow_name: name };
-                await apiSaveWorkflow(name, content, currentId, workflowOriginUserId || undefined);
+                await apiSaveAgentflow(name, content, currentId, workflowOriginUserId || undefined);
 
                 // Then duplicate
-                const result = await apiDuplicateWorkflow(currentId, sourceUserId);
+                const result = await apiDuplicateAgentflow(currentId, sourceUserId);
                 if (result?.workflow_id) {
                     const currentUserId = user?.user_id != null ? String(user.user_id) : undefined;
-                    const loadedData = await apiLoadWorkflow(result.workflow_id, currentUserId);
+                    const loadedData = await apiLoadAgentflow(result.workflow_id, currentUserId);
                     if (loadedData && canvasRef.current) {
                         const loadName = result.workflow_name || loadedData.workflow_name || `${name} (copy)`;
                         const loadContent = loadedData.content || loadedData;
                         canvasRef.current.loadCanvasState(loadContent as any);
-                        setWorkflowName(loadName);
-                        setWorkflowId(result.workflow_id);
+                        setAgentflowName(loadName);
+                        setAgentflowId(result.workflow_id);
                         setStoredState(STORAGE_KEYS.WORKFLOW_NAME, loadName);
                         setStoredState(STORAGE_KEYS.WORKFLOW_ID, result.workflow_id);
                         setIsOwner(true);
-                        setWorkflowOriginUserId(null);
+                        setAgentflowOriginUserId(null);
                     }
                 }
                 toast.update(savingId, 'success', t('canvas.toast.duplicateSuccess'));
             } else {
-                // Workflow already saved — confirm before duplicating
+                // Agentflow already saved — confirm before duplicating
                 const userConfirmed = await toast.confirm({
                     title: t('canvas.toast.duplicateConfirmTitle'),
                     message: t('canvas.toast.duplicateConfirmMessage', { name: workflowName }),
@@ -660,20 +660,20 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                 if (!userConfirmed) return;
 
                 const loadingId = toast.loading(t('canvas.toast.duplicating'));
-                const result = await apiDuplicateWorkflow(workflowId, sourceUserId);
+                const result = await apiDuplicateAgentflow(workflowId, sourceUserId);
                 if (result?.workflow_id) {
                     const currentUserId = user?.user_id != null ? String(user.user_id) : undefined;
-                    const loadedData = await apiLoadWorkflow(result.workflow_id, currentUserId);
+                    const loadedData = await apiLoadAgentflow(result.workflow_id, currentUserId);
                     if (loadedData && canvasRef.current) {
                         const loadName = result.workflow_name || loadedData.workflow_name || `${workflowName} (copy)`;
                         const loadContent = loadedData.content || loadedData;
                         canvasRef.current.loadCanvasState(loadContent as any);
-                        setWorkflowName(loadName);
-                        setWorkflowId(result.workflow_id);
+                        setAgentflowName(loadName);
+                        setAgentflowId(result.workflow_id);
                         setStoredState(STORAGE_KEYS.WORKFLOW_NAME, loadName);
                         setStoredState(STORAGE_KEYS.WORKFLOW_ID, result.workflow_id);
                         setIsOwner(true);
-                        setWorkflowOriginUserId(null);
+                        setAgentflowOriginUserId(null);
                     }
                 }
                 toast.update(loadingId, 'success', t('canvas.toast.duplicateSuccess'));
@@ -713,17 +713,17 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         setNodeDetailModalState({ isOpen: false, nodeId: '', nodeDataId: '', nodeName: '' });
     }, []);
 
-    // ── Workflow load handler ──
-    const handleLoadWorkflow = useCallback((workflowData: any, name?: string, id?: string) => {
+    // ── Agentflow load handler ──
+    const handleLoadAgentflow = useCallback((workflowData: any, name?: string, id?: string) => {
         if (canvasRef.current) {
-            canvasRef.current.loadWorkflow(workflowData);
+            canvasRef.current.loadAgentflow(workflowData);
         }
         if (name) {
-            setWorkflowName(name);
+            setAgentflowName(name);
             setStoredState(STORAGE_KEYS.WORKFLOW_NAME, name);
         }
         if (id) {
-            setWorkflowId(id);
+            setAgentflowId(id);
             setStoredState(STORAGE_KEYS.WORKFLOW_ID, id);
         }
     }, []);
@@ -753,23 +753,23 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
 
         try {
             const canvasState = canvasRef.current.getCanvasState();
-            const name = validateWorkflowName(workflowName);
+            const name = validateAgentflowName(workflowName);
 
             if (!canvasState.nodes || canvasState.nodes.length === 0) {
-                throw new Error(t('canvas.toast.emptyWorkflow'));
+                throw new Error(t('canvas.toast.emptyAgentflow'));
             }
 
             // Ensure we have a valid workflow ID
             let currentId = workflowId;
             if (!currentId || currentId === 'None') {
-                currentId = generateWorkflowId();
-                setWorkflowId(currentId);
+                currentId = generateAgentflowId();
+                setAgentflowId(currentId);
                 setStoredState(STORAGE_KEYS.WORKFLOW_ID, currentId);
             }
 
             // Save before executing
             const content = { ...canvasState, workflow_id: currentId, workflow_name: name };
-            await apiSaveWorkflow(name, content, currentId, workflowOriginUserId || undefined);
+            await apiSaveAgentflow(name, content, currentId, workflowOriginUserId || undefined);
 
             // Abort previous execution if any
             if (executionAbortRef.current) {
@@ -783,7 +783,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
 
             toast.update(loadingId, 'info', t('canvas.toast.executionRunning'));
 
-            await executeWorkflowStream({
+            await executeAgentflowStream({
                 workflowName: name,
                 workflowId: currentId,
                 inputData: inputText ? { input: inputText } : undefined,
@@ -913,8 +913,8 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                 try {
                     const text = await file.text();
                     const parsed = JSON.parse(text);
-                    const importedName = validateWorkflowName(parsed.workflow_name || file.name.replace(/\.json$/i, ''));
-                    const newId = generateWorkflowId();
+                    const importedName = validateAgentflowName(parsed.workflow_name || file.name.replace(/\.json$/i, ''));
+                    const newId = generateAgentflowId();
                     const nextState = {
                         ...parsed,
                         workflow_id: newId,
@@ -923,8 +923,8 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                     if (canvasRef.current) {
                         canvasRef.current.loadCanvasState(nextState);
                     }
-                    setWorkflowId(newId);
-                    setWorkflowName(importedName);
+                    setAgentflowId(newId);
+                    setAgentflowName(importedName);
                     setStoredState(STORAGE_KEYS.WORKFLOW_ID, newId);
                     setStoredState(STORAGE_KEYS.WORKFLOW_NAME, importedName);
                     setStoredState(STORAGE_KEYS.WORKFLOW_STATE, nextState);
@@ -992,10 +992,10 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         const Wrapped: React.FC<{ onBack: () => void }> = ({ onBack }) => (
             <TemplatePanel
                 onBack={onBack}
-                onLoadWorkflow={handleLoadWorkflow}
-                fetchTemplates={apiListWorkflowsDetail}
-                createNewWorkflowId={generateWorkflowId}
-                hasCurrentWorkflow={() => {
+                onLoadAgentflow={handleLoadAgentflow}
+                fetchTemplates={apiListAgentflowsDetail}
+                createNewAgentflowId={generateAgentflowId}
+                hasCurrentAgentflow={() => {
                     if (!canvasRef.current) return false;
                     const state = canvasRef.current.getCanvasState();
                     return (state.nodes?.length ?? 0) > 0;
@@ -1004,37 +1004,37 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         );
         Wrapped.displayName = 'TemplatePanelWrapped';
         return Wrapped;
-    }, [handleLoadWorkflow]);
+    }, [handleLoadAgentflow]);
 
-    const WorkflowPanelWrapped = useMemo(() => {
+    const AgentflowPanelWrapped = useMemo(() => {
         const Wrapped: React.FC<{ onBack: () => void }> = ({ onBack }) => (
-            <WorkflowPanel
+            <AgentflowPanel
                 onBack={onBack}
                 onLoad={handleFileInputClick}
                 onExport={handleExport}
-                onLoadWorkflow={handleLoadWorkflow}
-                fetchWorkflowsDetail={apiListWorkflowsDetail}
-                loadWorkflowById={async (wfId: string, userId: number) => {
-                    const result = await apiLoadWorkflow(wfId, userId);
+                onLoadAgentflow={handleLoadAgentflow}
+                fetchAgentflowsDetail={apiListAgentflowsDetail}
+                loadAgentflowById={async (wfId: string, userId: number) => {
+                    const result = await apiLoadAgentflow(wfId, userId);
                     return result.content || result;
                 }}
-                deleteWorkflowById={apiDeleteWorkflow}
-                hasCurrentWorkflow={() => {
+                deleteAgentflowById={apiDeleteAgentflow}
+                hasCurrentAgentflow={() => {
                     if (!canvasRef.current) return false;
                     const state = canvasRef.current.getCanvasState();
                     return (state.nodes?.length ?? 0) > 0;
                 }}
             />
         );
-        Wrapped.displayName = 'WorkflowPanelWrapped';
+        Wrapped.displayName = 'AgentflowPanelWrapped';
         return Wrapped;
-    }, [handleFileInputClick, handleExport, handleLoadWorkflow]);
+    }, [handleFileInputClick, handleExport, handleLoadAgentflow]);
 
     // ── Deploy handler ──
     const handleDeploy = useCallback(() => {
         if (!canvasRef.current) return;
         const canvasState = canvasRef.current.getCanvasState();
-        setWorkflowDetailData(canvasState);
+        setAgentflowDetailData(canvasState);
         setShowDeploymentModal(true);
     }, []);
 
@@ -1106,19 +1106,19 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                 <HeaderComponent
                     {...pluginContext}
                     onSave={handleSave}
-                    onNewWorkflow={handleNewWorkflow}
+                    onNewAgentflow={handleNewAgentflow}
                     onDeploy={handleDeploy}
                     onDuplicate={handleDuplicate}
                     onTemplateStart={handleTemplateStart}
                     onAddNodeClick={handleAddNodeClick}
-                    onAutoWorkflowClick={handleAutoWorkflowClick}
+                    onAutoAgentflowClick={handleAutoAgentflowClick}
                     onHistoryClick={handleHistoryClick}
-                    onImportWorkflow={handleImportWorkflow}
-                    onWorkflowNameChange={handleWorkflowNameChange}
+                    onImportAgentflow={handleImportAgentflow}
+                    onAgentflowNameChange={handleAgentflowNameChange}
                     isOwner={isOwner}
-                    renameWorkflow={apiRenameWorkflow}
-                    checkWorkflowExistence={checkWorkflowExistence}
-                    listWorkflows={apiListWorkflows}
+                    renameAgentflow={apiRenameAgentflow}
+                    checkAgentflowExistence={checkAgentflowExistence}
+                    listAgentflows={apiListAgentflows}
                     sidebarLayout={{ isOpen: !sidebarCollapsed }}
                 />
             )}
@@ -1180,7 +1180,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                             onSidebarDragStart={handleSidebarDragStart}
                             onSidebarDragEnd={handleSidebarDragEnd}
                             onClose={() => setActiveSidePanel(null)}
-                            onLoadWorkflow={handleLoadWorkflow}
+                            onLoadAgentflow={handleLoadAgentflow}
                         />
                     </aside>
                 )}
@@ -1193,7 +1193,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                         onClose={() => setDirectPanel(null)}
                         AddNodePanel={AddNodePanelWrapped}
                         TemplatePanel={TemplatePanelWrapped}
-                        WorkflowPanel={WorkflowPanelWrapped}
+                        AgentflowPanel={AgentflowPanelWrapped}
                     />
                 )}
 
@@ -1221,7 +1221,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                                 executionProps.userId = workflowOriginUserId || (user?.user_id != null ? String(user.user_id) : null);
                                 executionProps.onExecuteWithInput = handleExecuteWithInput;
                                 executionProps.executionSource = executionSource;
-                                executionProps.fetchExecutionOrderByData = getWorkflowExecutionOrderByData;
+                                executionProps.fetchExecutionOrderByData = getAgentflowExecutionOrderByData;
                                 executionProps.onToggleExpanded = () => setBottomPanelExpanded((prev) => !prev);
                             }
                             if (panel.id === 'bottom-panel') {
@@ -1232,7 +1232,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                                 executionProps.userId = workflowOriginUserId || (user?.user_id != null ? String(user.user_id) : null);
                                 executionProps.onExecuteWithInput = handleExecuteWithInput;
                                 executionProps.executionSource = executionSource;
-                                executionProps.fetchExecutionOrderByData = getWorkflowExecutionOrderByData;
+                                executionProps.fetchExecutionOrderByData = getAgentflowExecutionOrderByData;
                             }
                             return (
                                 <PanelComponent
@@ -1248,20 +1248,20 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                 )}
             </main>
 
-            {/* Overlays (AutoWorkflow sidebar, History panel, etc.) */}
+            {/* Overlays (AutoAgentflow sidebar, History panel, etc.) */}
             {overlays.map((overlay) => {
                 const OverlayComponent = overlay.component;
                 const isOpen =
-                    overlay.id === 'auto-workflow-sidebar' ? isAutoWorkflowOpen :
+                    overlay.id === 'auto-workflow-sidebar' ? isAutoAgentflowOpen :
                     overlay.id === 'history-panel' ? isHistoryPanelOpen :
                     false;
                 const onClose =
-                    overlay.id === 'auto-workflow-sidebar' ? () => setIsAutoWorkflowOpen(false) :
+                    overlay.id === 'auto-workflow-sidebar' ? () => setIsAutoAgentflowOpen(false) :
                     overlay.id === 'history-panel' ? () => setIsHistoryPanelOpen(false) :
                     () => {};
                 const extraProps: Record<string, unknown> = {};
                 if (overlay.id === 'auto-workflow-sidebar') {
-                    extraProps.onLoadWorkflow = handleLoadWorkflow;
+                    extraProps.onLoadAgentflow = handleLoadAgentflow;
                     extraProps.getCanvasState = () => canvasRef.current?.getCanvasState();
                 }
                 if (overlay.id === 'history-panel') {

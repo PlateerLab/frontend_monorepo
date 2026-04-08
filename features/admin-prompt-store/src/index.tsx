@@ -18,7 +18,7 @@ import DownloadDropdown from './components/download-dropdown';
 // Constants
 // ─────────────────────────────────────────────────────────────
 
-const PS = 'admin.workflowManagement.promptStore';
+const PS = 'admin.agentflowManagement.promptStore';
 
 type LanguageFilter = 'all' | 'ko' | 'en';
 type TypeFilter = 'all' | 'user' | 'system';

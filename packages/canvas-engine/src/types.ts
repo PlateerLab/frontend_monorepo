@@ -101,7 +101,7 @@ export interface CanvasRef {
     /** Get full canvas state (view + nodes + edges + memos) */
     getCanvasState: () => { view: View; nodes: CanvasNode[]; edges: CanvasEdge[]; memos: CanvasMemo[] };
     /** Load a workflow into the canvas (replaces entire state) */
-    loadWorkflow: (state: { nodes?: CanvasNode[]; edges?: CanvasEdge[]; memos?: CanvasMemo[]; view?: View }) => void;
+    loadAgentflow: (state: { nodes?: CanvasNode[]; edges?: CanvasEdge[]; memos?: CanvasMemo[]; view?: View }) => void;
     /** Load canvas state with validation (for history restore) */
     loadCanvasState: (state: Partial<{ view: View; nodes: CanvasNode[]; edges: CanvasEdge[]; memos: CanvasMemo[] }>) => void;
     /** Load canvas state without view (for history undo/redo) */

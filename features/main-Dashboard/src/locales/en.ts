@@ -4,16 +4,16 @@ export const en: TranslationData = {
   dashboard: {
     welcome: 'Welcome',
     welcomeSubtitle: 'Have a productive day',
-    workplaceOverview: 'Workflow Overview',
+    workplaceOverview: 'Agentflow Overview',
     latestUpdates: 'Latest Updates',
     noUpdates: 'No recent updates',
-    topWorkflows: 'Top Workflows',
-    noWorkflows: 'No workflows',
+    topAgentflows: 'Top Agentflows',
+    noAgentflows: 'No workflows',
     recentErrors: 'Recent Errors',
     noErrors: 'No errors',
     lastUpdated: 'Last Updated',
     errors: {
-      workflow: 'Workflow',
+      workflow: 'Agentflow',
       time: 'Time',
       message: 'Message'
     },

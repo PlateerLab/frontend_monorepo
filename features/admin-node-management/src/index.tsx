@@ -16,7 +16,7 @@ type ViewMode = 'table' | 'tree';
 const AdminNodeManagementPage: React.FC<RouteComponentProps> = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const prefix = 'admin.workflowManagement.nodeManagement';
+  const prefix = 'admin.agentflowManagement.nodeManagement';
 
   const [categories, setCategories] = useState<NodeCategory[]>([]);
   const [loading, setLoading] = useState(true);

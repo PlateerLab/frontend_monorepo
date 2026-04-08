@@ -6,7 +6,7 @@ import { useTranslation } from '@xgen/i18n';
 import { FiCopy, FiEdit, FiTrash2, FiUser, FiCalendar } from '@xgen/icons';
 import type { Prompt } from '../types';
 
-const PS = 'admin.workflowManagement.promptStore';
+const PS = 'admin.agentflowManagement.promptStore';
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '-';

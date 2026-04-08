@@ -5,13 +5,13 @@ import type { AdminFeatureModule, RouteComponentProps } from '@xgen/types';
 import { ContentArea, Button, SearchInput, StatusBadge, Modal, StatCard } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import {
-  getTrackedWorkflows,
+  getTrackedAgentflows,
   getAuditLogs,
   getAuditTrackingStats,
-  getWorkflowAuditTimeline,
+  getAgentflowAuditTimeline,
 } from '@xgen/api-client';
 import type {
-  TrackedWorkflow,
+  TrackedAgentflow,
   AuditLogEntry,
   AuditStats,
   TimelineEntry,
@@ -338,7 +338,7 @@ const ChangeLogTab: React.FC<{ workflowId: string }> = ({ workflowId }: { workfl
   const loadTimeline = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getWorkflowAuditTimeline(workflowId);
+      const data = await getAgentflowAuditTimeline(workflowId);
       setEntries(Array.isArray(data) ? data : []);
     } catch {
       setEntries([]);
@@ -421,19 +421,19 @@ const ChangeLogTab: React.FC<{ workflowId: string }> = ({ workflowId }: { workfl
 };
 
 /* ------------------------------------------------------------------ */
-/*  Sub-component: Workflow Detail (Level 2)                           */
+/*  Sub-component: Agentflow Detail (Level 2)                           */
 /* ------------------------------------------------------------------ */
 
-interface SelectedWorkflow {
+interface SelectedAgentflow {
   id: string;
   name: string;
-  workflow: TrackedWorkflow;
+  workflow: TrackedAgentflow;
 }
 
-const WorkflowDetailView: React.FC<{
-  selected: SelectedWorkflow;
+const AgentflowDetailView: React.FC<{
+  selected: SelectedAgentflow;
   onBack: () => void;
-}> = ({ selected, onBack }: { selected: SelectedWorkflow; onBack: () => void }) => {
+}> = ({ selected, onBack }: { selected: SelectedAgentflow; onBack: () => void }) => {
   const { t } = useTranslation();
   const [detailTab, setDetailTab] = useState<DetailTabId>('usage');
 
@@ -463,7 +463,7 @@ const WorkflowDetailView: React.FC<{
         <h2 className="text-lg font-bold text-foreground">{wf.workflowName}</h2>
       </div>
 
-      {/* Workflow info cards */}
+      {/* Agentflow info cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <div className="rounded-xl border border-border bg-card p-4">
           <p className="text-xs text-muted-foreground">{t('admin.governance.auditTracking.owner', 'Owner')}</p>
@@ -544,16 +544,16 @@ const WorkflowDetailView: React.FC<{
 };
 
 /* ------------------------------------------------------------------ */
-/*  Main Component (Level 1 - Workflow List)                           */
+/*  Main Component (Level 1 - Agentflow List)                           */
 /* ------------------------------------------------------------------ */
 
 const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
   const { t } = useTranslation();
-  const [workflows, setWorkflows] = useState<TrackedWorkflow[]>([]);
+  const [workflows, setAgentflows] = useState<TrackedAgentflow[]>([]);
   const [stats, setStats] = useState<AuditStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [selectedWorkflow, setSelectedWorkflow] = useState<SelectedWorkflow | null>(null);
+  const [selectedAgentflow, setSelectedAgentflow] = useState<SelectedAgentflow | null>(null);
 
   /* -- Data loading -- */
 
@@ -561,13 +561,13 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
     setLoading(true);
     try {
       const [wfData, statsData] = await Promise.all([
-        getTrackedWorkflows(),
+        getTrackedAgentflows(),
         getAuditTrackingStats(),
       ]);
-      setWorkflows(Array.isArray(wfData) ? wfData : []);
+      setAgentflows(Array.isArray(wfData) ? wfData : []);
       setStats(statsData && typeof statsData === 'object' ? statsData : null);
     } catch {
-      setWorkflows([]);
+      setAgentflows([]);
       setStats(null);
     } finally {
       setLoading(false);
@@ -580,10 +580,10 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
 
   /* -- Filtering -- */
 
-  const filteredWorkflows = useMemo(() => {
+  const filteredAgentflows = useMemo(() => {
     if (!search.trim()) return workflows;
     const q = search.toLowerCase();
-    return workflows.filter((wf: TrackedWorkflow) =>
+    return workflows.filter((wf: TrackedAgentflow) =>
       wf.workflowName.toLowerCase().includes(q) ||
       wf.ownerName.toLowerCase().includes(q) ||
       (wf.ownerDepartment && wf.ownerDepartment.toLowerCase().includes(q)),
@@ -592,12 +592,12 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
 
   /* -- Navigation -- */
 
-  const handleSelectWorkflow = useCallback((wf: TrackedWorkflow) => {
-    setSelectedWorkflow({ id: wf.workflowId, name: wf.workflowName, workflow: wf });
+  const handleSelectAgentflow = useCallback((wf: TrackedAgentflow) => {
+    setSelectedAgentflow({ id: wf.workflowId, name: wf.workflowName, workflow: wf });
   }, []);
 
   const handleBack = useCallback(() => {
-    setSelectedWorkflow(null);
+    setSelectedAgentflow(null);
   }, []);
 
   const handleSearchChange = useCallback((v: string) => setSearch(v), []);
@@ -609,14 +609,14 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
       title={t('admin.pages.govAuditTracking.title', 'Audit Tracking')}
       description={t('admin.pages.govAuditTracking.description', 'Comprehensive audit trail and workflow tracking for AI governance')}
       headerActions={
-        !selectedWorkflow ? (
+        !selectedAgentflow ? (
           <Button variant="outline" size="sm" onClick={loadData}>
             {t('admin.governance.common.refresh', 'Refresh')}
           </Button>
         ) : undefined
       }
       toolbar={
-        !selectedWorkflow ? (
+        !selectedAgentflow ? (
           <SearchInput
             value={search}
             onChange={handleSearchChange}
@@ -625,7 +625,7 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
         ) : undefined
       }
       subToolbar={
-        !selectedWorkflow ? (
+        !selectedAgentflow ? (
           <div className="grid grid-cols-4 gap-4">
             <StatCard
               label={t('admin.governance.auditTracking.totalLogs', 'Total Logs')}
@@ -634,8 +634,8 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
               loading={loading}
             />
             <StatCard
-              label={t('admin.governance.auditTracking.trackedWorkflowCount', 'Tracked Workflows')}
-              value={loading ? '—' : (stats?.trackedWorkflows ?? 0)}
+              label={t('admin.governance.auditTracking.trackedAgentflowCount', 'Tracked Agentflows')}
+              value={loading ? '—' : (stats?.trackedAgentflows ?? 0)}
               variant="success"
               loading={loading}
             />
@@ -655,15 +655,15 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
         ) : undefined
       }
     >
-      {selectedWorkflow ? (
-          <WorkflowDetailView selected={selectedWorkflow} onBack={handleBack} />
+      {selectedAgentflow ? (
+          <AgentflowDetailView selected={selectedAgentflow} onBack={handleBack} />
         ) : (
             <div className="rounded-xl border border-border bg-card overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
                     <th className="py-2.5 px-4 text-left font-semibold text-xs text-muted-foreground tracking-wide">
-                      {t('admin.governance.auditTracking.workflowName', 'Workflow Name')}
+                      {t('admin.governance.auditTracking.workflowName', 'Agentflow Name')}
                     </th>
                     <th className="py-2.5 px-4 text-left font-semibold text-xs text-muted-foreground tracking-wide">
                       {t('admin.governance.auditTracking.owner', 'Owner')}
@@ -692,18 +692,18 @@ const AdminGovAuditTrackingPage: React.FC<RouteComponentProps> = () => {
                         {t('admin.governance.common.loading', 'Loading...')}
                       </td>
                     </tr>
-                  ) : filteredWorkflows.length === 0 ? (
+                  ) : filteredAgentflows.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="py-10 text-center text-muted-foreground">
-                        {t('admin.governance.auditTracking.noTrackedWorkflows', 'No tracked workflows found')}
+                        {t('admin.governance.auditTracking.noTrackedAgentflows', 'No tracked workflows found')}
                       </td>
                     </tr>
                   ) : (
-                    filteredWorkflows.map((wf: TrackedWorkflow) => (
+                    filteredAgentflows.map((wf: TrackedAgentflow) => (
                       <tr
                         key={wf.workflowId}
                         className="border-b border-border last:border-0 hover:bg-muted/40 cursor-pointer"
-                        onClick={() => handleSelectWorkflow(wf)}
+                        onClick={() => handleSelectAgentflow(wf)}
                       >
                         <td className="py-2.5 px-4 font-semibold text-foreground">{wf.workflowName}</td>
                         <td className="py-2.5 px-4 text-muted-foreground">{wf.ownerName || '-'}</td>

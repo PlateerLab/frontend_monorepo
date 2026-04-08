@@ -12,7 +12,7 @@ export const en: TranslationData = {
     stat2Value: 'Real-time',
     stat2Label: 'Chat Interface',
     stat3Value: 'Unlimited',
-    stat3Label: 'Workflow Creation',
+    stat3Label: 'Agentflow Creation',
     cta: 'Be More Productive with XGEN',
   },
   mockup: {

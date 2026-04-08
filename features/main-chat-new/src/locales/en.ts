@@ -5,7 +5,7 @@ export const en: TranslationData = {
     title: 'New Chat',
     description: 'Select a workflow to start a new chat',
     searchPlaceholder: 'Search workflows...',
-    sections: { favorites: 'Favorites', all: 'All Workflows' },
+    sections: { favorites: 'Favorites', all: 'All Agentflows' },
     owner: { all: 'All', personal: 'Personal', shared: 'Shared' },
     addFavorite: 'Add to Favorites',
     removeFavorite: 'Remove from Favorites',

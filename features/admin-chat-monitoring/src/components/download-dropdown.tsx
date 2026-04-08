@@ -11,7 +11,7 @@ export const DownloadDropdown: React.FC = () => {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [userId, setUserId] = useState('');
-  const [workflowId, setWorkflowId] = useState('');
+  const [workflowId, setAgentflowId] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [dataProcessing, setDataProcessing] = useState(false);
@@ -50,7 +50,7 @@ export const DownloadDropdown: React.FC = () => {
       URL.revokeObjectURL(url);
       setIsOpen(false);
     } catch {
-      toast.error(t('admin.workflowManagement.chatMonitoring.loadError'));
+      toast.error(t('admin.agentflowManagement.chatMonitoring.loadError'));
     } finally {
       setDownloading(false);
     }
@@ -68,14 +68,14 @@ export const DownloadDropdown: React.FC = () => {
         leftIcon={<FiDownload className="h-4 w-4" />}
         onClick={() => setIsOpen((prev) => !prev)}
       >
-        {t('admin.workflowManagement.chatMonitoring.excelDownload')}
+        {t('admin.agentflowManagement.chatMonitoring.excelDownload')}
       </Button>
 
       {isOpen && (
         <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-lg border border-border bg-card p-4 shadow-lg">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-semibold text-foreground">
-              {t('admin.workflowManagement.chatMonitoring.excelDownloadOptions')}
+              {t('admin.agentflowManagement.chatMonitoring.excelDownloadOptions')}
             </span>
             <button
               type="button"
@@ -89,12 +89,12 @@ export const DownloadDropdown: React.FC = () => {
           <div className="flex flex-col gap-3">
             <div>
               <label className={labelClass}>
-                {t('admin.workflowManagement.chatMonitoring.userIdOptional')}
+                {t('admin.agentflowManagement.chatMonitoring.userIdOptional')}
               </label>
               <input
                 type="text"
                 className={inputClass}
-                placeholder={t('admin.workflowManagement.chatMonitoring.searchAllPlaceholder')}
+                placeholder={t('admin.agentflowManagement.chatMonitoring.searchAllPlaceholder')}
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
               />
@@ -102,20 +102,20 @@ export const DownloadDropdown: React.FC = () => {
 
             <div>
               <label className={labelClass}>
-                {t('admin.workflowManagement.chatMonitoring.workflowIdOptional')}
+                {t('admin.agentflowManagement.chatMonitoring.workflowIdOptional')}
               </label>
               <input
                 type="text"
                 className={inputClass}
-                placeholder={t('admin.workflowManagement.chatMonitoring.searchAllPlaceholder')}
+                placeholder={t('admin.agentflowManagement.chatMonitoring.searchAllPlaceholder')}
                 value={workflowId}
-                onChange={(e) => setWorkflowId(e.target.value)}
+                onChange={(e) => setAgentflowId(e.target.value)}
               />
             </div>
 
             <div>
               <label className={labelClass}>
-                {t('admin.workflowManagement.chatMonitoring.startDateOptional')}
+                {t('admin.agentflowManagement.chatMonitoring.startDateOptional')}
               </label>
               <input
                 type="date"
@@ -127,7 +127,7 @@ export const DownloadDropdown: React.FC = () => {
 
             <div>
               <label className={labelClass}>
-                {t('admin.workflowManagement.chatMonitoring.endDateOptional')}
+                {t('admin.agentflowManagement.chatMonitoring.endDateOptional')}
               </label>
               <input
                 type="date"
@@ -144,7 +144,7 @@ export const DownloadDropdown: React.FC = () => {
                 onChange={(e) => setDataProcessing(e.target.checked)}
                 className="rounded border-border"
               />
-              {t('admin.workflowManagement.chatMonitoring.applyDataProcessing')}
+              {t('admin.agentflowManagement.chatMonitoring.applyDataProcessing')}
             </label>
 
             <Button
@@ -156,8 +156,8 @@ export const DownloadDropdown: React.FC = () => {
               onClick={handleDownload}
             >
               {downloading
-                ? t('admin.workflowManagement.chatMonitoring.downloading')
-                : t('admin.workflowManagement.chatMonitoring.startDownload')}
+                ? t('admin.agentflowManagement.chatMonitoring.downloading')
+                : t('admin.agentflowManagement.chatMonitoring.startDownload')}
             </Button>
           </div>
         </div>

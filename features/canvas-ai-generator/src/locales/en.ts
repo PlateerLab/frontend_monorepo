@@ -1,6 +1,6 @@
 export const en: Record<string, unknown> = {
-  autoWorkflow: {
-    title: 'Auto Workflow Generation',
+  autoAgentflow: {
+    title: 'Auto Agentflow Generation',
     close: 'Close',
     selectAgent: 'Select Agent Node',
     selectAgentDescription: 'Select the agent node that will be the core of the workflow.',
@@ -9,7 +9,7 @@ export const en: Record<string, unknown> = {
     selectModel: 'Select Model',
     requirements: 'Enter Requirements',
     requirementsPlaceholder: 'Describe the workflow you want...',
-    workflowName: 'Workflow Name',
+    workflowName: 'Agentflow Name',
     workflowNamePlaceholder: 'Enter workflow name',
     selectedInfo: 'Selected Agent Info',
     nodeName: 'Node Name',
@@ -17,14 +17,14 @@ export const en: Record<string, unknown> = {
     count: '',
     model: 'Model',
     generating: 'Generating...',
-    generate: 'Generate Workflow',
+    generate: 'Generate Agentflow',
   },
   toasts: {
     agentFetchFailed: 'Failed to fetch agent nodes.',
     agentSelectRequired: 'Please select an agent node.',
-    autoWorkflowRequirementsMissing: 'Please enter your requirements.',
-    autoWorkflowGenerating: 'Generating workflow...',
-    autoWorkflowGenerateSuccess: 'Workflow has been generated successfully!',
-    autoWorkflowGenerateFailed: 'Failed to generate workflow',
+    autoAgentflowRequirementsMissing: 'Please enter your requirements.',
+    autoAgentflowGenerating: 'Generating workflow...',
+    autoAgentflowGenerateSuccess: 'Agentflow has been generated successfully!',
+    autoAgentflowGenerateFailed: 'Failed to generate workflow',
   },
 };

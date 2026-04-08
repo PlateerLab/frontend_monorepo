@@ -18,7 +18,7 @@ import {
 /* ------------------------------------------------------------------ */
 
 const ACTIVITY_TYPE_CONFIG: Record<ActivityType, { label: string; color: string; bg: string }> = {
-  workflow_change:   { label: '워크플로우 변경',     color: '#305eeb', bg: 'rgba(48,94,235,0.08)' },
+  workflow_change:   { label: '에이전트플로우 변경',     color: '#305eeb', bg: 'rgba(48,94,235,0.08)' },
   model_change:      { label: '모델 변경',          color: '#ea580c', bg: 'rgba(234,88,12,0.08)' },
   policy_change:     { label: '정책 변경',          color: '#7c3aed', bg: 'rgba(124,58,237,0.08)' },
   deploy_approval:   { label: '배포 승인',          color: '#16a34a', bg: 'rgba(22,163,74,0.08)' },
@@ -306,7 +306,7 @@ const AdminGovOperationHistoryPage: React.FC<RouteComponentProps> = () => {
             <SearchInput
               value={search}
               onChange={handleSearchChange}
-              placeholder={t('admin.gov.searchOps', '활동 내용, 워크플로우, 수행자 검색...')}
+              placeholder={t('admin.gov.searchOps', '활동 내용, 에이전트플로우, 수행자 검색...')}
             />
           </div>
 
@@ -380,7 +380,7 @@ const AdminGovOperationHistoryPage: React.FC<RouteComponentProps> = () => {
                     {t('admin.governance.operationHistory.detail', '상세')}
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-xs text-muted-foreground tracking-wide">
-                    {t('admin.governance.common.workflow', '워크플로우')}
+                    {t('admin.governance.common.workflow', '에이전트플로우')}
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-xs text-muted-foreground tracking-wide">
                     {t('admin.governance.auditTracking.performer', '수행자')}

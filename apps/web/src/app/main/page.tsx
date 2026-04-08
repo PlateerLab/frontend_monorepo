@@ -20,7 +20,7 @@ import styles from './MainPage.module.scss';
 const SIDEBAR_LABEL_OVERRIDES: SidebarLabelOverrides = {
   // 예시: 섹션/아이템 타이틀 오버라이드
   // workflow: {
-  //   title: 'My Workflows',
+  //   title: 'My Agentflows',
   //   items: {
   //     'tool-storage': { title: 'My API Tools' },
   //   },

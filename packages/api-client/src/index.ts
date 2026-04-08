@@ -136,29 +136,29 @@ export type {
   UpdateUserProfileData,
 } from './user-profile';
 
-// Workflow API exports
+// Agentflow API exports
 export {
-  saveWorkflow,
-  listWorkflows,
-  listWorkflowsDetail,
-  listWorkflowsDetailAdmin,
-  loadWorkflow,
-  deleteWorkflow,
-  checkWorkflowExistence,
-  renameWorkflow,
-  duplicateWorkflow,
-  executeWorkflowStream,
-  listWorkflowVersions,
-  getWorkflowVersionData,
-  updateWorkflow,
-  updateWorkflowVersion,
-  updateWorkflowVersionLabel,
-  deleteWorkflowVersion,
-  getWorkflowPerformance,
-  deleteWorkflowPerformance,
-  getWorkflowIOLogs,
-  rateWorkflowIOLog,
-  deleteWorkflowIOLogs,
+  saveAgentflow,
+  listAgentflows,
+  listAgentflowsDetail,
+  listAgentflowsDetailAdmin,
+  loadAgentflow,
+  deleteAgentflow,
+  checkAgentflowExistence,
+  renameAgentflow,
+  duplicateAgentflow,
+  executeAgentflowStream,
+  listAgentflowVersions,
+  getAgentflowVersionData,
+  updateAgentflow,
+  updateAgentflowVersion,
+  updateAgentflowVersionLabel,
+  deleteAgentflowVersion,
+  getAgentflowPerformance,
+  deleteAgentflowPerformance,
+  getAgentflowIOLogs,
+  rateAgentflowIOLog,
+  deleteAgentflowIOLogs,
   getDeployStatus,
   getDeployStatusPublic,
   generateEmbedJs,
@@ -167,31 +167,31 @@ export {
   getDeployImage,
   deleteDeployChat,
   listInteractions,
-  // Admin workflow APIs
-  getAllWorkflowMetaAdmin,
-  deleteWorkflowAdmin,
-  updateWorkflowAdmin,
+  // Admin agentflow APIs
+  getAllAgentflowMetaAdmin,
+  deleteAgentflowAdmin,
+  updateAgentflowAdmin,
   getAdminAllIOLogs,
-  getWorkflowPerformanceAdmin,
-  deleteWorkflowPerformanceAdmin,
-  getAdminIOLogsForWorkflow,
-} from './workflow';
+  getAgentflowPerformanceAdmin,
+  deleteAgentflowPerformanceAdmin,
+  getAdminIOLogsForAgentflow,
+} from './agentflow';
 export type {
-  WorkflowContent,
-  WorkflowSaveRequest,
-  WorkflowListItem,
-  WorkflowLoadResult,
-  WorkflowExistence,
-  ExecuteWorkflowOptions,
+  AgentflowContent,
+  AgentflowSaveRequest,
+  AgentflowListItem,
+  AgentflowLoadResult,
+  AgentflowExistence,
+  ExecuteAgentflowOptions,
   DeployStatus,
   DeployUpdateData,
   InteractionListFilters,
   ExecutionMeta,
-  AdminWorkflowMeta,
+  AdminAgentflowMeta,
   AdminIOLog,
   AdminPerformanceData,
   AdminNodePerformance,
-} from './workflow';
+} from './agentflow';
 
 // Node API exports
 export {
@@ -210,9 +210,9 @@ export type {
 
 // Tracker API exports
 export {
-  getWorkflowExecutionOrder,
-  getWorkflowExecutionOrderByData,
-  getWorkflowExecutionLayoutByData,
+  getAgentflowExecutionOrder,
+  getAgentflowExecutionOrderByData,
+  getAgentflowExecutionLayoutByData,
 } from './tracker';
 
 // Admin User API exports
@@ -385,13 +385,13 @@ export type {
 
 // Admin Governance API exports
 export {
-  // Workflow Approval
+  // Agentflow Approval
   getApprovalRequests,
-  getWorkflowApprovalDetail,
-  reviewGovernanceWorkflow,
+  getAgentflowApprovalDetail,
+  reviewGovernanceAgentflow,
   // Risk Review
-  getWorkflowRiskAssessments,
-  getWorkflowRiskDetail,
+  getAgentflowRiskAssessments,
+  getAgentflowRiskDetail,
   updateRiskAssessment,
   submitGovernanceReview,
   getRiskChangeHistory,
@@ -401,7 +401,7 @@ export {
   downloadGovernanceFile,
   deleteGovernanceFile,
   // Monitoring / Inspections
-  getMonitoringWorkflows,
+  getMonitoringAgentflows,
   getInspections,
   getInspectionDetail,
   createInspection,
@@ -435,9 +435,9 @@ export {
   getOperationStats,
   // Audit Tracking
   getAuditLogs,
-  getTrackedWorkflows,
+  getTrackedAgentflows,
   getAuditTrackingStats,
-  getWorkflowAuditTimeline,
+  getAgentflowAuditTimeline,
 } from './admin-governance';
 export type {
   RiskLevel,
@@ -450,11 +450,11 @@ export type {
   ApprovalStatus,
   ApprovalRequest,
   NodeSummary,
-  WorkflowDetail,
+  AgentflowDetail,
   ReviewHistoryEntry,
   CombinedHistoryEntry,
   OverdueItem,
-  WorkflowSummary,
+  AgentflowSummary,
   InspectionCycle,
   InspectionType,
   InspectionResult,
@@ -469,7 +469,7 @@ export type {
   OperationStats,
   AuditAction,
   AuditLogEntry,
-  TrackedWorkflow,
+  TrackedAgentflow,
   AuditStats,
   TimelineEntry,
 } from './admin-governance';

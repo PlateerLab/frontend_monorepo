@@ -19,7 +19,7 @@ export interface RouteComponentProps {
 export type SidebarSectionId =
   | 'workspace'
   | 'chat'
-  | 'workflow'
+  | 'agentflow'
   | 'admin'
   | 'mypage'
   | string; // 확장 가능
@@ -154,8 +154,8 @@ export interface SidebarConfig {
  *
  * @example
  * const overrides: SidebarLabelOverrides = {
- *   workflow: {
- *     title: 'My Workflows',
+ *   agentflow: {
+ *     title: 'My Agentflows',
  *     items: {
  *       'tool-storage': { title: 'My Tools' },
  *       'prompt-storage': { title: 'My Prompts' },
@@ -227,7 +227,7 @@ export interface MainFeatureModule {
 /** Admin 사이드바 섹션 ID */
 export type AdminSidebarSectionId =
   | 'admin-user'
-  | 'admin-workflow'
+  | 'admin-agentflow'
   | 'admin-setting'
   | 'admin-system'
   | 'admin-data'
@@ -321,7 +321,7 @@ export interface IntroductionSectionPlugin {
 
 // ─────────────────────────────────────────────────────────────
 // Storage List Plugin
-// 목록 페이지(워크플로우, 도구, 프롬프트 등)의 공통 인터페이스
+// 목록 페이지(에이전트플로우, 도구, 프롬프트 등)의 공통 인터페이스
 // ─────────────────────────────────────────────────────────────
 export interface StorageFilterConfig {
   key: string;
@@ -346,7 +346,7 @@ export interface StorageListPlugin {
 
 // ─────────────────────────────────────────────────────────────
 // Card Types — 범용 카드 컴포넌트 인터페이스
-// 워크플로우, 프롬프트, 컬렉션, 스케줄 등 다양한 목록에서 사용
+// 에이전트플로우, 프롬프트, 컬렉션, 스케줄 등 다양한 목록에서 사용
 // ─────────────────────────────────────────────────────────────
 
 /** 배지 변형 타입 */
@@ -499,12 +499,12 @@ export interface ResourceCardGridProps<T = unknown> {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Workflow Management Types — 워크플로우 관리 타입
+// Agentflow Management Types — 에이전트플로우 관리 타입
 // Storage, Store, Scheduler, Tester 공통
 // ─────────────────────────────────────────────────────────────
 
-/** 워크플로우 상태 */
-export type WorkflowStatus = 'active' | 'draft' | 'archived' | 'unactive';
+/** 에이전트플로우 상태 */
+export type AgentflowStatus = 'active' | 'draft' | 'archived' | 'unactive';
 
 /** 배포 상태 */
 export type DeployStatus = 'deployed' | 'not_deployed' | 'pending' | 'error' | null;
@@ -512,20 +512,20 @@ export type DeployStatus = 'deployed' | 'not_deployed' | 'pending' | 'error' | n
 /** 공유 권한 */
 export type SharePermission = 'read_only' | 'read_write';
 
-/** 워크플로우 필터 */
-export type WorkflowStatusFilter = 'all' | 'active' | 'archived' | 'unactive';
-export type WorkflowOwnerFilter = 'all' | 'personal' | 'shared';
+/** 에이전트플로우 필터 */
+export type AgentflowStatusFilter = 'all' | 'active' | 'archived' | 'unactive';
+export type AgentflowOwnerFilter = 'all' | 'personal' | 'shared';
 
-/** 워크플로우 탭 */
-export type WorkflowTab = 'storage' | 'store' | 'scheduler' | 'tester';
+/** 에이전트플로우 탭 */
+export type AgentflowTab = 'storage' | 'store' | 'scheduler' | 'tester';
 
-/** 워크플로우 상세 정보 */
-export interface WorkflowDetail {
+/** 에이전트플로우 상세 정보 */
+export interface AgentflowDetail {
   /** DB ID */
   keyValue: number;
-  /** 워크플로우 UUID */
+  /** 에이전트플로우 UUID */
   id: string;
-  /** 워크플로우 이름 */
+  /** 에이전트플로우 이름 */
   name: string;
   /** 설명 */
   description?: string;
@@ -536,7 +536,7 @@ export interface WorkflowDetail {
   /** 노드 수 */
   nodeCount: number;
   /** 상태 */
-  status: WorkflowStatus;
+  status: AgentflowStatus;
   /** 마지막 수정일 */
   lastModified?: string;
   /** 생성일 */
@@ -559,15 +559,15 @@ export interface WorkflowDetail {
   isDeployed?: boolean;
 }
 
-/** 워크플로우 스토어 아이템 (템플릿) */
-export interface WorkflowStoreItem {
+/** 에이전트플로우 스토어 아이템 (템플릿) */
+export interface AgentflowStoreItem {
   /** DB ID */
   id: number;
-  /** 워크플로우 UUID */
+  /** 에이전트플로우 UUID */
   workflowId: string;
   /** 업로드 이름 */
   uploadName: string;
-  /** 워크플로우 이름 */
+  /** 에이전트플로우 이름 */
   workflowName: string;
   /** 설명 */
   description?: string;
@@ -607,13 +607,13 @@ export type ScheduleStatus = 'active' | 'paused' | 'completed' | 'failed';
 /** 스케줄 주기 타입 */
 export type ScheduleFrequency = 'once' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'cron';
 
-/** 워크플로우 스케줄 */
-export interface WorkflowSchedule {
+/** 에이전트플로우 스케줄 */
+export interface AgentflowSchedule {
   /** 스케줄 ID */
   id: number;
-  /** 워크플로우 ID */
+  /** 에이전트플로우 ID */
   workflowId: string;
-  /** 워크플로우 이름 */
+  /** 에이전트플로우 이름 */
   workflowName: string;
   /** 스케줄 이름 */
   name: string;
@@ -644,8 +644,8 @@ export interface WorkflowSchedule {
 /** 테스터 실행 상태 */
 export type TesterRunStatus = 'idle' | 'running' | 'success' | 'failed';
 
-/** 워크플로우 테스트 케이스 */
-export interface WorkflowTestCase {
+/** 에이전트플로우 테스트 케이스 */
+export interface AgentflowTestCase {
   /** 테스트 케이스 ID */
   id: string;
   /** 테스트 이름 */
@@ -666,16 +666,16 @@ export interface WorkflowTestCase {
   executedAt?: string;
 }
 
-/** 워크플로우 테스터 세션 */
-export interface WorkflowTesterSession {
+/** 에이전트플로우 테스터 세션 */
+export interface AgentflowTesterSession {
   /** 세션 ID */
   id: string;
-  /** 워크플로우 ID */
+  /** 에이전트플로우 ID */
   workflowId: string;
-  /** 워크플로우 이름 */
+  /** 에이전트플로우 이름 */
   workflowName: string;
   /** 테스트 케이스 목록 */
-  testCases: WorkflowTestCase[];
+  testCases: AgentflowTestCase[];
   /** 전체 상태 */
   status: TesterRunStatus;
   /** 성공 개수 */
@@ -741,7 +741,7 @@ export interface BaseEntity {
   updatedAt: string;
 }
 
-export interface WorkflowItem extends BaseEntity {
+export interface AgentflowItem extends BaseEntity {
   name: string;
   description?: string;
   thumbnail?: string;
@@ -829,8 +829,8 @@ export interface ChatMessage {
   errorMessage?: string;
 }
 
-/** 워크플로우 정보 (채팅에서 사용) */
-export interface ChatWorkflow {
+/** 에이전트플로우 정보 (채팅에서 사용) */
+export interface ChatAgentflow {
   id: string;
   name: string;
   description?: string;
@@ -842,8 +842,8 @@ export interface ChatWorkflow {
   lastModified?: string;
 }
 
-/** 워크플로우 선택 옵션 */
-export interface WorkflowOption extends ChatWorkflow {
+/** 에이전트플로우 선택 옵션 */
+export interface AgentflowOption extends ChatAgentflow {
   category?: string;
   usageCount?: number;
   isFavorite?: boolean;
@@ -871,7 +871,7 @@ export type ChatHistoryFilter = 'all' | 'active' | 'deleted' | 'deploy';
 /** 채팅 세션 */
 export interface ChatSession extends BaseEntity {
   interactionId: string;
-  workflow: ChatWorkflow;
+  workflow: ChatAgentflow;
   messages: ChatMessage[];
   title?: string;
   lastMessage?: string;
@@ -935,8 +935,8 @@ export interface ListInteractionsResponse {
   }>;
 }
 
-/** 워크플로우 상세 API 응답 */
-export interface WorkflowDetailResponse {
+/** 에이전트플로우 상세 API 응답 */
+export interface AgentflowDetailResponse {
   id: number;
   workflow_name: string;
   workflow_id: string;
@@ -1065,10 +1065,10 @@ export type AuthProfileFilter = 'all' | 'active' | 'inactive';
 export type AuthProfileStoreFilter = 'all' | 'my';
 
 // ─────────────────────────────────────────────────────────────
-// Workflow Tab Plugin
-// 워크플로우 페이지에 탭으로 끼워지는 플러그인 인터페이스
+// Agentflow Tab Plugin
+// 에이전트플로우 페이지에 탭으로 끼워지는 플러그인 인터페이스
 // ─────────────────────────────────────────────────────────────
-export interface WorkflowTabPlugin {
+export interface AgentflowTabPlugin {
   /** 플러그인 고유 ID (탭 key로도 사용) */
   id: string;
   /** 플러그인 이름 */
@@ -1078,10 +1078,10 @@ export interface WorkflowTabPlugin {
   /** 탭 순서 (작을수록 앞) */
   order: number;
   /** 탭 컨텐츠 컴포넌트 */
-  component: ComponentType<WorkflowTabPluginProps>;
+  component: ComponentType<AgentflowTabPluginProps>;
 }
 
-export interface WorkflowTabPluginProps {
+export interface AgentflowTabPluginProps {
   /** 다른 섹션으로 이동 */
   onNavigate?: (sectionId: string) => void;
   /** 서브 툴바 콘텐츠를 상위로 전달 */
@@ -1211,10 +1211,10 @@ export interface GovMonitoringTabPluginProps {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Workflow Management Tab Plugin
-// 워크플로우 관리 오케스트레이터에 탭으로 끼워지는 플러그인 인터페이스
+// Agentflow Management Tab Plugin
+// 에이전트플로우 관리 오케스트레이터에 탭으로 끼워지는 플러그인 인터페이스
 // ─────────────────────────────────────────────────────────────
-export interface WorkflowMgmtTabPlugin {
+export interface AgentflowMgmtTabPlugin {
   /** 플러그인 고유 ID (탭 key로도 사용) */
   id: string;
   /** 플러그인 이름 */
@@ -1224,18 +1224,18 @@ export interface WorkflowMgmtTabPlugin {
   /** 탭 순서 (작을수록 앞) */
   order: number;
   /** 탭 컨텐츠 컴포넌트 */
-  component: ComponentType<WorkflowMgmtTabPluginProps>;
+  component: ComponentType<AgentflowMgmtTabPluginProps>;
 }
 
-export interface WorkflowMgmtTabPluginProps {
-  /** 선택된 워크플로우 (AdminWorkflowMeta from @xgen/api-client) */
-  selectedWorkflow: Record<string, unknown>;
+export interface AgentflowMgmtTabPluginProps {
+  /** 선택된 에이전트플로우 (AdminAgentflowMeta from @xgen/api-client) */
+  selectedAgentflow: Record<string, unknown>;
   /** 서브 툴바 콘텐츠를 상위로 전달 */
   onSubToolbarChange?: (content: React.ReactNode) => void;
 }
 
-/** Admin 워크플로우 메타 (api-client에서 가져오는 타입 미러) */
-export interface AdminWorkflowMeta {
+/** Admin 에이전트플로우 메타 (api-client에서 가져오는 타입 미러) */
+export interface AdminAgentflowMeta {
   id: number;
   user_id: number;
   workflow_id: string;
@@ -1280,7 +1280,7 @@ export interface CanvasSidePanel {
 
 export interface CanvasSidePanelProps extends CanvasPluginContext {
   onClose: () => void;
-  onLoadWorkflow?: (data: any) => void;
+  onLoadAgentflow?: (data: any) => void;
 }
 
 /** 하단 패널 설정 */
@@ -1322,20 +1322,20 @@ export interface CanvasModalProps extends CanvasPluginContext {
 /** 헤더 컴포넌트 Props */
 export interface CanvasHeaderProps extends CanvasPluginContext {
   onSave: () => void;
-  onNewWorkflow: () => void;
+  onNewAgentflow: () => void;
   onDeploy: () => void;
   onAddNodeClick?: () => void;
-  onAutoWorkflowClick?: () => void;
+  onAutoAgentflowClick?: () => void;
   onHistoryClick?: () => void;
   onTemplateStart?: () => void;
-  onImportWorkflow?: () => void;
-  onWorkflowNameChange?: (name: string) => void;
+  onImportAgentflow?: () => void;
+  onAgentflowNameChange?: (name: string) => void;
   onDuplicate?: () => void;
   isOwner?: boolean;
   sidebarLayout?: { isOpen: boolean };
-  renameWorkflow?: (oldName: string, newName: string, workflowId: string) => Promise<void>;
-  checkWorkflowExistence?: (name: string) => Promise<{ exists: boolean }>;
-  listWorkflows?: () => Promise<any[]>;
+  renameAgentflow?: (oldName: string, newName: string, workflowId: string) => Promise<void>;
+  checkAgentflowExistence?: (name: string) => Promise<{ exists: boolean }>;
+  listAgentflows?: () => Promise<any[]>;
 }
 
 /** 캔버스 페이지 플러그인 */
@@ -1367,14 +1367,14 @@ class FeatureRegistryClass {
   private introductionPlugins: Map<string, IntroductionSectionPlugin> = new Map();
   private dashboardPlugins: Map<string, DashboardPlugin> = new Map();
   private storageListPlugins: Map<string, StorageListPlugin> = new Map();
-  private workflowTabPlugins: Map<string, WorkflowTabPlugin> = new Map();
+  private agentflowTabPlugins: Map<string, AgentflowTabPlugin> = new Map();
   private toolTabPlugins: Map<string, ToolTabPlugin> = new Map();
   private documentTabPlugins: Map<string, DocumentTabPlugin> = new Map();
   private promptTabPlugins: Map<string, PromptTabPlugin> = new Map();
   private authProfileTabPlugins: Map<string, AuthProfileTabPlugin> = new Map();
   private canvasPagePlugins: Map<string, CanvasPagePlugin> = new Map();
   private govMonitoringTabPlugins: Map<string, GovMonitoringTabPlugin> = new Map();
-  private workflowMgmtTabPlugins: Map<string, WorkflowMgmtTabPlugin> = new Map();
+  private agentflowMgmtTabPlugins: Map<string, AgentflowMgmtTabPlugin> = new Map();
 
   // ── FeatureModule (기존 호환) ──
   register(feature: FeatureModule): void {
@@ -1495,13 +1495,13 @@ class FeatureRegistryClass {
     return Array.from(this.storageListPlugins.values());
   }
 
-  // ── WorkflowTabPlugin ──
-  registerWorkflowTabPlugin(plugin: WorkflowTabPlugin): void {
-    this.workflowTabPlugins.set(plugin.id, plugin);
+  // ── AgentflowTabPlugin ──
+  registerAgentflowTabPlugin(plugin: AgentflowTabPlugin): void {
+    this.agentflowTabPlugins.set(plugin.id, plugin);
   }
 
-  getWorkflowTabPlugins(): WorkflowTabPlugin[] {
-    return Array.from(this.workflowTabPlugins.values())
+  getAgentflowTabPlugins(): AgentflowTabPlugin[] {
+    return Array.from(this.agentflowTabPlugins.values())
       .sort((a, b) => a.order - b.order);
   }
 
@@ -1555,13 +1555,13 @@ class FeatureRegistryClass {
       .sort((a, b) => a.order - b.order);
   }
 
-  // ── WorkflowMgmtTabPlugin ──
-  registerWorkflowMgmtTabPlugin(plugin: WorkflowMgmtTabPlugin): void {
-    this.workflowMgmtTabPlugins.set(plugin.id, plugin);
+  // ── AgentflowMgmtTabPlugin ──
+  registerAgentflowMgmtTabPlugin(plugin: AgentflowMgmtTabPlugin): void {
+    this.agentflowMgmtTabPlugins.set(plugin.id, plugin);
   }
 
-  getWorkflowMgmtTabPlugins(): WorkflowMgmtTabPlugin[] {
-    return Array.from(this.workflowMgmtTabPlugins.values())
+  getAgentflowMgmtTabPlugins(): AgentflowMgmtTabPlugin[] {
+    return Array.from(this.agentflowMgmtTabPlugins.values())
       .sort((a, b) => a.order - b.order);
   }
 
@@ -1633,7 +1633,7 @@ export interface AdminUsersResponse {
 /** 사용 가능한 유저 섹션 목록 */
 export const AVAILABLE_USER_SECTIONS = [
   'canvas',
-  'workflows',
+  'agentflows',
   'documents',
   'tool-storage',
   'prompt-store',

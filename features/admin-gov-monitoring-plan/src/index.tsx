@@ -5,10 +5,10 @@ import type { GovMonitoringTabPlugin, GovMonitoringTabPluginProps } from '@xgen/
 import { Button, Modal } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import {
-  getMonitoringWorkflows,
+  getMonitoringAgentflows,
   getInspectionDetail,
   type InspectionRecord,
-  type WorkflowSummary,
+  type AgentflowSummary,
   type InspectionCycle,
   type InspectionType,
   type InspectionResult,
@@ -51,24 +51,24 @@ const GovMonitoringPlan: React.FC<GovMonitoringTabPluginProps> = () => {
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(false);
-  const [workflows, setWorkflows] = useState<WorkflowSummary[]>([]);
+  const [workflows, setAgentflows] = useState<AgentflowSummary[]>([]);
   const [selectedRecord, setSelectedRecord] = useState<InspectionRecord | null>(null);
 
-  const loadWorkflows = useCallback(async () => {
+  const loadAgentflows = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getMonitoringWorkflows();
-      setWorkflows(Array.isArray(data) ? data : []);
+      const data = await getMonitoringAgentflows();
+      setAgentflows(Array.isArray(data) ? data : []);
     } catch {
-      setWorkflows([]);
+      setAgentflows([]);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    loadWorkflows();
-  }, [loadWorkflows]);
+    loadAgentflows();
+  }, [loadAgentflows]);
 
   const openDetail = useCallback(async (record: InspectionRecord) => {
     try {
@@ -161,13 +161,13 @@ const GovMonitoringPlan: React.FC<GovMonitoringTabPluginProps> = () => {
   return (
     <div className="p-6">
       <p className="text-sm text-muted-foreground mb-4">
-        {t('admin.governance.monitoring.planDescription', 'Workflow inspection plan overview by workflow.')}
+        {t('admin.governance.monitoring.planDescription', 'Agentflow inspection plan overview by workflow.')}
       </p>
       <div className="overflow-x-auto rounded-xl border border-border">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/30">
-              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.common.workflow', 'Workflow')}</th>
+              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.common.workflow', 'Agentflow')}</th>
               <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.inspectionCount', 'Inspection Count')}</th>
               <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.lastInspection', 'Last Inspection')}</th>
               <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.nextInspection', 'Next Inspection')}</th>
@@ -191,7 +191,7 @@ const GovMonitoringPlan: React.FC<GovMonitoringTabPluginProps> = () => {
                 </td>
               </tr>
             ) : (
-              workflows.map((wf: WorkflowSummary) => {
+              workflows.map((wf: AgentflowSummary) => {
                 const latest = wf.latestInspection;
                 return (
                   <tr key={wf.workflowId} className="border-b border-border hover:bg-muted/40 transition-colors">

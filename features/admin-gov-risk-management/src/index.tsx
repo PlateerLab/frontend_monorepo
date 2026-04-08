@@ -5,8 +5,8 @@ import type { AdminFeatureModule, RouteComponentProps } from '@xgen/types';
 import { ContentArea, Button, SearchInput, Modal, StatCard } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import {
-  getWorkflowRiskAssessments,
-  getWorkflowRiskDetail,
+  getAgentflowRiskAssessments,
+  getAgentflowRiskDetail,
   updateRiskAssessment,
   getGovernanceFiles,
   uploadGovernanceFile,
@@ -15,7 +15,7 @@ import {
   getActiveRiskPolicy,
   type RiskAssessment,
   type RiskLevel,
-  type WorkflowDetail,
+  type AgentflowDetail,
   type GovernanceFile,
   type RiskChangeHistory,
   type RiskPolicy,
@@ -188,7 +188,7 @@ const AdminGovRiskManagementPage: React.FC<RouteComponentProps> = () => {
 
   // Detail modal
   const [selectedRecord, setSelectedRecord] = useState<RiskAssessment | null>(null);
-  const [detailData, setDetailData] = useState<WorkflowDetail | null>(null);
+  const [detailData, setDetailData] = useState<AgentflowDetail | null>(null);
   const [detailFiles, setDetailFiles] = useState<GovernanceFile[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
 
@@ -223,7 +223,7 @@ const AdminGovRiskManagementPage: React.FC<RouteComponentProps> = () => {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getWorkflowRiskAssessments();
+      const data = await getAgentflowRiskAssessments();
       setRecords(Array.isArray(data) ? data : []);
     } catch (error: unknown) {
       console.error('Failed to load risk workflows:', error);
@@ -356,7 +356,7 @@ const AdminGovRiskManagementPage: React.FC<RouteComponentProps> = () => {
     setDetailData(null);
     setDetailFiles([]);
     try {
-      const detail = await getWorkflowRiskDetail(record.workflow_id);
+      const detail = await getAgentflowRiskDetail(record.workflow_id);
       setDetailData(detail);
     } catch (error: unknown) {
       console.error('Failed to load workflow detail:', error);
@@ -669,7 +669,7 @@ const AdminGovRiskManagementPage: React.FC<RouteComponentProps> = () => {
               {/* Basic info grid */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-muted-foreground">Workflow ID</p>
+                  <p className="text-xs text-muted-foreground">Agentflow ID</p>
                   <p className="text-sm font-medium text-foreground">{selectedRecord.workflow_id}</p>
                 </div>
                 <div>

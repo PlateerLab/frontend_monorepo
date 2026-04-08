@@ -16,9 +16,9 @@ import { FiRefreshCw } from '@xgen/icons';
 import { getUserTokenUsage } from './api/token-api';
 import type { UserTokenUsage, TokenUsageResponse } from './types';
 import TokenUsageBar from './components/token-usage-bar';
-import WorkflowDetailModal from './components/workflow-detail-modal';
+import AgentflowDetailModal from './components/agentflow-detail-modal';
 
-const i18nPrefix = 'admin.workflowManagement.userTokenDashboard';
+const i18nPrefix = 'admin.agentflowManagement.userTokenDashboard';
 
 const PAGE_SIZE = 20;
 
@@ -66,7 +66,7 @@ const AdminUserTokenDashboardPage: React.FC<RouteComponentProps> = () => {
   const [appliedStartDate, setAppliedStartDate] = useState('');
   const [appliedEndDate, setAppliedEndDate] = useState('');
 
-  // ── Workflow detail modal ──
+  // ── Agentflow detail modal ──
   const [modalUser, setModalUser] = useState<UserTokenUsage | null>(null);
 
   // ── Fetch data ──
@@ -262,7 +262,7 @@ const AdminUserTokenDashboardPage: React.FC<RouteComponentProps> = () => {
       },
       {
         id: 'most_used_workflow',
-        header: t(`${i18nPrefix}.columns.mainWorkflow`),
+        header: t(`${i18nPrefix}.columns.mainAgentflow`),
         field: 'most_used_workflow' as keyof UserTokenUsage,
         sortable: true,
         minWidth: '160px',
@@ -276,7 +276,7 @@ const AdminUserTokenDashboardPage: React.FC<RouteComponentProps> = () => {
                 <button
                   type="button"
                   className="shrink-0 rounded px-1 text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                  title={t(`${i18nPrefix}.viewWorkflowDetails`)}
+                  title={t(`${i18nPrefix}.viewAgentflowDetails`)}
                   onClick={(e) => {
                     e.stopPropagation();
                     setModalUser(row);
@@ -451,9 +451,9 @@ const AdminUserTokenDashboardPage: React.FC<RouteComponentProps> = () => {
         }
       />
 
-      {/* Workflow Detail Modal */}
+      {/* Agentflow Detail Modal */}
       {modalUser && modalUser.workflow_usage && (
-        <WorkflowDetailModal
+        <AgentflowDetailModal
           isOpen={!!modalUser}
           onClose={() => setModalUser(null)}
           username={modalUser.username ?? `User #${modalUser.user_id}`}

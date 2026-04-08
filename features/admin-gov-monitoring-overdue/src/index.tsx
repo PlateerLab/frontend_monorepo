@@ -5,10 +5,10 @@ import type { GovMonitoringTabPlugin, GovMonitoringTabPluginProps } from '@xgen/
 import { Button, Modal, StatCard } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import {
-  getMonitoringWorkflows,
+  getMonitoringAgentflows,
   getOverdueInspections,
   createInspection,
-  type WorkflowSummary,
+  type AgentflowSummary,
   type OverdueItem,
   type InspectionCycle,
   type InspectionType,
@@ -83,7 +83,7 @@ const GovMonitoringOverdue: React.FC<GovMonitoringTabPluginProps> = ({ onSubTool
 
   const [loading, setLoading] = useState(false);
   const [overdueList, setOverdueList] = useState<OverdueItem[]>([]);
-  const [workflows, setWorkflows] = useState<WorkflowSummary[]>([]);
+  const [workflows, setAgentflows] = useState<AgentflowSummary[]>([]);
 
   const [showFormModal, setShowFormModal] = useState(false);
   const [formData, setFormData] = useState<FormData>({ ...EMPTY_FORM });
@@ -137,8 +137,8 @@ const GovMonitoringOverdue: React.FC<GovMonitoringTabPluginProps> = ({ onSubTool
     setFormData({ ...EMPTY_FORM, workflow_id: item.workflowId });
     if (workflows.length === 0) {
       try {
-        const data = await getMonitoringWorkflows();
-        setWorkflows(Array.isArray(data) ? data : []);
+        const data = await getMonitoringAgentflows();
+        setAgentflows(Array.isArray(data) ? data : []);
       } catch { /* ignore */ }
     }
     setShowFormModal(true);
@@ -187,7 +187,7 @@ const GovMonitoringOverdue: React.FC<GovMonitoringTabPluginProps> = ({ onSubTool
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-foreground mb-1">
-              {t('admin.governance.monitoring.selectWorkflow', 'Workflow')}
+              {t('admin.governance.monitoring.selectAgentflow', 'Agentflow')}
             </label>
             <select
               className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
@@ -195,7 +195,7 @@ const GovMonitoringOverdue: React.FC<GovMonitoringTabPluginProps> = ({ onSubTool
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData((prev: FormData) => ({ ...prev, workflow_id: e.target.value }))}
             >
               <option value="">{t('admin.governance.monitoring.workflowPlaceholder', 'Select workflow...')}</option>
-              {workflows.map((wf: WorkflowSummary) => (
+              {workflows.map((wf: AgentflowSummary) => (
                 <option key={wf.workflowId} value={wf.workflowId}>{wf.workflowName}</option>
               ))}
             </select>
@@ -332,7 +332,7 @@ const GovMonitoringOverdue: React.FC<GovMonitoringTabPluginProps> = ({ onSubTool
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/30">
-              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.common.workflow', 'Workflow')}</th>
+              <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.common.workflow', 'Agentflow')}</th>
               <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.inspectionCycle', 'Cycle')}</th>
               <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.expectedDate', 'Expected Date')}</th>
               <th className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide">{t('admin.governance.monitoring.overdueDays', 'Overdue Days')}</th>

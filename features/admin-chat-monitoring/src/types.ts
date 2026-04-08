@@ -1,4 +1,4 @@
-export interface WorkflowLog {
+export interface AgentflowLog {
   id: number;
   user_id: number | null;
   username: string | null;
@@ -23,6 +23,6 @@ export interface PaginationInfo {
 }
 
 export interface ChatLogsResponse {
-  io_logs: WorkflowLog[];
+  io_logs: AgentflowLog[];
   pagination: PaginationInfo;
 }

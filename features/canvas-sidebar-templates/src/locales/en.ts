@@ -16,7 +16,7 @@ export const en: Record<string, unknown> = {
     templateLoadError: 'An error occurred while loading the template.',
   },
   messages: {
-    workflowLoadTitle: 'Load Workflow',
+    workflowLoadTitle: 'Load Agentflow',
     workflowLoadMessage: 'There is a workflow with unsaved changes.\nLoading will replace the current work.',
   },
 };

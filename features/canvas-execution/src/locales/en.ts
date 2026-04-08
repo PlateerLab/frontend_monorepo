@@ -71,7 +71,7 @@ export const en: Record<string, unknown> = {
     clearOutput: 'Clear Output',
     copyOutput: 'Copy Output',
     copied: 'Copied!',
-    runWorkflow: 'Run Workflow',
+    runAgentflow: 'Run Agentflow',
     saveAndRun: 'Save & Run',
   },
   detailPanel: {

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import type { RouteComponentProps, MainFeatureModule } from '@xgen/types';
 import { ContentArea, Button, useToast } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
-import { listWorkflows } from '@xgen/api-client';
+import { listAgentflows } from '@xgen/api-client';
 import './locales';
 
 // ─────────────────────────────────────────────────────────────
@@ -33,7 +33,7 @@ function setStoredState(key: string, value: any): void {
   } catch { /* quota exceeded — silent */ }
 }
 
-function clearWorkflowSession(): void {
+function clearAgentflowSession(): void {
   if (typeof window === 'undefined') return;
   try {
     sessionStorage.removeItem(STORAGE_KEYS.WORKFLOW_STATE);
@@ -42,16 +42,16 @@ function clearWorkflowSession(): void {
   } catch { /* silent */ }
 }
 
-function generateWorkflowId(): string {
+function generateAgentflowId(): string {
   return `wf_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 }
 
-/** 기존 워크플로우 목록에서 고유한 이름 생성 (xgen-frontend 로직 동일) */
-function generateUniqueWorkflowName(existingWorkflows: any[]): string {
-  const baseName = 'Workflow';
+/** 기존 에이전트플로우 목록에서 고유한 이름 생성 (xgen-frontend 로직 동일) */
+function generateUniqueAgentflowName(existingAgentflows: any[]): string {
+  const baseName = 'Agentflow';
 
   const workflowNames = new Set(
-    existingWorkflows.map((item) => {
+    existingAgentflows.map((item) => {
       let name = '';
       if (typeof item === 'string') {
         name = item;
@@ -65,7 +65,7 @@ function generateUniqueWorkflowName(existingWorkflows: any[]): string {
   if (!workflowNames.has(baseName)) return baseName;
 
   const usedNumbers = new Set<number>();
-  const pattern = /^Workflow \((\d+)\)$/;
+  const pattern = /^Agentflow \((\d+)\)$/;
   workflowNames.forEach((name) => {
     const match = name.match(pattern);
     if (match) {
@@ -111,17 +111,17 @@ const CanvasIntroPage: React.FC<CanvasIntroPageProps> = ({ onNavigate }) => {
   /** 새 캔버스 만들기: 세션 초기화 → 고유 이름 생성 → /canvas 이동 */
   const handleCreateBlank = useCallback(async () => {
     // 1. 세션 초기화
-    clearWorkflowSession();
+    clearAgentflowSession();
 
-    // 2. 새 워크플로우 ID 생성
-    const newId = generateWorkflowId();
+    // 2. 새 에이전트플로우 ID 생성
+    const newId = generateAgentflowId();
     setStoredState(STORAGE_KEYS.WORKFLOW_ID, newId);
 
     // 3. 기존 목록에서 고유한 이름 생성
-    let newName = 'Workflow';
+    let newName = 'Agentflow';
     try {
-      const existing = await listWorkflows();
-      newName = generateUniqueWorkflowName(existing);
+      const existing = await listAgentflows();
+      newName = generateUniqueAgentflowName(existing);
     } catch {
       // API 실패 시 기본값 사용
     }

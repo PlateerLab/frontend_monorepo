@@ -5,14 +5,14 @@ import type { GovMonitoringTabPlugin, GovMonitoringTabPluginProps } from '@xgen/
 import { Button, SearchInput, Modal, StatCard } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import {
-  getMonitoringWorkflows,
+  getMonitoringAgentflows,
   getInspections,
   getInspectionDetail,
   createInspection,
   updateInspection,
   deleteInspection,
   type InspectionRecord,
-  type WorkflowSummary,
+  type AgentflowSummary,
   type InspectionCycle,
   type InspectionType,
   type InspectionResult,
@@ -92,7 +92,7 @@ const GovMonitoringHistory: React.FC<GovMonitoringTabPluginProps> = ({ onSubTool
   const [sortField, setSortField] = useState<'inspectionDate' | 'nextInspectionDate' | 'workflowName'>('inspectionDate');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
-  const [workflows, setWorkflows] = useState<WorkflowSummary[]>([]);
+  const [workflows, setAgentflows] = useState<AgentflowSummary[]>([]);
   const [selectedRecord, setSelectedRecord] = useState<InspectionRecord | null>(null);
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingRecord, setEditingRecord] = useState<InspectionRecord | null>(null);
@@ -181,8 +181,8 @@ const GovMonitoringHistory: React.FC<GovMonitoringTabPluginProps> = ({ onSubTool
     setFormData({ ...EMPTY_FORM });
     if (workflows.length === 0) {
       try {
-        const data = await getMonitoringWorkflows();
-        setWorkflows(Array.isArray(data) ? data : []);
+        const data = await getMonitoringAgentflows();
+        setAgentflows(Array.isArray(data) ? data : []);
       } catch { /* ignore */ }
     }
     setShowFormModal(true);
@@ -371,7 +371,7 @@ const GovMonitoringHistory: React.FC<GovMonitoringTabPluginProps> = ({ onSubTool
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-foreground mb-1">
-              {t('admin.governance.monitoring.selectWorkflow', 'Workflow')}
+              {t('admin.governance.monitoring.selectAgentflow', 'Agentflow')}
             </label>
             {isEdit ? (
               <input
@@ -387,13 +387,13 @@ const GovMonitoringHistory: React.FC<GovMonitoringTabPluginProps> = ({ onSubTool
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData((prev: FormData) => ({ ...prev, workflow_id: e.target.value }))}
               >
                 <option value="">{t('admin.governance.monitoring.workflowPlaceholder', 'Select workflow...')}</option>
-                {workflows.map((wf: WorkflowSummary) => (
+                {workflows.map((wf: AgentflowSummary) => (
                   <option key={wf.workflowId} value={wf.workflowId}>{wf.workflowName}</option>
                 ))}
               </select>
             )}
             <p className="text-xs text-muted-foreground mt-1">
-              {t('admin.governance.monitoring.selectWorkflowHelp', 'Select the workflow to inspect.')}
+              {t('admin.governance.monitoring.selectAgentflowHelp', 'Select the workflow to inspect.')}
             </p>
           </div>
 
@@ -567,7 +567,7 @@ const GovMonitoringHistory: React.FC<GovMonitoringTabPluginProps> = ({ onSubTool
                 className="px-4 py-3 text-left font-semibold text-xs text-muted-foreground tracking-wide cursor-pointer hover:text-foreground"
                 onClick={() => handleSort('workflowName')}
               >
-                {t('admin.governance.common.workflow', 'Workflow')}
+                {t('admin.governance.common.workflow', 'Agentflow')}
                 {sortField === 'workflowName' && <span className="ml-1">{sortDirection === 'asc' ? '▲' : '▼'}</span>}
               </th>
               <th
