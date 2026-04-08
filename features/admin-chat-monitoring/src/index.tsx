@@ -224,7 +224,7 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
       },
       {
         id: 'workflow_name',
-        header: t('admin.agentflowManagement.chatMonitoring.columns.workflowName'),
+        header: t('admin.agentflowManagement.chatMonitoring.columns.agentflowName'),
         field: 'workflow_name' as keyof AgentflowLog,
         sortable: true,
         minWidth: '140px',
@@ -234,7 +234,7 @@ const AdminChatMonitoringPage: React.FC<RouteComponentProps> = () => {
       },
       {
         id: 'workflow_id',
-        header: t('admin.agentflowManagement.chatMonitoring.columns.workflowId'),
+        header: t('admin.agentflowManagement.chatMonitoring.columns.agentflowId'),
         field: 'workflow_id' as keyof AgentflowLog,
         sortable: true,
         minWidth: '140px',
