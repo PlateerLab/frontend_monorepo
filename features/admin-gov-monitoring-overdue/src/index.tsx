@@ -194,7 +194,7 @@ const GovMonitoringOverdue: React.FC<GovMonitoringTabPluginProps> = ({ onSubTool
               value={formData.workflow_id}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData((prev: FormData) => ({ ...prev, workflow_id: e.target.value }))}
             >
-              <option value="">{t('admin.governance.monitoring.workflowPlaceholder', 'Select workflow...')}</option>
+              <option value="">{t('admin.governance.monitoring.agentflowPlaceholder', 'Select agentflow...')}</option>
               {workflows.map((wf: AgentflowSummary) => (
                 <option key={wf.workflowId} value={wf.workflowId}>{wf.workflowName}</option>
               ))}
