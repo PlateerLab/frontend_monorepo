@@ -28,7 +28,7 @@
     "@xgen/feature-admin-gov-monitoring-plan": "workspace:*",
     "@xgen/feature-admin-gov-operation-history": "workspace:*",
     "@xgen/feature-admin-gov-risk-management": "workspace:*",
-    "@xgen/feature-admin-gov-workflow-approval": "workspace:*",
+    "@xgen/feature-admin-gov-agentflow-approval": "workspace:*",
     "@xgen/feature-admin-role-management": "workspace:*",
     "@xgen/feature-admin-mcp-market": "workspace:*",
     "@xgen/feature-admin-mcp-station": "workspace:*",

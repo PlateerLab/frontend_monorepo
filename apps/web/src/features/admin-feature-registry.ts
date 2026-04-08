@@ -65,8 +65,8 @@ export async function initializeAdminFeatures(): Promise<void> {
       import('@xgen/feature-admin-users'),
       import('@xgen/feature-admin-user-create'),
       import('@xgen/feature-admin-role-management'),
-      // 워크플로우 리소스 (admin-workflow)
-      import('@xgen/feature-admin-workflow-management-orchestrator'),
+      // 에이전트플로우 리소스 (admin-agentflow)
+      import('@xgen/feature-admin-agentflow-management-orchestrator'),
       import('@xgen/feature-admin-chat-monitoring'),
       import('@xgen/feature-admin-user-token-dashboard'),
       import('@xgen/feature-admin-node-management'),
@@ -120,18 +120,20 @@ export async function initializeAdminFeatures(): Promise<void> {
     govResults.forEach((r, i) => { if (r.status === 'rejected') console.warn(`[Admin] Gov monitoring plugin #${i} failed:`, r.reason); });
 
     // Agentflow Management Tab Plugins
-    const [viewMod, executorMod, monitoringMod, testMod, logMod] = await Promise.all([
+    const agentflowResults = await Promise.allSettled([
       import('@xgen/feature-admin-agentflow-management-view'),
       import('@xgen/feature-admin-agentflow-management-executor'),
       import('@xgen/feature-admin-agentflow-management-monitoring'),
       import('@xgen/feature-admin-agentflow-management-test'),
       import('@xgen/feature-admin-agentflow-management-log'),
     ]);
-    CoreRegistry.registerAgentflowMgmtTabPlugin(viewMod.agentflowMgmtViewPlugin);
-    CoreRegistry.registerAgentflowMgmtTabPlugin(executorMod.agentflowMgmtExecutorPlugin);
-    CoreRegistry.registerAgentflowMgmtTabPlugin(monitoringMod.agentflowMgmtMonitoringPlugin);
-    CoreRegistry.registerAgentflowMgmtTabPlugin(testMod.agentflowMgmtTestPlugin);
-    CoreRegistry.registerAgentflowMgmtTabPlugin(logMod.agentflowMgmtLogPlugin);
+    const [viewResult, executorResult, monitoringResult, testResult, logResult] = agentflowResults;
+    if (viewResult.status === 'fulfilled') CoreRegistry.registerAgentflowMgmtTabPlugin(viewResult.value.agentflowMgmtViewPlugin);
+    if (executorResult.status === 'fulfilled') CoreRegistry.registerAgentflowMgmtTabPlugin(executorResult.value.agentflowMgmtExecutorPlugin);
+    if (monitoringResult.status === 'fulfilled') CoreRegistry.registerAgentflowMgmtTabPlugin(monitoringResult.value.agentflowMgmtMonitoringPlugin);
+    if (testResult.status === 'fulfilled') CoreRegistry.registerAgentflowMgmtTabPlugin(testResult.value.agentflowMgmtTestPlugin);
+    if (logResult.status === 'fulfilled') CoreRegistry.registerAgentflowMgmtTabPlugin(logResult.value.agentflowMgmtLogPlugin);
+    agentflowResults.forEach((r, i) => { if (r.status === 'rejected') console.warn(`[Admin] Agentflow mgmt plugin #${i} failed:`, r.reason); });
 
     adminInitialized = true;
   } catch (error) {
