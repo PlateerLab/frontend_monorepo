@@ -12,7 +12,8 @@ export interface CollectionAPIResponse {
   collection_make_name?: string;
   display_name?: string;
   description?: string;
-  document_count: number;
+  document_count?: number;
+  total_documents?: number;
   is_shared: boolean;
   is_secured: boolean;
   embedding_model?: string;
@@ -53,7 +54,7 @@ function transformCollection(raw: CollectionAPIResponse): CollectionItem {
     name: raw.collection_name,
     displayName: raw.collection_make_name || raw.display_name || raw.collection_name,
     description: raw.description || '',
-    documentCount: raw.document_count ?? 0,
+    documentCount: raw.total_documents ?? raw.document_count ?? 0,
     isShared: raw.is_shared ?? false,
     isSecured: raw.is_secured ?? false,
     embedding: raw.embedding_model || '',

@@ -93,6 +93,15 @@ export const ko: TranslationData = {
         fileCountSuffix: '개의 파일을 업로드합니다.',
         hint: '확인 버튼을 누르면 임베딩 옵션을 설정할 수 있습니다.',
       },
+      duplicateFolder: {
+        title: '동일한 폴더가 이미 존재합니다',
+        description: '이미 같은 이름의 폴더가 존재합니다. 어떻게 처리할까요?',
+        merge: '기존 폴더에 추가',
+        mergeDesc: '기존 폴더에 문서를 추가합니다',
+        createNew: '새 폴더로 업로드',
+        createNewDesc: '번호가 붙은 새 폴더를 생성합니다',
+        cancel: '취소',
+      },
       noChunks: '청크가 없습니다',
       error: {
         loadFailed: '문서 목록을 불러오지 못했습니다',

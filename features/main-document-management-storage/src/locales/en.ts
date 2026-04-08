@@ -89,6 +89,16 @@ export const en: TranslationData = {
         fileCountSuffix: ' file(s) will be uploaded.',
         moreFiles: ' more files',
       },
+      duplicateFolder: {
+        title: 'Folder already exists',
+        description: 'A folder with the same name already exists. How would you like to proceed?',
+        folderNames: 'Duplicate folders',
+        merge: 'Add to existing folder',
+        mergeDesc: 'Files will be added to the existing folder',
+        createNew: 'Upload as new folder',
+        createNewDesc: 'A new folder with a numbered suffix will be created',
+        cancel: 'Cancel',
+      },
       error: {
         loadFailed: 'Failed to load files',
       },

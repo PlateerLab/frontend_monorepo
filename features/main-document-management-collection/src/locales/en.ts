@@ -95,6 +95,15 @@ export const en: TranslationData = {
         fileCountSuffix: ' file(s) will be uploaded.',
         hint: 'Press confirm to configure embedding options.',
       },
+      duplicateFolder: {
+        title: 'Folder already exists',
+        description: 'A folder with the same name already exists. How would you like to proceed?',
+        merge: 'Add to existing folder',
+        mergeDesc: 'Documents will be added to the existing folder',
+        createNew: 'Upload as new folder',
+        createNewDesc: 'A new folder with a numbered suffix will be created',
+        cancel: 'Cancel',
+      },
       noChunks: 'No chunks',
       error: {
         loadFailed: 'Failed to load documents',

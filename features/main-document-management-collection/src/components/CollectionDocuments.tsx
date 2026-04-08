@@ -153,6 +153,10 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
   const [newFolderName, setNewFolderName] = useState('');
   const [creatingFolder, setCreatingFolder] = useState(false);
 
+  // Duplicate folder detection state
+  const [isDuplicateFolderModalOpen, setIsDuplicateFolderModalOpen] = useState(false);
+  const [duplicateFolderNames, setDuplicateFolderNames] = useState<string[]>([]);
+
   const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -343,22 +347,70 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
     }
   }, [uploading]);
 
-  // ── Multi-file upload (from external drop) ──
-  const handleUploadMultiple = useCallback(async () => {
-    if (uploadFiles.length === 0) return;
+  // ── Duplicate folder detection helpers (collection) ──
+  const getTopLevelFolderNames = useCallback((relativePaths: Map<File, string>): string[] => {
+    const names = new Set<string>();
+    for (const relPath of relativePaths.values()) {
+      if (!relPath) continue;
+      const topLevel = relPath.split('/')[0];
+      if (topLevel) names.add(topLevel);
+    }
+    return [...names];
+  }, []);
+
+  const findDuplicateFolders = useCallback((topLevelNames: string[], parentFolder: FolderItem | null): string[] => {
+    return topLevelNames.filter(name => {
+      const basePath = parentFolder?.fullPath || `/${collection.displayName}`;
+      const expectedFullPath = `${basePath}/${name}`.replace(/\/+$/, '');
+      return folders.some(f => f.fullPath.replace(/\/+$/, '') === expectedFullPath);
+    });
+  }, [folders, collection.displayName]);
+
+  const renameDuplicatePaths = useCallback((relativePaths: Map<File, string>, parentFolder: FolderItem | null): Map<File, string> => {
+    const newPaths = new Map<File, string>();
+    const renamedMap = new Map<string, string>();
+
+    for (const [file, relPath] of relativePaths) {
+      if (!relPath) { newPaths.set(file, relPath); continue; }
+
+      const parts = relPath.split('/');
+      const topLevel = parts[0];
+
+      if (!renamedMap.has(topLevel)) {
+        const basePath = parentFolder?.fullPath || `/${collection.displayName}`;
+        const expectedFullPath = `${basePath}/${topLevel}`.replace(/\/+$/, '');
+        const isDuplicate = folders.some(f => f.fullPath.replace(/\/+$/, '') === expectedFullPath);
+
+        if (isDuplicate) {
+          let counter = 1;
+          let newName = `${topLevel} (${counter})`;
+          while (folders.some(f => f.fullPath.replace(/\/+$/, '') === `${basePath}/${newName}`.replace(/\/+$/, ''))) {
+            counter++;
+            newName = `${topLevel} (${counter})`;
+          }
+          renamedMap.set(topLevel, newName);
+        } else {
+          renamedMap.set(topLevel, topLevel);
+        }
+      }
+
+      parts[0] = renamedMap.get(topLevel)!;
+      newPaths.set(file, parts.join('/'));
+    }
+    return newPaths;
+  }, [folders, collection.displayName]);
+
+  // ── Core upload logic (called after duplicate resolution) ──
+  const executeMultiUpload = useCallback(async (filesToUpload: File[], pathsMap: Map<File, string>, targetFolder: FolderItem | null) => {
     setUploading(true);
     setUploadProgress(null);
-    // Auto-close modal immediately — progress shown in status panel
     setIsUploadModalOpen(false);
-    const filesToUpload = [...uploadFiles];
-    const pathsMap = new Map(uploadFilesRelativePaths);
     setUploadFiles([]);
     setUploadFilesRelativePaths(new Map());
     setUploadFile(null);
 
     try {
-      // Create folder structure before uploading
-      const basePath = pendingDropTargetFolder?.fullPath || currentFolder?.fullPath || undefined;
+      const basePath = targetFolder?.fullPath || currentFolder?.fullPath || undefined;
       await ensureFolderStructure(
         pathsMap,
         collection.collectionId,
@@ -371,12 +423,9 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
         const file = filesToUpload[i];
         const relPath = pathsMap.get(file) || '';
 
-        // Compute target folder_path
-        let targetFolderPath = pendingDropTargetFolder?.fullPath || currentFolder?.fullPath || undefined;
+        let targetFolderPath = targetFolder?.fullPath || currentFolder?.fullPath || undefined;
         if (relPath) {
-          // Append relative path from folder structure
-          const lastSlash = relPath.lastIndexOf('/');
-          const folderPortion = lastSlash !== -1 ? relPath : relPath;
+          const folderPortion = relPath;
           targetFolderPath = targetFolderPath
             ? `${targetFolderPath}/${folderPortion}`
             : `/${collection.displayName}/${folderPortion}`;
@@ -431,7 +480,49 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
       setUploading(false);
       setPendingDropTargetFolder(null);
     }
-  }, [uploadFiles, uploadFilesRelativePaths, pendingDropTargetFolder, currentFolder, collection, user, chunkSize, chunkOverlap, useOcr, useLlm, useMeta, forceChunk, loadData, addSession, updateSession]);
+  }, [currentFolder, collection, user, chunkSize, chunkOverlap, useOcr, useLlm, useMeta, forceChunk, loadData, addSession, updateSession]);
+
+  // ── Multi-file upload (from external drop) ──
+  const handleUploadMultiple = useCallback(async () => {
+    if (uploadFiles.length === 0) return;
+    const filesToUpload = [...uploadFiles];
+    const pathsMap = new Map(uploadFilesRelativePaths);
+    const targetFolder = pendingDropTargetFolder;
+
+    // Check for duplicate top-level folders
+    const topLevelNames = getTopLevelFolderNames(pathsMap);
+    const duplicates = findDuplicateFolders(topLevelNames, targetFolder || currentFolder);
+
+    if (duplicates.length > 0) {
+      setDuplicateFolderNames(duplicates);
+      // Keep files in state for later resolution
+      setIsDuplicateFolderModalOpen(true);
+      return;
+    }
+
+    executeMultiUpload(filesToUpload, pathsMap, targetFolder);
+  }, [uploadFiles, uploadFilesRelativePaths, pendingDropTargetFolder, currentFolder, getTopLevelFolderNames, findDuplicateFolders, executeMultiUpload]);
+
+  const handleDuplicateMerge = useCallback(() => {
+    setIsDuplicateFolderModalOpen(false);
+    const filesToUpload = [...uploadFiles];
+    const pathsMap = new Map(uploadFilesRelativePaths);
+    const targetFolder = pendingDropTargetFolder;
+    executeMultiUpload(filesToUpload, pathsMap, targetFolder);
+  }, [uploadFiles, uploadFilesRelativePaths, pendingDropTargetFolder, executeMultiUpload]);
+
+  const handleDuplicateCreateNew = useCallback(() => {
+    setIsDuplicateFolderModalOpen(false);
+    const filesToUpload = [...uploadFiles];
+    const pathsMap = new Map(uploadFilesRelativePaths);
+    const targetFolder = pendingDropTargetFolder;
+    const renamedPaths = renameDuplicatePaths(pathsMap, targetFolder || currentFolder);
+    executeMultiUpload(filesToUpload, renamedPaths, targetFolder);
+  }, [uploadFiles, uploadFilesRelativePaths, pendingDropTargetFolder, currentFolder, renameDuplicatePaths, executeMultiUpload]);
+
+  const handleDuplicateCancel = useCallback(() => {
+    setIsDuplicateFolderModalOpen(false);
+  }, []);
 
   const handleFolderUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -967,6 +1058,51 @@ export const CollectionDocuments: React.FC<CollectionDocumentsProps> = ({
           <p className="text-xs text-muted-foreground">
             {t('documents.collection.detail.dropConfirm.hint', '확인 버튼을 누르면 임베딩 옵션을 설정할 수 있습니다.')}
           </p>
+        </div>
+      </Modal>
+
+      {/* Duplicate Folder Modal */}
+      <Modal
+        isOpen={isDuplicateFolderModalOpen}
+        onClose={handleDuplicateCancel}
+        title={t('documents.collection.detail.duplicateFolder.title', '동일한 폴더가 이미 존재합니다')}
+        size="sm"
+        footer={<div />}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            {t('documents.collection.detail.duplicateFolder.description', '이미 같은 이름의 폴더가 존재합니다. 어떻게 처리할까요?')}
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {duplicateFolderNames.map((name, idx) => (
+              <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 bg-orange-50 text-orange-700 border border-orange-200 rounded text-xs font-medium">
+                <FiFolder className="w-3 h-3" />
+                {name}
+              </span>
+            ))}
+          </div>
+          <div className="space-y-2">
+            <button
+              onClick={handleDuplicateMerge}
+              className="w-full text-left p-3 rounded-lg border border-border hover:bg-accent transition-colors"
+            >
+              <p className="text-sm font-medium">{t('documents.collection.detail.duplicateFolder.merge', '기존 폴더에 추가')}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('documents.collection.detail.duplicateFolder.mergeDesc', '기존 폴더에 문서를 추가합니다')}</p>
+            </button>
+            <button
+              onClick={handleDuplicateCreateNew}
+              className="w-full text-left p-3 rounded-lg border border-border hover:bg-accent transition-colors"
+            >
+              <p className="text-sm font-medium">{t('documents.collection.detail.duplicateFolder.createNew', '새 폴더로 업로드')}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('documents.collection.detail.duplicateFolder.createNewDesc', '번호가 붙은 새 폴더를 생성합니다')}</p>
+            </button>
+            <button
+              onClick={handleDuplicateCancel}
+              className="w-full text-left p-3 rounded-lg border border-border hover:bg-accent transition-colors"
+            >
+              <p className="text-sm font-medium text-muted-foreground">{t('documents.collection.detail.duplicateFolder.cancel', '취소')}</p>
+            </button>
+          </div>
         </div>
       </Modal>
     </div>
