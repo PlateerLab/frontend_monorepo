@@ -2,6 +2,19 @@ import type { ComponentType, ReactNode } from 'react';
 import type React from 'react';
 
 // ─────────────────────────────────────────────────────────────
+// ⚠️  Backend API Naming Convention
+// ─────────────────────────────────────────────────────────────
+// The backend API uses "workflow" naming (workflow_id, workflow_name, etc.).
+// The frontend has been renamed to "agentflow", but snake_case fields
+// (e.g., workflow_id, workflow_name, workflow_data) retain their original
+// names to match the API contract.
+//
+//   Frontend "agentflow" === Backend "workflow"
+//
+// Do NOT rename these fields without coordinating with the backend team.
+// ─────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────
 // Route Component Props
 // ─────────────────────────────────────────────────────────────
 export interface RouteComponentProps {

@@ -4,6 +4,17 @@ import { createApiClient } from './index';
 import type { ApiClient } from './client';
 
 // ─────────────────────────────────────────────────────────────
+// ⚠️  Backend API Naming Convention
+// ─────────────────────────────────────────────────────────────
+// API paths use "workflow" naming (e.g., /api/workflow/save, /api/workflow/load).
+// Request/response fields also use "workflow" (workflow_id, workflow_name, etc.).
+//
+//   Frontend "agentflow" === Backend "workflow"
+//
+// Do NOT rename API paths or snake_case fields without backend coordination.
+// ─────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────
 // Agentflow API Types
 // ─────────────────────────────────────────────────────────────
 
