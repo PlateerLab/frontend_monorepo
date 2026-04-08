@@ -134,6 +134,12 @@ export function storeStorageSessionToken(storageId: number, token: string): void
   sessionStorage.setItem('securedStorageTokens', JSON.stringify(tokens));
 }
 
+export function clearStorageSessionToken(storageId: number): void {
+  const tokens = JSON.parse(sessionStorage.getItem('securedStorageTokens') || '{}');
+  delete tokens[String(storageId)];
+  sessionStorage.setItem('securedStorageTokens', JSON.stringify(tokens));
+}
+
 export function getStorageSessionToken(storageId: number): string | null {
   const tokens = JSON.parse(sessionStorage.getItem('securedStorageTokens') || '{}');
   const entry = tokens[String(storageId)];
