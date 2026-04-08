@@ -16,11 +16,12 @@ export interface LoginData {
 }
 
 export interface LoginResult {
-  success: boolean;
   access_token: string;
   refresh_token: string;
   user_id: number;
   username: string;
+  /** 백엔드가 success 필드를 반환하지 않을 수 있음 — access_token 존재 여부로 판단 */
+  success?: boolean;
 }
 
 export interface SignupData {
@@ -194,10 +195,13 @@ export async function login(data: LoginData): Promise<LoginResult> {
 
   const result = response.data;
 
-  // 쿠키에 토큰만 저장 (user_id, username 등은 JWT에서 디코드하여 사용)
-  if (result.access_token) {
-    setCookie('access_token', result.access_token);
+  // access_token이 있으면 로그인 성공으로 판단 (백엔드가 success 필드를 반환하지 않을 수 있음)
+  if (!result.access_token) {
+    throw new Error(result.success === false ? 'LOGIN_FAILED' : 'Invalid response from server');
   }
+
+  // 쿠키에 토큰만 저장 (user_id, username 등은 JWT에서 디코드하여 사용)
+  setCookie('access_token', result.access_token);
   if (result.refresh_token) {
     setCookie('refresh_token', result.refresh_token);
   }

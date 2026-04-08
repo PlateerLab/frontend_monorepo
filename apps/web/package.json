@@ -49,6 +49,7 @@
     "@xgen/feature-admin-agentflow-management-view": "workspace:*",
     "@xgen/feature-admin-agentflow-store": "workspace:*",
     "@xgen/feature-auth-login-form": "workspace:*",
+    "@xgen/feature-auth-signup-form": "workspace:*",
     "@xgen/feature-canvas-ai-generator": "workspace:*",
     "@xgen/feature-canvas-core": "workspace:*",
     "@xgen/feature-canvas-deploy": "workspace:*",

@@ -76,18 +76,24 @@ export class ApiClient {
   private async handleResponse<T>(response: Response): Promise<ApiResponse<T>> {
     if (response.status === 401) {
       this.onUnauthorized();
-      throw new Error('Unauthorized');
+      const errorData = await response.json().catch(() => ({}));
+      const message = errorData.message || errorData.detail || 'Unauthorized';
+      throw new Error(message);
     }
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      const error: ApiError = {
+      const message = errorData.message || errorData.detail || response.statusText;
+      const error = new Error(message);
+      (error as Error & { code?: string; details?: unknown }).code = errorData.code || `HTTP_${response.status}`;
+      (error as Error & { details?: unknown }).details = errorData.details;
+
+      const apiError: ApiError = {
         code: errorData.code || `HTTP_${response.status}`,
-        message: errorData.message || response.statusText,
+        message,
         details: errorData.details,
       };
-
-      this.onError?.(error);
+      this.onError?.(apiError);
       throw error;
     }
 

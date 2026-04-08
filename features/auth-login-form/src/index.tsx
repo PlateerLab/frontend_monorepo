@@ -34,9 +34,25 @@ function getErrorMessageKey(error: string): string {
     'Database error': 'loginForm.errors.databaseError',
     'Failed to create token': 'loginForm.errors.tokenCreationFailed',
     'LOGIN_FAILED': 'loginForm.errors.loginFailed',
+    'Unauthorized': 'loginForm.errors.invalidCredentials',
   };
 
-  return errorKeyMap[error] || 'loginForm.errors.loginFailed';
+  // 정확한 매칭 먼저
+  if (errorKeyMap[error]) return errorKeyMap[error];
+
+  // 부분 매칭 (서버 메시지 변형 대응)
+  const lowerError = error.toLowerCase();
+  if (lowerError.includes('invalid') && (lowerError.includes('email') || lowerError.includes('password'))) {
+    return 'loginForm.errors.invalidCredentials';
+  }
+  if (lowerError.includes('database')) {
+    return 'loginForm.errors.databaseError';
+  }
+  if (lowerError.includes('token')) {
+    return 'loginForm.errors.tokenCreationFailed';
+  }
+
+  return 'loginForm.errors.loginFailed';
 }
 
 // ─────────────────────────────────────────────────────────────

@@ -128,6 +128,9 @@ importers:
       '@xgen/feature-auth-login-form':
         specifier: workspace:*
         version: link:../../features/auth-login-form
+      '@xgen/feature-auth-signup-form':
+        specifier: workspace:*
+        version: link:../../features/auth-signup-form
       '@xgen/feature-canvas-ai-generator':
         specifier: workspace:*
         version: link:../../features/canvas-ai-generator
@@ -172,10 +175,10 @@ importers:
         version: link:../../features/main-chat-history
       '@xgen/feature-main-dashboard':
         specifier: workspace:*
-        version: link:../../features/main-Dashboard
+        version: link:../../features/main-dashboard
       '@xgen/feature-root-landing':
         specifier: workspace:*
-        version: link:../../features/root-Landing
+        version: link:../../features/root-landing
       '@xgen/feature-root-landing-cta':
         specifier: workspace:*
         version: link:../../features/root-landing-cta
@@ -265,7 +268,7 @@ importers:
         version: link:../../features/main-upload-history
       '@xgen/mypage-profile':
         specifier: workspace:*
-        version: link:../../features/mypage-Profile
+        version: link:../../features/mypage-profile
       '@xgen/sidebar-admin':
         specifier: workspace:*
         version: link:../../features/sidebar-admin
@@ -1356,6 +1359,34 @@ importers:
         specifier: ^5
         version: 5.9.3
 
+  features/auth-signup-form:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      next:
+        specifier: ^15.1.0
+        version: 15.5.14(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.99.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
   features/canvas-ai-generator:
     dependencies:
       '@xgen/api-client':
@@ -1650,30 +1681,6 @@ importers:
       typescript:
         specifier: ^5
         version: 5.9.3
-
-  features/main-Dashboard:
-    dependencies:
-      '@xgen/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@xgen/auth-provider':
-        specifier: workspace:*
-        version: link:../../packages/auth-provider
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
 
   features/main-agentflow-management-orchestrator:
     dependencies:
@@ -2080,6 +2087,30 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
+  features/main-dashboard:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+
   features/main-document-management-collection:
     dependencies:
       '@xgen/api-client':
@@ -2477,7 +2508,7 @@ importers:
         specifier: ^5
         version: 5.9.3
 
-  features/mypage-Profile:
+  features/mypage-profile:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -2501,7 +2532,7 @@ importers:
         specifier: ^19.1.0
         version: 19.2.4
 
-  features/root-Landing:
+  features/root-landing:
     dependencies:
       '@xgen/types':
         specifier: workspace:*

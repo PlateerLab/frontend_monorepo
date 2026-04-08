@@ -61,6 +61,8 @@ const nextConfig: NextConfig = {
         '@xgen/feature-canvas-sidebar-agentflows',
         '@xgen/feature-canvas-execution',
         '@xgen/feature-canvas-history',
+        '@xgen/feature-auth-login-form',
+        '@xgen/feature-auth-signup-form',
         '@xgen/feature-canvas-ai-generator',
         '@xgen/feature-canvas-node-detail',
         '@xgen/feature-canvas-document-drop',

@@ -162,13 +162,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, onAuthStat
         password: credentials.password,
       });
 
-      if (result.success && result.access_token) {
+      // access_token 존재 여부로 로그인 성공 판단 (백엔드가 success 필드를 반환하지 않을 수 있음)
+      if (result.access_token) {
         // JWT payload에서 사용자 정보 추출
         const payload = decodeJwtPayload(result.access_token);
         const newUser: User = {
-          id: payload?.sub ?? result.user_id.toString(),
-          user_id: payload ? parseInt(payload.sub, 10) : result.user_id,
-          username: payload?.username ?? result.username,
+          id: payload?.sub ?? result.user_id?.toString() ?? '',
+          user_id: payload ? parseInt(payload.sub, 10) : (result.user_id ?? 0),
+          username: payload?.username ?? result.username ?? '',
           email: credentials.email,
           is_superuser: payload?.is_superuser ?? payload?.is_admin ?? false,
           is_admin: payload?.is_superuser ?? payload?.is_admin ?? false,
