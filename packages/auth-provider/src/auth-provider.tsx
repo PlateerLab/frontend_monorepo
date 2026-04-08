@@ -2,12 +2,12 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import type { User, AuthState } from '@xgen/types';
+import { hasPermission as checkPermission, canAccessAdmin } from '@xgen/types';
 import {
   login as apiLogin,
   logout as apiLogout,
   validateToken,
   getCookie,
-  setCookie,
   clearAllAuthCookies,
   decodeJwtPayload,
   type TokenValidationResult,
@@ -36,10 +36,6 @@ interface AuthContextValue extends AuthState {
   refreshAuth: () => Promise<void>;
   hasPermission: (permission: string) => boolean;
   hasAccessToSection: (section: string) => boolean;
-  /** 사용 가능한 사용자 섹션 */
-  availableUserSections: string[];
-  /** 사용 가능한 관리자 섹션 */
-  availableAdminSections: string[];
   /** 로그아웃 진행 중 여부 (guard redirect loop 방지) */
   isLoggingOut: boolean;
 }
@@ -60,8 +56,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, onAuthStat
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [availableUserSections, setAvailableUserSections] = useState<string[]>([]);
-  const [availableAdminSections, setAvailableAdminSections] = useState<string[]>([]);
   const lastCheckedTokenRef = useRef<string | null>(null);
 
   // ──────────────────────────────────────────────────────────
@@ -79,28 +73,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, onAuthStat
           id: payload.sub,
           user_id: parseInt(payload.sub, 10),
           username: payload.username,
-          is_admin: payload.is_admin,
+          is_superuser: payload.is_superuser ?? payload.is_admin ?? false,
+          is_admin: payload.is_superuser ?? payload.is_admin ?? false,
+          roles: payload.roles ?? [],
         });
       } else {
         // JWT 디코드 실패 → 인증 정보 클리어
         setUser(null);
-        setAvailableUserSections([]);
-        setAvailableAdminSections([]);
-      }
-
-      // 섹션 정보 복원 (쿠키에서)
-      const savedUserSections = getCookie('available_user_section');
-      const savedAdminSections = getCookie('available_admin_section');
-      if (savedUserSections) {
-        setAvailableUserSections(savedUserSections.split(',').filter(Boolean));
-      }
-      if (savedAdminSections) {
-        setAvailableAdminSections(savedAdminSections.split(',').filter(Boolean));
       }
     } else {
       setUser(null);
-      setAvailableUserSections([]);
-      setAvailableAdminSections([]);
     }
 
     setIsInitialized(true);
@@ -114,28 +96,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, onAuthStat
       const result = await validateToken(token);
 
       if (result.valid) {
-        // 사용자 정보 업데이트
+        // 사용자 정보 업데이트 (ABAC 필드)
         setUser(prev => prev ? {
           ...prev,
-          is_admin: result.is_admin ?? false,
-          user_type: result.user_type ?? 'user',
-          available_user_section: result.available_user_section ?? [],
-          available_admin_section: result.available_admin_section ?? [],
+          is_superuser: result.is_superuser ?? result.is_admin ?? false,
+          is_admin: result.is_superuser ?? result.is_admin ?? false,
+          roles: result.roles ?? [],
+          permissions: result.permissions ?? [],
+          user_type: result.user_type,
         } : prev);
-
-        // 섹션 정보 업데이트
-        const userSections = result.available_user_section ?? [];
-        const adminSections = result.available_admin_section ?? [];
-        setAvailableUserSections(userSections);
-        setAvailableAdminSections(adminSections);
-
-        // 섹션 정보 쿠키에 저장
-        if (userSections.length > 0) {
-          setCookie('available_user_section', userSections.join(','), 30);
-        }
-        if (adminSections.length > 0) {
-          setCookie('available_admin_section', adminSections.join(','), 30);
-        }
 
         lastCheckedTokenRef.current = token;
         return result;
@@ -156,15 +125,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, onAuthStat
     setIsLoggingOut(true);
     clearAllAuthCookies();
 
-    // 섹션 쿠키도 삭제
-    if (typeof document !== 'undefined') {
-      document.cookie = 'xgen_available_user_section=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      document.cookie = 'xgen_available_admin_section=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    }
-
     setUser(null);
-    setAvailableUserSections([]);
-    setAvailableAdminSections([]);
     lastCheckedTokenRef.current = null;
 
     // 100ms 후 isLoggingOut 해제 (AuthGuard redirect loop 방지)
@@ -209,7 +170,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, onAuthStat
           user_id: payload ? parseInt(payload.sub, 10) : result.user_id,
           username: payload?.username ?? result.username,
           email: credentials.email,
-          is_admin: payload?.is_admin,
+          is_superuser: payload?.is_superuser ?? payload?.is_admin ?? false,
+          is_admin: payload?.is_superuser ?? payload?.is_admin ?? false,
+          roles: payload?.roles ?? [],
         };
         setUser(newUser);
 
@@ -261,24 +224,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, onAuthStat
   // ──────────────────────────────────────────────────────────
   const hasPermission = useCallback((permission: string): boolean => {
     if (!user) return false;
-    return user.permissions?.includes(permission) ?? false;
+    // ABAC: 와일드카드 매칭 사용
+    return checkPermission(user.permissions ?? [], permission);
   }, [user]);
 
-  // 섹션 접근 권한 확인
+  // 섹션 접근 권한 확인 (ABAC 기반)
   const hasAccessToSection = useCallback((section: string): boolean => {
     if (!user) return false;
 
-    // 관리자는 모든 섹션 접근 가능
-    if (user.is_admin) return true;
+    // superuser는 모든 섹션 접근 가능
+    if (user.is_superuser) return true;
 
-    // available_user_section에 해당 섹션이 있는지 확인
-    if (availableUserSections.length > 0) {
-      return availableUserSections.includes(section);
+    // ABAC: 퍼미션 기반 체크 (section → resource 매핑)
+    if (user.permissions && user.permissions.length > 0) {
+      return checkPermission(user.permissions, `${section}:read`) ||
+             checkPermission(user.permissions, `${section}:*`);
     }
 
-    // 섹션 정보가 없으면 기본 허용
-    return true;
-  }, [user, availableUserSections]);
+    // 권한이 없으면 기본 거부
+    return false;
+  }, [user]);
 
   const value = useMemo<AuthContextValue>(() => ({
     user,
@@ -291,11 +256,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, onAuthStat
     refreshAuth,
     hasPermission,
     hasAccessToSection,
-    availableUserSections,
-    availableAdminSections,
     isLoggingOut,
   }), [user, isLoading, isInitialized, loginWithCredentials, redirectToLogin, logout, refreshAuth,
-    hasPermission, hasAccessToSection, availableUserSections, availableAdminSections, isLoggingOut]);
+    hasPermission, hasAccessToSection, isLoggingOut]);
 
   return (
     <AuthContext.Provider value={value}>

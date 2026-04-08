@@ -141,32 +141,22 @@ const AdminUsersPage: React.FC<RouteComponentProps> = () => {
           </StatusBadge>
         ),
       },
-      {
-        id: 'groups',
-        header: t('admin.userManagement.userList.tableHeaders.organization'),
-        cell: (row) => (
-          <div className="flex flex-wrap gap-1">
-            {row.groups?.map((g) => (
-              <span key={g} className="rounded bg-accent px-1.5 py-0.5 text-xs">
-                {g}
-              </span>
-            ))}
-          </div>
-        ),
-      },
+
       {
         id: 'user_type',
         header: t('admin.userManagement.userList.tableHeaders.roleType'),
         field: 'user_type',
         sortable: true,
         cell: (row) => {
+          const isSuperuser = row.is_superuser;
           const variant =
-            row.user_type === 'superuser'
+            isSuperuser
               ? 'error'
-              : row.user_type === 'admin'
+              : (row.roles?.length ?? 0) > 0
                 ? 'warning'
                 : 'neutral';
-          return <StatusBadge variant={variant} dot={false}>{row.user_type}</StatusBadge>;
+          const label = isSuperuser ? 'superuser' : (row.roles?.length ? row.roles.join(', ') : (row.user_type ?? 'standard'));
+          return <StatusBadge variant={variant} dot={false}>{label}</StatusBadge>;
         },
       },
       {

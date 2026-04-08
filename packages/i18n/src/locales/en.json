@@ -519,9 +519,9 @@
           "title": "Create User",
           "description": "Register new users"
         },
-        "groupPermissions": {
-          "title": "Group Permissions",
-          "description": "Configure group permissions"
+        "roleManagement": {
+          "title": "ABAC Role/Permission Management",
+          "description": "Manage roles, permissions, and supervision"
         }
       },
       "workflow": {
@@ -706,9 +706,9 @@
         "title": "Create User",
         "description": "Register a new user."
       },
-      "groupPermissions": {
-        "title": "Group Permissions",
-        "description": "Configure permissions by group."
+      "roleManagement": {
+        "title": "ABAC Role/Permission Management",
+        "description": "Manage roles, permissions, and supervision."
       },
       "workflowManagement": {
         "title": "Workflow Management",
@@ -1138,99 +1138,6 @@
         "cancel": "Cancel",
         "save": "Save",
         "saving": "Saving..."
-      },
-      "groupPermissions": {
-        "loading": "Loading organization list...",
-        "loadError": "Failed to load organization list.",
-        "errorOccurred": "Error Occurred",
-        "retry": "Retry",
-        "createGroup": "Create New Organization",
-        "groupNamePlaceholder": "Search by organization name...",
-        "createModal": {
-          "title": "Create New Organization",
-          "groupName": "Organization Name",
-          "groupNamePlaceholder": "Enter organization name",
-          "cancel": "Cancel",
-          "create": "Create"
-        },
-        "editPermissions": "Edit Permissions",
-        "delete": "Delete",
-        "cancel": "Cancel",
-        "members": "Members",
-        "addMember": "Add Member",
-        "addMemberModal": {
-          "title": "Add Organization Member",
-          "close": "Close",
-          "searchPlaceholder": "Search by email, username, or name",
-          "loading": "Loading users...",
-          "selectAtLeastOne": "Please select at least one user to add.",
-          "statusAvailable": "Available",
-          "statusAlreadyMember": "Already in group",
-          "add": "Add",
-          "adding": "Adding...",
-          "addSuccess": "Added {{count}} users to the organization.",
-          "addError": "Failed to add users.",
-          "noUsersAvailable": "No users available to add.",
-          "selectedCount": "{{count}} selected"
-        },
-        "permissionModal": {
-          "titleSuffix": "Edit Permissions",
-          "statusActive": "Active Status",
-          "statusInactive": "Inactive Status",
-          "availableSections": "Available Sections",
-          "update": "Update Permissions",
-          "selectAll": "Select All",
-          "clearAll": "Clear All",
-          "selectedCount": "{{count}} / {{total}} selected"
-        },
-        "createSuccess": "Organization has been successfully created.",
-        "createError": "Failed to create organization.",
-        "updateSuccess": "Organization permissions have been successfully updated.",
-        "updateError": "Failed to update organization permissions.",
-        "deleteSuccess": "Organization has been successfully deleted.",
-        "deleteError": "Failed to delete organization.",
-        "deleteTitle": "Delete Organization",
-        "deleteMessage": "Are you sure you want to delete \"{{groupName}}\" organization?\nUsers in this organization will be moved to 'none' group.",
-        "noGroups": "No registered organizations.",
-        "groupsTab": "Groups",
-        "membersTab": "{{groupName}} Members",
-        "membersTabEmpty": "Members",
-        "memberCount": "{{count}} members",
-        "totalGroups": "Total {{count}} organizations",
-        "backToGroups": "Back",
-        "groupUsers": "{{groupName}} Organization Users ({{count}})",
-        "removeFromGroup": "Remove",
-        "removeUserConfirmTitle": "Remove from Organization",
-        "removeUserConfirmMessage": "Are you sure you want to remove \"{{username}}\" from \"{{groupName}}\" organization?",
-        "removeUserSuccess": "User has been removed from the organization.",
-        "removeUserError": "Failed to remove user from organization.",
-        "loadUsersError": "Failed to load group user list.",
-        "tableHeaders": {
-          "groupName": "Organization Name",
-          "status": "Status",
-          "sections": "Available Sections",
-          "actions": "Actions"
-        },
-        "userTableHeaders": {
-          "id": "ID",
-          "email": "Email",
-          "username": "Username",
-          "fullName": "Full Name",
-          "status": "Status",
-          "registrationDate": "Registration Date",
-          "lastLogin": "Last Login",
-          "permission": "Permission",
-          "actions": "Actions"
-        },
-        "status": {
-          "active": "Active",
-          "inactive": "Inactive"
-        },
-        "noSearchResults": "No search results.",
-        "noUsersInGroup": "No users in this organization.",
-        "loadingUsers": "Loading user list...",
-        "noSections": "None",
-        "viewUsers": "View Users"
       }
     },
     "workflowManagement": {

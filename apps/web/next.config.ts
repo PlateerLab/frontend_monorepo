@@ -71,7 +71,6 @@ const nextConfig: NextConfig = {
         // admin features (33 individual per-sidebar-item packages)
         '@xgen/feature-admin-users',
         '@xgen/feature-admin-user-create',
-        '@xgen/feature-admin-group-permissions',
         '@xgen/feature-admin-workflow-management-orchestrator',
         '@xgen/feature-admin-workflow-management-view',
         '@xgen/feature-admin-workflow-management-executor',

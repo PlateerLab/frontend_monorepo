@@ -101,7 +101,8 @@ export const ProfileView: React.FC = () => {
     });
   };
 
-  const getUserTypeLabel = (userType?: string) => {
+  const getUserTypeLabel = (userType?: string, isSuperuserFlag?: boolean) => {
+    if (isSuperuserFlag) return t('mypage.profile.userType.superuser');
     switch (userType) {
       case 'superuser': return t('mypage.profile.userType.superuser');
       case 'admin': return t('mypage.profile.userType.admin');
@@ -110,7 +111,7 @@ export const ProfileView: React.FC = () => {
     }
   };
 
-  const isSuperuser = user?.user_type === 'superuser';
+  const isSuperuser = user?.is_superuser ?? user?.user_type === 'superuser';
 
   if (loading) {
     return (
@@ -153,7 +154,7 @@ export const ProfileView: React.FC = () => {
               <h2 className="text-lg font-bold text-foreground">
                 {user?.full_name || user?.username || t('mypage.profile.user')}
               </h2>
-              <span className="text-sm text-muted-foreground">{getUserTypeLabel(user?.user_type)}</span>
+              <span className="text-sm text-muted-foreground">{getUserTypeLabel(user?.user_type, user?.is_superuser)}</span>
               {user?.is_active !== undefined && (
                 <span className={cn(
                   'inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full w-fit',
@@ -171,47 +172,42 @@ export const ProfileView: React.FC = () => {
           <div className="grid gap-4">
             <InfoRow icon={<UserIcon />} label={t('mypage.profile.fields.username')} value={user?.username || '-'} />
             <InfoRow icon={<MailIcon />} label={t('mypage.profile.fields.email')} value={user?.email || '-'} />
-            <InfoRow icon={<UsersIcon />} label={t('mypage.profile.fields.group')} value={user?.group_name || '-'} />
-            <InfoRow icon={<ShieldIcon />} label={t('mypage.profile.fields.adminPermission')} value={user?.is_admin ? t('mypage.profile.permission.yes') : t('mypage.profile.permission.no')} />
+            <InfoRow icon={<ShieldIcon />} label={t('mypage.profile.fields.adminPermission')} value={isSuperuser ? t('mypage.profile.permission.yes') : t('mypage.profile.permission.no')} />
             <InfoRow icon={<CalendarIcon />} label={t('mypage.profile.fields.joinDate')} value={formatDate(user?.created_at)} />
             <InfoRow icon={<ClockIcon />} label={t('mypage.profile.fields.lastLogin')} value={user?.last_login ? formatDate(user.last_login) : t('mypage.profile.fields.noRecord')} />
           </div>
         </div>
 
-        {/* Access Permissions — superuser가 아닌 경우에만 표시 */}
-        {!isSuperuser && (user?.available_user_sections || user?.available_admin_sections) && (
+        {/* Roles & Permissions — 역할 정보 표시 */}
+        {!isSuperuser && user?.roles && user.roles.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+            <h3 className="text-sm font-semibold text-foreground mb-4">{t('mypage.profile.accessPermission.title')}</h3>
+            <div className="mb-4">
+              <span className="text-xs font-medium text-muted-foreground mb-2 block">
+                역할 (Roles)
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {user.roles.map((role: string, i: number) => (
+                  <span key={i} className="text-xs px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 font-medium">
+                    {role}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Access Permissions — ABAC 권한 표시 */}
+        {!isSuperuser && user?.permissions && user.permissions.length > 0 && (
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h3 className="text-sm font-semibold text-foreground mb-4">{t('mypage.profile.accessPermission.title')}</h3>
-
-            {user?.available_user_sections && user.available_user_sections.length > 0 && (
-              <div className="mb-4">
-                <span className="text-xs font-medium text-muted-foreground mb-2 block">
-                  {t('mypage.profile.accessPermission.userSection')}
+            <div className="flex flex-wrap gap-1.5">
+              {user.permissions.map((perm: string, i: number) => (
+                <span key={i} className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-medium">
+                  {perm}
                 </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {user.available_user_sections.map((section: string, i: number) => (
-                    <span key={i} className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-medium">
-                      {section}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {user?.available_admin_sections && user.available_admin_sections.length > 0 && (
-              <div>
-                <span className="text-xs font-medium text-muted-foreground mb-2 block">
-                  {t('mypage.profile.accessPermission.adminSection')}
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {user.available_admin_sections.map((section: string, i: number) => (
-                    <span key={i} className="text-xs px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 font-medium">
-                      {section}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
         )}
       </div>

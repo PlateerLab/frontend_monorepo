@@ -22,7 +22,7 @@ export interface WorkflowDetailFromAPI {
   has_endnode: boolean;
   is_completed: boolean;
   is_shared: boolean;
-  share_group: string | null;
+  share_roles: string[] | null;
   share_permissions: string;
   metadata?: Record<string, unknown>;
   error?: string;

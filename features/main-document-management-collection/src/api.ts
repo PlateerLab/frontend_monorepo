@@ -157,7 +157,7 @@ export async function updateCollection(
   data: {
     collection_make_name?: string;
     is_shared?: boolean;
-    share_group?: string | null;
+    share_roles?: string[] | null;
     is_secured?: boolean;
     password_hash?: string | null;
   }

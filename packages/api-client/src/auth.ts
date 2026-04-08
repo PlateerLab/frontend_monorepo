@@ -28,7 +28,6 @@ export interface SignupData {
   email: string;
   password: string;
   full_name?: string;
-  group_name?: string;
   mobile_phone_number?: string;
 }
 
@@ -42,18 +41,30 @@ export interface TokenValidationResult {
   valid: boolean;
   user_id: number | null;
   username: string | null;
-  is_admin: boolean | null;
-  user_type: string | null;
-  available_user_section: string[] | null;
-  available_admin_section: string[] | null;
+  is_superuser: boolean | null;
+  roles: string[] | null;
+  permissions: string[] | null;
   new_access_token?: string;
+  /** @deprecated Use is_superuser instead */
+  is_admin?: boolean | null;
+  /** @deprecated Use roles instead */
+  user_type?: string | null;
+  /** @deprecated Use permissions-based checks */
+  available_user_section?: string[] | null;
+  /** @deprecated Use permissions-based checks */
+  available_admin_section?: string[] | null;
 }
 
 export interface UserInfo {
   user_id: number;
   username: string;
   email?: string;
+  is_superuser?: boolean;
+  roles?: string[];
+  permissions?: string[];
+  /** @deprecated Use is_superuser instead */
   is_admin?: boolean;
+  /** @deprecated Use roles instead */
   user_type?: string;
 }
 
@@ -61,9 +72,12 @@ export interface UserInfo {
 export interface JwtPayload {
   sub: string;
   username: string;
-  is_admin: boolean;
+  is_superuser: boolean;
+  roles: string[];
   exp: number;
   type: string;
+  /** @deprecated Use is_superuser instead */
+  is_admin?: boolean;
 }
 
 // ============================================================================
@@ -140,7 +154,7 @@ export function clearAllAuthCookies(): void {
 /**
  * JWT 토큰의 payload를 디코드합니다.
  * 서명 검증은 수행하지 않습니다 (백엔드 validateToken에서 수행).
- * user_id, username, is_admin 등 사용자 정보를 쿠키 노출 없이 추출합니다.
+ * user_id, username, is_superuser 등 사용자 정보를 쿠키 노출 없이 추출합니다.
  */
 export function decodeJwtPayload(token: string): JwtPayload | null {
   try {
@@ -264,10 +278,9 @@ export async function validateToken(token?: string): Promise<TokenValidationResu
     valid: false,
     user_id: null,
     username: null,
-    is_admin: null,
-    user_type: null,
-    available_user_section: null,
-    available_admin_section: null,
+    is_superuser: null,
+    roles: null,
+    permissions: null,
   };
 
   if (!accessToken) {
@@ -316,8 +329,9 @@ export async function getCurrentUser(): Promise<UserInfo | null> {
     return {
       user_id: validation.user_id!,
       username: validation.username!,
-      is_admin: validation.is_admin ?? false,
-      user_type: validation.user_type ?? 'user',
+      is_superuser: validation.is_superuser ?? false,
+      roles: validation.roles ?? [],
+      permissions: validation.permissions ?? [],
     };
   } catch {
     return null;
@@ -338,7 +352,8 @@ export function getUserFromToken(): UserInfo | null {
   return {
     user_id: parseInt(payload.sub, 10),
     username: payload.username,
-    is_admin: payload.is_admin,
+    is_superuser: payload.is_superuser ?? payload.is_admin ?? false,
+    roles: payload.roles ?? [],
   };
 }
 

@@ -34,7 +34,7 @@ export interface ToolDetailAPIResponse {
   username: string;
   full_name: string;
   is_shared: boolean;
-  share_group: string | null;
+  share_roles: string[] | null;
   share_permissions: string;
 }
 
@@ -66,7 +66,7 @@ export interface ToolDetail {
   createdAt: string;
   lastModified: string;
   isShared: boolean;
-  shareGroup: string | null;
+  shareRoles: string[] | null;
   sharePermissions: string;
   isDeployed?: boolean;
   inquireDeploy?: boolean;
@@ -181,7 +181,7 @@ function transformToolDetail(response: ToolDetailAPIResponse): ToolDetail {
     createdAt: response.created_at,
     lastModified: response.updated_at,
     isShared: response.is_shared,
-    shareGroup: response.share_group,
+    shareRoles: response.share_roles,
     sharePermissions: response.share_permissions,
     isDeployed: response.is_deployed,
     inquireDeploy: response.inquire_deploy,

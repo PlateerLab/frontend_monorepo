@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { MainSidebar } from '@xgen/sidebar-main';
 import type { MainSidebarSection } from '@xgen/sidebar-main';
 import type { SidebarLabelOverrides } from '@xgen/types';
+import { canAccessAdmin } from '@xgen/types';
 import { useTranslation } from '@xgen/i18n';
 import { AuthGuard, useAuth } from '@xgen/auth-provider';
 import { featureRegistry, initializeFeatures } from '@/features';
@@ -127,13 +128,13 @@ function MainPageContent() {
         activeItemId={activeItemId}
         collapsed={sidebarCollapsed}
         userName={user?.username}
-        isAdmin={user?.is_admin}
+        isAdmin={canAccessAdmin(user)}
         locale={locale}
         onLocaleChange={(l) => setLocale(l as 'ko' | 'en')}
         onNavigate={handleNavigate}
         onToggle={handleSidebarToggle}
         onLogout={() => logout()}
-        onAdminClick={user?.is_admin ? () => router.push('/admin') : undefined}
+        onAdminClick={canAccessAdmin(user) ? () => router.push('/admin') : undefined}
         onUserClick={() => router.push('/mypage')}
         labelOverrides={SIDEBAR_LABEL_OVERRIDES}
       />

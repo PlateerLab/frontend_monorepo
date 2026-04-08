@@ -1,5 +1,5 @@
 {
-  "name": "@xgen/feature-admin-group-permissions",
+  "name": "@xgen/feature-admin-role-management",
   "version": "0.0.0",
   "private": true,
   "main": "src/index.tsx",

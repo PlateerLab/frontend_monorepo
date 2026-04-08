@@ -37,7 +37,7 @@ export interface WorkflowListItem {
     has_endnode?: boolean;
     is_completed?: boolean;
     is_shared?: boolean;
-    share_group?: string | null;
+    share_roles?: string[] | null;
     share_permissions?: string;
     metadata?: Record<string, unknown>;
     error?: string;
@@ -670,7 +670,7 @@ export interface AdminWorkflowMeta {
     has_startnode?: boolean;
     has_endnode?: boolean;
     is_shared: boolean;
-    share_group?: string | null;
+    share_roles?: string[] | null;
     share_permissions?: string | null;
     description?: string;
     inquire_deploy?: boolean;

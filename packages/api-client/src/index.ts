@@ -222,21 +222,30 @@ export {
   approveUser,
   deleteUser as deleteAdminUser,
   editUser,
-  addUserGroup,
-  removeUserGroup,
-  updateUserAvailableAdminSections,
-  updateUserAvailableUserSections,
 } from './admin-users';
 
-// Admin Group API exports
+// Admin Role/Permission/Supervision API exports (ABAC)
 export {
-  getAllGroups,
-  getAllGroupsList,
-  createGroup,
-  getGroupUsers,
-  updateGroupPermissions,
-  deleteGroup,
-} from './admin-groups';
+  getAllRoles,
+  createRole,
+  updateRole,
+  deleteRole,
+  getRolePermissions,
+  updateRolePermissions,
+  getAllPermissions,
+  getRoleUsers,
+  getUserRoles,
+  assignUserRole,
+  removeUserRole,
+  getUserDirectPermissions,
+  setUserDirectPermission,
+  removeUserDirectPermission,
+  resolveUserPermissions,
+  getAllSupervisions,
+  getRoleSupervision,
+  createSupervision,
+  deleteSupervision,
+} from './admin-roles';
 
 // Admin System API exports
 export {

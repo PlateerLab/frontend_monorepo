@@ -52,9 +52,9 @@ function applySecurityHeaders(response: NextResponse, pathname: string): void {
   const csp = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:",
-    "style-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https:",
-    "font-src 'self' data:",
+    "font-src 'self' data: https://fonts.gstatic.com",
     "connect-src 'self' https: wss: ws://localhost:* ws://127.0.0.1:* http://localhost:*",
     "frame-src 'self' https:",
     "media-src 'self' blob:",

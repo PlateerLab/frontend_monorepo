@@ -33,7 +33,7 @@ export interface DBConnectionAPIResponse {
   denied_tables?: string | null;
   is_active?: boolean;
   is_shared?: boolean;
-  share_group?: string | null;
+  share_roles?: string[] | null;
   share_permissions?: string | null;
   last_connection_status?: string | null;
   last_connected_at?: string | null;
@@ -74,7 +74,7 @@ export interface DBConnectionItem {
   deniedTables: string;
   isActive: boolean;
   isShared: boolean;
-  shareGroup: string | null;
+  shareRoles: string[] | null;
   sharePermissions: string | null;
   lastConnectionStatus: string | null;
   lastConnectedAt: string | null;
@@ -115,7 +115,7 @@ function transformDBConnection(raw: DBConnectionAPIResponse): DBConnectionItem {
     deniedTables: raw.denied_tables || '',
     isActive: raw.is_active ?? true,
     isShared: raw.is_shared ?? false,
-    shareGroup: raw.share_group || null,
+    shareRoles: raw.share_roles || [],
     sharePermissions: raw.share_permissions || null,
     lastConnectionStatus: raw.last_connection_status || null,
     lastConnectedAt: raw.last_connected_at || null,
@@ -202,7 +202,7 @@ export async function testSavedDBConnection(connectionId: number): Promise<{ suc
 
 export async function shareDBConnection(
   connectionId: number,
-  data: { is_shared: boolean; share_group?: string | null; share_permissions?: string },
+  data: { is_shared: boolean; share_roles?: string[] | null; share_permissions?: string },
 ): Promise<void> {
   const api = createApiClient();
   await api.post(`/api/workflow/db-connection/share/${connectionId}`, data);

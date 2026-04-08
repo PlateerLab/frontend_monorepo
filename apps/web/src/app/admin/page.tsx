@@ -6,6 +6,7 @@ import { AdminSidebar } from '@xgen/sidebar-admin';
 import { useTranslation } from '@xgen/i18n';
 import { AuthGuard, useAuth } from '@xgen/auth-provider';
 import { ContentArea } from '@xgen/ui';
+import { canAccessAdmin } from '@xgen/types';
 import { initializeAdminFeatures, getAdminRouteComponent, getAdminSidebarSections } from '@/features/admin-feature-registry';
 import styles from './AdminPage.module.scss';
 
@@ -58,7 +59,9 @@ function AdminPageContent() {
   useEffect(() => {
     async function init() {
       await initializeAdminFeatures();
-      setSections(getAdminSidebarSections());
+      const userPerms = user?.permissions ?? [];
+      const isSuperuser = user?.is_superuser ?? false;
+      setSections(getAdminSidebarSections(isSuperuser ? undefined : userPerms));
       setInitialized(true);
     }
     init();
@@ -141,12 +144,29 @@ function AdminPageContent() {
 // Admin Page with Suspense boundary for useSearchParams
 // ─────────────────────────────────────────────────────────────
 
+const NoPermissionFallback: React.FC = () => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', flexDirection: 'column', gap: '8px' }}>
+    <h2>접근 권한이 없습니다</h2>
+    <p style={{ color: '#888' }}>관리자 페이지에 접근하려면 관리자 권한이 필요합니다.</p>
+  </div>
+);
+
+function AdminPageGuard({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) return <LoadingSpinner />;
+  if (!canAccessAdmin(user)) return <NoPermissionFallback />;
+  return <>{children}</>;
+}
+
 export default function AdminPage() {
   return (
     <AuthGuard>
-      <Suspense fallback={<LoadingSpinner />}>
-        <AdminPageContent />
-      </Suspense>
+      <AdminPageGuard>
+        <Suspense fallback={<LoadingSpinner />}>
+          <AdminPageContent />
+        </Suspense>
+      </AdminPageGuard>
     </AuthGuard>
   );
 }

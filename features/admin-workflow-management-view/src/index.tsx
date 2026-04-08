@@ -129,7 +129,7 @@ const WorkflowListView: React.FC<ViewProps> = ({ onSelectWorkflow, onSubToolbarC
         inquire_deploy: false,
         is_accepted: Boolean(w.is_accepted),
         is_shared: Boolean(w.is_shared),
-        share_group: w.share_group || null,
+        share_roles: w.share_roles || [],
         user_id: w.user_id,
       });
       toast.success(t('admin.workflowManagement.workflowControl.deployApproveSuccess', { name: w.workflow_name }));
@@ -146,7 +146,7 @@ const WorkflowListView: React.FC<ViewProps> = ({ onSelectWorkflow, onSubToolbarC
         inquire_deploy: false,
         is_accepted: Boolean(w.is_accepted),
         is_shared: Boolean(w.is_shared),
-        share_group: w.share_group || null,
+        share_roles: w.share_roles || [],
         user_id: w.user_id,
       });
       toast.success(t('admin.workflowManagement.workflowControl.deployRejectSuccess', { name: w.workflow_name }));

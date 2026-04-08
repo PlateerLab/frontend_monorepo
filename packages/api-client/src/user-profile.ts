@@ -18,14 +18,19 @@ export interface UserProfileDetail {
   created_at: string;
   updated_at: string;
   is_active: boolean;
-  is_admin: boolean;
-  user_type: string;
-  groups: string[] | null;
-  group_name: string | null;
+  is_superuser: boolean;
+  roles: string[];
+  permissions: string[];
   last_login: string | null;
   preferences: Record<string, unknown> | null;
-  available_user_sections: string[] | null;
-  available_admin_sections: string[] | null;
+  /** @deprecated Use is_superuser instead */
+  is_admin?: boolean;
+  /** @deprecated Use roles instead */
+  user_type?: string;
+  /** @deprecated Use permissions-based checks */
+  available_user_sections?: string[] | null;
+  /** @deprecated Use permissions-based checks */
+  available_admin_sections?: string[] | null;
 }
 
 export interface UpdateUserProfileData {

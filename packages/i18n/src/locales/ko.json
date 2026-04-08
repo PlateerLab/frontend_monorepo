@@ -519,9 +519,9 @@
           "title": "사용자 생성",
           "description": "새 사용자 등록"
         },
-        "groupPermissions": {
-          "title": "그룹 권한",
-          "description": "그룹별 권한 설정"
+        "roleManagement": {
+          "title": "ABAC 역할/권한 관리",
+          "description": "역할, 권한, 감독 관계 관리"
         }
       },
       "workflow": {
@@ -706,9 +706,9 @@
         "title": "사용자 생성",
         "description": "새 사용자를 등록합니다."
       },
-      "groupPermissions": {
-        "title": "그룹 권한",
-        "description": "그룹별 권한을 설정합니다."
+      "roleManagement": {
+        "title": "ABAC 역할/권한 관리",
+        "description": "역할, 권한, 감독 관계를 관리합니다."
       },
       "workflowManagement": {
         "title": "워크플로우 관리",
@@ -1138,99 +1138,6 @@
         "cancel": "취소",
         "save": "저장",
         "saving": "저장 중..."
-      },
-      "groupPermissions": {
-        "loading": "조직 목록을 불러오는 중...",
-        "loadError": "조직 목록을 불러오는데 실패했습니다.",
-        "errorOccurred": "오류 발생",
-        "retry": "다시 시도",
-        "createGroup": "새 조직 생성",
-        "groupNamePlaceholder": "조직명으로 검색...",
-        "createModal": {
-          "title": "새 조직 생성",
-          "groupName": "조직명",
-          "groupNamePlaceholder": "조직명을 입력하세요",
-          "cancel": "취소",
-          "create": "생성"
-        },
-        "editPermissions": "권한 편집",
-        "delete": "삭제",
-        "cancel": "취소",
-        "members": "멤버",
-        "addMember": "조직원 추가",
-        "addMemberModal": {
-          "title": "조직원 추가",
-          "close": "닫기",
-          "searchPlaceholder": "이메일, 사용자명, 이름으로 검색",
-          "loading": "사용자 목록을 불러오는 중...",
-          "selectAtLeastOne": "추가할 사용자를 선택해주세요.",
-          "statusAvailable": "추가가능",
-          "statusAlreadyMember": "이미 소속됨",
-          "add": "추가",
-          "adding": "추가 중...",
-          "addSuccess": "{{count}}명의 사용자를 조직에 추가했습니다.",
-          "addError": "사용자 추가에 실패했습니다.",
-          "noUsersAvailable": "추가 가능한 사용자가 없습니다.",
-          "selectedCount": "{{count}}명 선택됨"
-        },
-        "permissionModal": {
-          "titleSuffix": "권한 편집",
-          "statusActive": "활성화 상태",
-          "statusInactive": "비활성화 상태",
-          "availableSections": "사용 가능한 섹션",
-          "update": "권한 업데이트",
-          "selectAll": "전체 선택",
-          "clearAll": "전체 해제",
-          "selectedCount": "{{count}} / {{total}} 선택됨"
-        },
-        "createSuccess": "조직이 성공적으로 생성되었습니다.",
-        "createError": "조직 생성에 실패했습니다.",
-        "updateSuccess": "조직 권한이 성공적으로 업데이트되었습니다.",
-        "updateError": "조직 권한 업데이트에 실패했습니다.",
-        "deleteSuccess": "조직이 성공적으로 삭제되었습니다.",
-        "deleteError": "조직 삭제에 실패했습니다.",
-        "deleteTitle": "조직 삭제",
-        "deleteMessage": "정말로 \"{{groupName}}\" 조직을 삭제하시겠습니까?\n이 조직에 속한 사용자들은 'none' 그룹으로 이동됩니다.",
-        "noGroups": "등록된 조직이 없습니다.",
-        "groupsTab": "그룹 목록",
-        "membersTab": "{{groupName}} 멤버",
-        "membersTabEmpty": "멤버",
-        "memberCount": "{{count}}명",
-        "totalGroups": "총 {{count}}개의 조직",
-        "backToGroups": "뒤로",
-        "groupUsers": "{{groupName}} 조직 사용자 ({{count}}명)",
-        "removeFromGroup": "제외",
-        "removeUserConfirmTitle": "조직에서 제외",
-        "removeUserConfirmMessage": "정말로 \"{{username}}\" 사용자를 \"{{groupName}}\" 조직에서 제외하시겠습니까?",
-        "removeUserSuccess": "사용자가 조직에서 제외되었습니다.",
-        "removeUserError": "사용자 제외에 실패했습니다.",
-        "loadUsersError": "그룹 사용자 목록을 불러오는데 실패했습니다.",
-        "tableHeaders": {
-          "groupName": "조직명",
-          "status": "상태",
-          "sections": "사용 가능 섹션",
-          "actions": "액션"
-        },
-        "userTableHeaders": {
-          "id": "ID",
-          "email": "이메일",
-          "username": "사용자명",
-          "fullName": "이름",
-          "status": "상태",
-          "registrationDate": "등록일",
-          "lastLogin": "마지막 로그인",
-          "permission": "권한",
-          "actions": "액션"
-        },
-        "status": {
-          "active": "활성",
-          "inactive": "비활성"
-        },
-        "noSearchResults": "검색 결과가 없습니다.",
-        "noUsersInGroup": "이 조직에 속한 사용자가 없습니다.",
-        "loadingUsers": "사용자 목록을 불러오는 중...",
-        "noSections": "없음",
-        "viewUsers": "사용자 보기"
       }
     },
     "workflowManagement": {

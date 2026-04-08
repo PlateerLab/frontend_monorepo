@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import type { AdminWorkflowMeta } from '@xgen/api-client';
-import { updateWorkflowAdmin, getAllGroupsList } from '@xgen/api-client';
+import { updateWorkflowAdmin, getAllRoles } from '@xgen/api-client';
 import { Modal, Button, ToggleSwitch, useToast } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 
@@ -25,9 +25,9 @@ export const WorkflowEditModal: React.FC<WorkflowEditModalProps> = ({
   const [isShared, setIsShared] = useState(false);
   const [toggleDeploy, setToggleDeploy] = useState(false);
   const [isAccepted, setIsAccepted] = useState(true);
-  const [shareGroup, setShareGroup] = useState('');
+  const [shareRoles, setShareRoles] = useState<string[]>([]);
   const [sharePermissions, setSharePermissions] = useState('read');
-  const [availableGroups, setAvailableGroups] = useState<string[]>([]);
+  const [availableRoles, setAvailableRoles] = useState<{ name: string; display_name?: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -35,25 +35,31 @@ export const WorkflowEditModal: React.FC<WorkflowEditModalProps> = ({
       setIsShared(workflow.is_shared === true);
       setToggleDeploy(workflow.is_deployed === true);
       setIsAccepted(workflow.is_accepted !== false);
-      setShareGroup(workflow.share_group || '');
+      setShareRoles(workflow.share_roles || []);
       setSharePermissions(workflow.share_permissions || 'read');
     }
   }, [workflow]);
 
   useEffect(() => {
     if (isOpen) {
-      getAllGroupsList()
-        .then((groups) => setAvailableGroups(groups ?? []))
-        .catch(() => setAvailableGroups([]));
+      getAllRoles()
+        .then((roles) => setAvailableRoles(roles?.map(r => ({ name: r.name, display_name: r.display_name })) ?? []))
+        .catch(() => setAvailableRoles([]));
     }
   }, [isOpen]);
+
+  const handleRoleToggle = (roleName: string) => {
+    setShareRoles(prev =>
+      prev.includes(roleName) ? prev.filter(r => r !== roleName) : [...prev, roleName]
+    );
+  };
 
   const handleSubmit = async () => {
     try {
       setLoading(true);
       await updateWorkflowAdmin(workflow.workflow_id, {
         is_shared: isShared,
-        share_group: isShared ? shareGroup || null : null,
+        share_roles: isShared ? shareRoles : [],
         share_permissions: isShared ? sharePermissions : null,
         enable_deploy: toggleDeploy,
         inquire_deploy: Boolean(workflow.inquire_deploy),
@@ -144,28 +150,33 @@ export const WorkflowEditModal: React.FC<WorkflowEditModalProps> = ({
           />
         </div>
 
-        {/* Share group selector (conditional) */}
+        {/* Share roles selector (conditional) */}
         {isShared && (
           <>
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium text-foreground">
-                {t('admin.workflowManagement.editModal.shareGroup')}
+                {t('admin.workflowManagement.editModal.shareRoles', 'Share Roles')}
               </label>
-              <select
-                value={shareGroup}
-                onChange={(e) => setShareGroup(e.target.value)}
-                disabled={loading || availableGroups.length === 0}
-                className="rounded-md border border-border bg-background px-3 py-2 text-sm"
-              >
-                <option value="">
-                  {availableGroups.length > 0
-                    ? t('admin.workflowManagement.editModal.selectGroup')
-                    : t('admin.workflowManagement.editModal.noOrganization')}
-                </option>
-                {availableGroups.map((g) => (
-                  <option key={g} value={g}>{g}</option>
-                ))}
-              </select>
+              <div className="max-h-32 overflow-y-auto rounded-md border border-border bg-background p-2">
+                {availableRoles.length > 0 ? (
+                  availableRoles.map((role) => (
+                    <label key={role.name} className="flex items-center gap-2 py-1 text-sm cursor-pointer hover:bg-muted rounded px-1">
+                      <input
+                        type="checkbox"
+                        checked={shareRoles.includes(role.name)}
+                        onChange={() => handleRoleToggle(role.name)}
+                        disabled={loading}
+                        className="rounded border-border"
+                      />
+                      <span>{role.display_name || role.name}</span>
+                    </label>
+                  ))
+                ) : (
+                  <span className="text-xs text-muted-foreground">
+                    {t('admin.workflowManagement.editModal.noRoles', 'No roles available')}
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col gap-1">

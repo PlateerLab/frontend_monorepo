@@ -22,7 +22,7 @@ interface WorkflowDetailAPIResponse {
   has_endnode: boolean;
   is_completed: boolean;
   is_shared: boolean;
-  share_group: string | null;
+  share_roles: string[] | null;
   share_permissions: string;
   metadata: Record<string, unknown>;
   error?: string;
@@ -55,7 +55,7 @@ function transformWorkflowDetail(response: WorkflowDetailAPIResponse): WorkflowD
     createdAt: response.created_at,
     error: response.error,
     isShared: response.is_shared,
-    shareGroup: response.share_group,
+    shareRoles: response.share_roles,
     sharePermissions: response.share_permissions as WorkflowDetail['sharePermissions'],
     inquireDeploy: response.inquire_deploy,
     isAccepted: response.is_accepted,
@@ -113,7 +113,7 @@ export async function updateWorkflow(
   workflowId: string,
   updateData: {
     is_shared?: boolean;
-    share_group?: string | null;
+    share_roles?: string[] | null;
     share_permissions?: string;
     enable_deploy?: boolean;
   }

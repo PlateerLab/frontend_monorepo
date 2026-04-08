@@ -6,6 +6,7 @@ import { MainSidebar } from '@xgen/sidebar-main';
 import type { MainSidebarSection } from '@xgen/sidebar-main';
 import { useTranslation } from '@xgen/i18n';
 import { AuthGuard, useAuth } from '@xgen/auth-provider';
+import { canAccessAdmin } from '@xgen/types';
 import { featureRegistry, initializeFeatures } from '@/features';
 import type { SidebarSection as FeatureSidebarSection } from '@/features';
 import styles from './CanvasPage.module.scss';
@@ -103,11 +104,11 @@ function CanvasPageContent() {
                 activeItemId="canvas"
                 collapsed={sidebarCollapsed}
                 userName={user?.username}
-                isAdmin={user?.is_admin}
+                isAdmin={canAccessAdmin(user)}
                 onNavigate={handleNavigate}
                 onToggle={handleSidebarToggle}
                 onLogout={() => logout()}
-                onAdminClick={user?.is_admin ? () => router.push('/admin') : undefined}
+                onAdminClick={canAccessAdmin(user) ? () => router.push('/admin') : undefined}
             />
 
             <main className={`${styles.content} ${sidebarCollapsed ? styles.sidebarCollapsed : ''}`}>

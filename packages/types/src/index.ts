@@ -547,8 +547,8 @@ export interface WorkflowDetail {
   error?: string;
   /** 공유 여부 */
   isShared?: boolean;
-  /** 공유 그룹 */
-  shareGroup?: string | null;
+  /** 공유 역할 목록 */
+  shareRoles?: string[] | null;
   /** 공유 권한 */
   sharePermissions?: SharePermission;
   /** 배포 요청 여부 */
@@ -718,11 +718,13 @@ export interface User {
   username: string;
   email?: string;
   role?: string;
+  /** @deprecated Use is_superuser instead */
   is_admin?: boolean;
+  /** @deprecated Use roles instead */
   user_type?: string;
+  is_superuser?: boolean;
+  roles?: string[];
   permissions?: string[];
-  available_user_section?: string[];
-  available_admin_section?: string[];
 }
 
 export interface AuthState {
@@ -951,7 +953,7 @@ export interface WorkflowDetailResponse {
   has_endnode: boolean;
   is_completed: boolean;
   is_shared: boolean;
-  share_group: string | null;
+  share_roles: string[] | null;
   share_permissions: string;
   metadata: Record<string, unknown>;
   error?: string;
@@ -1248,7 +1250,7 @@ export interface AdminWorkflowMeta {
   inquire_deploy?: boolean;
   is_accepted?: boolean;
   is_shared?: boolean;
-  share_group?: string | null;
+  share_roles?: string[] | null;
   share_permissions?: string | null;
   updated_at: string;
   created_at?: string;
@@ -1598,22 +1600,78 @@ export interface AdminUser {
   created_at: string;
   updated_at: string;
   is_active: boolean;
-  is_admin: boolean;
-  user_type: AdminUserType;
-  groups: string[] | null;
+  is_superuser: boolean;
+  roles: string[];
   last_login?: string | null;
   last_login_ip?: string | null;
   password_hash?: string;
   preferences?: Record<string, unknown>;
-  available_admin_sections?: string[];
-  available_user_sections?: string[];
+  /** @deprecated Use is_superuser instead */
+  is_admin?: boolean;
+  /** @deprecated Use roles instead */
+  user_type?: AdminUserType;
 }
 
-/** Admin 그룹 */
-export interface AdminGroup {
-  group_name: string;
-  available: boolean;
-  available_sections: string[];
+// ─────────────────────────────────────────────────────────────
+// ABAC Role / Permission / Supervision Types
+// ─────────────────────────────────────────────────────────────
+
+export interface AdminRole {
+  id: number;
+  name: string;
+  display_name: string;
+  description?: string | null;
+  permission_count?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface AdminPermission {
+  id: number;
+  resource: string;
+  action: string;
+  description?: string | null;
+  created_at?: string;
+}
+
+export interface AdminRolePermission {
+  role: AdminRole;
+  permissions: AdminPermission[];
+}
+
+export interface AdminSupervision {
+  id: number;
+  supervisor_role_id: number;
+  target_role_id: number;
+  supervisor_role_name?: string | null;
+  target_role_name?: string | null;
+  supervision_type: 'full' | 'monitor' | 'audit';
+  description?: string | null;
+  created_at?: string;
+}
+
+export interface AdminUserDirectPermission {
+  id: number;
+  permission_id: number;
+  resource: string;
+  action: string;
+  granted: boolean;
+}
+
+export interface PermissionGroup {
+  [resourceGroup: string]: Array<{
+    resource: string;
+    action: string;
+    description: string;
+  }>;
+}
+
+export interface ResolvedUserPermissions {
+  user_id: number;
+  username: string;
+  is_superuser: boolean;
+  roles: string[];
+  permissions: string[];
 }
 
 /** Admin 페이지네이션 정보 */
@@ -1630,28 +1688,33 @@ export interface AdminUsersResponse {
   pagination: AdminPaginationInfo;
 }
 
-/** 사용 가능한 유저 섹션 목록 */
-export const AVAILABLE_USER_SECTIONS = [
-  'canvas',
-  'workflows',
-  'documents',
-  'tool-storage',
-  'prompt-store',
-  'scenario-recorder',
-  'data-station',
-  'data-storage',
-  'train',
-  'train-monitor',
-  'eval',
-  'model-storage',
-  'model-upload',
-  'model-hub',
-  'model-inference',
-  'ml-train',
-  'ml-train-monitor',
-] as const;
+// ─────────────────────────────────────────────────────────────
+// ABAC Permission Utilities
+// ─────────────────────────────────────────────────────────────
 
-export type AvailableUserSection = (typeof AVAILABLE_USER_SECTIONS)[number];
+/** 권한 문자열 매칭 (와일드카드 지원) */
+export function hasPermission(userPermissions: string[], required: string): boolean {
+  if (userPermissions.includes('*:*')) return true;
+  if (userPermissions.includes(required)) return true;
+  const [resource, action] = required.split(':');
+  if (resource && userPermissions.includes(`${resource}:*`)) return true;
+  const parts = resource?.split('.') ?? [];
+  for (let i = 0; i < parts.length; i++) {
+    const prefix = parts.slice(0, i + 1).join('.');
+    if (userPermissions.includes(`${prefix}.*:*`) || userPermissions.includes(`${prefix}.*:${action}`)) return true;
+  }
+  return false;
+}
+
+/** 사용자가 admin 영역에 접근 가능한지 확인 */
+export function canAccessAdmin(user: User | null): boolean {
+  if (!user) return false;
+  if (user.is_superuser) return true;
+  if (user.permissions?.some(p => p.startsWith('admin.') || p === '*:*')) return true;
+  // 하위 호환: is_admin 필드 체크
+  if (user.is_admin) return true;
+  return false;
+}
 
 // Re-export React types for convenience
 export type { ComponentType, FC, ReactNode } from 'react';

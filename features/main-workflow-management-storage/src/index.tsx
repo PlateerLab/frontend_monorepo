@@ -315,8 +315,8 @@ export const WorkflowStorage: React.FC<WorkflowStorageProps> = ({ onNavigate, on
             ? [{ icon: <FiClock />, value: formatDate(workflow.lastModified) }]
             : []),
           { value: t('workflows.card.nodes', { count: workflow.nodeCount }) },
-          ...(workflow.shareGroup
-            ? [{ value: `${t('workflows.card.organization')}: ${workflow.shareGroup}` }]
+          ...(workflow.shareRoles && workflow.shareRoles.length > 0
+            ? [{ value: `${t('workflows.card.organization')}: ${workflow.shareRoles.join(', ')}` }]
             : []),
         ],
         primaryActions,

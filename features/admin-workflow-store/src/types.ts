@@ -25,7 +25,7 @@ export interface Workflow {
   workflow_name: string;
   workflow_upload_name: string;
   is_shared?: boolean;
-  share_group?: string | null;
+  share_roles?: string[] | null;
   share_permissions?: string | null;
   is_accepted?: boolean | null;
   inquire_deploy?: boolean | null;

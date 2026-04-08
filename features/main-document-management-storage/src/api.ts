@@ -15,7 +15,7 @@ export interface StorageAPIResponse {
   total_size: number;
   is_shared: boolean;
   is_secured: boolean;
-  share_group?: string | null;
+  share_roles?: string[] | null;
   share_permissions?: string;
   owner_user_id?: number;
   owner_username?: string;
@@ -99,7 +99,7 @@ export async function createStorage(data: {
     storage_name: data.storage_name,
     description: data.description || '',
     is_shared: data.is_shared ?? false,
-    share_group: null,
+    share_roles: [],
     share_permissions: 'read',
     is_secured: data.is_secured ?? false,
   };

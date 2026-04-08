@@ -7,7 +7,7 @@
  */
 
 import type { AdminFeatureModule, SidebarItem, AdminSidebarSectionId } from '@xgen/types';
-import { FeatureRegistry as CoreRegistry } from '@xgen/types';
+import { FeatureRegistry as CoreRegistry, hasPermission } from '@xgen/types';
 
 // ─────────────────────────────────────────────────────────────
 // Admin Section Order & Metadata
@@ -30,6 +30,21 @@ const ADMIN_SECTION_ORDER: AdminSectionMeta[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────
+// Admin Section → Required Permission Mapping
+// 사이드바 섹션별 접근에 필요한 ABAC 권한
+// ─────────────────────────────────────────────────────────────
+
+const ADMIN_SECTION_PERMISSIONS: Record<string, string> = {
+  'admin-user': 'admin.user:read',
+  'admin-workflow': 'admin.workflow:read',
+  'admin-setting': 'admin.system:read',
+  'admin-system': 'admin.system:monitor',
+  'admin-data': 'admin.database:read',
+  'admin-mcp': 'admin.mcp:read',
+  'admin-governance': 'admin.governance:manage',
+};
+
+// ─────────────────────────────────────────────────────────────
 // Admin Feature Initialization
 // ─────────────────────────────────────────────────────────────
 
@@ -43,11 +58,13 @@ export async function initializeAdminFeatures(): Promise<void> {
   if (adminInitialized) return;
 
   try {
-    const featureModules = await Promise.all([
+    // ── 개별 import를 Promise.allSettled로 처리 ──
+    // 하나의 feature import 실패가 전체를 죽이지 않도록 함
+    const featureImports = [
       // 사용자 & 조직 (admin-user)
       import('@xgen/feature-admin-users'),
       import('@xgen/feature-admin-user-create'),
-      import('@xgen/feature-admin-group-permissions'),
+      import('@xgen/feature-admin-role-management'),
       // 워크플로우 리소스 (admin-workflow)
       import('@xgen/feature-admin-workflow-management-orchestrator'),
       import('@xgen/feature-admin-chat-monitoring'),
@@ -73,34 +90,58 @@ export async function initializeAdminFeatures(): Promise<void> {
       import('@xgen/feature-admin-gov-monitoring-orchestrator'),
       import('@xgen/feature-admin-gov-control-policy'),
       import('@xgen/feature-admin-gov-audit-tracking'),
-    ]);
+    ];
+
+    const results = await Promise.allSettled(featureImports);
+    const featureModules = results
+      .filter((r): r is PromiseFulfilledResult<any> => r.status === 'fulfilled')
+      .map(r => r.value);
+
+    // 실패한 import 로깅
+    results.forEach((r, i) => {
+      if (r.status === 'rejected') {
+        console.warn(`[Admin] Feature import #${i} failed:`, r.reason);
+      }
+    });
 
     const features = featureModules.map(mod => mod.default || Object.values(mod)[0]);
     features.forEach(f => CoreRegistry.registerAdminFeature(f as AdminFeatureModule));
 
     // Gov Monitoring Tab Plugins
-    const [historyMod, planMod, overdueMod] = await Promise.all([
+    const govResults = await Promise.allSettled([
       import('@xgen/feature-admin-gov-monitoring-history'),
       import('@xgen/feature-admin-gov-monitoring-plan'),
       import('@xgen/feature-admin-gov-monitoring-overdue'),
     ]);
-    CoreRegistry.registerGovMonitoringTabPlugin(historyMod.govMonitoringHistoryPlugin);
-    CoreRegistry.registerGovMonitoringTabPlugin(planMod.govMonitoringPlanPlugin);
-    CoreRegistry.registerGovMonitoringTabPlugin(overdueMod.govMonitoringOverduePlugin);
+    const [historyResult, planResult, overdueResult] = govResults;
+    if (historyResult.status === 'fulfilled') CoreRegistry.registerGovMonitoringTabPlugin(historyResult.value.govMonitoringHistoryPlugin);
+    if (planResult.status === 'fulfilled') CoreRegistry.registerGovMonitoringTabPlugin(planResult.value.govMonitoringPlanPlugin);
+    if (overdueResult.status === 'fulfilled') CoreRegistry.registerGovMonitoringTabPlugin(overdueResult.value.govMonitoringOverduePlugin);
+    govResults.forEach((r, i) => { if (r.status === 'rejected') console.warn(`[Admin] Gov monitoring plugin #${i} failed:`, r.reason); });
 
     // Workflow Management Tab Plugins
-    const [viewMod, executorMod, monitoringMod, testMod, logMod] = await Promise.all([
+    const wfResults = await Promise.allSettled([
       import('@xgen/feature-admin-workflow-management-view'),
       import('@xgen/feature-admin-workflow-management-executor'),
       import('@xgen/feature-admin-workflow-management-monitoring'),
       import('@xgen/feature-admin-workflow-management-test'),
       import('@xgen/feature-admin-workflow-management-log'),
     ]);
-    CoreRegistry.registerWorkflowMgmtTabPlugin(viewMod.workflowMgmtViewPlugin);
-    CoreRegistry.registerWorkflowMgmtTabPlugin(executorMod.workflowMgmtExecutorPlugin);
-    CoreRegistry.registerWorkflowMgmtTabPlugin(monitoringMod.workflowMgmtMonitoringPlugin);
-    CoreRegistry.registerWorkflowMgmtTabPlugin(testMod.workflowMgmtTestPlugin);
-    CoreRegistry.registerWorkflowMgmtTabPlugin(logMod.workflowMgmtLogPlugin);
+    const wfPlugins = [
+      { key: 'workflowMgmtViewPlugin', register: CoreRegistry.registerWorkflowMgmtTabPlugin.bind(CoreRegistry) },
+      { key: 'workflowMgmtExecutorPlugin', register: CoreRegistry.registerWorkflowMgmtTabPlugin.bind(CoreRegistry) },
+      { key: 'workflowMgmtMonitoringPlugin', register: CoreRegistry.registerWorkflowMgmtTabPlugin.bind(CoreRegistry) },
+      { key: 'workflowMgmtTestPlugin', register: CoreRegistry.registerWorkflowMgmtTabPlugin.bind(CoreRegistry) },
+      { key: 'workflowMgmtLogPlugin', register: CoreRegistry.registerWorkflowMgmtTabPlugin.bind(CoreRegistry) },
+    ];
+    wfResults.forEach((r, i) => {
+      if (r.status === 'fulfilled') {
+        const plugin = r.value[wfPlugins[i].key];
+        if (plugin) wfPlugins[i].register(plugin);
+      } else {
+        console.warn(`[Admin] Workflow plugin #${i} failed:`, r.reason);
+      }
+    });
 
     adminInitialized = true;
   } catch (error) {
@@ -120,10 +161,10 @@ export function getAdminRouteComponent(itemId: string) {
 
 /**
  * Admin 사이드바 섹션을 Feature 기반으로 동적 빌드.
- * Main의 featureRegistry.getSidebarSections()와 동일한 패턴.
  * 등록된 AdminFeatureModule들의 sidebarItems를 adminSection별로 그룹핑.
+ * @param userPermissions 사용자 ABAC 권한 배열 — 섹션 필터링에 사용
  */
-export function getAdminSidebarSections(): { id: string; titleKey: string; items: SidebarItem[] }[] {
+export function getAdminSidebarSections(userPermissions?: string[]): { id: string; titleKey: string; items: SidebarItem[] }[] {
   const sectionMap = new Map<string, SidebarItem[]>();
 
   // 섹션 순서대로 초기화
@@ -139,11 +180,21 @@ export function getAdminSidebarSections(): { id: string; titleKey: string; items
     }
   });
 
-  // 빈 섹션 필터링 후 반환
+  // 빈 섹션 필터링 + ABAC 권한 필터링 후 반환
   return ADMIN_SECTION_ORDER
     .filter(({ id }) => {
       const items = sectionMap.get(id);
-      return items && items.length > 0;
+      if (!items || items.length === 0) return false;
+
+      // 권한 필터링: userPermissions가 제공되면 해당 섹션 권한 확인
+      if (userPermissions) {
+        const requiredPerm = ADMIN_SECTION_PERMISSIONS[id];
+        if (requiredPerm && !hasPermission(userPermissions, requiredPerm)) {
+          return false;
+        }
+      }
+
+      return true;
     })
     .map(({ id, titleKey }) => ({
       id,

@@ -379,7 +379,7 @@ export const DocumentDatabase: React.FC<DocumentDatabaseProps> = ({ onSubToolbar
           { icon: <FiDatabase />, value: `${db.dbType.toUpperCase()} · ${db.host}:${db.port}/${db.databaseName}` },
           { icon: <FiUser />, value: db.ownerFullName || db.ownerUsername },
           ...(db.updatedAt ? [{ icon: <FiClock />, value: formatDate(db.updatedAt) }] : []),
-          ...(db.isShared && db.shareGroup ? [{ icon: <FiUsers />, value: db.shareGroup }] : []),
+          ...(db.isShared && db.shareRoles && db.shareRoles.length > 0 ? [{ icon: <FiUsers />, value: db.shareRoles.join(', ') }] : []),
         ],
         primaryActions: [
           {

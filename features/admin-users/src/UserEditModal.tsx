@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import type { AdminUser, AdminUserType } from '@xgen/types';
-import { AVAILABLE_USER_SECTIONS } from '@xgen/types';
+import React, { useState, useEffect, useMemo } from 'react';
+import type { AdminUser, AdminUserType, AdminPermission } from '@xgen/types';
 import {
   Modal, Button, Input, Label,
   Select, SelectTrigger, SelectContent, SelectItem, SelectValue,
@@ -10,8 +9,11 @@ import {
 } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import {
-  updateUserAvailableAdminSections,
-  updateUserAvailableUserSections,
+  getAllPermissions,
+  getUserDirectPermissions,
+  setUserDirectPermission,
+  removeUserDirectPermission,
+  resolveUserPermissions,
 } from '@xgen/api-client';
 
 // ─────────────────────────────────────────────────────────────
@@ -54,10 +56,15 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // Section access
-  const [adminSections, setAdminSections] = useState<string[]>([]);
-  const [userSections, setUserSections] = useState<string[]>([]);
-  const [sectionSaving, setSectionSaving] = useState(false);
+  // ABAC Direct Permission assignment
+  const [allPermissions, setAllPermissions] = useState<AdminPermission[]>([]);
+  const [directPerms, setDirectPerms] = useState<Array<{
+    id: number; permission_id: number; resource: string; action: string; granted: boolean;
+  }>>([]);
+  const [permsLoading, setPermsLoading] = useState(false);
+  const [resolvedPerms, setResolvedPerms] = useState<Record<string, string[]> | null>(null);
+  const [resolving, setResolving] = useState(false);
+  const [permSearch, setPermSearch] = useState('');
 
   // Reset form when user changes
   useEffect(() => {
@@ -65,15 +72,59 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
       setEmail(user.email);
       setUsername(user.username);
       setFullName(user.full_name || '');
-      setUserType(user.user_type);
+      setUserType(user.user_type ?? (user.is_superuser ? 'superuser' : 'standard'));
       setIsActive(user.is_active);
-      setAdminSections(user.available_admin_sections || []);
-      setUserSections(user.available_user_sections || []);
       setShowPassword(false);
       setNewPassword('');
       setConfirmPassword('');
     }
   }, [user]);
+
+  // Load permissions when modal opens
+  useEffect(() => {
+    if (!isOpen || !user) return;
+    const loadPerms = async () => {
+      setPermsLoading(true);
+      try {
+        const [allPermsRes, directRes] = await Promise.all([
+          getAllPermissions(),
+          getUserDirectPermissions(user.id),
+        ]);
+        setAllPermissions(allPermsRes.db_permissions ?? []);
+        setDirectPerms(directRes.direct_permissions ?? []);
+      } catch (err) {
+        console.error('Failed to load permissions:', err);
+      } finally {
+        setPermsLoading(false);
+      }
+    };
+    loadPerms();
+    setResolvedPerms(null);
+    setPermSearch('');
+  }, [isOpen, user]);
+
+  // Separate granted / denied direct permissions
+  const grantedPerms = useMemo(() => directPerms.filter(p => p.granted), [directPerms]);
+  const deniedPerms = useMemo(() => directPerms.filter(p => !p.granted), [directPerms]);
+
+  // Permissions not yet directly assigned (available to add)
+  const directPermIds = useMemo(() => new Set(directPerms.map(p => p.permission_id)), [directPerms]);
+  const availablePermsGrouped = useMemo(() => {
+    const available = allPermissions.filter(p => !directPermIds.has(p.id));
+    const filtered = permSearch
+      ? available.filter(p =>
+          `${p.resource}:${p.action}`.toLowerCase().includes(permSearch.toLowerCase()) ||
+          (p.description ?? '').toLowerCase().includes(permSearch.toLowerCase()),
+        )
+      : available;
+    const groups: Record<string, AdminPermission[]> = {};
+    for (const p of filtered) {
+      const group = p.resource.split('.')[0] || 'other';
+      if (!groups[group]) groups[group] = [];
+      groups[group].push(p);
+    }
+    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
+  }, [allPermissions, directPermIds, permSearch]);
 
   if (!user) return null;
 
@@ -85,7 +136,7 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
         username,
         full_name: fullName || null,
         user_type: userType,
-        is_admin: userType !== 'standard',
+        is_superuser: userType === 'superuser',
         is_active: isActive,
       };
 
@@ -101,40 +152,65 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
     }
   };
 
-  const handleSaveAdminSections = async () => {
-    setSectionSaving(true);
+  const refreshDirectPerms = async () => {
+    if (!user) return;
     try {
-      await updateUserAvailableAdminSections({
-        id: user.id,
-        available_admin_sections: adminSections,
-      });
-    } finally {
-      setSectionSaving(false);
+      const res = await getUserDirectPermissions(user.id);
+      setDirectPerms(res.direct_permissions ?? []);
+    } catch (err) {
+      console.error('Failed to refresh permissions:', err);
     }
   };
 
-  const handleSaveUserSections = async () => {
-    setSectionSaving(true);
+  const handleGrantPermission = async (permissionId: number) => {
+    if (!user) return;
     try {
-      await updateUserAvailableUserSections({
-        id: user.id,
-        available_user_sections: userSections,
-      });
-    } finally {
-      setSectionSaving(false);
+      await setUserDirectPermission(user.id, permissionId, true);
+      await refreshDirectPerms();
+    } catch (err) {
+      console.error('Failed to grant permission:', err);
     }
   };
 
-  const toggleSection = (
-    list: string[],
-    setter: (v: string[]) => void,
-    section: string,
-  ) => {
-    setter(
-      list.includes(section)
-        ? list.filter((s) => s !== section)
-        : [...list, section],
-    );
+  const handleDenyPermission = async (permissionId: number) => {
+    if (!user) return;
+    try {
+      await setUserDirectPermission(user.id, permissionId, false);
+      await refreshDirectPerms();
+    } catch (err) {
+      console.error('Failed to deny permission:', err);
+    }
+  };
+
+  const handleRemoveDirectPerm = async (permissionId: number) => {
+    if (!user) return;
+    try {
+      await removeUserDirectPermission(user.id, permissionId);
+      await refreshDirectPerms();
+    } catch (err) {
+      console.error('Failed to remove permission:', err);
+    }
+  };
+
+  const handleResolvePermissions = async () => {
+    setResolving(true);
+    try {
+      const result = await resolveUserPermissions(user.id);
+      // permissions는 "resource:action" 문자열 배열 → 리소스별 그룹핑
+      const grouped = (result.permissions ?? []).reduce<Record<string, string[]>>((acc, perm) => {
+        const idx = perm.indexOf(':');
+        const resource = idx > 0 ? perm.slice(0, idx) : perm;
+        const action = idx > 0 ? perm.slice(idx + 1) : '*';
+        if (!acc[resource]) acc[resource] = [];
+        acc[resource].push(action);
+        return acc;
+      }, {});
+      setResolvedPerms(grouped);
+    } catch (err) {
+      console.error('Failed to resolve permissions:', err);
+    } finally {
+      setResolving(false);
+    }
   };
 
   const passwordValid = !showPassword || !newPassword || validatePassword(newPassword);
@@ -165,7 +241,7 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
       <Tabs defaultValue="basic" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="basic">기본 정보</TabsTrigger>
-          <TabsTrigger value="sections">섹션 권한</TabsTrigger>
+          <TabsTrigger value="roles">권한 (ABAC)</TabsTrigger>
           <TabsTrigger value="info">상세 정보</TabsTrigger>
         </TabsList>
 
@@ -276,75 +352,122 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
           </div>
         </TabsContent>
 
-        {/* ─── Section Access Tab ─── */}
-        <TabsContent value="sections" className="space-y-6">
-          {/* Admin sections */}
-          <div className="space-y-3">
-            <div>
-              <h4 className="text-sm font-semibold">
-                {t('admin.userManagement.userEditModal.adminSectionAccess.title')}
-              </h4>
-              <p className="text-xs text-muted-foreground">
-                {t('admin.userManagement.userEditModal.adminSectionAccess.description')}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {['admin-user', 'admin-workflow', 'admin-setting', 'admin-system', 'admin-data', 'admin-security', 'admin-mcp', 'admin-ml', 'admin-governance'].map(
-                (section) => (
-                  <Button
-                    key={section}
-                    variant={adminSections.includes(section) ? 'secondary' : 'outline'}
-                    size="sm"
-                    onClick={() => toggleSection(adminSections, setAdminSections, section)}
-                  >
-                    {section}
-                  </Button>
-                ),
-              )}
-            </div>
-            <Button
-              size="sm"
-              onClick={handleSaveAdminSections}
-              disabled={sectionSaving}
-            >
-              {sectionSaving
-                ? t('admin.userManagement.userEditModal.adminSectionAccess.saving')
-                : t('admin.userManagement.userEditModal.adminSectionAccess.saveButton')}
-            </Button>
-          </div>
+        {/* ─── ABAC Permissions Tab ─── */}
+        <TabsContent value="roles" className="space-y-6">
+          {permsLoading ? (
+            <p className="text-sm text-muted-foreground">권한 로딩 중...</p>
+          ) : (
+            <>
+              {/* Granted Permissions */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold">부여된 권한 ({grantedPerms.length})</h4>
+                {grantedPerms.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">직접 부여된 권한이 없습니다.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {grantedPerms.map((p) => (
+                      <span key={p.id} className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 rounded-md text-xs font-mono">
+                        {p.resource}:{p.action}
+                        <button
+                          className="ml-1 text-emerald-600 hover:text-red-600 font-bold"
+                          onClick={() => handleRemoveDirectPerm(p.permission_id)}
+                        >×</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-          {/* User sections */}
-          <div className="space-y-3 border-t border-border pt-4">
-            <div>
-              <h4 className="text-sm font-semibold">
-                {t('admin.userManagement.userEditModal.userSectionAccess.title')}
-              </h4>
-              <p className="text-xs text-muted-foreground">
-                {t('admin.userManagement.userEditModal.userSectionAccess.description')}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {AVAILABLE_USER_SECTIONS.map((section) => (
-                <Button
-                  key={section}
-                  variant={userSections.includes(section) ? 'secondary' : 'outline'}
-                  size="sm"
-                  onClick={() => toggleSection(userSections, setUserSections, section)}
-                >
-                  {section}
-                </Button>
-              ))}
-            </div>
-            <Button
-              size="sm"
-              onClick={handleSaveUserSections}
-              disabled={sectionSaving}
-            >
-              {sectionSaving
-                ? t('admin.userManagement.userEditModal.userSectionAccess.saving')
-                : t('admin.userManagement.userEditModal.userSectionAccess.saveButton')}
-            </Button>
-          </div>
+              {/* Denied Permissions */}
+              <div className="space-y-3 border-t border-border pt-4">
+                <h4 className="text-sm font-semibold">거부된 권한 ({deniedPerms.length})</h4>
+                {deniedPerms.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">직접 거부된 권한이 없습니다.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {deniedPerms.map((p) => (
+                      <span key={p.id} className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-md text-xs font-mono">
+                        {p.resource}:{p.action}
+                        <button
+                          className="ml-1 text-red-600 hover:text-gray-600 font-bold"
+                          onClick={() => handleRemoveDirectPerm(p.permission_id)}
+                        >×</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Available Permissions to Add */}
+              <div className="space-y-3 border-t border-border pt-4">
+                <h4 className="text-sm font-semibold">권한 추가</h4>
+                <Input
+                  value={permSearch}
+                  onChange={(e) => setPermSearch(e.target.value)}
+                  placeholder="권한 검색... (예: workflow:create)"
+                  className="text-sm"
+                />
+                <div className="max-h-48 overflow-y-auto space-y-3">
+                  {availablePermsGrouped.map(([group, perms]) => (
+                    <div key={group}>
+                      <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">{group}</p>
+                      <div className="grid grid-cols-1 gap-1 ml-2">
+                        {perms.map(p => (
+                          <div key={p.id} className="flex items-center justify-between py-0.5">
+                            <span className="font-mono text-xs">{p.resource}:{p.action}</span>
+                            <div className="flex gap-1">
+                              <Button variant="outline" size="sm" onClick={() => handleGrantPermission(p.id)}>
+                                + 부여
+                              </Button>
+                              <Button variant="danger" size="sm" onClick={() => handleDenyPermission(p.id)}>
+                                − 거부
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  {availablePermsGrouped.length === 0 && !permSearch && (
+                    <p className="text-xs text-muted-foreground">모든 권한이 이미 설정되어 있습니다.</p>
+                  )}
+                  {availablePermsGrouped.length === 0 && permSearch && (
+                    <p className="text-xs text-muted-foreground">검색 결과가 없습니다.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Resolved Permissions Preview */}
+              <div className="space-y-3 border-t border-border pt-4">
+                <div className="flex items-center gap-3">
+                  <h4 className="text-sm font-semibold">최종 권한 확인</h4>
+                  <Button size="sm" variant="outline" onClick={handleResolvePermissions} disabled={resolving}>
+                    {resolving ? '확인 중...' : '권한 조회'}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  역할 기반 권한 + 직접 부여 − 직접 거부 = 최종 권한
+                </p>
+                {resolvedPerms && (
+                  <div className="rounded border border-border p-3 space-y-2 max-h-48 overflow-y-auto">
+                    {Object.entries(resolvedPerms).map(([resource, actions]) => (
+                      <div key={resource} className="flex items-start gap-2 text-xs">
+                        <span className="font-mono font-semibold text-primary min-w-[140px]">{resource}</span>
+                        <div className="flex flex-wrap gap-1">
+                          {actions.map((action) => (
+                            <span key={action} className="rounded bg-accent px-1.5 py-0.5">{action}</span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                    {Object.keys(resolvedPerms).length === 0 && (
+                      <p className="text-muted-foreground">이 사용자에게 부여된 권한이 없습니다.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </TabsContent>
 
         {/* ─── Info Tab ─── */}
@@ -369,14 +492,6 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
             <div>
               <span className="text-muted-foreground">{t('admin.userManagement.userEditModal.lastLoginIp')}:</span>
               <span className="ml-2">{user.last_login_ip || '-'}</span>
-            </div>
-          </div>
-          <div className="border-t border-border pt-3 mt-3">
-            <span className="text-sm text-muted-foreground">Groups:</span>
-            <div className="flex flex-wrap gap-1 mt-1">
-              {user.groups?.map((g) => (
-                <span key={g} className="rounded bg-accent px-2 py-0.5 text-xs">{g}</span>
-              )) ?? <span className="text-xs text-muted-foreground">None</span>}
             </div>
           </div>
         </TabsContent>
