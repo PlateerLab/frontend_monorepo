@@ -16,7 +16,7 @@ const barActionBtnClass = 'inline-flex items-center justify-center p-0.5 border-
 const ExecutionOutputRenderer: React.FC<{ output: ExecutionOutput }> = ({ output }) => {
     const { t } = useTranslation();
     if (!output) {
-        return <div className="text-[#40444d] whitespace-pre-wrap">{t('canvas.executionPanel.placeholder', 'Run workflow to see results')}</div>;
+        return <div className="text-[#40444d] whitespace-pre-wrap">{t('canvas.executionPanel.placeholder', 'Run agentflow to see results')}</div>;
     }
     if (hasError(output)) {
         return (

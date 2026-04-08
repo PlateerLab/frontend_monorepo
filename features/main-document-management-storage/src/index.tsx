@@ -6,7 +6,7 @@ import { Button, FilterTabs, SearchInput, Modal, Input, Label, Switch, Textarea,
 import type { ExternalDropResult } from '@xgen/ui';
 import { FiServer, FiFile, FiDatabase, FiClock, FiTrash2, FiLock, FiSettings } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
-import { listStorages, createStorage, deleteStorage, updateStorage, verifyStoragePassword, storeStorageSessionToken, getStorageSessionToken, uploadStorageFile, sha256, type FileStorageItem } from './api';
+import { listStorages, createStorage, deleteStorage, updateStorage, verifyStoragePassword, storeStorageSessionToken, getStorageSessionToken, clearStorageSessionToken, uploadStorageFile, sha256, type FileStorageItem } from './api';
 import { StorageFiles } from './components/StorageFiles';
 import './locales';
 
@@ -337,6 +337,10 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
         updateData.password_hash = null;
       }
       await updateStorage(settingsStorage.storageId, updateData);
+      // 비밀번호 변경 또는 암호화 해제 시 기존 세션 토큰 삭제
+      if ((settingsSecured && settingsChangePassword && settingsPassword) || (!settingsSecured && settingsStorage.isSecured)) {
+        clearStorageSessionToken(settingsStorage.storageId);
+      }
       setIsSettingsModalOpen(false);
       setSettingsStorage(null);
       setSettingsChangePassword(false);
@@ -731,7 +735,7 @@ export const DocumentStorage: React.FC<DocumentStorageProps> = ({ onSubToolbarCh
                 } else {
                   setSettingsCurrentPassword('');
                   setSettingsCurrentPasswordError(null);
-                  setSettingsChangePassword(false);
+                  setSettingsChangePassword(true);
                 }
               }}
               className={`w-full px-4 py-2.5 text-sm text-center rounded-lg border transition-colors ${

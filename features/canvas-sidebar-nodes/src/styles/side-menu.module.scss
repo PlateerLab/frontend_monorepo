@@ -49,8 +49,8 @@
         border-color: #abb1ba;
     }
 
-    // WorkflowPanel 뷰일 때 크기 확장
-    &[data-view="workflow"] {
+    // AgentflowPanel 뷰일 때 크기 확장
+    &[data-view="agentflow"] {
         min-width: 400px; // 확장 시 최소 너비
         width: auto; // 동적 너비
         max-width: 600px; // 최대 너비 제한
@@ -60,7 +60,7 @@
 
     // TemplatePanel 뷰일 때 크기 확장
     &[data-view="template"] {
-        min-width: 400px; // WorkflowPanel과 동일한 최소 너비
+        min-width: 400px; // AgentflowPanel과 동일한 최소 너비
         width: auto; // 동적 너비
         max-width: 600px; // 최대 너비 제한
         height: 85vh;

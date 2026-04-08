@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '@xgen/i18n';
 import type { CanvasPagePlugin } from '@xgen/types';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@xgen/ui';
-import styles from './styles/auto-workflow-sidebar.module.scss';
+import styles from './styles/auto-agentflow-sidebar.module.scss';
 
 // ── Types ──────────────────────────────────────────────────────
 
@@ -24,15 +24,15 @@ export interface AgentNode {
     }>;
 }
 
-export interface AutoWorkflowSidebarProps {
+export interface AutoAgentflowSidebarProps {
     isOpen: boolean;
     onClose: () => void;
-    onLoadWorkflow: (workflowData: any) => void;
+    onLoadAgentflow: (workflowData: any) => void;
     getCanvasState?: () => any;
     /** Injected API: fetch available agent nodes */
     fetchAgentNodes?: () => Promise<AgentNode[]>;
     /** Injected API: generate workflow with AI */
-    generateWorkflow?: (requestData: any) => Promise<any>;
+    generateAgentflow?: (requestData: any) => Promise<any>;
     /** Injected API: fetch VLLM model info for a given node */
     fetchVllmModelInfo?: (nodeId: string) => Promise<{ model: string; base_url: string; temperature: number; max_tokens: number }>;
     /** Toast helpers — injected */
@@ -44,13 +44,13 @@ export interface AutoWorkflowSidebarProps {
 
 // ── Component ──────────────────────────────────────────────────
 
-const AutoWorkflowSidebar: React.FC<AutoWorkflowSidebarProps> = ({
+const AutoAgentflowSidebar: React.FC<AutoAgentflowSidebarProps> = ({
     isOpen,
     onClose,
-    onLoadWorkflow,
+    onLoadAgentflow,
     getCanvasState,
     fetchAgentNodes,
-    generateWorkflow,
+    generateAgentflow,
     fetchVllmModelInfo,
     showSuccess,
     showError,
@@ -61,7 +61,7 @@ const AutoWorkflowSidebar: React.FC<AutoWorkflowSidebarProps> = ({
     const [agentNodes, setAgentNodes] = useState<AgentNode[]>([]);
     const [selectedAgentNode, setSelectedAgentNode] = useState<AgentNode | null>(null);
     const [userRequirements, setUserRequirements] = useState('');
-    const [workflowName, setWorkflowName] = useState('');
+    const [workflowName, setAgentflowName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const [compatibleNodesCount, setCompatibleNodesCount] = useState(0);
@@ -122,22 +122,22 @@ const AutoWorkflowSidebar: React.FC<AutoWorkflowSidebarProps> = ({
             }
         }
 
-        if (!workflowName) setWorkflowName('workflow');
+        if (!workflowName) setAgentflowName('workflow');
     };
 
-    const handleGenerateWorkflow = async () => {
+    const handleGenerateAgentflow = async () => {
         if (!selectedAgentNode) {
             showError?.(t('canvas.toasts.agentSelectRequired', 'Select an agent node'));
             return;
         }
         if (!userRequirements.trim()) {
-            showError?.(t('canvas.toasts.autoWorkflowRequirementsMissing', 'Enter requirements'));
+            showError?.(t('canvas.toasts.autoAgentflowRequirementsMissing', 'Enter requirements'));
             return;
         }
-        if (!generateWorkflow) return;
+        if (!generateAgentflow) return;
 
-        const finalWorkflowName = workflowName?.trim() || 'workflow';
-        const toastId = showLoading?.(t('canvas.toasts.autoWorkflowGenerating', 'Generating workflow...'));
+        const finalAgentflowName = workflowName?.trim() || 'workflow';
+        const toastId = showLoading?.(t('canvas.toasts.autoAgentflowGenerating', 'Generating agentflow...'));
         setIsGenerating(true);
 
         try {
@@ -163,7 +163,7 @@ const AutoWorkflowSidebar: React.FC<AutoWorkflowSidebarProps> = ({
             const requestData: any = {
                 agent_node_id: selectedAgentNode.id,
                 user_requirements: userRequirements,
-                workflow_name: finalWorkflowName,
+                workflow_name: finalAgentflowName,
                 context: canvasContext,
             };
 
@@ -171,20 +171,20 @@ const AutoWorkflowSidebar: React.FC<AutoWorkflowSidebarProps> = ({
                 requestData.selected_model = selectedModel;
             }
 
-            const data = await generateWorkflow(requestData);
+            const data = await generateAgentflow(requestData);
             if (data?.success && data?.workflow_data) {
-                onLoadWorkflow(data.workflow_data);
-                showSuccess?.(t('canvas.toasts.autoWorkflowGenerateSuccess', 'Workflow generated'));
+                onLoadAgentflow(data.workflow_data);
+                showSuccess?.(t('canvas.toasts.autoAgentflowGenerateSuccess', 'Agentflow generated'));
                 setUserRequirements('');
-                setWorkflowName('');
+                setAgentflowName('');
                 setSelectedAgentNode(null);
                 setCompatibleNodesCount(0);
                 onClose();
             } else {
-                throw new Error(data?.message || 'Workflow generation failed');
+                throw new Error(data?.message || 'Agentflow generation failed');
             }
         } catch (error) {
-            showError?.(`${t('canvas.toasts.autoWorkflowGenerateFailed', 'Generation failed')}: ${error instanceof Error ? error.message : t('common.unknownError', 'Unknown error')}`);
+            showError?.(`${t('canvas.toasts.autoAgentflowGenerateFailed', 'Generation failed')}: ${error instanceof Error ? error.message : t('common.unknownError', 'Unknown error')}`);
         } finally {
             if (toastId) dismissLoading?.(toastId);
             setIsGenerating(false);
@@ -201,8 +201,8 @@ const AutoWorkflowSidebar: React.FC<AutoWorkflowSidebarProps> = ({
         <div className={styles.overlay}>
             <div ref={sidebarRef} className={styles.sidebar}>
                 <div className={styles.header}>
-                    <h2>{t('canvas.autoWorkflow.title', '자동 워크플로우 생성')}</h2>
-                    <button className={styles.closeButton} onClick={onClose} aria-label={t('canvas.autoWorkflow.close', 'Close')} type="button">
+                    <h2>{t('canvas.autoAgentflow.title', '자동 에이전트플로우 생성')}</h2>
+                    <button className={styles.closeButton} onClick={onClose} aria-label={t('canvas.autoAgentflow.close', 'Close')} type="button">
                         ✕
                     </button>
                 </div>
@@ -210,13 +210,13 @@ const AutoWorkflowSidebar: React.FC<AutoWorkflowSidebarProps> = ({
                 <div className={styles.content}>
                     {/* Agent node selection */}
                     <div className={styles.section}>
-                        <h3>{t('canvas.autoWorkflow.selectAgent', 'Agent 노드 선택')}</h3>
+                        <h3>{t('canvas.autoAgentflow.selectAgent', 'Agent 노드 선택')}</h3>
                         <p className={styles.description}>
-                            {t('canvas.autoWorkflow.selectAgentDescription', '워크플로우의 핵심이 될 Agent 노드를 선택하세요.')}
+                            {t('canvas.autoAgentflow.selectAgentDescription', '에이전트플로우의 핵심이 될 Agent 노드를 선택하세요.')}
                         </p>
 
                         {isLoading ? (
-                            <div className={styles.loading}>{t('canvas.autoWorkflow.loading', 'Loading...')}</div>
+                            <div className={styles.loading}>{t('canvas.autoAgentflow.loading', 'Loading...')}</div>
                         ) : (
                             <div className={styles.agentNodeList}>
                                 {agentNodes.map((node) => (
@@ -247,7 +247,7 @@ const AutoWorkflowSidebar: React.FC<AutoWorkflowSidebarProps> = ({
                                 ))}
                                 {agentNodes.length === 0 && (
                                     <div className={styles.emptyState}>
-                                        {t('canvas.autoWorkflow.noAgents', '사용 가능한 Agent 노드가 없습니다.')}
+                                        {t('canvas.autoAgentflow.noAgents', '사용 가능한 Agent 노드가 없습니다.')}
                                     </div>
                                 )}
                             </div>
@@ -257,7 +257,7 @@ const AutoWorkflowSidebar: React.FC<AutoWorkflowSidebarProps> = ({
                     {/* Model selection (OpenAI only) */}
                     {selectedAgentNode && availableModels.length > 0 && selectedAgentNode.id.toLowerCase().includes('openai') && (
                         <div className={styles.section}>
-                            <h3>{t('canvas.autoWorkflow.selectModel', '모델 선택')}</h3>
+                            <h3>{t('canvas.autoAgentflow.selectModel', '모델 선택')}</h3>
                             <Select value={selectedModel} onValueChange={setSelectedModel}>
                                 <SelectTrigger className={styles.modelSelect}>
                                     <SelectValue />
@@ -273,35 +273,35 @@ const AutoWorkflowSidebar: React.FC<AutoWorkflowSidebarProps> = ({
 
                     {/* Requirements */}
                     <div className={styles.section}>
-                        <h3>{t('canvas.autoWorkflow.requirements', '요구사항 입력')}</h3>
+                        <h3>{t('canvas.autoAgentflow.requirements', '요구사항 입력')}</h3>
                         <textarea
                             className={styles.requirementsInput}
-                            placeholder={t('canvas.autoWorkflow.requirementsPlaceholder', 'Describe the workflow you want...')}
+                            placeholder={t('canvas.autoAgentflow.requirementsPlaceholder', 'Describe the agentflow you want...')}
                             value={userRequirements}
                             onChange={(e) => setUserRequirements(e.target.value)}
                             rows={4}
                         />
                     </div>
 
-                    {/* Workflow name */}
+                    {/* Agentflow name */}
                     <div className={styles.section}>
-                        <h3>{t('canvas.autoWorkflow.workflowName', '워크플로우 이름')}</h3>
+                        <h3>{t('canvas.autoAgentflow.agentflowName', '에이전트플로우 이름')}</h3>
                         <input
                             type="text"
-                            className={styles.workflowNameInput}
-                            placeholder={t('canvas.autoWorkflow.workflowNamePlaceholder', 'Enter workflow name')}
+                            className={styles.agentflowNameInput}
+                            placeholder={t('canvas.autoAgentflow.agentflowNamePlaceholder', 'Enter agentflow name')}
                             value={workflowName}
-                            onChange={(e) => setWorkflowName(e.target.value)}
+                            onChange={(e) => setAgentflowName(e.target.value)}
                         />
                     </div>
 
                     {/* Selected agent info */}
                     {selectedAgentNode && (
                         <div className={styles.section}>
-                            <h3>{t('canvas.autoWorkflow.selectedInfo', '선택된 Agent 정보')}</h3>
+                            <h3>{t('canvas.autoAgentflow.selectedInfo', '선택된 Agent 정보')}</h3>
                             <div className={styles.selectedAgentInfo}>
                                 <div className={styles.infoRow}>
-                                    <span className={styles.label}>{t('canvas.autoWorkflow.nodeName', '노드명')}:</span>
+                                    <span className={styles.label}>{t('canvas.autoAgentflow.nodeName', '노드명')}:</span>
                                     <span className={styles.value}>{selectedAgentNode.nodeName}</span>
                                 </div>
                                 <div className={styles.infoRow}>
@@ -309,13 +309,13 @@ const AutoWorkflowSidebar: React.FC<AutoWorkflowSidebarProps> = ({
                                     <span className={styles.value}>{selectedAgentNode.id}</span>
                                 </div>
                                 <div className={styles.infoRow}>
-                                    <span className={styles.label}>{t('canvas.autoWorkflow.compatibleNodes', '호환 노드')}:</span>
-                                    <span className={styles.value}>{compatibleNodesCount}{t('canvas.autoWorkflow.count', '개')}</span>
+                                    <span className={styles.label}>{t('canvas.autoAgentflow.compatibleNodes', '호환 노드')}:</span>
+                                    <span className={styles.value}>{compatibleNodesCount}{t('canvas.autoAgentflow.count', '개')}</span>
                                 </div>
                                 {agentModelInfo && (
                                     <>
                                         <div className={styles.infoRow}>
-                                            <span className={styles.label}>{t('canvas.autoWorkflow.model', '모델')}:</span>
+                                            <span className={styles.label}>{t('canvas.autoAgentflow.model', '모델')}:</span>
                                             <span className={styles.value}>{agentModelInfo.model}</span>
                                         </div>
                                         <div className={styles.infoRow}>
@@ -332,13 +332,13 @@ const AutoWorkflowSidebar: React.FC<AutoWorkflowSidebarProps> = ({
                     <div className={styles.section}>
                         <button
                             className={styles.generateButton}
-                            onClick={handleGenerateWorkflow}
+                            onClick={handleGenerateAgentflow}
                             disabled={!selectedAgentNode || !userRequirements.trim() || isGenerating}
                             type="button"
                         >
                             {isGenerating
-                                ? t('canvas.autoWorkflow.generating', '생성 중...')
-                                : t('canvas.autoWorkflow.generate', '워크플로우 생성')}
+                                ? t('canvas.autoAgentflow.generating', '생성 중...')
+                                : t('canvas.autoAgentflow.generate', '에이전트플로우 생성')}
                         </button>
                     </div>
                 </div>
@@ -354,11 +354,11 @@ export const canvasAiGeneratorPlugin: CanvasPagePlugin = {
     name: 'Canvas AI Generator',
     overlays: [
         {
-            id: 'auto-workflow-sidebar',
-            component: AutoWorkflowSidebar as any,
+            id: 'auto-agentflow-sidebar',
+            component: AutoAgentflowSidebar as any,
         },
     ],
 };
 
-export { AutoWorkflowSidebar };
-export default AutoWorkflowSidebar;
+export { AutoAgentflowSidebar };
+export default AutoAgentflowSidebar;

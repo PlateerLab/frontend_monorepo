@@ -6,7 +6,7 @@ import { ChatPanel, ChatEmptyState } from '@xgen/ui';
 import type { ChatPanelMessage } from '@xgen/ui';
 import {
   getDeployStatusPublic,
-  executeWorkflowStream,
+  executeAgentflowStream,
 } from '@xgen/api-client';
 import type { DeployStatus } from '@xgen/api-client';
 
@@ -155,7 +155,7 @@ export default function ChatbotPage() {
       let accumulatedContent = '';
 
       try {
-        await executeWorkflowStream({
+        await executeAgentflowStream({
           workflowName: deployStatus?.workflow_name || chatId,
           workflowId: chatId,
           inputData: message,
@@ -185,7 +185,7 @@ export default function ChatbotPage() {
             );
           },
           onError: (err) => {
-            console.error('Workflow execution failed:', err);
+            console.error('Agentflow execution failed:', err);
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === assistantMessageId

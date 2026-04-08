@@ -65,7 +65,7 @@ export interface GovernanceFile {
   uploaded_by: string;
 }
 
-// --- Workflow Approval ---
+// --- Agentflow Approval ---
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
 
 export interface ApprovalRequest {
@@ -94,7 +94,7 @@ export interface NodeSummary {
   outputs: string[];
 }
 
-export interface WorkflowDetail {
+export interface AgentflowDetail {
   workflow_id: string;
   workflow_name: string;
   owner_name: string;
@@ -171,7 +171,7 @@ export interface OverdueItem {
   managerName: string;
 }
 
-export interface WorkflowSummary {
+export interface AgentflowSummary {
   workflowId: string;
   workflowName: string;
   inspectionCount: number;
@@ -285,7 +285,7 @@ export interface AuditLogEntry {
   createdAt: string;
 }
 
-export interface TrackedWorkflow {
+export interface TrackedAgentflow {
   workflowId: string;
   workflowName: string;
   userId?: number;
@@ -304,7 +304,7 @@ export interface TrackedWorkflow {
 
 export interface AuditStats {
   totalLogs: number;
-  trackedWorkflows: number;
+  trackedAgentflows: number;
   fullApprovalCount: number;
   revokedCount: number;
   actionCounts?: Record<string, number>;
@@ -349,22 +349,22 @@ function getClient() {
   };
 }
 
-// ─── Workflow Approval ────────────────────────────────────────
+// ─── Agentflow Approval ────────────────────────────────────────
 
-/** 거버넌스 승인 대기 워크플로우 목록 */
+/** 거버넌스 승인 대기 에이전트플로우 목록 */
 export async function getApprovalRequests(): Promise<ApprovalRequest[]> {
   const client = getClient();
   return client.get<ApprovalRequest[]>('/api/admin/governance/workflow-approval/workflows');
 }
 
-/** 워크플로우 상세 정보 (캔버스, 노드 요약 포함) */
-export async function getWorkflowApprovalDetail(workflowId: string): Promise<WorkflowDetail> {
+/** 에이전트플로우 상세 정보 (캔버스, 노드 요약 포함) */
+export async function getAgentflowApprovalDetail(workflowId: string): Promise<AgentflowDetail> {
   const client = getClient();
-  return client.get<WorkflowDetail>(`/api/admin/governance/workflow-approval/workflows/${encodeURIComponent(workflowId)}/detail`);
+  return client.get<AgentflowDetail>(`/api/admin/governance/workflow-approval/workflows/${encodeURIComponent(workflowId)}/detail`);
 }
 
-/** 워크플로우 거버넌스 승인/거부 */
-export async function reviewGovernanceWorkflow(
+/** 에이전트플로우 거버넌스 승인/거부 */
+export async function reviewGovernanceAgentflow(
   workflowId: string,
   isAccepted: boolean,
   comment?: string,
@@ -378,16 +378,16 @@ export async function reviewGovernanceWorkflow(
 
 // ─── Risk Review (통합 리스크 + 거버넌스 리뷰) ─────────────────
 
-/** 리스크 리뷰 워크플로우 목록 */
-export async function getWorkflowRiskAssessments(): Promise<RiskAssessment[]> {
+/** 리스크 리뷰 에이전트플로우 목록 */
+export async function getAgentflowRiskAssessments(): Promise<RiskAssessment[]> {
   const client = getClient();
   return client.get<RiskAssessment[]>('/api/admin/governance/risk-review/workflows');
 }
 
-/** 리스크 리뷰 워크플로우 상세 */
-export async function getWorkflowRiskDetail(workflowId: string): Promise<WorkflowDetail> {
+/** 리스크 리뷰 에이전트플로우 상세 */
+export async function getAgentflowRiskDetail(workflowId: string): Promise<AgentflowDetail> {
   const client = getClient();
-  return client.get<WorkflowDetail>(`/api/admin/governance/risk-review/workflows/${encodeURIComponent(workflowId)}/detail`);
+  return client.get<AgentflowDetail>(`/api/admin/governance/risk-review/workflows/${encodeURIComponent(workflowId)}/detail`);
 }
 
 /** 리스크 등급 업데이트 */
@@ -462,10 +462,10 @@ export async function deleteGovernanceFile(fileId: string): Promise<void> {
 
 // ─── Monitoring / Inspections ─────────────────────────────────
 
-/** 모니터링 워크플로우 목록 */
-export async function getMonitoringWorkflows(): Promise<WorkflowSummary[]> {
+/** 모니터링 에이전트플로우 목록 */
+export async function getMonitoringAgentflows(): Promise<AgentflowSummary[]> {
   const client = getClient();
-  return client.get<WorkflowSummary[]>('/api/admin/governance/monitoring/workflows');
+  return client.get<AgentflowSummary[]>('/api/admin/governance/monitoring/workflows');
 }
 
 /** 점검 이력 목록 (필터 지원) */
@@ -740,10 +740,10 @@ export async function getAuditLogs(params?: {
   });
 }
 
-/** 추적 워크플로우 목록 */
-export async function getTrackedWorkflows(): Promise<TrackedWorkflow[]> {
+/** 추적 에이전트플로우 목록 */
+export async function getTrackedAgentflows(): Promise<TrackedAgentflow[]> {
   const client = getClient();
-  return client.get<TrackedWorkflow[]>('/api/admin/governance/audit-tracking/tracked-workflows');
+  return client.get<TrackedAgentflow[]>('/api/admin/governance/audit-tracking/tracked-workflows');
 }
 
 /** 감사 추적 통계 */
@@ -752,8 +752,8 @@ export async function getAuditTrackingStats(): Promise<AuditStats> {
   return client.get<AuditStats>('/api/admin/governance/audit-tracking/stats');
 }
 
-/** 워크플로우 감사 타임라인 */
-export async function getWorkflowAuditTimeline(workflowId: string): Promise<TimelineEntry[]> {
+/** 에이전트플로우 감사 타임라인 */
+export async function getAgentflowAuditTimeline(workflowId: string): Promise<TimelineEntry[]> {
   const client = getClient();
   return client.get<TimelineEntry[]>(`/api/admin/governance/audit-tracking/workflow/${encodeURIComponent(workflowId)}/timeline`);
 }

@@ -31,7 +31,7 @@ export const ko: TranslationData = {
   },
   empty: {
     title: '인증 프로필이 없습니다',
-    description: 'API 인증 정보를 등록하여 워크플로우에서 활용하세요',
+    description: 'API 인증 정보를 등록하여 에이전트플로우에서 활용하세요',
   },
   store: {
     empty: {

@@ -669,12 +669,12 @@ const AuthProfilePage: React.FC<AuthProfilePageProps> = ({
 export const mainAuthProfileFeature: MainFeatureModule = {
   id: 'main-auth-profile',
   name: 'Auth Profile',
-  sidebarSection: 'workflow',
+  sidebarSection: 'agentflow',
   sidebarItems: [
     {
       id: 'auth-profile',
-      titleKey: 'sidebar.workflow.authProfile.title',
-      descriptionKey: 'sidebar.workflow.authProfile.description',
+      titleKey: 'sidebar.agentflow.authProfile.title',
+      descriptionKey: 'sidebar.agentflow.authProfile.description',
     },
   ],
   routes: {

@@ -6,7 +6,7 @@ import { useTranslation } from '@xgen/i18n';
 import { FiDownload, FiX } from '@xgen/icons';
 import { downloadAllPrompts } from '../api/prompt-api';
 
-const PS = 'admin.workflowManagement.promptStore';
+const PS = 'admin.agentflowManagement.promptStore';
 const DL = `${PS}.download`;
 
 interface DownloadDropdownProps {

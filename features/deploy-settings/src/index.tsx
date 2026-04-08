@@ -10,7 +10,7 @@ import {
 } from '@xgen/icons';
 import {
   getDeployStatus, updateDeploySettings, uploadDeployImage,
-  getDeployImage, deleteDeployChat, executeWorkflowStream,
+  getDeployImage, deleteDeployChat, executeAgentflowStream,
 } from '@xgen/api-client';
 import type { DeployStatus, DeployUpdateData } from '@xgen/api-client';
 import { config } from '@xgen/config';
@@ -21,14 +21,14 @@ import './locales';
 // Types
 // ─────────────────────────────────────────────────────────────
 
-export interface DeploySettingsWorkflow {
+export interface DeploySettingsAgentflow {
   id: string;
   name: string;
   userId?: number | string;
 }
 
 export interface DeploySettingsProps {
-  workflow: DeploySettingsWorkflow;
+  workflow: DeploySettingsAgentflow;
   onBack: () => void;
 }
 
@@ -62,7 +62,7 @@ export const DeploySettings: React.FC<DeploySettingsProps> = ({ workflow, onBack
   // Customization state
   const [profileImage, setProfileImage] = useState('');
   const [profileImageBlobUrl, setProfileImageBlobUrl] = useState('');
-  const [botName, setBotName] = useState(workflow.name || 'Workflow');
+  const [botName, setBotName] = useState(workflow.name || 'Agentflow');
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [primaryColor, setPrimaryColor] = useState('#2563eb');
   const [botMessageColor, setBotMessageColor] = useState('#ffffff');
@@ -254,7 +254,7 @@ export const DeploySettings: React.FC<DeploySettingsProps> = ({ workflow, onBack
   // ── Reset to defaults ───────────────────────────────────
 
   const handleResetDefaults = useCallback(() => {
-    setBotName(workflow.name || 'Workflow');
+    setBotName(workflow.name || 'Agentflow');
     setTheme('light');
     setPrimaryColor('#2563eb');
     setBotMessageColor('#ffffff');
@@ -334,7 +334,7 @@ export const DeploySettings: React.FC<DeploySettingsProps> = ({ workflow, onBack
     let accumulated = '';
 
     try {
-      await executeWorkflowStream({
+      await executeAgentflowStream({
         workflowName: workflow.name,
         workflowId: workflow.id,
         inputData: text,

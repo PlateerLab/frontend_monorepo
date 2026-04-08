@@ -7,9 +7,9 @@ import { createApiClient } from './index';
 // ─────────────────────────────────────────────────────────────
 
 /**
- * 워크플로우의 실행 순서를 가져옵니다.
+ * 에이전트플로우의 실행 순서를 가져옵니다.
  */
-export async function getWorkflowExecutionOrder(
+export async function getAgentflowExecutionOrder(
     workflowName: string,
     workflowId: string,
     userId?: string | number | null,
@@ -27,18 +27,18 @@ export async function getWorkflowExecutionOrder(
 }
 
 /**
- * 워크플로우 데이터를 기반으로 실행 순서를 가져옵니다.
+ * 에이전트플로우 데이터를 기반으로 실행 순서를 가져옵니다.
  */
-export async function getWorkflowExecutionOrderByData(workflowData: any): Promise<any> {
+export async function getAgentflowExecutionOrderByData(workflowData: any): Promise<any> {
     const client = createApiClient({ service: 'core' });
     const response = await client.post<any>('/api/workflow/execute/tracker/order-by-data', workflowData);
     return response.data;
 }
 
 /**
- * 워크플로우 데이터를 기반으로 자동 정렬 레이아웃 데이터를 가져옵니다.
+ * 에이전트플로우 데이터를 기반으로 자동 정렬 레이아웃 데이터를 가져옵니다.
  */
-export async function getWorkflowExecutionLayoutByData(workflowData: any): Promise<any> {
+export async function getAgentflowExecutionLayoutByData(workflowData: any): Promise<any> {
     const client = createApiClient({ service: 'core' });
     const response = await client.post<any>('/api/workflow/execute/tracker/layout-by-data?debug=true', workflowData);
     return response.data;

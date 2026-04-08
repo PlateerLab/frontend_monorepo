@@ -32,6 +32,27 @@ importers:
       '@xgen/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@xgen/feature-admin-agentflow-management-executor':
+        specifier: workspace:*
+        version: link:../../features/admin-agentflow-management-executor
+      '@xgen/feature-admin-agentflow-management-log':
+        specifier: workspace:*
+        version: link:../../features/admin-agentflow-management-log
+      '@xgen/feature-admin-agentflow-management-monitoring':
+        specifier: workspace:*
+        version: link:../../features/admin-agentflow-management-monitoring
+      '@xgen/feature-admin-agentflow-management-orchestrator':
+        specifier: workspace:*
+        version: link:../../features/admin-agentflow-management-orchestrator
+      '@xgen/feature-admin-agentflow-management-test':
+        specifier: workspace:*
+        version: link:../../features/admin-agentflow-management-test
+      '@xgen/feature-admin-agentflow-management-view':
+        specifier: workspace:*
+        version: link:../../features/admin-agentflow-management-view
+      '@xgen/feature-admin-agentflow-store':
+        specifier: workspace:*
+        version: link:../../features/admin-agentflow-store
       '@xgen/feature-admin-backend-logs':
         specifier: workspace:*
         version: link:../../features/admin-backend-logs
@@ -41,6 +62,9 @@ importers:
       '@xgen/feature-admin-database':
         specifier: workspace:*
         version: link:../../features/admin-database
+      '@xgen/feature-admin-gov-agentflow-approval':
+        specifier: workspace:*
+        version: link:../../features/admin-gov-agentflow-approval
       '@xgen/feature-admin-gov-audit-tracking':
         specifier: workspace:*
         version: link:../../features/admin-gov-audit-tracking
@@ -65,9 +89,6 @@ importers:
       '@xgen/feature-admin-gov-risk-management':
         specifier: workspace:*
         version: link:../../features/admin-gov-risk-management
-      '@xgen/feature-admin-gov-workflow-approval':
-        specifier: workspace:*
-        version: link:../../features/admin-gov-workflow-approval
       '@xgen/feature-admin-group-permissions':
         specifier: workspace:*
         version: link:../../features/admin-group-permissions
@@ -107,27 +128,6 @@ importers:
       '@xgen/feature-admin-users':
         specifier: workspace:*
         version: link:../../features/admin-users
-      '@xgen/feature-admin-workflow-management-executor':
-        specifier: workspace:*
-        version: link:../../features/admin-workflow-management-executor
-      '@xgen/feature-admin-workflow-management-log':
-        specifier: workspace:*
-        version: link:../../features/admin-workflow-management-log
-      '@xgen/feature-admin-workflow-management-monitoring':
-        specifier: workspace:*
-        version: link:../../features/admin-workflow-management-monitoring
-      '@xgen/feature-admin-workflow-management-orchestrator':
-        specifier: workspace:*
-        version: link:../../features/admin-workflow-management-orchestrator
-      '@xgen/feature-admin-workflow-management-test':
-        specifier: workspace:*
-        version: link:../../features/admin-workflow-management-test
-      '@xgen/feature-admin-workflow-management-view':
-        specifier: workspace:*
-        version: link:../../features/admin-workflow-management-view
-      '@xgen/feature-admin-workflow-store':
-        specifier: workspace:*
-        version: link:../../features/admin-workflow-store
       '@xgen/feature-auth-login-form':
         specifier: workspace:*
         version: link:../../features/auth-login-form
@@ -155,15 +155,18 @@ importers:
       '@xgen/feature-canvas-node-detail':
         specifier: workspace:*
         version: link:../../features/canvas-node-detail
+      '@xgen/feature-canvas-sidebar-agentflows':
+        specifier: workspace:*
+        version: link:../../features/canvas-sidebar-agentflows
       '@xgen/feature-canvas-sidebar-nodes':
         specifier: workspace:*
         version: link:../../features/canvas-sidebar-nodes
       '@xgen/feature-canvas-sidebar-templates':
         specifier: workspace:*
         version: link:../../features/canvas-sidebar-templates
-      '@xgen/feature-canvas-sidebar-workflows':
+      '@xgen/feature-canvas-tutorial':
         specifier: workspace:*
-        version: link:../../features/canvas-sidebar-workflows
+        version: link:../../features/canvas-tutorial
       '@xgen/feature-deploy-settings':
         specifier: workspace:*
         version: link:../../features/deploy-settings
@@ -197,6 +200,21 @@ importers:
       '@xgen/icons':
         specifier: workspace:*
         version: link:../../packages/icons
+      '@xgen/main-agentflow-management-orchestrator':
+        specifier: workspace:*
+        version: link:../../features/main-agentflow-management-orchestrator
+      '@xgen/main-agentflow-management-scheduler':
+        specifier: workspace:*
+        version: link:../../features/main-agentflow-management-scheduler
+      '@xgen/main-agentflow-management-storage':
+        specifier: workspace:*
+        version: link:../../features/main-agentflow-management-storage
+      '@xgen/main-agentflow-management-store':
+        specifier: workspace:*
+        version: link:../../features/main-agentflow-management-store
+      '@xgen/main-agentflow-management-tester':
+        specifier: workspace:*
+        version: link:../../features/main-agentflow-management-tester
       '@xgen/main-auth-profile-library':
         specifier: workspace:*
         version: link:../../features/main-auth-profile-library
@@ -248,21 +266,6 @@ importers:
       '@xgen/main-upload-history':
         specifier: workspace:*
         version: link:../../features/main-upload-history
-      '@xgen/main-workflow-management-orchestrator':
-        specifier: workspace:*
-        version: link:../../features/main-workflow-management-orchestrator
-      '@xgen/main-workflow-management-scheduler':
-        specifier: workspace:*
-        version: link:../../features/main-workflow-management-scheduler
-      '@xgen/main-workflow-management-storage':
-        specifier: workspace:*
-        version: link:../../features/main-workflow-management-storage
-      '@xgen/main-workflow-management-store':
-        specifier: workspace:*
-        version: link:../../features/main-workflow-management-store
-      '@xgen/main-workflow-management-tester':
-        specifier: workspace:*
-        version: link:../../features/main-workflow-management-tester
       '@xgen/mypage-profile':
         specifier: workspace:*
         version: link:../../features/mypage-Profile
@@ -318,6 +321,189 @@ importers:
       typescript:
         specifier: ^5
         version: 5.9.3
+
+  features/admin-agentflow-management-executor:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/admin-agentflow-management-log:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/admin-agentflow-management-monitoring:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/admin-agentflow-management-orchestrator:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/admin-agentflow-management-test:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/admin-agentflow-management-view:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/admin-agentflow-store:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
 
   features/admin-audit-logs:
     dependencies:
@@ -425,6 +611,27 @@ importers:
         version: link:../../packages/ui
 
   features/admin-error-logs:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
+  features/admin-gov-agentflow-approval:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -606,27 +813,6 @@ importers:
         version: link:../../packages/ui
 
   features/admin-gov-risk-management:
-    dependencies:
-      '@xgen/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@xgen/auth-provider':
-        specifier: workspace:*
-        version: link:../../packages/auth-provider
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-
-  features/admin-gov-workflow-approval:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -1166,189 +1352,6 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
 
-  features/admin-workflow-management-executor:
-    dependencies:
-      '@xgen/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-    devDependencies:
-      '@types/react':
-        specifier: ^19
-        version: 19.2.14
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-
-  features/admin-workflow-management-log:
-    dependencies:
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-    devDependencies:
-      '@types/react':
-        specifier: ^19
-        version: 19.2.14
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-
-  features/admin-workflow-management-monitoring:
-    dependencies:
-      '@xgen/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-    devDependencies:
-      '@types/react':
-        specifier: ^19
-        version: 19.2.14
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-
-  features/admin-workflow-management-orchestrator:
-    dependencies:
-      '@xgen/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-    devDependencies:
-      '@types/react':
-        specifier: ^19
-        version: 19.2.14
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-
-  features/admin-workflow-management-test:
-    dependencies:
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-    devDependencies:
-      '@types/react':
-        specifier: ^19
-        version: 19.2.14
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-
-  features/admin-workflow-management-view:
-    dependencies:
-      '@xgen/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-    devDependencies:
-      '@types/react':
-        specifier: ^19
-        version: 19.2.14
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-
-  features/admin-workflow-store:
-    dependencies:
-      '@xgen/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@xgen/auth-provider':
-        specifier: workspace:*
-        version: link:../../packages/auth-provider
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-
   features/auth-login-form:
     dependencies:
       '@xgen/auth-provider':
@@ -1551,6 +1554,24 @@ importers:
         specifier: ^19.0.0
         version: 19.2.4(react@19.2.4)
 
+  features/canvas-sidebar-agentflows:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+
   features/canvas-sidebar-nodes:
     dependencies:
       '@xgen/i18n':
@@ -1599,11 +1620,14 @@ importers:
         specifier: ^19.0.0
         version: 19.2.4(react@19.2.4)
 
-  features/canvas-sidebar-workflows:
+  features/canvas-tutorial:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
+      '@xgen/canvas-types':
+        specifier: workspace:*
+        version: link:../../packages/canvas-types
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
@@ -1613,9 +1637,9 @@ importers:
       '@xgen/types':
         specifier: workspace:*
         version: link:../../packages/types
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
 
   features/deploy-settings:
     dependencies:
@@ -1674,6 +1698,188 @@ importers:
       react:
         specifier: ^19.0.0
         version: 19.2.4
+
+  features/main-agentflow-management-orchestrator:
+    dependencies:
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      next:
+        specifier: ^15.1.0
+        version: 15.1.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.98.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      sass:
+        specifier: ^1.89.2
+        version: 1.98.0
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/main-agentflow-management-scheduler:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      next:
+        specifier: ^15.1.0
+        version: 15.1.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.98.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      sass:
+        specifier: ^1.89.2
+        version: 1.98.0
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/main-agentflow-management-storage:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/feature-canvas-deploy':
+        specifier: workspace:*
+        version: link:../canvas-deploy
+      '@xgen/feature-deploy-settings':
+        specifier: workspace:*
+        version: link:../deploy-settings
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      next:
+        specifier: ^15.1.0
+        version: 15.1.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.98.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      sass:
+        specifier: ^1.89.2
+        version: 1.98.0
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/main-agentflow-management-store:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      next:
+        specifier: ^15.1.0
+        version: 15.1.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.98.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      sass:
+        specifier: ^1.89.2
+        version: 1.98.0
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  features/main-agentflow-management-tester:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      next:
+        specifier: ^15.1.0
+        version: 15.1.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.98.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      sass:
+        specifier: ^1.89.2
+        version: 1.98.0
+      typescript:
+        specifier: ^5
+        version: 5.9.3
 
   features/main-auth-profile:
     dependencies:

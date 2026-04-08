@@ -13,7 +13,7 @@ export const en: Record<string, unknown> = {
     // ── Chat Tab ───────────────────────────────────────────────
     chat: {
       title: 'Chat',
-      placeholder: 'Enter a message to run the workflow.',
+      placeholder: 'Enter a message to run the agentflow.',
       inputHint: 'Type a message...',
       send: 'Send',
     },
@@ -21,7 +21,7 @@ export const en: Record<string, unknown> = {
     // ── Executor Tab ───────────────────────────────────────────
     executor: {
       title: 'Executor',
-      placeholder: "Click 'Run' to execute the workflow.",
+      placeholder: "Click 'Run' to execute the agentflow.",
       running: 'Running...',
     },
 
@@ -60,8 +60,8 @@ export const en: Record<string, unknown> = {
   // ── Legacy keys (backward compat — will be removed) ──────────
   executionPanel: {
     title: 'Execution',
-    placeholder: "Click 'Run' to execute the workflow.",
-    chatPlaceholder: 'Enter a message to run the workflow.',
+    placeholder: "Click 'Run' to execute the agentflow.",
+    chatPlaceholder: 'Enter a message to run the agentflow.',
     chatInputPlaceholder: 'Type a message...',
     send: 'Send',
     tabChat: 'Chat',
@@ -71,7 +71,7 @@ export const en: Record<string, unknown> = {
     clearOutput: 'Clear Output',
     copyOutput: 'Copy Output',
     copied: 'Copied!',
-    runWorkflow: 'Run Workflow',
+    runAgentflow: 'Run Agentflow',
     saveAndRun: 'Save & Run',
   },
   detailPanel: {

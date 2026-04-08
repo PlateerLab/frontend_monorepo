@@ -5,8 +5,8 @@ import type { RouteComponentProps, MainFeatureModule, ChatHistoryItem, ChatHisto
 import { ContentArea, FilterTabs, SearchInput, EmptyState } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import './locales';
-import { listInteractions, listWorkflowsDetail, deleteWorkflowIOLogs } from '@xgen/api-client';
-import type { WorkflowListItem } from '@xgen/api-client';
+import { listInteractions, listAgentflowsDetail, deleteAgentflowIOLogs } from '@xgen/api-client';
+import type { AgentflowListItem } from '@xgen/api-client';
 
 import type { ChatHistoryPageProps, ExecutionMeta } from './types';
 
@@ -105,13 +105,13 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
     setError(null);
 
     try {
-      // 채팅 기록과 워크플로우 목록을 병렬로 가져오기
+      // 채팅 기록과 에이전트플로우 목록을 병렬로 가져오기
       const [chatList, workflows] = await Promise.all([
         listInteractions({ limit: 1000 }),
-        listWorkflowsDetail(),
+        listAgentflowsDetail(),
       ]);
 
-      // 각 채팅 기록에 대해 해당 워크플로우가 존재하는지 확인
+      // 각 채팅 기록에 대해 해당 에이전트플로우가 존재하는지 확인
       const enrichedChatList: ChatHistoryItem[] = chatList.map((chat: ExecutionMeta) => {
         // default_mode인 경우는 항상 사용 가능
         if (chat.workflow_name === 'default_mode') {
@@ -124,14 +124,14 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
             metadata: chat.metadata,
             createdAt: chat.created_at,
             updatedAt: chat.updated_at,
-            isWorkflowDeleted: false,
+            isAgentflowDeleted: false,
             userId: undefined,
           };
         }
 
-        // 해당 워크플로우 찾기
-        const matchingWorkflow = workflows.find(
-          (workflow: WorkflowListItem) => workflow.workflow_id === chat.workflow_id
+        // 해당 에이전트플로우 찾기
+        const matchingAgentflow = workflows.find(
+          (workflow: AgentflowListItem) => workflow.workflow_id === chat.workflow_id
         );
 
         return {
@@ -143,8 +143,8 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
           metadata: chat.metadata,
           createdAt: chat.created_at,
           updatedAt: chat.updated_at,
-          isWorkflowDeleted: !matchingWorkflow,
-          userId: matchingWorkflow?.user_id,
+          isAgentflowDeleted: !matchingAgentflow,
+          userId: matchingAgentflow?.user_id,
         };
       });
 
@@ -175,9 +175,9 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
     const isDeploy = isDeployChat(chat.interactionId);
     switch (filter) {
       case 'active':
-        return !chat.isWorkflowDeleted && !isDeploy;
+        return !chat.isAgentflowDeleted && !isDeploy;
       case 'deleted':
-        return chat.isWorkflowDeleted;
+        return chat.isAgentflowDeleted;
       case 'deploy':
         return isDeploy;
       case 'all':
@@ -189,8 +189,8 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
   // 카운트 계산
   const counts = {
     all: chats.length,
-    active: chats.filter((c) => !c.isWorkflowDeleted && !isDeployChat(c.interactionId)).length,
-    deleted: chats.filter((c) => c.isWorkflowDeleted).length,
+    active: chats.filter((c) => !c.isAgentflowDeleted && !isDeployChat(c.interactionId)).length,
+    deleted: chats.filter((c) => c.isAgentflowDeleted).length,
     deploy: chats.filter((c) => isDeployChat(c.interactionId)).length,
   };
 
@@ -206,9 +206,9 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
   // ─────────────────────────────────────────────────────────────
 
   const handleContinueChat = async (chat: ChatHistoryItem) => {
-    // 삭제된 워크플로우는 계속 불가
-    if (chat.isWorkflowDeleted) {
-      alert(t('chatHistory.error.workflowDeleted'));
+    // 삭제된 에이전트플로우는 계속 불가
+    if (chat.isAgentflowDeleted) {
+      alert(t('chatHistory.error.agentflowDeleted'));
       return;
     }
 
@@ -246,7 +246,7 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
     if (!confirmed) return;
 
     try {
-      await deleteWorkflowIOLogs(
+      await deleteAgentflowIOLogs(
         chat.workflowName,
         chat.workflowId,
         chat.interactionId,
@@ -351,7 +351,7 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
             {filteredChats.map((chat) => (
               <article
                 key={chat.id}
-                className={`group flex items-center gap-4 px-6 py-4 bg-white border border-border rounded-lg cursor-pointer transition-all hover:border-primary hover:shadow-sm ${chat.isWorkflowDeleted ? 'opacity-60 hover:opacity-80' : ''}`}
+                className={`group flex items-center gap-4 px-6 py-4 bg-white border border-border rounded-lg cursor-pointer transition-all hover:border-primary hover:shadow-sm ${chat.isAgentflowDeleted ? 'opacity-60 hover:opacity-80' : ''}`}
               >
                 <div className="w-10 h-10 flex items-center justify-center bg-primary/10 rounded-lg text-primary shrink-0 [&_svg]:w-5 [&_svg]:h-5">
                   <MessageIcon />
@@ -366,7 +366,7 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
                     <span className="text-border">•</span>
                     <span>{formatDate(chat.updatedAt)}</span>
 
-                    {chat.isWorkflowDeleted && (
+                    {chat.isAgentflowDeleted && (
                       <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-red-500/10 text-red-500">
                         {t('chatHistory.deleted')}
                       </span>
@@ -383,7 +383,7 @@ const ChatHistoryPage: React.FC<RouteComponentProps & ChatHistoryPageProps> = ({
                   <button
                     className="flex items-center justify-center gap-1 px-4 py-1 min-w-8 h-8 bg-primary border border-primary text-white rounded text-sm cursor-pointer transition-all hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed [&_span]:font-medium [&_svg]:w-4 [&_svg]:h-4 [&_svg]:shrink-0"
                     onClick={() => handleContinueChat(chat)}
-                    disabled={chat.isWorkflowDeleted}
+                    disabled={chat.isAgentflowDeleted}
                     title={t('chatHistory.continue')}
                   >
                     <PlayIcon />

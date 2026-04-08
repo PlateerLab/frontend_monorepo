@@ -21,7 +21,7 @@ interface AdminSectionMeta {
 
 const ADMIN_SECTION_ORDER: AdminSectionMeta[] = [
   { id: 'admin-user', titleKey: 'admin.sidebar.sections.user' },
-  { id: 'admin-workflow', titleKey: 'admin.sidebar.sections.workflow' },
+  { id: 'admin-agentflow', titleKey: 'admin.sidebar.sections.agentflow' },
   { id: 'admin-setting', titleKey: 'admin.sidebar.sections.setting' },
   { id: 'admin-system', titleKey: 'admin.sidebar.sections.system' },
   { id: 'admin-data', titleKey: 'admin.sidebar.sections.data' },
@@ -70,7 +70,7 @@ export async function initializeAdminFeatures(): Promise<void> {
       import('@xgen/feature-admin-chat-monitoring'),
       import('@xgen/feature-admin-user-token-dashboard'),
       import('@xgen/feature-admin-node-management'),
-      import('@xgen/feature-admin-workflow-store'),
+      import('@xgen/feature-admin-agentflow-store'),
       import('@xgen/feature-admin-prompt-store'),
       // 환경 설정 (admin-setting)
       import('@xgen/feature-admin-system-settings'),
@@ -119,29 +119,19 @@ export async function initializeAdminFeatures(): Promise<void> {
     if (overdueResult.status === 'fulfilled') CoreRegistry.registerGovMonitoringTabPlugin(overdueResult.value.govMonitoringOverduePlugin);
     govResults.forEach((r, i) => { if (r.status === 'rejected') console.warn(`[Admin] Gov monitoring plugin #${i} failed:`, r.reason); });
 
-    // Workflow Management Tab Plugins
-    const wfResults = await Promise.allSettled([
-      import('@xgen/feature-admin-workflow-management-view'),
-      import('@xgen/feature-admin-workflow-management-executor'),
-      import('@xgen/feature-admin-workflow-management-monitoring'),
-      import('@xgen/feature-admin-workflow-management-test'),
-      import('@xgen/feature-admin-workflow-management-log'),
+    // Agentflow Management Tab Plugins
+    const [viewMod, executorMod, monitoringMod, testMod, logMod] = await Promise.all([
+      import('@xgen/feature-admin-agentflow-management-view'),
+      import('@xgen/feature-admin-agentflow-management-executor'),
+      import('@xgen/feature-admin-agentflow-management-monitoring'),
+      import('@xgen/feature-admin-agentflow-management-test'),
+      import('@xgen/feature-admin-agentflow-management-log'),
     ]);
-    const wfPlugins = [
-      { key: 'workflowMgmtViewPlugin', register: CoreRegistry.registerWorkflowMgmtTabPlugin.bind(CoreRegistry) },
-      { key: 'workflowMgmtExecutorPlugin', register: CoreRegistry.registerWorkflowMgmtTabPlugin.bind(CoreRegistry) },
-      { key: 'workflowMgmtMonitoringPlugin', register: CoreRegistry.registerWorkflowMgmtTabPlugin.bind(CoreRegistry) },
-      { key: 'workflowMgmtTestPlugin', register: CoreRegistry.registerWorkflowMgmtTabPlugin.bind(CoreRegistry) },
-      { key: 'workflowMgmtLogPlugin', register: CoreRegistry.registerWorkflowMgmtTabPlugin.bind(CoreRegistry) },
-    ];
-    wfResults.forEach((r, i) => {
-      if (r.status === 'fulfilled') {
-        const plugin = r.value[wfPlugins[i].key];
-        if (plugin) wfPlugins[i].register(plugin);
-      } else {
-        console.warn(`[Admin] Workflow plugin #${i} failed:`, r.reason);
-      }
-    });
+    CoreRegistry.registerAgentflowMgmtTabPlugin(viewMod.agentflowMgmtViewPlugin);
+    CoreRegistry.registerAgentflowMgmtTabPlugin(executorMod.agentflowMgmtExecutorPlugin);
+    CoreRegistry.registerAgentflowMgmtTabPlugin(monitoringMod.agentflowMgmtMonitoringPlugin);
+    CoreRegistry.registerAgentflowMgmtTabPlugin(testMod.agentflowMgmtTestPlugin);
+    CoreRegistry.registerAgentflowMgmtTabPlugin(logMod.agentflowMgmtLogPlugin);
 
     adminInitialized = true;
   } catch (error) {

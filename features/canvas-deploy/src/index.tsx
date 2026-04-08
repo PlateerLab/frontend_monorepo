@@ -16,7 +16,7 @@ import {
 } from '@xgen/icons';
 import {
   getDeployStatus,
-  updateWorkflow,
+  updateAgentflow,
   generateEmbedJs,
 } from '@xgen/api-client';
 import { config } from '@xgen/config';
@@ -247,7 +247,7 @@ export const DeploymentModal: React.FC<DeploymentModalProps> = ({
     setLoading(true);
     try {
       setToggleDeploy(newStatus);
-      await updateWorkflow(workflow.id, { enable_deploy: newStatus });
+      await updateAgentflow(workflow.id, { enable_deploy: newStatus });
       onDeployStatusChange?.(workflow.name, newStatus);
     } catch {
       setToggleDeploy(!newStatus);
@@ -469,11 +469,11 @@ ${outputSchema ? `\n// Output Schema:\n// ${formatParams(outputSchema)}` : ''}`;
 
                   <div className={styles.embedParamsForm}>
                     {([
-                      ['workflowId', 'Workflow ID', 'workflow_xxxxx'],
+                      ['workflowId', 'Agentflow ID', 'workflow_xxxxx'],
                       ['userId', 'User ID', 'user_id'],
                       ['apiHost', 'API Host', 'https://example.com'],
                       ['backendApiHost', 'Backend API Host', 'https://backend.example.com'],
-                      ['workflowName', 'Workflow Name', 'My Chatbot'],
+                      ['workflowName', 'Agentflow Name', 'My Chatbot'],
                     ] as const).map(([key, label, placeholder]) => (
                       <div key={key} className={styles.formGroup}>
                         <label htmlFor={`embed-${key}`}>{label}</label>

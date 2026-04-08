@@ -39,7 +39,7 @@ class FeatureRegistry {
   private sectionOrder: string[] = [
     'dashboard',
     'chat',
-    'workflow',
+    'agentflow',
     'knowledge',
     'settings',
   ];
@@ -178,9 +178,9 @@ export async function initializeFeatures(): Promise<void> {
     import('@xgen/main-chat-current'),
     import('@xgen/feature-main-chat-history'),
 
-    // Workflow Section
+    // Agentflow Section
     import('@xgen/main-canvas-intro'),
-    import('@xgen/main-workflow-management-orchestrator'),
+    import('@xgen/main-agentflow-management-orchestrator'),
     import('@xgen/main-tool-management-orchestrator'),
     import('@xgen/main-prompt-management-orchestrator'),
     import('@xgen/main-auth-profile-orchestrator'),
@@ -195,23 +195,23 @@ export async function initializeFeatures(): Promise<void> {
   const features = featureModules.map(mod => mod.default || Object.values(mod)[0]);
   featureRegistry.registerAll(features as MainFeatureModule[]);
 
-  // Register Workflow Tab Plugins (순서 = 탭 순서)
+  // Register Agentflow Tab Plugins (순서 = 탭 순서)
   const [
-    wfStorageMod,
-    wfStoreMod,
-    wfSchedulerMod,
-    wfTesterMod,
+    afStorageMod,
+    afStoreMod,
+    afSchedulerMod,
+    afTesterMod,
   ] = await Promise.all([
-    import('@xgen/main-workflow-management-storage'),
-    import('@xgen/main-workflow-management-store'),
-    import('@xgen/main-workflow-management-scheduler'),
-    import('@xgen/main-workflow-management-tester'),
+    import('@xgen/main-agentflow-management-storage'),
+    import('@xgen/main-agentflow-management-store'),
+    import('@xgen/main-agentflow-management-scheduler'),
+    import('@xgen/main-agentflow-management-tester'),
   ]);
 
-  CoreRegistry.registerWorkflowTabPlugin(wfStorageMod.workflowStoragePlugin);
-  CoreRegistry.registerWorkflowTabPlugin(wfStoreMod.workflowStorePlugin);
-  CoreRegistry.registerWorkflowTabPlugin(wfSchedulerMod.workflowSchedulerPlugin);
-  CoreRegistry.registerWorkflowTabPlugin(wfTesterMod.workflowTesterPlugin);
+  CoreRegistry.registerAgentflowTabPlugin(afStorageMod.agentflowStoragePlugin);
+  CoreRegistry.registerAgentflowTabPlugin(afStoreMod.agentflowStorePlugin);
+  CoreRegistry.registerAgentflowTabPlugin(afSchedulerMod.agentflowSchedulerPlugin);
+  CoreRegistry.registerAgentflowTabPlugin(afTesterMod.agentflowTesterPlugin);
 
   // Register Document Tab Plugins (순서 = 탭 순서)
   const [

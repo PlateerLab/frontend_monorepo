@@ -14,7 +14,7 @@ const OutputRenderer: React.FC<OutputRendererProps> = ({ output }) => {
     const { t } = useTranslation();
 
     if (!output) {
-        return <div className="text-[#40444d] whitespace-pre-wrap">{t('canvas.executionPanel.placeholder', 'Run workflow to see results')}</div>;
+        return <div className="text-[#40444d] whitespace-pre-wrap">{t('canvas.executionPanel.placeholder', 'Run agentflow to see results')}</div>;
     }
     if (hasError(output)) {
         return (
@@ -102,7 +102,7 @@ const ExecutionPanel: React.FC<ExecutionPanelProps> = ({ onExecute, onClear, out
                         {isCopied ? <LuCheck /> : <LuCopy />}
                     </button>
                     <button onClick={onExecute} className={`${actionBtnBase} bg-[#28a745] text-white hover:enabled:bg-[#218838]`}
-                        title={t('canvas.executionPanel.runWorkflow', 'Run')} disabled={isLoading} type="button">
+                        title={t('canvas.executionPanel.runAgentflow', 'Run')} disabled={isLoading} type="button">
                         {isLoading ? (
                             <div className="border-2 border-[#f3f3f3] border-t-[#3498db] rounded-full w-3.5 h-3.5 animate-spin" />
                         ) : (

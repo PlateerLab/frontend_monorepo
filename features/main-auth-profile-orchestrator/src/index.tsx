@@ -61,12 +61,12 @@ const AuthProfilePage: React.FC<AuthProfilePageProps> = ({ onNavigate }) => {
 export const mainAuthProfileOrchestratorFeature: MainFeatureModule = {
   id: 'main-auth-profile-orchestrator',
   name: 'Auth Profile Management',
-  sidebarSection: 'workflow',
+  sidebarSection: 'agentflow',
   sidebarItems: [
     {
       id: 'auth-profile',
-      titleKey: 'sidebar.workflow.authProfile.title',
-      descriptionKey: 'sidebar.workflow.authProfile.description',
+      titleKey: 'sidebar.agentflow.authProfile.title',
+      descriptionKey: 'sidebar.agentflow.authProfile.description',
     },
   ],
   routes: {

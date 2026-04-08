@@ -1,0 +1,284 @@
+{
+  "tutorial_id": "basic_chatbot",
+  "tutorial_name": "기본 챗봇 만들기",
+  "tutorial_description": "Input -> Agent -> Output 기본 구조를 배웁니다. 가장 기본적인 AI 챗봇 워크플로우를 만들어봅니다.",
+  "tags": ["초급", "챗봇", "openai"],
+  "view": {
+    "x": -36528,
+    "y": -15535,
+    "scale": 0.73
+  },
+  "tutorial_steps": [
+    {
+      "step": 1,
+      "title": "시작 노드 생성",
+      "message": "워크플로우의 시작점인 Input String 노드를 생성합니다.\n이 노드는 사용자의 텍스트 입력을 받아 다음 노드로 전달하는 역할을 합니다.\n모든 워크플로우는 이 시작 노드에서 출발합니다.",
+      "nodes": [
+        {
+          "id": "input_string-tut-1",
+          "data": {
+            "functionId": "startnode",
+            "id": "input_string",
+            "nodeName": "Input String",
+            "description": "사용자가 설정한 문자열 값을 출력하는 입력 노드입니다.",
+            "tags": ["input", "string", "text", "start_node"],
+            "inputs": [
+              {
+                "id": "args_schema",
+                "name": "ArgsSchema",
+                "type": "InputSchema",
+                "required": false
+              }
+            ],
+            "outputs": [
+              {
+                "id": "text",
+                "name": "Text",
+                "type": "STR"
+              }
+            ],
+            "parameters": [
+              {
+                "id": "input_str",
+                "name": "INPUT",
+                "type": "STR",
+                "value": "안녕하세요! 오늘 날씨가 어때요?",
+                "required": false
+              }
+            ]
+          },
+          "position": {
+            "x": 50408,
+            "y": 21803
+          }
+        }
+      ],
+      "edges": []
+    },
+    {
+      "step": 2,
+      "title": "AI Agent 노드 추가",
+      "message": "Agent Xgen 노드를 추가합니다.\n이 노드는 OpenAI의 GPT 모델을 사용하여 AI 응답을 스트리밍으로 생성합니다.\nInput 노드의 Text 출력이 Agent의 Text 입력으로 자동 연결됩니다.",
+      "nodes": [
+        {
+          "id": "agents/xgen-tut-2",
+          "data": {
+            "functionId": "agents",
+            "id": "agents/xgen",
+            "nodeName": "Agent Xgen",
+            "description": "워크플로우의 핵심 AI 두뇌입니다. OpenAI, Anthropic, Google, AWS Bedrock, vLLM 프로바이더를 지원합니다.",
+            "tags": ["agent", "chat", "rag", "public_model", "stream", "xgen"],
+            "inputs": [
+              {
+                "id": "text",
+                "name": "Text",
+                "type": "STREAM STR|STR",
+                "multi": true,
+                "required": false
+              },
+              {
+                "id": "files",
+                "name": "Files",
+                "type": "FILE",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "images",
+                "name": "Images",
+                "type": "LIST",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "tools",
+                "name": "Tools",
+                "type": "TOOL",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "memory",
+                "name": "Memory",
+                "type": "OBJECT",
+                "multi": false,
+                "required": false
+              },
+              {
+                "id": "rag_context",
+                "name": "RAG Context",
+                "type": "DocsContext",
+                "multi": false,
+                "required": false
+              },
+              {
+                "id": "args_schema",
+                "name": "ArgsSchema",
+                "type": "OutputSchema"
+              },
+              {
+                "id": "plan",
+                "name": "Plan",
+                "type": "PLAN",
+                "required": false
+              }
+            ],
+            "outputs": [
+              {
+                "id": "stream",
+                "name": "Stream",
+                "type": "STREAM STR",
+                "stream": true
+              }
+            ],
+            "parameters": [
+              {
+                "id": "provider",
+                "name": "Provider",
+                "type": "STR",
+                "value": "openai",
+                "required": true,
+                "options": [
+                  { "value": "openai", "label": "OpenAI" },
+                  { "value": "anthropic", "label": "Anthropic" },
+                  { "value": "google", "label": "Google" },
+                  { "value": "bedrock", "label": "AWS Bedrock" },
+                  { "value": "vllm", "label": "vLLM" }
+                ]
+              },
+              {
+                "id": "openai_model",
+                "name": "OpenAI Model",
+                "type": "STR",
+                "value": "gpt-4o",
+                "required": true,
+                "options": [
+                  { "value": "gpt-3.5-turbo", "label": "GPT-3.5 Turbo" },
+                  { "value": "gpt-4", "label": "GPT-4" },
+                  { "value": "gpt-4o", "label": "GPT-4o" },
+                  { "value": "gpt-4.1", "label": "GPT-4.1" },
+                  { "value": "gpt-4.1-mini", "label": "GPT-4.1 Mini" }
+                ],
+                "dependency": "provider",
+                "dependencyValue": "openai"
+              },
+              {
+                "id": "temperature",
+                "name": "Temperature",
+                "type": "FLOAT",
+                "value": 1,
+                "min": 0,
+                "max": 2,
+                "step": 0.1
+              },
+              {
+                "id": "max_tokens",
+                "name": "Max Tokens",
+                "type": "INT",
+                "value": 8192,
+                "min": 1,
+                "max": 65536,
+                "step": 1
+              },
+              {
+                "id": "max_iterations",
+                "name": "Max Iterations",
+                "type": "INT",
+                "value": 15,
+                "min": 1,
+                "max": 100,
+                "step": 1
+              },
+              {
+                "id": "system_prompt",
+                "name": "System Prompt",
+                "type": "STR",
+                "value": "You are a helpful AI assistant.",
+                "required": false,
+                "expandable": true
+              },
+              {
+                "id": "streaming",
+                "name": "Streaming",
+                "type": "BOOL",
+                "value": true,
+                "required": false
+              }
+            ]
+          },
+          "position": {
+            "x": 51114,
+            "y": 21773
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "edge-tut-input-to-agent",
+          "source": {
+            "nodeId": "input_string-tut-1",
+            "portId": "text",
+            "portType": "output",
+            "type": "STR"
+          },
+          "target": {
+            "nodeId": "agents/xgen-tut-2",
+            "portId": "text",
+            "portType": "input"
+          }
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "title": "출력 노드로 완성",
+      "message": "Print Agent Output 노드를 추가하여 워크플로우를 완성합니다.\nAgent의 출력이 이 노드로 연결되어 결과를 확인할 수 있습니다.\n\n이제 상단의 실행 버튼을 눌러 결과를 확인해보세요!",
+      "nodes": [
+        {
+          "id": "tools/print_agent_output-tut-3",
+          "data": {
+            "functionId": "endnode",
+            "id": "tools/print_agent_output",
+            "nodeName": "Print Agent Output",
+            "description": "Agent의 출력을 화면에 표시하는 출력 노드입니다.",
+            "tags": ["output", "print", "end_node", "utility", "any_type"],
+            "inputs": [
+              {
+                "id": "input_print",
+                "name": "Print",
+                "type": "STREAM STR|STR",
+                "multi": true,
+                "required": true
+              }
+            ],
+            "outputs": [],
+            "parameters": []
+          },
+          "position": {
+            "x": 51688,
+            "y": 21821
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "edge-tut-agent-to-print",
+          "source": {
+            "nodeId": "agents/xgen-tut-2",
+            "portId": "stream",
+            "portType": "output",
+            "type": "STREAM STR"
+          },
+          "target": {
+            "nodeId": "tools/print_agent_output-tut-3",
+            "portId": "input_print",
+            "portType": "input"
+          }
+        }
+      ]
+    }
+  ]
+}

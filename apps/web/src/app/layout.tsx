@@ -6,7 +6,7 @@ import { ToastProvider } from '@xgen/ui';
 
 export const metadata: Metadata = {
     title: 'XGEN',
-    description: 'XGEN - Next-Gen AI Workflow Platform',
+    description: 'XGEN - Next-Gen AI Agentflow Platform',
     icons: {
         icon: [
             { url: '/favicon.png', sizes: '32x32', type: 'image/x-icon' },

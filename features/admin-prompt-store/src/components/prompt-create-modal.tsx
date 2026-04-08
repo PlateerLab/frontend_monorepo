@@ -5,7 +5,7 @@ import { Modal, Button, useToast } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
 import { createPrompt } from '../api/prompt-api';
 
-const PS = 'admin.workflowManagement.promptStore';
+const PS = 'admin.agentflowManagement.promptStore';
 const CM = `${PS}.createModal`;
 
 interface PromptCreateModalProps {

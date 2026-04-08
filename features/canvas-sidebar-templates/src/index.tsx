@@ -4,12 +4,12 @@ import { LuArrowLeft, LuLayoutTemplate, LuCopy } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import type { CanvasPagePlugin } from '@xgen/types';
 import type { Template } from './components/MiniCanvas';
-import styles from './styles/workflow-panel.module.scss';
+import styles from './styles/agentflow-panel.module.scss';
 import sideMenuStyles from './styles/side-menu.module.scss';
 
 // ── Types ──────────────────────────────────────────────────────
 
-interface Workflow {
+interface Agentflow {
     id: number;
     workflow_id: string;
     workflow_name: string;
@@ -24,33 +24,33 @@ interface Workflow {
 
 export interface TemplatePanelProps {
     onBack: () => void;
-    onLoadWorkflow: (workflowData: any, workflowName: string, workflowId: string) => void;
+    onLoadAgentflow: (workflowData: any, workflowName: string, workflowId: string) => void;
     /** Fetch templates from API — injected to avoid direct API import */
-    fetchTemplates?: () => Promise<Workflow[]>;
+    fetchTemplates?: () => Promise<Agentflow[]>;
     /** Create new workflow ID — injected utility */
-    createNewWorkflowId?: () => string;
+    createNewAgentflowId?: () => string;
     /** Toast helpers — injected */
     showWarningConfirm?: (opts: { title: string; message: string; onConfirm: () => void; confirmText: string; cancelText: string }) => void;
     showSuccess?: (msg: string) => void;
     showError?: (msg: string) => void;
     /** Check if canvas has existing data */
-    hasCurrentWorkflow?: () => boolean;
+    hasCurrentAgentflow?: () => boolean;
 }
 
 // ── Component ──────────────────────────────────────────────────
 
 const TemplatePanel: React.FC<TemplatePanelProps> = ({
     onBack,
-    onLoadWorkflow,
+    onLoadAgentflow,
     fetchTemplates,
-    createNewWorkflowId,
+    createNewAgentflowId,
     showWarningConfirm,
     showSuccess,
     showError,
-    hasCurrentWorkflow,
+    hasCurrentAgentflow,
 }) => {
     const { t } = useTranslation();
-    const [workflows, setWorkflows] = useState<Workflow[]>([]);
+    const [workflows, setAgentflows] = useState<Agentflow[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -60,10 +60,10 @@ const TemplatePanel: React.FC<TemplatePanelProps> = ({
                 if (fetchTemplates) {
                     const workflowList = await fetchTemplates();
                     const templates = workflowList.filter((w) => w.is_template === true);
-                    setWorkflows(templates);
+                    setAgentflows(templates);
                 }
             } catch {
-                setWorkflows([]);
+                setAgentflows([]);
             } finally {
                 setIsLoading(false);
             }
@@ -71,7 +71,7 @@ const TemplatePanel: React.FC<TemplatePanelProps> = ({
         loadTemplates();
     }, [fetchTemplates]);
 
-    const performLoadTemplate = (workflow: Workflow): void => {
+    const performLoadTemplate = (workflow: Agentflow): void => {
         try {
             if (!workflow.workflow_data) {
                 showError?.(t('canvas.toasts.templateLoadFailed', 'Failed to load template'));
@@ -88,10 +88,10 @@ const TemplatePanel: React.FC<TemplatePanelProps> = ({
                 }
             }
 
-            const newWorkflowId = createNewWorkflowId?.() ?? crypto.randomUUID();
+            const newAgentflowId = createNewAgentflowId?.() ?? crypto.randomUUID();
 
             setTimeout(() => {
-                onLoadWorkflow(workflowData, workflow.workflow_upload_name, newWorkflowId);
+                onLoadAgentflow(workflowData, workflow.workflow_upload_name, newAgentflowId);
                 showSuccess?.(`${t('canvas.toasts.templateLoadSuccess', 'Template loaded')}: "${workflow.workflow_upload_name}"`);
                 onBack();
             }, 100);
@@ -100,13 +100,13 @@ const TemplatePanel: React.FC<TemplatePanelProps> = ({
         }
     };
 
-    const handleCopyWorkflow = (workflow: Workflow): void => {
-        const hasExistingWork = hasCurrentWorkflow?.() ?? false;
+    const handleCopyAgentflow = (workflow: Agentflow): void => {
+        const hasExistingWork = hasCurrentAgentflow?.() ?? false;
 
         if (hasExistingWork && showWarningConfirm) {
             showWarningConfirm({
-                title: t('canvas.messages.workflowLoadTitle', 'Load Workflow'),
-                message: t('canvas.messages.workflowLoadMessage', 'This will replace the current workflow. Continue?'),
+                title: t('canvas.messages.agentflowLoadTitle', 'Load Agentflow'),
+                message: t('canvas.messages.agentflowLoadMessage', 'This will replace the current agentflow. Continue?'),
                 onConfirm: () => performLoadTemplate(workflow),
                 confirmText: t('common.confirm', 'Confirm'),
                 cancelText: t('common.cancel', 'Cancel'),
@@ -118,7 +118,7 @@ const TemplatePanel: React.FC<TemplatePanelProps> = ({
 
     if (isLoading) {
         return (
-            <div className={styles.workflowPanel}>
+            <div className={styles.agentflowPanel}>
                 <div className={sideMenuStyles.header}>
                     <button onClick={onBack} className={sideMenuStyles.backButton} type="button">
                         <LuArrowLeft />
@@ -134,7 +134,7 @@ const TemplatePanel: React.FC<TemplatePanelProps> = ({
     }
 
     return (
-        <div className={styles.workflowPanel}>
+        <div className={styles.agentflowPanel}>
             <div className={sideMenuStyles.header}>
                 <button onClick={onBack} className={sideMenuStyles.backButton} type="button">
                     <LuArrowLeft />
@@ -142,7 +142,7 @@ const TemplatePanel: React.FC<TemplatePanelProps> = ({
                 <h3>{t('canvas.templatePanel.title', 'Templates')}</h3>
             </div>
 
-            <div className={styles.workflowList}>
+            <div className={styles.agentflowList}>
                 <div className={styles.listHeader}>
                     <h3>📁 {t('canvas.templatePanel.available', 'Available Templates')}</h3>
                     <span className={styles.count}>{workflows.length}</span>
@@ -178,7 +178,7 @@ const TemplatePanel: React.FC<TemplatePanelProps> = ({
                             <div className={styles.templateActions}>
                                 <button
                                     className={styles.templateActionButton}
-                                    onClick={(e) => { e.stopPropagation(); e.preventDefault(); handleCopyWorkflow(workflow); }}
+                                    onClick={(e) => { e.stopPropagation(); e.preventDefault(); handleCopyAgentflow(workflow); }}
                                     title={t('canvas.templatePanel.preview', 'Preview Template')}
                                     type="button"
                                 >
@@ -208,7 +208,7 @@ export const canvasSidebarTemplatesPlugin: CanvasPagePlugin = {
 };
 
 export { TemplatePanel };
-export type { Template, Workflow };
+export type { Template, Agentflow };
 export { default as MiniCanvas } from './components/MiniCanvas';
 export { default as TemplatePreview } from './components/TemplatePreview';
 export default TemplatePanel;
