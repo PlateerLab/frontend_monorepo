@@ -24,6 +24,7 @@ export const en: Record<string, unknown> = {
     deploySettings: 'Deploy Settings',
     addNode: 'Add Node',
     history: 'History',
+    tutorial: 'Tutorial',
   },
   toast: {
     saving: 'Saving agentflow...',

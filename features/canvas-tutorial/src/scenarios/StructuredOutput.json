@@ -1,0 +1,381 @@
+{
+  "tutorial_id": "structured_output",
+  "tutorial_name": "구조화된 JSON 출력",
+  "tutorial_description": "Schema Provider 노드를 사용하여 AI가 정해진 JSON 형식으로 응답하도록 만들어봅니다.",
+  "tags": ["중급", "스키마", "JSON"],
+  "view": {
+    "x": -36528,
+    "y": -15535,
+    "scale": 0.73
+  },
+  "tutorial_steps": [
+    {
+      "step": 1,
+      "title": "분석할 텍스트 입력",
+      "message": "AI가 분석할 텍스트를 입력받는 Input String 노드를 생성합니다.\n예시로 제품 리뷰 텍스트가 설정되어 있습니다.",
+      "nodes": [
+        {
+          "id": "input_string-tut-1",
+          "data": {
+            "functionId": "startnode",
+            "id": "input_string",
+            "nodeName": "Input String",
+            "description": "사용자가 설정한 문자열 값을 출력하는 입력 노드입니다.",
+            "tags": ["input", "string", "text", "start_node"],
+            "inputs": [
+              {
+                "id": "args_schema",
+                "name": "ArgsSchema",
+                "type": "InputSchema",
+                "required": false
+              }
+            ],
+            "outputs": [
+              {
+                "id": "text",
+                "name": "Text",
+                "type": "STR"
+              }
+            ],
+            "parameters": [
+              {
+                "id": "input_str",
+                "name": "INPUT",
+                "type": "STR",
+                "value": "이 노트북은 정말 가볍고 성능이 좋습니다. 배터리도 하루종일 사용할 수 있어서 만족스럽습니다. 다만 키보드가 약간 딱딱한 느낌이 있고, 가격이 200만원이라 좀 비싸다는 느낌이 있네요. 전반적으로 업무용으로 추천합니다.",
+                "required": false
+              }
+            ]
+          },
+          "position": {
+            "x": 49800,
+            "y": 21700
+          }
+        }
+      ],
+      "edges": []
+    },
+    {
+      "step": 2,
+      "title": "출력 스키마 정의",
+      "message": "Schema Provider(Output) 노드를 추가합니다.\n\n이 노드는 AI의 응답 형식을 JSON 스키마로 정의합니다.\n노드의 + 버튼을 눌러 필드를 추가할 수 있습니다.\n\n예: summary(str), sentiment(str), score(int), pros(str), cons(str)\n\n이렇게 하면 AI가 항상 동일한 구조의 JSON으로 응답합니다.",
+      "nodes": [
+        {
+          "id": "output_schema_provider-tut-2",
+          "data": {
+            "functionId": "tools",
+            "id": "output_schema_provider",
+            "nodeName": "Schema Provider(Output)",
+            "description": "AI 응답의 출력 형식을 JSON 스키마로 정의합니다.",
+            "tags": ["input", "json", "dict", "parameter", "source", "user_input", "key_value"],
+            "inputs": [],
+            "outputs": [
+              {
+                "id": "args_schema",
+                "name": "ArgsSchema",
+                "type": "OutputSchema"
+              }
+            ],
+            "parameters": [
+              {
+                "id": "summary",
+                "name": "summary",
+                "type": "STR",
+                "value": "str",
+                "handle_id": true
+              },
+              {
+                "id": "summary_description",
+                "name": "summary_description",
+                "type": "STR",
+                "value": "리뷰 한 줄 요약"
+              },
+              {
+                "id": "sentiment",
+                "name": "sentiment",
+                "type": "STR",
+                "value": "str",
+                "handle_id": true
+              },
+              {
+                "id": "sentiment_description",
+                "name": "sentiment_description",
+                "type": "STR",
+                "value": "감정 분석 결과 (긍정/부정/중립)"
+              },
+              {
+                "id": "score",
+                "name": "score",
+                "type": "STR",
+                "value": "int",
+                "handle_id": true
+              },
+              {
+                "id": "score_description",
+                "name": "score_description",
+                "type": "STR",
+                "value": "1-10점 척도의 종합 점수"
+              },
+              {
+                "id": "pros",
+                "name": "pros",
+                "type": "STR",
+                "value": "str",
+                "handle_id": true
+              },
+              {
+                "id": "pros_description",
+                "name": "pros_description",
+                "type": "STR",
+                "value": "장점 목록"
+              },
+              {
+                "id": "cons",
+                "name": "cons",
+                "type": "STR",
+                "value": "str",
+                "handle_id": true
+              },
+              {
+                "id": "cons_description",
+                "name": "cons_description",
+                "type": "STR",
+                "value": "단점 목록"
+              }
+            ]
+          },
+          "position": {
+            "x": 49800,
+            "y": 22200
+          }
+        }
+      ],
+      "edges": []
+    },
+    {
+      "step": 3,
+      "title": "AI Agent 연결",
+      "message": "Agent Xgen 노드를 추가합니다.\n\nInput String의 텍스트와 Schema Provider의 스키마를 모두 연결합니다.\n\n핵심: Agent의 ArgsSchema 입력에 스키마가 연결되면,\nAI는 반드시 해당 JSON 형식에 맞춰 응답합니다.\n\nStreaming은 꺼야 구조화된 JSON 출력이 정상 동작합니다.",
+      "nodes": [
+        {
+          "id": "agents/xgen-tut-3",
+          "data": {
+            "functionId": "agents",
+            "id": "agents/xgen",
+            "nodeName": "Agent Xgen",
+            "description": "워크플로우의 핵심 AI 두뇌입니다.",
+            "tags": ["agent", "chat", "rag", "public_model", "stream", "xgen"],
+            "inputs": [
+              {
+                "id": "text",
+                "name": "Text",
+                "type": "STREAM STR|STR",
+                "multi": true,
+                "required": false
+              },
+              {
+                "id": "files",
+                "name": "Files",
+                "type": "FILE",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "images",
+                "name": "Images",
+                "type": "LIST",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "tools",
+                "name": "Tools",
+                "type": "TOOL",
+                "multi": true,
+                "required": false,
+                "value": []
+              },
+              {
+                "id": "memory",
+                "name": "Memory",
+                "type": "OBJECT",
+                "multi": false,
+                "required": false
+              },
+              {
+                "id": "rag_context",
+                "name": "RAG Context",
+                "type": "DocsContext",
+                "multi": false,
+                "required": false
+              },
+              {
+                "id": "args_schema",
+                "name": "ArgsSchema",
+                "type": "OutputSchema"
+              },
+              {
+                "id": "plan",
+                "name": "Plan",
+                "type": "PLAN",
+                "required": false
+              }
+            ],
+            "outputs": [
+              {
+                "id": "result",
+                "name": "Result",
+                "type": "STR"
+              }
+            ],
+            "parameters": [
+              {
+                "id": "provider",
+                "name": "Provider",
+                "type": "STR",
+                "value": "openai",
+                "required": true,
+                "options": [
+                  { "value": "openai", "label": "OpenAI" },
+                  { "value": "anthropic", "label": "Anthropic" },
+                  { "value": "google", "label": "Google" }
+                ]
+              },
+              {
+                "id": "openai_model",
+                "name": "OpenAI Model",
+                "type": "STR",
+                "value": "gpt-4o",
+                "required": true,
+                "options": [
+                  { "value": "gpt-4o", "label": "GPT-4o" },
+                  { "value": "gpt-4.1", "label": "GPT-4.1" },
+                  { "value": "gpt-4.1-mini", "label": "GPT-4.1 Mini" }
+                ],
+                "dependency": "provider",
+                "dependencyValue": "openai"
+              },
+              {
+                "id": "temperature",
+                "name": "Temperature",
+                "type": "FLOAT",
+                "value": 0.3,
+                "min": 0,
+                "max": 2,
+                "step": 0.1
+              },
+              {
+                "id": "max_tokens",
+                "name": "Max Tokens",
+                "type": "INT",
+                "value": 8192,
+                "min": 1,
+                "max": 65536,
+                "step": 1
+              },
+              {
+                "id": "system_prompt",
+                "name": "System Prompt",
+                "type": "STR",
+                "value": "You are a product review analyzer. Analyze the given review and provide structured output. Always respond in Korean for text fields.",
+                "required": false,
+                "expandable": true
+              },
+              {
+                "id": "streaming",
+                "name": "Streaming",
+                "type": "BOOL",
+                "value": false,
+                "required": false
+              }
+            ]
+          },
+          "position": {
+            "x": 50700,
+            "y": 21900
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "edge-tut-input-to-agent",
+          "source": {
+            "nodeId": "input_string-tut-1",
+            "portId": "text",
+            "portType": "output",
+            "type": "STR"
+          },
+          "target": {
+            "nodeId": "agents/xgen-tut-3",
+            "portId": "text",
+            "portType": "input"
+          }
+        },
+        {
+          "id": "edge-tut-schema-to-agent",
+          "source": {
+            "nodeId": "output_schema_provider-tut-2",
+            "portId": "args_schema",
+            "portType": "output",
+            "type": "OutputSchema"
+          },
+          "target": {
+            "nodeId": "agents/xgen-tut-3",
+            "portId": "args_schema",
+            "portType": "input"
+          }
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "title": "JSON 결과 출력",
+      "message": "Print Agent Output 노드를 추가하여 구조화된 JSON 결과를 확인합니다.\n\n워크플로우가 완성되었습니다!\n실행하면 리뷰가 summary, sentiment, score, pros, cons 형식의 JSON으로 분석됩니다.\n\n이 패턴은 데이터 파이프라인, 보고서 자동 생성 등에 활용할 수 있습니다.",
+      "nodes": [
+        {
+          "id": "tools/print_agent_output-tut-4",
+          "data": {
+            "functionId": "endnode",
+            "id": "tools/print_agent_output",
+            "nodeName": "Print Agent Output",
+            "description": "Agent의 출력을 화면에 표시하는 출력 노드입니다.",
+            "tags": ["output", "print", "end_node", "utility", "any_type"],
+            "inputs": [
+              {
+                "id": "input_print",
+                "name": "Print",
+                "type": "STREAM STR|STR",
+                "multi": true,
+                "required": true
+              }
+            ],
+            "outputs": [],
+            "parameters": []
+          },
+          "position": {
+            "x": 51500,
+            "y": 21900
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "edge-tut-agent-to-print",
+          "source": {
+            "nodeId": "agents/xgen-tut-3",
+            "portId": "result",
+            "portType": "output",
+            "type": "STR"
+          },
+          "target": {
+            "nodeId": "tools/print_agent_output-tut-4",
+            "portId": "input_print",
+            "portType": "input"
+          }
+        }
+      ]
+    }
+  ]
+}
