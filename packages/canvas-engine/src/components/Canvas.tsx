@@ -548,6 +548,12 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
         clearSidebarDragPreview: () => {
             // Sidebar drag preview is handled by the page orchestrator
         },
+        openAddNodePopup: (position: Position) => {
+            setAddNodePopup({ position });
+        },
+        closeAddNodePopup: () => {
+            setAddNodePopup(null);
+        },
     }), [
         nodes, edges, memos, view, selectedNodeIds,
         setNodes, setEdges, setMemos, setView,

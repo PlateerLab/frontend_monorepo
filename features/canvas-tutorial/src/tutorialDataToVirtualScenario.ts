@@ -5,10 +5,11 @@ import type { VirtualTutorialScenario, VirtualTutorialStep } from './virtual-cur
  * 기존 JSON 기반 TutorialData를 VirtualTutorialScenario로 변환.
  *
  * 각 tutorial_step에서:
- *   - 노드 1개 → add-node 스텝 생성 (커서가 캔버스 위치로 이동하며 노드 추가)
- *   - 엣지 N개 → connect 스텝 N개 생성 (addEdge API 호출)
- *
- * 결과: 커서가 자동으로 노드를 배치하고 엣지를 연결하는 데모가 됩니다.
+ *   - 노드 1개 → 3개 서브스텝 생성:
+ *     1) open-popup: 캔버스 더블클릭 → 노드추가 팝업 열기
+ *     2) click: 아코디언 그룹(functionName) 클릭 → 펼치기
+ *     3) click: 노드 항목 클릭 → 노드 생성 + 팝업 닫기
+ *   - 엣지 N개 → connect 스텝 N개 생성
  */
 export function tutorialDataToVirtualScenario(tutorial: TutorialData): VirtualTutorialScenario {
     const steps: VirtualTutorialStep[] = [];
@@ -18,13 +19,16 @@ export function tutorialDataToVirtualScenario(tutorial: TutorialData): VirtualTu
         const tutStepIndex = tutStep.step; // 1-based
         const totalTutSteps = tutorial.tutorial_steps.length;
 
-        // 1) 각 노드를 add-node 스텝으로 생성
+        // 1) 각 노드를 3개 서브스텝으로 생성
         for (const node of tutStep.nodes) {
+            const functionId = (node.data as any)?.functionId || '';
+
+            // 1-a) 캔버스 더블클릭 → 노드추가 팝업 열기
             stepIdx++;
             steps.push({
-                id: `${tutorial.tutorial_id}-s${stepIdx}-add-${node.id}`,
+                id: `${tutorial.tutorial_id}-s${stepIdx}-open-popup-${node.id}`,
                 targetSelector: '',
-                cursorAction: 'add-node',
+                cursorAction: 'open-popup',
                 nodeId: node.id,
                 nodeData: node.data,
                 targetPosition: node.position,
@@ -34,7 +38,40 @@ export function tutorialDataToVirtualScenario(tutorial: TutorialData): VirtualTu
                 tutorialStepIndex: tutStepIndex,
                 tutorialStepTotal: totalTutSteps,
                 hintPosition: 'bottom',
-                autoAdvanceDelay: 1200,
+                autoAdvanceDelay: 1000,
+            });
+
+            // 1-b) 아코디언 그룹 클릭 → 펼치기
+            stepIdx++;
+            steps.push({
+                id: `${tutorial.tutorial_id}-s${stepIdx}-accordion-${node.id}`,
+                targetSelector: `[data-accordion-group="${functionId}"]`,
+                cursorAction: 'click',
+                hintKey: '',
+                stepTitle: tutStep.title,
+                stepMessage: tutStep.message,
+                tutorialStepIndex: tutStepIndex,
+                tutorialStepTotal: totalTutSteps,
+                hintPosition: 'bottom',
+                autoAdvanceDelay: 1500,
+            });
+
+            // 1-c) 노드 항목으로 스크롤 + 클릭 → 노드 생성 + 팝업 닫기
+            stepIdx++;
+            steps.push({
+                id: `${tutorial.tutorial_id}-s${stepIdx}-select-${node.id}`,
+                targetSelector: `[data-node-item="${node.data.id}"]`,
+                cursorAction: 'click',
+                nodeId: node.id,
+                nodeData: node.data,
+                targetPosition: node.position,
+                hintKey: '',
+                stepTitle: tutStep.title,
+                stepMessage: tutStep.message,
+                tutorialStepIndex: tutStepIndex,
+                tutorialStepTotal: totalTutSteps,
+                hintPosition: 'bottom',
+                autoAdvanceDelay: 1500,
             });
         }
 

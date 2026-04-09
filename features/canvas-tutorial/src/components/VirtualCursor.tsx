@@ -18,6 +18,7 @@ const VirtualCursor: React.FC<VirtualCursorProps> = ({ x, y, phase, visible }) =
     if (!visible) return null;
 
     const isClicking = phase === 'acting';
+    // arrived: 도착 후 대기 상태 — 클릭 전 잠시 멈춤
     const scale = isClicking ? 0.9 : 1;
 
     return (
