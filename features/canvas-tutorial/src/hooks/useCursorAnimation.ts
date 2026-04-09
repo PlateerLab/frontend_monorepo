@@ -34,6 +34,7 @@ export function useCursorAnimation(
     });
 
     const animFrameRef = useRef<number>(0);
+    const actingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     // currentPos는 항상 최신 커서 좌표 (stale closure 방지)
     const currentPosRef = useRef({ x: initX, y: initY });
     const onActionCompleteRef = useRef(onActionComplete);
@@ -44,6 +45,13 @@ export function useCursorAnimation(
     const targetY = targetRect ? targetRect.top + targetRect.height / 2 : null;
 
     useEffect(() => {
+        // cleanup: 이전 스텝의 pending 타이머 모두 취소
+        cancelAnimationFrame(animFrameRef.current);
+        if (actingTimerRef.current !== null) {
+            clearTimeout(actingTimerRef.current);
+            actingTimerRef.current = null;
+        }
+
         if (targetX === null || targetY === null || !action) {
             setState((s) => ({ ...s, phase: 'idle' }));
             return;
@@ -76,17 +84,23 @@ export function useCursorAnimation(
                     action === 'click' || action === 'add-node' ? 400 :
                     action === 'connect' ? 600 : 200;
 
-                setTimeout(() => {
+                actingTimerRef.current = setTimeout(() => {
+                    actingTimerRef.current = null;
                     setState((s) => ({ ...s, phase: 'done' }));
                     onActionCompleteRef.current?.();
                 }, actingDelay);
             }
         };
 
-        cancelAnimationFrame(animFrameRef.current);
         animFrameRef.current = requestAnimationFrame(animate);
 
-        return () => cancelAnimationFrame(animFrameRef.current);
+        return () => {
+            cancelAnimationFrame(animFrameRef.current);
+            if (actingTimerRef.current !== null) {
+                clearTimeout(actingTimerRef.current);
+                actingTimerRef.current = null;
+            }
+        };
         // stepKey가 바뀔 때만 재시작. targetX/Y는 안정적인 number.
     }, [targetX, targetY, action, stepKey]);
 

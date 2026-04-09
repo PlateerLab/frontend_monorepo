@@ -3,6 +3,8 @@ import type { CanvasNode, CanvasEdge, NodeData, Position, View } from '@xgen/can
 export interface CanvasRefHandle {
     addNode: (node: CanvasNode) => void;
     addEdge: (edge: CanvasEdge) => void;
+    getNodes?: () => CanvasNode[];
+    getEdges?: () => CanvasEdge[];
     getView?: () => View;
     setView?: (view: View) => void;
     loadAgentflow?: (data: { nodes: CanvasNode[]; edges: CanvasEdge[]; memos?: any[]; view?: View }) => void;
@@ -15,7 +17,7 @@ export function triggerClick(element: HTMLElement): void {
     );
 }
 
-/** add-node 모드: canvasRef.addNode() API 호출로 노드 추가 */
+/** add-node 모드: canvasRef.addNode() API 호출로 노드 추가 (중복 방지) */
 export function triggerAddNode(
     canvasRef: CanvasRefHandle,
     nodeData: NodeData,
@@ -23,6 +25,15 @@ export function triggerAddNode(
     nodeId?: string,
 ): string {
     const id = nodeId || `tutorial-${Date.now()}`;
+
+    // 이미 같은 ID의 노드가 있으면 건너뜀
+    if (canvasRef.getNodes) {
+        const existing = canvasRef.getNodes();
+        if (existing.some(n => n.id === id)) {
+            return id;
+        }
+    }
+
     canvasRef.addNode({
         id,
         data: { ...nodeData } as NodeData,
@@ -31,7 +42,7 @@ export function triggerAddNode(
     return id;
 }
 
-/** connect 모드: canvasRef.addEdge() API 호출로 엣지 연결 */
+/** connect 모드: canvasRef.addEdge() API 호출로 엣지 연결 (중복 방지) */
 export function triggerConnect(
     canvasRef: CanvasRefHandle,
     sourceNodeId: string,
@@ -39,8 +50,18 @@ export function triggerConnect(
     targetNodeId: string,
     targetPortId: string,
 ): void {
+    const edgeId = `edge-${sourceNodeId}-${sourcePortId}-${targetNodeId}-${targetPortId}`;
+
+    // 이미 같은 ID의 엣지가 있으면 건너뜀
+    if (canvasRef.getEdges) {
+        const existing = canvasRef.getEdges();
+        if (existing.some(e => e.id === edgeId)) {
+            return;
+        }
+    }
+
     canvasRef.addEdge({
-        id: `edge-${sourceNodeId}-${sourcePortId}-${targetNodeId}-${targetPortId}`,
+        id: edgeId,
         source: { nodeId: sourceNodeId, portId: sourcePortId, portType: 'output' },
         target: { nodeId: targetNodeId, portId: targetPortId, portType: 'input' },
     });

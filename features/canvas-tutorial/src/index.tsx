@@ -11,6 +11,8 @@ export type { TutorialData, TutorialStep } from './types';
 // ── Virtual Cursor Tutorial ──
 export { default as VirtualTutorialOverlay } from './components/VirtualTutorialOverlay';
 export { default as ScenarioSelectModal } from './components/ScenarioSelectModal';
+export { default as VirtualTutorialIntegration } from './components/VirtualTutorialIntegration';
+export type { VirtualTutorialHandle } from './components/VirtualTutorialIntegration';
 export { VirtualTutorialProvider, useVirtualTutorial } from './context/VirtualTutorialContext';
 export { VIRTUAL_TUTORIALS } from './scenarios/virtual';
 export { tutorialDataToVirtualScenario } from './tutorialDataToVirtualScenario';

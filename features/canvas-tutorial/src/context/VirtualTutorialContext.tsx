@@ -14,6 +14,9 @@ interface VirtualTutorialContextValue {
     prev: () => void;
     skip: () => void;
     reset: () => void;
+    pause: () => void;
+    resume: () => void;
+    goTo: (stepIndex: number) => void;
 }
 
 type Action =
@@ -22,7 +25,10 @@ type Action =
     | { type: 'PREV' }
     | { type: 'SKIP' }
     | { type: 'COMPLETE' }
-    | { type: 'RESET' };
+    | { type: 'RESET' }
+    | { type: 'PAUSE' }
+    | { type: 'RESUME' }
+    | { type: 'GOTO'; stepIndex: number };
 
 function reducer(
     state: VirtualTutorialState,
@@ -34,6 +40,7 @@ function reducer(
             return {
                 ...state,
                 isActive: true,
+                isPaused: false,
                 currentScenarioId: action.scenarioId,
                 currentStepIndex: 0,
             };
@@ -47,21 +54,23 @@ function reducer(
                 return {
                     ...state,
                     isActive: false,
+                    isPaused: false,
                     currentScenarioId: null,
                     currentStepIndex: 0,
                     completedScenarios: [...state.completedScenarios, scenario.id],
                 };
             }
-            return { ...state, currentStepIndex: nextIndex };
+            return { ...state, currentStepIndex: nextIndex, isPaused: false };
         }
         case 'PREV': {
             if (state.currentStepIndex <= 0) return state;
-            return { ...state, currentStepIndex: state.currentStepIndex - 1 };
+            return { ...state, currentStepIndex: state.currentStepIndex - 1, isPaused: false };
         }
         case 'SKIP':
             return {
                 ...state,
                 isActive: false,
+                isPaused: false,
                 currentScenarioId: null,
                 currentStepIndex: 0,
             };
@@ -71,6 +80,7 @@ function reducer(
             return {
                 ...state,
                 isActive: false,
+                isPaused: false,
                 currentScenarioId: null,
                 currentStepIndex: 0,
                 completedScenarios: scenario
@@ -81,10 +91,21 @@ function reducer(
         case 'RESET':
             return {
                 isActive: false,
+                isPaused: false,
                 currentScenarioId: null,
                 currentStepIndex: 0,
                 completedScenarios: [],
             };
+        case 'PAUSE':
+            return { ...state, isPaused: true };
+        case 'RESUME':
+            return { ...state, isPaused: false };
+        case 'GOTO': {
+            const scenario = scenarios.find((s) => s.id === state.currentScenarioId);
+            if (!scenario) return state;
+            const idx = Math.max(0, Math.min(action.stepIndex, scenario.steps.length - 1));
+            return { ...state, currentStepIndex: idx, isPaused: false };
+        }
         default:
             return state;
     }
@@ -102,6 +123,7 @@ export const VirtualTutorialProvider: React.FC<ProviderProps> = ({ children, sce
         (s: VirtualTutorialState, a: Action) => reducer(s, a, scenarios),
         {
             isActive: false,
+            isPaused: false,
             currentScenarioId: null,
             currentStepIndex: 0,
             completedScenarios: getCompletedScenarios(),
@@ -116,9 +138,12 @@ export const VirtualTutorialProvider: React.FC<ProviderProps> = ({ children, sce
     const prev = useCallback(() => rawDispatch({ type: 'PREV' }), []);
     const skip = useCallback(() => rawDispatch({ type: 'SKIP' }), []);
     const reset = useCallback(() => rawDispatch({ type: 'RESET' }), []);
+    const pause = useCallback(() => rawDispatch({ type: 'PAUSE' }), []);
+    const resume = useCallback(() => rawDispatch({ type: 'RESUME' }), []);
+    const goTo = useCallback((stepIndex: number) => rawDispatch({ type: 'GOTO', stepIndex }), []);
 
     return (
-        <Context.Provider value={{ state, currentStep, currentScenario, scenarios, start, next, prev, skip, reset }}>
+        <Context.Provider value={{ state, currentStep, currentScenario, scenarios, start, next, prev, skip, reset, pause, resume, goTo }}>
             {children}
         </Context.Provider>
     );

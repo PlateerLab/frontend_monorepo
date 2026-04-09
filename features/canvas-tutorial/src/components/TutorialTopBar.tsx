@@ -10,6 +10,16 @@ interface TutorialTopBarProps {
     title: string;
     /** 스텝 설명 메시지 */
     message?: string;
+    /** 일시정지 여부 */
+    isPaused?: boolean;
+    /** 이전 스텝 콜백 */
+    onPrev?: () => void;
+    /** 다음 스텝 콜백 */
+    onNext?: () => void;
+    /** 일시정지 콜백 */
+    onPause?: () => void;
+    /** 재개 콜백 */
+    onResume?: () => void;
     /** 중지 콜백 */
     onStop?: () => void;
 }
@@ -18,13 +28,19 @@ interface TutorialTopBarProps {
  * 가상 커서 튜토리얼용 상단 정보 바.
  * 캔버스 헤더(56px) 바로 아래, 사이드바 오른쪽부터 캔버스 영역 상단에 표시.
  */
-const TutorialTopBar: React.FC<TutorialTopBarProps> = ({
-    currentStep,
-    totalSteps,
-    title,
-    message,
-    onStop,
-}) => {
+const TutorialTopBar: React.FC<TutorialTopBarProps> = (props: TutorialTopBarProps) => {
+    const {
+        currentStep,
+        totalSteps,
+        title,
+        message,
+        isPaused = false,
+        onPrev,
+        onNext,
+        onPause,
+        onResume,
+        onStop,
+    } = props;
     const [sidebarWidth, setSidebarWidth] = useState(0);
 
     useEffect(() => {
@@ -39,20 +55,51 @@ const TutorialTopBar: React.FC<TutorialTopBarProps> = ({
         };
 
         detect();
-        // 사이드바 토글(250↔72px) 시 너비 변경을 ResizeObserver로 추적
         const observer = new ResizeObserver(detect);
         const sidebar = findSidebar();
         if (sidebar) observer.observe(sidebar);
         return () => observer.disconnect();
     }, []);
 
+    const isFirst = currentStep <= 1;
+    const isLast = currentStep >= totalSteps;
+
     return (
         <div style={{ ...containerStyle, left: sidebarWidth }}>
-            {/* 좌측: 단계 뱃지 + 제목 */}
+            {/* 좌측: 단계 뱃지 + < > 네비게이션 + 제목 */}
             <div style={leftStyle}>
                 <span style={badgeStyle}>
                     {currentStep}/{totalSteps} 단계
                 </span>
+
+                {/* < > 네비게이션 */}
+                <div style={navStyle}>
+                    <button
+                        type="button"
+                        style={{
+                            ...navBtnStyle,
+                            ...(isFirst ? navBtnDisabledStyle : {}),
+                        }}
+                        onClick={onPrev}
+                        disabled={isFirst}
+                        title="이전 단계"
+                    >
+                        ‹
+                    </button>
+                    <button
+                        type="button"
+                        style={{
+                            ...navBtnStyle,
+                            ...(isLast ? navBtnDisabledStyle : {}),
+                        }}
+                        onClick={onNext}
+                        disabled={isLast}
+                        title="다음 단계"
+                    >
+                        ›
+                    </button>
+                </div>
+
                 <span style={titleStyle}>{title}</span>
             </div>
 
@@ -61,7 +108,7 @@ const TutorialTopBar: React.FC<TutorialTopBarProps> = ({
                 <div style={messageStyle}>{message}</div>
             )}
 
-            {/* 우측: 진행 점 + 중지 */}
+            {/* 우측: 진행 점 + 일시정지 + 종료 */}
             <div style={rightStyle}>
                 <div style={dotsStyle}>
                     {Array.from({ length: totalSteps }, (_, i) => (
@@ -77,6 +124,27 @@ const TutorialTopBar: React.FC<TutorialTopBarProps> = ({
                         />
                     ))}
                 </div>
+
+                {/* 일시정지 / 재개 버튼 */}
+                {(onPause || onResume) && (
+                    <button
+                        type="button"
+                        onClick={isPaused ? onResume : onPause}
+                        style={pauseBtnStyle}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = isPaused ? '#4f46e5' : '#f3f4f6';
+                            e.currentTarget.style.color = isPaused ? '#fff' : '#374151';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = isPaused ? '#eef2ff' : 'transparent';
+                            e.currentTarget.style.color = isPaused ? '#4f46e5' : '#6b7280';
+                        }}
+                        title={isPaused ? '재개' : '일시정지'}
+                    >
+                        {isPaused ? '▶' : '⏸'}
+                    </button>
+                )}
+
                 {onStop && (
                     <button
                         onClick={onStop}
@@ -104,8 +172,8 @@ const TutorialTopBar: React.FC<TutorialTopBarProps> = ({
 
 const containerStyle: React.CSSProperties = {
     position: 'fixed',
-    top: 56, // 캔버스 헤더(h-14 = 56px) 바로 아래
-    left: 0, // sidebarWidth로 덮어씀
+    top: 56,
+    left: 0,
     right: 0,
     zIndex: 100000,
     display: 'flex',
@@ -137,6 +205,35 @@ const badgeStyle: React.CSSProperties = {
     whiteSpace: 'nowrap',
 };
 
+const navStyle: React.CSSProperties = {
+    display: 'flex',
+    gap: 2,
+    alignItems: 'center',
+};
+
+const navBtnStyle: React.CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 24,
+    height: 24,
+    padding: 0,
+    border: '1px solid #d1d5db',
+    borderRadius: 6,
+    background: '#fff',
+    color: '#374151',
+    fontSize: '1rem',
+    fontWeight: 600,
+    lineHeight: 1,
+    cursor: 'pointer',
+    transition: 'all 0.15s',
+};
+
+const navBtnDisabledStyle: React.CSSProperties = {
+    opacity: 0.35,
+    cursor: 'default',
+};
+
 const titleStyle: React.CSSProperties = {
     fontWeight: 600,
     color: '#111827',
@@ -159,7 +256,7 @@ const messageStyle: React.CSSProperties = {
 const rightStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: 12,
+    gap: 8,
     flexShrink: 0,
     marginLeft: 'auto',
 };
@@ -168,6 +265,23 @@ const dotsStyle: React.CSSProperties = {
     display: 'flex',
     gap: 5,
     alignItems: 'center',
+};
+
+const pauseBtnStyle: React.CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 28,
+    height: 28,
+    padding: 0,
+    border: '1px solid #d1d5db',
+    borderRadius: 14,
+    background: 'transparent',
+    color: '#6b7280',
+    fontSize: '0.7rem',
+    cursor: 'pointer',
+    transition: 'all 0.15s',
+    lineHeight: 1,
 };
 
 const stopBtnStyle: React.CSSProperties = {

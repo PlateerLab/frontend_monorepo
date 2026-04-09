@@ -26,19 +26,45 @@
 ### 1.3 기존 채팅과의 관계
 
 - **기존 1:1 채팅은 그대로 유지** (`/main?section=current-chat`)
-- XGEN-Teams는 별도 라우트 (`/teams`)로 공존
+- XGEN-Teams는 **같은 /main 페이지 내 feature**로 등록 (`/main?section=teams`)
+- 사이드바에 "Teams" 메뉴 아이템 추가
 - 간단한 작업 → 기존 채팅 / 복합 업무 → Teams
 
-### 1.4 전체 시스템 아키텍처
+### 1.4 Feature ON/OFF 방식
+
+```typescript
+// apps/web/src/features/feature-registry.ts
+
+const featureModules = await Promise.all([
+  // Chat Section
+  import('@xgen/feature-main-dashboard'),
+  import('@xgen/main-chat-new'),
+  import('@xgen/main-chat-current'),
+  import('@xgen/feature-main-chat-history'),
+
+  // ★ Teams — 이 한 줄 주석처리로 기능 ON/OFF
+  import('@xgen/main-teams'),
+
+  // Agentflow Section
+  import('@xgen/main-canvas-intro'),
+  // ...
+]);
+```
+
+`@xgen/main-teams` feature 모듈이 사이드바 아이템 + 라우트 컴포넌트를 함께 export.
+import 한 줄을 주석처리하면 사이드바에서도 사라지고, 라우트도 비활성화됨.
+
+### 1.5 전체 시스템 아키텍처
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        프론트엔드 (Next.js)                      │
 │  frontend_monorepo/apps/web                                     │
-│  ├── /main       ← 기존 메인                                    │
-│  ├── /admin      ← 기존 어드민                                   │
-│  ├── /canvas     ← 기존 캔버스                                   │
-│  └── /teams      ← ★ 신규 Teams UI                              │
+│  └── /main                                                      │
+│       ├── ?section=dashboard     ← 대시보드                      │
+│       ├── ?section=current-chat  ← 기존 1:1 채팅                 │
+│       ├── ?section=teams         ← ★ Teams (feature-registry)   │
+│       └── ...                    ← 기타 feature들                │
 └──────────────────────────┬──────────────────────────────────────┘
                            │ HTTP / WebSocket
                            ▼
@@ -71,28 +97,42 @@
                          └─────────┘        └─────────┘
 ```
 
-### 1.5 프론트엔드 아키텍처 위치
+### 1.6 프론트엔드 아키텍처 위치
 
 ```
 frontend_monorepo/
 ├── apps/web/
-│   └── src/app/
-│       ├── main/          ← 기존 메인
-│       ├── admin/         ← 기존 어드민
-│       ├── canvas/        ← 기존 캔버스
-│       └── teams/         ← ★ 신규 Teams 라우트
-│           ├── layout.tsx
-│           └── page.tsx
+│   └── src/
+│       ├── app/main/page.tsx      ← 기존 메인 (feature-registry로 라우팅)
+│       └── features/
+│           └── feature-registry.ts ← ★ import('@xgen/main-teams') 한 줄 추가
 ├── features/
-│   ├── teams-chat-room/       ← 채팅방 UI (메시지 목록 + 입력)
-│   ├── teams-room-list/       ← 채팅방 목록 (좌측 패널)
-│   ├── teams-agent-panel/     ← 에이전트 관리 패널 (우측)
-│   ├── teams-router/          ← 하이브리드 분기 라우터 로직
-│   └── teams-log-viewer/      ← 실행 로그 뷰어
+│   ├── main-teams/                ← ★ 메인 feature (사이드바 등록 + 3-column 레이아웃)
+│   │   └── src/
+│   │       ├── index.tsx          # MainFeatureModule export (사이드바 + 라우트)
+│   │       ├── TeamsPage.tsx      # 3-column 레이아웃 (방목록 + 채팅 + 패널)
+│   │       ├── components/
+│   │       │   ├── RoomList/      # 채팅방 목록 (좌측)
+│   │       │   ├── ChatRoom/      # 채팅 영역 (중앙)
+│   │       │   ├── AgentPanel/    # 에이전트/멤버/로그 패널 (우측)
+│   │       │   └── Router/        # 하이브리드 라우터 로직
+│   │       ├── hooks/
+│   │       │   ├── useTeamsWebSocket.ts
+│   │       │   ├── useTeamsChat.ts
+│   │       │   └── useAgentExecution.ts
+│   │       └── locales/
+│   │           ├── en.ts
+│   │           └── ko.ts
+│   └── (기존 features...)
 ├── packages/
-│   ├── api-client/            ← teams API 함수 추가
-│   └── types/                 ← teams 관련 타입 추가
+│   ├── api-client/                ← teams API 함수 추가 (src/teams.ts)
+│   └── types/                     ← teams 관련 타입 추가 (src/teams.ts)
 ```
+
+**기존 패턴과의 통일성:**
+- `main-chat-current`가 자체 채팅 레이아웃을 가지듯, `main-teams`도 자체 3-column 레이아웃 관리
+- `MainFeatureModule` 인터페이스를 따라 `sidebarSection`, `sidebarItems`, `routes` export
+- 별도 라우트(`/teams`) 없이 `/main?section=teams`로 접근
 
 ---
 
@@ -393,7 +433,7 @@ interface ExecutionLog {
 
 **연결 흐름:**
 ```
-1. 사용자 /teams 접속
+1. 사용자 /main?section=teams 접속
 2. WebSocket 연결: ws://gateway:8000/api/teams/ws
    → Gateway가 xgen-teams 서비스로 프록시 (기존 ws_proxy 활용)
 3. JWT 토큰으로 인증 (Gateway가 X-User-ID 헤더 주입)
@@ -409,7 +449,7 @@ interface ExecutionLog {
 
 | 항목 | 선택 | 비고 |
 |------|------|------|
-| 언어 | Python 3.11+ | (확인 필요 — 기존 워크플로우 서비스와 동일 스택 권장) |
+| 언어 | Python 3.14 | 기존 워크플로우 서비스(xgen-workflow)와 동일 |
 | 프레임워크 | FastAPI | 비동기 + WebSocket 기본 지원 |
 | DB | PostgreSQL | 기존 XGEN 인프라 공유 |
 | ORM | SQLAlchemy 2.0 (async) | 비동기 쿼리 |
@@ -629,17 +669,17 @@ class TeamsWebSocketHub:
 
 ### Phase 1: 기반 구조 (뼈대)
 
-> 목표: Teams 라우트 생성, 3-column 레이아웃, 기본 네비게이션
+> 목표: feature-registry 등록, 3-column 레이아웃, 기본 네비게이션
 
 **프론트엔드:**
 
 | # | 작업 | 파일/위치 | 설명 |
 |---|------|----------|------|
-| 1-1 | Teams 라우트 생성 | `apps/web/src/app/teams/` | `layout.tsx`, `page.tsx` 생성 |
-| 1-2 | Teams 타입 정의 | `packages/types/src/teams.ts` | Room, Message, Agent, Router, Member 타입 |
-| 1-3 | 3-Column 레이아웃 | `features/teams-layout/` | 좌측 방목록 + 중앙 채팅 + 우측 패널 |
-| 1-4 | 사이드바 연동 | `features/sidebar-main/` | Teams 메뉴 아이템 추가 |
-| 1-5 | next.config 업데이트 | `apps/web/next.config.ts` | transpilePackages에 teams 패키지 추가 |
+| 1-1 | Teams feature 모듈 생성 | `features/main-teams/` | `MainFeatureModule` export (사이드바 + 라우트) |
+| 1-2 | feature-registry 등록 | `apps/web/src/features/feature-registry.ts` | `import('@xgen/main-teams')` 한 줄 추가 |
+| 1-3 | Teams 타입 정의 | `packages/types/src/teams.ts` | Room, Message, Agent, Router, Member 타입 |
+| 1-4 | 3-Column 레이아웃 | `features/main-teams/src/TeamsPage.tsx` | 좌측 방목록 + 중앙 채팅 + 우측 패널 |
+| 1-5 | next.config 업데이트 | `apps/web/next.config.ts` | transpilePackages에 `@xgen/main-teams` 추가 |
 
 **백엔드:**
 
@@ -649,7 +689,7 @@ class TeamsWebSocketHub:
 | 1-7 | DB 마이그레이션 | PostgreSQL 테이블 생성 (teams_rooms, teams_messages 등) |
 | 1-8 | 게이트웨이 등록 | `services.yaml`에 teams-service 추가 |
 
-**결과물:** `/teams` 접속 시 3-column 빈 레이아웃 표시, 백엔드 서비스 기동
+**결과물:** `/main?section=teams` 접속 시 3-column 빈 레이아웃 표시, 백엔드 서비스 기동
 
 ---
 
@@ -661,10 +701,10 @@ class TeamsWebSocketHub:
 
 | # | 작업 | 파일/위치 | 설명 |
 |---|------|----------|------|
-| 2-1 | 방 목록 컴포넌트 | `features/teams-room-list/` | 방 리스트, 검색, 생성 버튼 |
-| 2-2 | 방 생성 모달 | `features/teams-room-list/` | 이름, 설명 + 초기 에이전트/멤버 선택 |
+| 2-1 | 방 목록 컴포넌트 | `features/main-teams/src/components/RoomList/` | 방 리스트, 검색, 생성 버튼 |
+| 2-2 | 방 생성 모달 | `features/main-teams/src/components/RoomList/` | 이름, 설명 + 초기 에이전트/멤버 선택 |
 | 2-3 | API 클라이언트 | `packages/api-client/src/teams.ts` | 방 CRUD + 멤버/에이전트 API |
-| 2-4 | 방 상태 관리 | `features/teams-layout/` | 선택된 방, 방 전환 로직 |
+| 2-4 | 방 상태 관리 | `features/main-teams/src/hooks/` | 선택된 방, 방 전환 로직 |
 
 **백엔드:**
 
@@ -686,12 +726,12 @@ class TeamsWebSocketHub:
 
 | # | 작업 | 파일/위치 | 설명 |
 |---|------|----------|------|
-| 3-1 | 채팅 메시지 UI | `features/teams-chat-room/` | 메시지 버블 (사용자/에이전트별 아바타) |
-| 3-2 | 메시지 입력 | `features/teams-chat-room/` | @멘션 자동완성, 파일 첨부 |
-| 3-3 | WebSocket 연결 | `features/teams-chat-room/` | 연결/재연결/이벤트 핸들링 |
-| 3-4 | 에이전트 실행 연동 | `features/teams-chat-room/` | 실행 요청 → SSE→WebSocket 스트리밍 수신 |
-| 3-5 | 접속 멤버 표시 | `features/teams-agent-panel/` | 온라인 멤버 목록 (WebSocket 기반) |
-| 3-6 | 라우터 알림 메시지 | `features/teams-chat-room/` | 시스템 메시지 표시 |
+| 3-1 | 채팅 메시지 UI | `features/main-teams/src/components/ChatRoom/` | 메시지 버블 (사용자/에이전트별 아바타) |
+| 3-2 | 메시지 입력 | `features/main-teams/src/components/ChatRoom/` | @멘션 자동완성, 파일 첨부 |
+| 3-3 | WebSocket 연결 | `features/main-teams/src/hooks/useTeamsWebSocket.ts` | 연결/재연결/이벤트 핸들링 |
+| 3-4 | 에이전트 실행 연동 | `features/main-teams/src/hooks/useAgentExecution.ts` | 실행 요청 → SSE→WebSocket 스트리밍 수신 |
+| 3-5 | 접속 멤버 표시 | `features/main-teams/src/components/AgentPanel/` | 온라인 멤버 목록 (WebSocket 기반) |
+| 3-6 | 라우터 알림 메시지 | `features/main-teams/src/components/ChatRoom/` | 시스템 메시지 표시 |
 
 **백엔드:**
 
@@ -714,10 +754,10 @@ class TeamsWebSocketHub:
 
 | # | 작업 | 파일/위치 | 설명 |
 |---|------|----------|------|
-| 4-1 | @멘션 파서 | `features/teams-router/` | 메시지에서 @에이전트명 추출 |
-| 4-2 | 라우팅 결과 UI | `features/teams-chat-room/` | 라우팅 알림 + 에이전트 선택 버튼 (fallback) |
-| 4-3 | 멀티 실행 UI | `features/teams-chat-room/` | 순차 실행 진행 표시 (① → ② → ③) |
-| 4-4 | 라우터 설정 UI | `features/teams-agent-panel/` | 모드 변경 (auto/manual/hybrid) |
+| 4-1 | @멘션 파서 | `features/main-teams/src/components/Router/` | 메시지에서 @에이전트명 추출 |
+| 4-2 | 라우팅 결과 UI | `features/main-teams/src/components/ChatRoom/` | 라우팅 알림 + 에이전트 선택 버튼 (fallback) |
+| 4-3 | 멀티 실행 UI | `features/main-teams/src/components/ChatRoom/` | 순차 실행 진행 표시 (① → ② → ③) |
+| 4-4 | 라우터 설정 UI | `features/main-teams/src/components/AgentPanel/` | 모드 변경 (auto/manual/hybrid) |
 
 **백엔드:**
 
@@ -738,11 +778,11 @@ class TeamsWebSocketHub:
 
 | # | 작업 | 파일/위치 | 설명 |
 |---|------|----------|------|
-| 5-1 | 에이전트 목록 패널 | `features/teams-agent-panel/` | 초대된 에이전트 카드 목록 |
-| 5-2 | 에이전트 추가 모달 | `features/teams-agent-panel/` | 워크플로우 검색 + 초대 |
-| 5-3 | 에이전트 상태 표시 | `features/teams-agent-panel/` | online/busy/error 뱃지 |
-| 5-4 | 로그 뷰어 | `features/teams-log-viewer/` | 실행 타임라인, 노드 상태 |
-| 5-5 | 로그 상세 모달 | `features/teams-log-viewer/` | 토큰 수, 소요시간, 원본 로그 |
+| 5-1 | 에이전트 목록 패널 | `features/main-teams/src/components/AgentPanel/` | 초대된 에이전트 카드 목록 |
+| 5-2 | 에이전트 추가 모달 | `features/main-teams/src/components/AgentPanel/` | 워크플로우 검색 + 초대 |
+| 5-3 | 에이전트 상태 표시 | `features/main-teams/src/components/AgentPanel/` | online/busy/error 뱃지 |
+| 5-4 | 로그 뷰어 | `features/main-teams/src/components/LogViewer/` | 실행 타임라인, 노드 상태 |
+| 5-5 | 로그 상세 모달 | `features/main-teams/src/components/LogViewer/` | 토큰 수, 소요시간, 원본 로그 |
 
 **백엔드:**
 
@@ -773,89 +813,69 @@ class TeamsWebSocketHub:
 
 ## 6. 신규 생성 파일 목록
 
-### 프론트엔드 features/ (신규 6개)
+### 프론트엔드 features/main-teams/ (단일 feature 모듈)
 
 ```
-features/
-├── teams-layout/
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── src/
-│       ├── index.tsx              # TeamsLayout (3-column)
-│       ├── TeamsLayout.module.scss
-│       └── locales/
-│           ├── en.ts
-│           └── ko.ts
-│
-├── teams-room-list/
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── src/
-│       ├── index.tsx              # RoomList 컴포넌트
-│       ├── components/
-│       │   ├── RoomCard.tsx
-│       │   ├── CreateRoomModal.tsx
-│       │   └── RoomSearch.tsx
-│       └── locales/
-│           ├── en.ts
-│           └── ko.ts
-│
-├── teams-chat-room/
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── src/
-│       ├── index.tsx              # ChatRoom 메인 컴포넌트
-│       ├── components/
-│       │   ├── TeamsMessageList.tsx
-│       │   ├── TeamsMessageItem.tsx
-│       │   ├── TeamsMessageInput.tsx
-│       │   ├── MentionAutocomplete.tsx
-│       │   ├── RouterNotice.tsx
-│       │   └── AgentSelectFallback.tsx  # 라우팅 실패 시 수동 선택
-│       ├── hooks/
-│       │   ├── useTeamsChat.ts       # 메시지 상태 관리
-│       │   ├── useTeamsWebSocket.ts  # WebSocket 연결/이벤트
-│       │   └── useAgentExecution.ts  # 에이전트 실행 + 스트리밍
-│       └── locales/
-│           ├── en.ts
-│           └── ko.ts
-│
-├── teams-agent-panel/
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── src/
-│       ├── index.tsx              # AgentPanel 컴포넌트
-│       ├── components/
-│       │   ├── AgentCard.tsx
-│       │   ├── AddAgentModal.tsx
-│       │   ├── MemberList.tsx     # 접속 멤버 목록
-│       │   └── RouterSettings.tsx
-│       └── locales/
-│           ├── en.ts
-│           └── ko.ts
-│
-├── teams-router/
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── src/
-│       ├── index.ts               # 라우터 엔트리
-│       ├── mention-parser.ts      # @멘션 파싱
-│       ├── llm-router.ts          # LLM 기반 라우팅 API 호출
-│       └── types.ts               # 라우터 전용 타입
-│
-└── teams-log-viewer/
-    ├── package.json
-    ├── tsconfig.json
-    └── src/
-        ├── index.tsx              # LogViewer 컴포넌트
-        ├── components/
-        │   ├── ExecutionTimeline.tsx
-        │   ├── NodeStatusBar.tsx
-        │   └── LogDetailModal.tsx
-        └── locales/
-            ├── en.ts
-            └── ko.ts
+features/main-teams/
+├── package.json                       # @xgen/main-teams
+├── tsconfig.json
+└── src/
+    ├── index.tsx                      # MainFeatureModule export
+    │                                  # → sidebarSection: 'chat'
+    │                                  # → sidebarItems: [{ id: 'teams', ... }]
+    │                                  # → routes: { 'teams': TeamsPage }
+    ├── TeamsPage.tsx                  # 3-column 메인 레이아웃
+    ├── TeamsPage.module.scss
+    │
+    ├── components/
+    │   ├── RoomList/                  # 좌측 패널 — 채팅방 목록
+    │   │   ├── RoomList.tsx
+    │   │   ├── RoomCard.tsx
+    │   │   ├── CreateRoomModal.tsx
+    │   │   └── RoomSearch.tsx
+    │   │
+    │   ├── ChatRoom/                  # 중앙 — 채팅 영역
+    │   │   ├── ChatRoom.tsx
+    │   │   ├── TeamsMessageList.tsx
+    │   │   ├── TeamsMessageItem.tsx
+    │   │   ├── TeamsMessageInput.tsx
+    │   │   ├── MentionAutocomplete.tsx
+    │   │   ├── RouterNotice.tsx
+    │   │   └── AgentSelectFallback.tsx
+    │   │
+    │   ├── AgentPanel/                # 우측 패널 — 에이전트/멤버 관리
+    │   │   ├── AgentPanel.tsx
+    │   │   ├── AgentCard.tsx
+    │   │   ├── AddAgentModal.tsx
+    │   │   ├── MemberList.tsx
+    │   │   └── RouterSettings.tsx
+    │   │
+    │   ├── LogViewer/                 # 우측 패널 — 실행 로그
+    │   │   ├── LogViewer.tsx
+    │   │   ├── ExecutionTimeline.tsx
+    │   │   ├── NodeStatusBar.tsx
+    │   │   └── LogDetailModal.tsx
+    │   │
+    │   └── Router/                    # 하이브리드 라우터 로직
+    │       ├── mentionParser.ts
+    │       └── routingClient.ts
+    │
+    ├── hooks/
+    │   ├── useTeamsWebSocket.ts       # WebSocket 연결/재연결/이벤트
+    │   ├── useTeamsChat.ts            # 메시지 상태 관리
+    │   ├── useAgentExecution.ts       # 에이전트 실행 + 스트리밍
+    │   └── useRoomState.ts            # 방 선택/전환 상태
+    │
+    └── locales/
+        ├── en.ts
+        └── ko.ts
 ```
+
+**장점: 단일 feature 모듈**
+- `features/main-teams/` 폴더 하나로 모든 Teams 프론트엔드 코드 관리
+- `feature-registry.ts`에서 import 한 줄로 ON/OFF
+- 기존 feature들과 동일한 패턴 (`main-chat-current` 등과 같은 구조)
+- 내부적으로 `components/` 하위에 영역별 분리하여 관심사 구분
 
 ### 백엔드 xgen-teams/ (신규 서비스)
 
@@ -894,14 +914,15 @@ xgen-teams/
 
 ```
 프론트엔드:
-├── apps/web/src/app/teams/          # 신규 라우트 (layout.tsx, page.tsx)
-├── apps/web/src/features/           # feature-registry에 teams 등록 (선택)
-├── apps/web/next.config.ts          # transpilePackages 추가
-├── packages/types/src/teams.ts      # Teams 관련 타입 (신규 파일)
-├── packages/types/src/index.ts      # teams 타입 re-export
-├── packages/api-client/src/teams.ts # Teams API + WebSocket 함수 (신규 파일)
-├── packages/api-client/src/index.ts # teams API re-export
-└── features/sidebar-main/           # Teams 사이드바 메뉴 추가
+├── apps/web/src/features/feature-registry.ts  # ★ import('@xgen/main-teams') 추가 (핵심 1줄)
+├── apps/web/next.config.ts                    # transpilePackages에 '@xgen/main-teams' 추가
+├── packages/types/src/teams.ts                # Teams 관련 타입 (신규 파일)
+├── packages/types/src/index.ts                # teams 타입 re-export
+├── packages/api-client/src/teams.ts           # Teams API + WebSocket 함수 (신규 파일)
+└── packages/api-client/src/index.ts           # teams API re-export
+
+※ 별도 라우트(apps/web/src/app/teams/) 생성 불필요
+※ sidebar-main 수정 불필요 — main-teams가 sidebarItems을 자체 export
 
 백엔드 (기존 인프라):
 └── xgen-backend-gateway/config/services.yaml  # teams-service 등록
@@ -1004,7 +1025,7 @@ Phase 3까지 완료되면 핵심 기능 동작:
 
 | 항목 | 상태 | 비고 |
 |------|------|------|
-| 백엔드 언어/프레임워크 | ⚠️ 확인 필요 | Gateway는 Rust, 워크플로우 서비스는 Python/FastAPI 추정 |
+| 백엔드 언어/프레임워크 | ✅ 확인 완료 | Gateway: Rust+Axum, 워크플로우 서비스: Python 3.14 + FastAPI 0.128.0 |
 | xgen-teams 서비스 위치 | 미정 | 기존 백엔드 레포에 추가 or 별도 레포 |
 | Docker Compose 설정 | 미정 | xgen-teams 컨테이너 추가 필요 |
 | Haiku API 키 관리 | 미정 | 기존 LLM 설정(admin-setting-llm)과 연동 여부 |
