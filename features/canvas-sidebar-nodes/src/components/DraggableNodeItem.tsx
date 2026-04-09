@@ -105,6 +105,7 @@ const DraggableNodeItem: React.FC<DraggableNodeItemProps> = ({
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onClick={handleClick}
+            data-node-type={nodeData.id}
             style={{ cursor: 'grab' }}
         >
             <span>{locale === 'ko' && nodeData.nodeNameKo ? nodeData.nodeNameKo : nodeData.nodeName}</span>

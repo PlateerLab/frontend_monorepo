@@ -223,6 +223,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                     padding="compact"
                     className="h-7 rounded-lg text-sm font-medium text-[var(--color-gray-800)] border-[var(--color-line-50)]"
                     onClick={onSave}
+                    data-tutorial="save"
                     title={t('canvas.header.saveAgentflow', 'Save')}
                 >
                     {t('canvas.header.save', 'Save')}
@@ -254,6 +255,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                         type="button"
                         className="flex items-center justify-center w-7 h-7 min-w-7 min-h-7 p-0 bg-transparent border-none text-[var(--color-gray-600)] cursor-pointer rounded-lg select-none transition-colors hover:bg-black/[0.04]"
                         onClick={onAddNodeClick}
+                        data-tutorial="add-node"
                         title={t('canvas.header.addNode', 'Add Node')}
                     >
                         <LuCirclePlus />
@@ -274,6 +276,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
                         type="button"
                         className="flex items-center justify-center w-7 h-7 min-w-7 min-h-7 p-0 bg-transparent border-none text-[var(--color-gray-600)] cursor-pointer rounded-lg select-none transition-colors hover:bg-black/[0.04]"
                         onClick={onTutorialClick}
+                        data-tutorial="tutorial"
                         title={t('canvas.header.tutorial', 'Tutorial')}
                     >
                         <LuBookOpen />

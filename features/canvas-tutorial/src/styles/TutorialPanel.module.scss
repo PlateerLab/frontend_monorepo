@@ -236,6 +236,27 @@
     align-items: center;
     flex-shrink: 0;
     margin-left: 8px;
+    gap: 4px;
+}
+
+.tutorialPlayButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #e0e0ff;
+    background: #f5f3ff;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #6d5dd3;
+    transition: all 0.15s;
+
+    &:hover {
+        border-color: #6d5dd3;
+        color: #ffffff;
+        background: #6d5dd3;
+    }
 }
 
 .tutorialActionButton {
