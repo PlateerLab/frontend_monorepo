@@ -15,5 +15,32 @@ export const ko: Record<string, unknown> = {
     started: '"{{name}}" 튜토리얼을 시작합니다.',
     completed: '튜토리얼을 완료했습니다!',
     exited: '튜토리얼을 종료했습니다.',
+
+    // ── 가상 커서 튜토리얼 ──
+    virtualTutorial: {
+      stop: '중지',
+      selectTitle: '가상 커서 튜토리얼',
+      selectDescription: '학습할 시나리오를 선택하세요.',
+      scenario1Title: '첫 에이전트플로우 만들기',
+      scenario1Desc: 'Input → Agent → Output 기본 구조를 배웁니다.',
+      scenario2Title: '노드 연결하기',
+      scenario2Desc: '두 노드 사이에 엣지를 연결합니다.',
+      scenario3Title: '에이전트플로우 실행하기',
+      scenario3Desc: '워크플로우를 저장하고 실행합니다.',
+      hint: {
+        openSidebar: '노드 추가 패널을 열어보겠습니다.',
+        addInputNode: 'Input String 노드를 추가합니다.',
+        addAgentNode: 'Agent 노드를 추가합니다.',
+        connectInputToAgent: 'Input 노드의 출력 포트를 Agent 노드의 입력 포트에 연결합니다.',
+        firstFlowComplete: '첫 에이전트플로우가 완성되었습니다! 저장 버튼을 눌러 저장하세요.',
+        identifySourcePort: '연결을 시작할 출력 포트(Output)를 확인합니다.',
+        identifyTargetPort: '연결할 입력 포트(Input)를 확인합니다.',
+        dragToConnect: '출력 포트에서 입력 포트로 드래그하여 연결합니다.',
+        connectionComplete: '노드 연결이 완료되었습니다!',
+        clickSave: '저장 버튼을 클릭하여 워크플로우를 저장합니다.',
+        waitSave: '저장 중입니다. 잠시 기다려주세요...',
+        executeComplete: '에이전트플로우가 준비되었습니다!',
+      },
+    },
   },
 };

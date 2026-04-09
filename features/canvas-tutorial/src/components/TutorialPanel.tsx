@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import styles from '../styles/TutorialPanel.module.scss';
-import { LuArrowLeft, LuBookOpen, LuLayoutTemplate, LuLoader } from '@xgen/icons';
+import { LuArrowLeft, LuBookOpen, LuLayoutTemplate, LuLoader, LuPlay } from '@xgen/icons';
 import { useTranslation } from '@xgen/i18n';
 import { createApiClient } from '@xgen/api-client';
 import { TUTORIALS } from '../scenarios';
@@ -24,11 +24,13 @@ interface TemplateWorkflow {
 interface TutorialPanelProps {
     onBack: () => void;
     onSelectTutorial: (tutorial: TutorialData) => void;
+    onStartVirtualTutorial?: (tutorialId: string) => void;
 }
 
 const TutorialPanel: React.FC<TutorialPanelProps> = ({
     onBack,
     onSelectTutorial,
+    onStartVirtualTutorial,
 }) => {
     const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState<'basic' | 'template'>('basic');
@@ -171,6 +173,18 @@ const TutorialPanel: React.FC<TutorialPanelProps> = ({
                                 </div>
                             </div>
                             <div className={styles.tutorialActions}>
+                                {onStartVirtualTutorial && (
+                                    <button
+                                        className={styles.tutorialPlayButton}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onStartVirtualTutorial(tutorial.tutorial_id);
+                                        }}
+                                        title={t('canvas.tutorial.virtualTutorial.selectTitle', '가상 커서 튜토리얼')}
+                                    >
+                                        <LuPlay />
+                                    </button>
+                                )}
                                 <button
                                     className={styles.tutorialActionButton}
                                     onClick={(e) => {

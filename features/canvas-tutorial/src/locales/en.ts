@@ -15,5 +15,32 @@ export const en: Record<string, unknown> = {
     started: 'Starting "{{name}}" tutorial.',
     completed: 'Tutorial completed!',
     exited: 'Tutorial exited.',
+
+    // ── Virtual Cursor Tutorial ──
+    virtualTutorial: {
+      stop: 'Stop',
+      selectTitle: 'Virtual Cursor Tutorial',
+      selectDescription: 'Select a scenario to learn.',
+      scenario1Title: 'Create Your First Agentflow',
+      scenario1Desc: 'Learn the basic Input → Agent → Output structure.',
+      scenario2Title: 'Connect Nodes',
+      scenario2Desc: 'Connect two nodes with an edge.',
+      scenario3Title: 'Execute Agentflow',
+      scenario3Desc: 'Save and execute the workflow.',
+      hint: {
+        openSidebar: 'Let\'s open the node panel.',
+        addInputNode: 'Adding an Input String node.',
+        addAgentNode: 'Adding an Agent node.',
+        connectInputToAgent: 'Connect the Input node\'s output port to the Agent node\'s input port.',
+        firstFlowComplete: 'Your first agentflow is complete! Click Save to save it.',
+        identifySourcePort: 'Identify the output port to start the connection.',
+        identifyTargetPort: 'Identify the input port to connect to.',
+        dragToConnect: 'Drag from the output port to the input port to connect.',
+        connectionComplete: 'Node connection complete!',
+        clickSave: 'Click the Save button to save the workflow.',
+        waitSave: 'Saving... Please wait.',
+        executeComplete: 'Agentflow is ready!',
+      },
+    },
   },
 };

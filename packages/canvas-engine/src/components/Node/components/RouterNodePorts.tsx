@@ -101,6 +101,8 @@ export const RouterNodePorts: React.FC<RouterNodePortsProps> = ({
                     ref={(el) => registerPortRef && registerPortRef(nodeId, port.id, portType, el)}
                     data-port-id={portKey}
                     data-port-type={portType}
+                    data-tutorial-port={portType}
+                    data-tutorial-node-id={nodeId}
                     onMouseDown={(e) => {
                         if (!isPreview && onPortMouseDown) {
                             e.stopPropagation();
