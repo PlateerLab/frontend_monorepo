@@ -27,6 +27,7 @@
     justify-content: space-between;
     border-bottom: 1px solid #e5e7eb;
     background: #f8fafc;
+    flex-shrink: 0;
 }
 
 .title {
@@ -62,6 +63,7 @@
     padding: 12px 18px;
     border-bottom: 1px solid #e5e7eb;
     background: #ffffff;
+    flex-shrink: 0;
 }
 
 .searchInput {
@@ -97,8 +99,9 @@
     text-align: left;
     cursor: pointer;
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
     transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
@@ -112,11 +115,14 @@
     font-size: 14px;
     font-weight: 600;
     color: #111827;
+    white-space: nowrap;
 }
 
 .itemId {
     font-size: 11px;
     color: #6b7280;
+    flex: 1;
+    min-width: 0;
 }
 
 .empty {
@@ -127,4 +133,142 @@
     border: 1px dashed #d1d5db;
     border-radius: 10px;
     background: #f9fafb;
+}
+
+/* ── Description tooltip ── */
+
+.tooltipWrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.tooltipIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: help;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.tooltipWrapper:hover .tooltipIcon {
+    background: #3b82f6;
+    color: #ffffff;
+}
+
+.tooltipContent {
+    display: none;
+    position: absolute;
+    right: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 280px;
+    padding: 10px 12px;
+    background: #1f2937;
+    color: #f3f4f6;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    z-index: 10;
+    pointer-events: none;
+    word-break: keep-all;
+}
+
+.tooltipContent::after {
+    content: '';
+    position: absolute;
+    right: -5px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-left-color: #1f2937;
+}
+
+.tooltipWrapper:hover .tooltipContent {
+    display: block;
+}
+
+/* ── Category tab bar ── */
+
+.tabBar {
+    display: flex;
+    gap: 0;
+    padding: 0 18px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8fafc;
+    overflow-x: auto;
+    flex-shrink: 0;
+}
+
+.tabItem {
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.tabItem:hover {
+    color: #374151;
+}
+
+.tabItemActive {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+    font-weight: 600;
+}
+
+/* ── Accordion group ── */
+
+.accordionGroup {
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.accordionHeader {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    transition: background-color 0.15s ease;
+}
+
+.accordionHeader:hover {
+    background: #f9fafb;
+}
+
+.accordionIcon {
+    font-size: 12px;
+    color: #9ca3af;
+    transition: transform 0.2s ease;
+}
+
+.accordionContent {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 0 8px 0;
 }

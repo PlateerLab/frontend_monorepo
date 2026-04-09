@@ -25,7 +25,7 @@ import { CanvasNodes } from './CanvasNodes';
 import { CanvasEdges } from './CanvasEdges';
 import { CanvasMemos } from './CanvasMemos';
 import CanvasContextMenu from './CanvasContextMenu';
-import { NodeSelectorPopup } from './NodeSelectorPopup';
+import { NodeSelectorPopup, type NodeCategory } from './NodeSelectorPopup';
 
 import styles from '../styles/Canvas.module.scss';
 import { MIN_SCALE, MAX_SCALE } from '../hooks/useCanvasView';
@@ -71,6 +71,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
     const [portPositions, setPortPositions] = useState<Record<string, Position>>({});
     const [selectedMemoIds, setSelectedMemoIds] = useState<string[]>([]);
     const [nodeSpecs, setNodeSpecs] = useState(availableNodeSpecs);
+    const [nodeCategories, setNodeCategories] = useState<NodeCategory[]>([]);
     const [contextMenuState, setContextMenuState] = useState<{ position: Position; type: string } | null>(null);
     const [addNodePopup, setAddNodePopup] = useState<{ position: Position } | null>(null);
 
@@ -524,6 +525,9 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
         setAvailableNodeSpecs: (specs) => {
             setNodeSpecs(specs);
         },
+        setAvailableNodeCategories: (cats: NodeCategory[]) => {
+            setNodeCategories(cats);
+        },
         zoomIn: () => {
             zoomBy(1.2);
         },
@@ -862,6 +866,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(function Canvas(props, 
                 isOpen={addNodePopup !== null}
                 title={t('canvas.addNode')}
                 nodes={nodeSpecs}
+                categories={nodeCategories.length > 0 ? nodeCategories : undefined}
                 onSelectNode={handleAddNodeFromPopup}
                 onClose={handleCloseAddNodesPopup}
             />

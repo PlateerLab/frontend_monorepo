@@ -112,6 +112,8 @@ export interface CanvasRef {
     validateAndPrepareExecution: () => { success?: boolean; error?: string; nodeId?: string };
     /** Set available node specs */
     setAvailableNodeSpecs: (specs: NodeData[]) => void;
+    /** Set available node categories (for grouped popup) */
+    setAvailableNodeCategories: (categories: { categoryId: string; categoryName: string; functions: { functionId: string; functionName: string; nodes?: NodeData[] }[] }[]) => void;
     /** Zoom in */
     zoomIn: () => void;
     /** Zoom out */

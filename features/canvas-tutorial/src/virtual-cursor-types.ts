@@ -101,6 +101,7 @@ export interface VirtualTutorialScenario {
 /** 가상 커서 튜토리얼 전체 상태 */
 export interface VirtualTutorialState {
     isActive: boolean;
+    isPaused: boolean;
     currentScenarioId: string | null;
     currentStepIndex: number;
     completedScenarios: string[];

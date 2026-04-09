@@ -59,6 +59,12 @@ export const useCanvasView = ({ containerRef, contentRef, isDraggingRef, isInter
     }, [containerRef, contentRef]);
 
     const handleWheel = useCallback((e: WheelEvent): void => {
+        // 팝업/오버레이 위에서의 스크롤은 캔버스 줌으로 가로채지 않음
+        const target = e.target as HTMLElement;
+        if (target.closest('[data-add-nodes-popup], [data-node-selector-overlay]')) {
+            return;
+        }
+
         // 캔버스 드래그 중에는 휠 스크롤 확대/축소를 무시
         if (isDraggingRef?.current) {
             return;
