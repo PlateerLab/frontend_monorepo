@@ -130,6 +130,10 @@ export interface CanvasRef {
     updateSidebarDragPreview: (nodeData: NodeData, clientX: number, clientY: number) => void;
     /** Clear sidebar drag preview */
     clearSidebarDragPreview: () => void;
+    /** Open add-node popup at given world position (for virtual tutorial) */
+    openAddNodePopup: (position: Position) => void;
+    /** Close add-node popup (for virtual tutorial) */
+    closeAddNodePopup: () => void;
 }
 
 // ========== Edge Component Props ==========

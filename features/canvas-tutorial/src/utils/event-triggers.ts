@@ -8,6 +8,8 @@ export interface CanvasRefHandle {
     getView?: () => View;
     setView?: (view: View) => void;
     loadAgentflow?: (data: { nodes: CanvasNode[]; edges: CanvasEdge[]; memos?: any[]; view?: View }) => void;
+    openAddNodePopup?: (position: Position) => void;
+    closeAddNodePopup?: () => void;
 }
 
 /** click 모드: DOM 요소에 클릭 이벤트 발생 */

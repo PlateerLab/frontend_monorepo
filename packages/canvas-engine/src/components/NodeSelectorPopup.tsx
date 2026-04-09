@@ -34,15 +34,17 @@ export interface NodeSelectorPopupProps {
 
 const AccordionGroup: React.FC<{
     title: string;
+    functionId?: string;
     children: React.ReactNode;
     defaultOpen?: boolean;
-}> = ({ title, children, defaultOpen = false }) => {
+}> = ({ title, functionId, children, defaultOpen = false }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
     return (
         <div className={styles.accordionGroup}>
             <button
                 type="button"
                 className={styles.accordionHeader}
+                data-accordion-group={functionId || title}
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <span>{title}</span>
@@ -207,6 +209,7 @@ const NodeSelectorPopupComponent: React.FC<NodeSelectorPopupProps> = ({
                                 key={cat.categoryId}
                                 type="button"
                                 className={`${styles.tabItem} ${activeTab === cat.categoryId ? styles.tabItemActive : ''}`}
+                                data-tab-item={cat.categoryId}
                                 onClick={() => handleTabClick(cat.categoryId)}
                             >
                                 {cat.categoryName}
@@ -222,7 +225,7 @@ const NodeSelectorPopupComponent: React.FC<NodeSelectorPopupProps> = ({
                             <div className={styles.empty}>{t('canvas.noNodesFound')}</div>
                         ) : (
                             filteredFunctions.map(func => (
-                                <AccordionGroup key={func.functionId} title={func.functionName} defaultOpen={filteredFunctions.length === 1}>
+                                <AccordionGroup key={func.functionId} title={func.functionName} functionId={func.functionId} defaultOpen={filteredFunctions.length === 1}>
                                     {func.nodes?.map(node => {
                                         const desc = locale === 'ko' && node.description_ko
                                             ? node.description_ko
@@ -232,6 +235,7 @@ const NodeSelectorPopupComponent: React.FC<NodeSelectorPopupProps> = ({
                                                 key={node.id}
                                                 type="button"
                                                 className={styles.item}
+                                                data-node-item={node.id}
                                                 onClick={() => onSelectNode(node)}
                                             >
                                                 <span className={styles.itemName}>

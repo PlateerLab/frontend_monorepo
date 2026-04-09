@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { CursorAction } from '../virtual-cursor-types';
 
-export type CursorPhase = 'idle' | 'moving' | 'acting' | 'done';
+export type CursorPhase = 'idle' | 'moving' | 'arrived' | 'acting' | 'done';
 
 interface CursorAnimationState {
     x: number;
@@ -17,6 +17,9 @@ const MOVE_DURATION = 800; // ms
  * 커서 애니메이션 Hook.
  * stepKey가 바뀔 때마다 현재 위치 → 목표 중앙으로 부드럽게 이동.
  * 도착 후 action에 따라 acting → done 전이, onActionComplete 호출.
+ *
+ * open-popup: 도착 → 바로 done (클릭 시각 효과 없음)
+ * click: 도착 → arrived(500ms 대기) → acting(300ms 클릭 효과) → done
  */
 export function useCursorAnimation(
     targetRect: DOMRect | null,
@@ -35,6 +38,7 @@ export function useCursorAnimation(
 
     const animFrameRef = useRef<number>(0);
     const actingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const preActTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     // currentPos는 항상 최신 커서 좌표 (stale closure 방지)
     const currentPosRef = useRef({ x: initX, y: initY });
     const onActionCompleteRef = useRef(onActionComplete);
@@ -50,6 +54,10 @@ export function useCursorAnimation(
         if (actingTimerRef.current !== null) {
             clearTimeout(actingTimerRef.current);
             actingTimerRef.current = null;
+        }
+        if (preActTimerRef.current !== null) {
+            clearTimeout(preActTimerRef.current);
+            preActTimerRef.current = null;
         }
 
         if (targetX === null || targetY === null || !action) {
@@ -77,18 +85,41 @@ export function useCursorAnimation(
                 setState({ x, y, phase: 'moving' });
                 animFrameRef.current = requestAnimationFrame(animate);
             } else {
-                setState({ x: targetX, y: targetY, phase: 'acting' });
                 currentPosRef.current = { x: targetX, y: targetY };
 
-                const actingDelay =
-                    action === 'click' || action === 'add-node' ? 400 :
-                    action === 'connect' ? 600 : 200;
+                if (action === 'open-popup') {
+                    // open-popup: 클릭 시각 효과 없이 도착 후 바로 done → 액션 실행
+                    setState({ x: targetX, y: targetY, phase: 'done' });
+                    actingTimerRef.current = setTimeout(() => {
+                        actingTimerRef.current = null;
+                        onActionCompleteRef.current?.();
+                    }, 300);
+                } else if (action === 'click') {
+                    // click: 도착 → 0.5초 대기(arrived) → 클릭 효과(acting 0.3초) → done
+                    setState({ x: targetX, y: targetY, phase: 'arrived' });
+                    preActTimerRef.current = setTimeout(() => {
+                        preActTimerRef.current = null;
+                        setState((s) => ({ ...s, phase: 'acting' }));
+                        actingTimerRef.current = setTimeout(() => {
+                            actingTimerRef.current = null;
+                            setState((s) => ({ ...s, phase: 'done' }));
+                            onActionCompleteRef.current?.();
+                        }, 300);
+                    }, 500);
+                } else {
+                    // connect, add-node, 기타
+                    setState({ x: targetX, y: targetY, phase: 'acting' });
 
-                actingTimerRef.current = setTimeout(() => {
-                    actingTimerRef.current = null;
-                    setState((s) => ({ ...s, phase: 'done' }));
-                    onActionCompleteRef.current?.();
-                }, actingDelay);
+                    const actingDelay =
+                        action === 'add-node' ? 600 :
+                        action === 'connect' ? 600 : 200;
+
+                    actingTimerRef.current = setTimeout(() => {
+                        actingTimerRef.current = null;
+                        setState((s) => ({ ...s, phase: 'done' }));
+                        onActionCompleteRef.current?.();
+                    }, actingDelay);
+                }
             }
         };
 
@@ -99,6 +130,10 @@ export function useCursorAnimation(
             if (actingTimerRef.current !== null) {
                 clearTimeout(actingTimerRef.current);
                 actingTimerRef.current = null;
+            }
+            if (preActTimerRef.current !== null) {
+                clearTimeout(preActTimerRef.current);
+                preActTimerRef.current = null;
             }
         };
         // stepKey가 바뀔 때만 재시작. targetX/Y는 안정적인 number.

@@ -7,7 +7,8 @@ export type CursorAction =
     | 'add-node'
     | 'connect'
     | 'type'
-    | 'wait';
+    | 'wait'
+    | 'open-popup';
 
 /** 힌트 말풍선 위치 */
 export type HintPosition = 'top' | 'bottom' | 'left' | 'right' | 'auto';
