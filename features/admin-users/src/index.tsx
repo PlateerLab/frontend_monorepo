@@ -149,14 +149,19 @@ const AdminUsersPage: React.FC<RouteComponentProps> = () => {
         sortable: true,
         cell: (row) => {
           const isSuperuser = row.is_superuser;
-          const variant =
-            isSuperuser
-              ? 'error'
-              : (row.roles?.length ?? 0) > 0
-                ? 'warning'
-                : 'neutral';
-          const label = isSuperuser ? 'superuser' : (row.roles?.length ? row.roles.join(', ') : (row.user_type ?? 'standard'));
-          return <StatusBadge variant={variant} dot={false}>{label}</StatusBadge>;
+          const hasRoles = (row.roles?.length ?? 0) > 0;
+          const rolesLabel = hasRoles ? row.roles!.join(', ') : '';
+
+          return (
+            <div className="flex items-center gap-1.5">
+              {isSuperuser && <StatusBadge variant="error" dot={false}>superuser</StatusBadge>}
+              {hasRoles ? (
+                <StatusBadge variant="warning" dot={false}>{rolesLabel}</StatusBadge>
+              ) : !isSuperuser ? (
+                <StatusBadge variant="neutral" dot={false}>{row.user_type ?? 'standard'}</StatusBadge>
+              ) : null}
+            </div>
+          );
         },
       },
       {

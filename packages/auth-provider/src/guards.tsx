@@ -68,13 +68,28 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
       return;
     }
 
+    // refreshAuth()가 이미 loadUserSections()로 검증 + permissions 로드를 완료했으므로
+    // user.permissions가 존재하면 추가 검증 없이 통과
+    if (user.permissions && user.permissions.length > 0) {
+      lastCheckedTokenRef.current = token;
+      setIsValidated(true);
+      return;
+    }
+
+    // superuser는 permissions 없이도 통과 (is_superuser는 JWT에서 바로 세팅됨)
+    if (user.is_superuser) {
+      lastCheckedTokenRef.current = token;
+      setIsValidated(true);
+      return;
+    }
+
     // 이미 같은 토큰으로 검증했으면 스킵
     if (lastCheckedTokenRef.current === token) {
       setIsValidated(true);
       return;
     }
 
-    // 토큰 검증
+    // fallback: permissions가 아직 없으면 직접 validate-token 호출
     setIsValidating(true);
     validateToken(token)
       .then((result) => {
@@ -83,7 +98,6 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
           setIsValidated(true);
         } else if (result.user_id === null && result.username === null) {
           // validateToken 내부에서 네트워크 에러 등으로 실패 → 쿠키 기반 통과
-          // (valid:false + user_id:null = API 호출 자체가 실패한 경우)
           lastCheckedTokenRef.current = token;
           setIsValidated(true);
         } else {

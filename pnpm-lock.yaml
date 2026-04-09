@@ -175,10 +175,10 @@ importers:
         version: link:../../features/main-chat-history
       '@xgen/feature-main-dashboard':
         specifier: workspace:*
-        version: link:../../features/main-dashboard
+        version: link:../../features/main-Dashboard
       '@xgen/feature-root-landing':
         specifier: workspace:*
-        version: link:../../features/root-landing
+        version: link:../../features/root-Landing
       '@xgen/feature-root-landing-cta':
         specifier: workspace:*
         version: link:../../features/root-landing-cta
@@ -268,7 +268,7 @@ importers:
         version: link:../../features/main-upload-history
       '@xgen/mypage-profile':
         specifier: workspace:*
-        version: link:../../features/mypage-profile
+        version: link:../../features/mypage-Profile
       '@xgen/sidebar-admin':
         specifier: workspace:*
         version: link:../../features/sidebar-admin
@@ -1682,6 +1682,30 @@ importers:
         specifier: ^5
         version: 5.9.3
 
+  features/main-Dashboard:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+
   features/main-agentflow-management-orchestrator:
     dependencies:
       '@xgen/i18n':
@@ -2087,30 +2111,6 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
-  features/main-dashboard:
-    dependencies:
-      '@xgen/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@xgen/auth-provider':
-        specifier: workspace:*
-        version: link:../../packages/auth-provider
-      '@xgen/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
-      '@xgen/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@xgen/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@xgen/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-
   features/main-document-management-collection:
     dependencies:
       '@xgen/api-client':
@@ -2508,7 +2508,7 @@ importers:
         specifier: ^5
         version: 5.9.3
 
-  features/mypage-profile:
+  features/mypage-Profile:
     dependencies:
       '@xgen/api-client':
         specifier: workspace:*
@@ -2532,7 +2532,7 @@ importers:
         specifier: ^19.1.0
         version: 19.2.4
 
-  features/root-landing:
+  features/root-Landing:
     dependencies:
       '@xgen/types':
         specifier: workspace:*

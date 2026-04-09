@@ -59,37 +59,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, onAuthStat
   const lastCheckedTokenRef = useRef<string | null>(null);
 
   // ──────────────────────────────────────────────────────────
-  // 쿠키에서 인증 상태 복원 (JWT 디코드 방식)
+  // 인증 정보 클리어
   // ──────────────────────────────────────────────────────────
-  const refreshAuth = useCallback(async () => {
-    const accessToken = getCookie('access_token');
+  const clearAuth = useCallback(() => {
+    setIsLoggingOut(true);
+    clearAllAuthCookies();
 
-    if (accessToken) {
-      // JWT payload에서 사용자 정보 추출 (쿠키 노출 없이)
-      const payload = decodeJwtPayload(accessToken);
+    setUser(null);
+    lastCheckedTokenRef.current = null;
 
-      if (payload) {
-        setUser({
-          id: payload.sub,
-          user_id: parseInt(payload.sub, 10),
-          username: payload.username,
-          is_superuser: payload.is_superuser ?? payload.is_admin ?? false,
-          is_admin: payload.is_superuser ?? payload.is_admin ?? false,
-          roles: payload.roles ?? [],
-        });
-      } else {
-        // JWT 디코드 실패 → 인증 정보 클리어
-        setUser(null);
-      }
-    } else {
-      setUser(null);
-    }
-
-    setIsInitialized(true);
+    // 100ms 후 isLoggingOut 해제 (AuthGuard redirect loop 방지)
+    setTimeout(() => {
+      setIsLoggingOut(false);
+    }, 100);
   }, []);
 
   // ──────────────────────────────────────────────────────────
   // 토큰 검증 및 섹션 정보 로드
+  // user_id + roles 기반으로 서버에서 ABAC 권한(permissions) 조회
   // ──────────────────────────────────────────────────────────
   const loadUserSections = useCallback(async (token: string): Promise<TokenValidationResult | null> => {
     try {
@@ -116,23 +103,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, onAuthStat
     } catch {
       return null;
     }
-  }, []);
+  }, [clearAuth]);
 
   // ──────────────────────────────────────────────────────────
-  // 인증 정보 클리어
+  // 쿠키에서 인증 상태 복원 (JWT 디코드 + permissions 로드)
   // ──────────────────────────────────────────────────────────
-  const clearAuth = useCallback(() => {
-    setIsLoggingOut(true);
-    clearAllAuthCookies();
+  const refreshAuth = useCallback(async () => {
+    const accessToken = getCookie('access_token');
 
-    setUser(null);
-    lastCheckedTokenRef.current = null;
+    if (accessToken) {
+      // JWT payload에서 사용자 정보 추출 (쿠키 노출 없이)
+      const payload = decodeJwtPayload(accessToken);
 
-    // 100ms 후 isLoggingOut 해제 (AuthGuard redirect loop 방지)
-    setTimeout(() => {
-      setIsLoggingOut(false);
-    }, 100);
-  }, []);
+      if (payload) {
+        setUser({
+          id: payload.sub,
+          user_id: parseInt(payload.sub, 10),
+          username: payload.username,
+          is_superuser: payload.is_superuser ?? payload.is_admin ?? false,
+          is_admin: payload.is_superuser ?? payload.is_admin ?? false,
+          roles: payload.roles ?? [],
+        });
+
+        // JWT에는 permissions가 없으므로 validate-token API로 가져옴
+        // user_id + roles 기반으로 서버에서 ABAC 권한 조회
+        await loadUserSections(accessToken);
+      } else {
+        // JWT 디코드 실패 → 인증 정보 클리어
+        setUser(null);
+      }
+    } else {
+      setUser(null);
+    }
+
+    setIsInitialized(true);
+  }, [loadUserSections]);
 
   // ──────────────────────────────────────────────────────────
   // 초기 로드
