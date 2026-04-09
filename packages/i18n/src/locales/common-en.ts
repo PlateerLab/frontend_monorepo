@@ -112,6 +112,10 @@ export const commonEn: TranslationData = {
       title: 'Workspace',
       mainDashboard: { title: 'Dashboard', description: 'Main Dashboard' },
     },
+    dashboard: {
+      title: 'Dashboard',
+      mainDashboard: { title: 'Dashboard', description: 'Main Dashboard' },
+    },
   },
   header: {
     title: 'GEN AI Platform',

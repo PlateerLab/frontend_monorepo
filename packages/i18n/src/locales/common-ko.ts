@@ -112,6 +112,10 @@ export const commonKo: TranslationData = {
       title: '워크스페이스',
       mainDashboard: { title: '대시보드', description: '메인 대시보드' },
     },
+    dashboard: {
+      title: '대시보드',
+      mainDashboard: { title: '대시보드', description: '메인 대시보드' },
+    },
   },
   header: {
     title: 'GEN AI Platform',

@@ -10,6 +10,123 @@ import { FeatureRegistry as CoreRegistry } from '@xgen/types';
 import { registerCanvasPlugins } from './canvas-features-registry';
 
 // ─────────────────────────────────────────────────────────────
+// Main Section → Permission Prefix Mapping
+// 사이드바 섹션별 접근에 필요한 ABAC 권한 프리픽스 목록
+// chat 섹션은 모든 사용자에게 열려 있으므로 매핑하지 않음
+// ─────────────────────────────────────────────────────────────
+
+const MAIN_SECTION_PERMISSION_PREFIXES: Record<string, string[]> = {
+  'dashboard': ['main.dashboard:'],
+  'agentflow': [
+    'main.agentflow:', 'main.agentflow-store:', 'main.agentflow-schedule:',
+    'main.tool:', 'main.tool-store:',
+    'main.prompt:', 'main.prompt-store:',
+    'main.auth-profile:', 'main.auth-profile-store:',
+  ],
+  'knowledge': ['main.knowledge:', 'main.storage:', 'main.db-connection:'],
+  'settings': ['main.settings:'],
+  // 'chat' 은 권한 없이 모든 사용자 접근 가능
+};
+
+/**
+ * 사이드바 아이템별 권한 프리픽스 매핑.
+ * 이 맵에 존재하는 아이템은 개별적으로 권한 필터링됨.
+ * 존재하지 않으면 섹션 레벨 권한만 확인.
+ */
+const MAIN_ITEM_PERMISSION_PREFIXES: Record<string, string[]> = {
+  'main-dashboard': ['main.dashboard:'],
+  'canvas-intro': ['main.agentflow:'],
+  'agentflows': ['main.agentflow:', 'main.agentflow-store:', 'main.agentflow-schedule:'],
+  'tool-storage': ['main.tool:', 'main.tool-store:'],
+  'prompt-storage': ['main.prompt:', 'main.prompt-store:'],
+  'auth-profile': ['main.auth-profile:', 'main.auth-profile-store:'],
+  'documents': ['main.knowledge:', 'main.storage:', 'main.db-connection:'],
+  'upload-history': ['main.knowledge:'],
+};
+
+/**
+ * 탭 플러그인별 권한 프리픽스 매핑.
+ * orchestratorType → tabId → 필요한 권한 프리픽스
+ */
+const MAIN_TAB_PERMISSION_PREFIXES: Record<string, Record<string, string[]>> = {
+  agentflow: {
+    'storage': ['main.agentflow:'],
+    'store': ['main.agentflow-store:'],
+    'scheduler': ['main.agentflow-schedule:'],
+    'tester': ['main.agentflow:'],
+  },
+  document: {
+    'collection': ['main.knowledge:'],
+    'storage': ['main.storage:'],
+    'database': ['main.db-connection:'],
+  },
+  tool: {
+    'storage': ['main.tool:'],
+    'library': ['main.tool-store:'],
+  },
+  prompt: {
+    'storage': ['main.prompt:'],
+    'library': ['main.prompt-store:'],
+  },
+  'auth-profile': {
+    'storage': ['main.auth-profile:'],
+    'library': ['main.auth-profile-store:'],
+  },
+};
+
+/**
+ * 유저가 해당 메인 섹션에 접근할 권한이 있는지 확인.
+ */
+function hasAnyMainSectionPermission(userPermissions: string[], sectionId: string): boolean {
+  if (userPermissions.includes('*:*')) return true;
+
+  const prefixes = MAIN_SECTION_PERMISSION_PREFIXES[sectionId];
+  if (!prefixes) return true; // 매핑이 없으면 필터링 안 함 (chat 등)
+
+  return userPermissions.some(perm =>
+    prefixes.some(prefix => perm.startsWith(prefix))
+  );
+}
+
+/**
+ * 개별 사이드바 아이템에 대한 권한 확인.
+ */
+function hasMainItemPermission(userPermissions: string[], itemId: string): boolean {
+  if (userPermissions.includes('*:*')) return true;
+
+  const prefixes = MAIN_ITEM_PERMISSION_PREFIXES[itemId];
+  if (!prefixes) return true; // 매핑이 없으면 필터링 안 함
+
+  return userPermissions.some(perm =>
+    prefixes.some(prefix => perm.startsWith(prefix))
+  );
+}
+
+/**
+ * 탭 플러그인을 권한에 따라 필터링.
+ * orchestratorType에 해당하는 탭 권한 매핑을 사용해 접근 가능한 탭만 반환.
+ */
+export function filterTabPlugins<T extends { id: string }>(
+  plugins: T[],
+  orchestratorType: string,
+  userPermissions?: string[],
+): T[] {
+  if (!userPermissions) return plugins;
+  if (userPermissions.includes('*:*')) return plugins;
+
+  const tabMap = MAIN_TAB_PERMISSION_PREFIXES[orchestratorType];
+  if (!tabMap) return plugins;
+
+  return plugins.filter(plugin => {
+    const prefixes = tabMap[plugin.id];
+    if (!prefixes) return true;
+    return userPermissions.some(perm =>
+      prefixes.some(prefix => perm.startsWith(prefix))
+    );
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────
 
@@ -74,8 +191,9 @@ class FeatureRegistry {
 
   /**
    * Get sidebar sections organized by section ID
+   * @param userPermissions 사용자 ABAC 권한 배열 — 섹션 필터링에 사용 (undefined면 필터링 안 함)
    */
-  getSidebarSections(): SidebarSection[] {
+  getSidebarSections(userPermissions?: string[]): SidebarSection[] {
     const sectionMap = new Map<string, SidebarItem[]>();
 
     // Initialize sections in order
@@ -91,17 +209,36 @@ class FeatureRegistry {
       }
     });
 
-    // Convert to array and filter empty sections
+    // Convert to array and filter empty sections + ABAC 권한 필터링
     return this.sectionOrder
       .filter(sectionId => {
         const items = sectionMap.get(sectionId);
-        return items && items.length > 0;
+        if (!items || items.length === 0) return false;
+
+        // 섹션 레벨 권한 필터링
+        if (userPermissions) {
+          if (!hasAnyMainSectionPermission(userPermissions, sectionId)) {
+            return false;
+          }
+        }
+
+        return true;
       })
-      .map(sectionId => ({
-        id: sectionId,
-        titleKey: `sidebar.${sectionId}.title`,
-        items: sectionMap.get(sectionId) || [],
-      }));
+      .map(sectionId => {
+        let items = sectionMap.get(sectionId) || [];
+
+        // 아이템별 권한 필터링
+        if (userPermissions) {
+          items = items.filter(item => hasMainItemPermission(userPermissions, item.id));
+        }
+
+        return {
+          id: sectionId,
+          titleKey: `sidebar.${sectionId}.title`,
+          items,
+        };
+      })
+      .filter(section => section.items.length > 0);
   }
 
   /**
@@ -267,7 +404,8 @@ export async function initializeFeatures(): Promise<void> {
   // Register Canvas Page Plugins
   registerCanvasPlugins();
 
-
+  // 탭 권한 맵을 CoreRegistry에 주입하여 각 Orchestrator에서 사용
+  CoreRegistry.setMainTabPermissionMap(MAIN_TAB_PERMISSION_PREFIXES);
 }
 
 export default featureRegistry;

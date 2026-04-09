@@ -7,7 +7,7 @@
  */
 
 import type { AdminFeatureModule, SidebarItem, AdminSidebarSectionId } from '@xgen/types';
-import { FeatureRegistry as CoreRegistry, hasPermission } from '@xgen/types';
+import { FeatureRegistry as CoreRegistry } from '@xgen/types';
 
 // ─────────────────────────────────────────────────────────────
 // Admin Section Order & Metadata
@@ -24,25 +24,98 @@ const ADMIN_SECTION_ORDER: AdminSectionMeta[] = [
   { id: 'admin-agentflow', titleKey: 'admin.sidebar.sections.agentflow' },
   { id: 'admin-setting', titleKey: 'admin.sidebar.sections.setting' },
   { id: 'admin-system', titleKey: 'admin.sidebar.sections.system' },
+  { id: 'admin-security', titleKey: 'admin.sidebar.sections.security' },
   { id: 'admin-data', titleKey: 'admin.sidebar.sections.data' },
   { id: 'admin-mcp', titleKey: 'admin.sidebar.sections.mcp' },
+  { id: 'admin-ml', titleKey: 'admin.sidebar.sections.ml' },
   { id: 'admin-governance', titleKey: 'admin.sidebar.sections.governance' },
 ];
 
 // ─────────────────────────────────────────────────────────────
-// Admin Section → Required Permission Mapping
-// 사이드바 섹션별 접근에 필요한 ABAC 권한
+// Admin Section → Permission Prefix Mapping
+// 사이드바 섹션별 접근에 필요한 ABAC 권한 프리픽스 목록
+// 유저가 해당 프리픽스 중 하나라도 시작하는 권한을 갖고 있으면 섹션 표시
 // ─────────────────────────────────────────────────────────────
 
-const ADMIN_SECTION_PERMISSIONS: Record<string, string> = {
-  'admin-user': 'admin.user:read',
-  'admin-workflow': 'admin.workflow:read',
-  'admin-setting': 'admin.system:read',
-  'admin-system': 'admin.system:monitor',
-  'admin-data': 'admin.database:read',
-  'admin-mcp': 'admin.mcp:read',
-  'admin-governance': 'admin.governance:manage',
+const ADMIN_SECTION_PERMISSION_PREFIXES: Record<string, string[]> = {
+  'admin-user': ['admin.user:', 'admin.role:', 'admin.supervision:', 'admin.permission:'],
+  'admin-agentflow': ['admin.workflow:', 'admin.prompt:', 'admin.user-token:', 'admin.node:'],
+  'admin-setting': ['admin.system:read', 'admin.system:update', 'admin.system:config', 'admin.security:'],
+  'admin-system': ['admin.system:monitor', 'admin.log:'],
+  'admin-security': ['admin.log:', 'admin.security:', 'admin.audit:'],
+  'admin-data': ['admin.database:', 'admin.storage:', 'admin.backup:'],
+  'admin-mcp': ['admin.mcp:'],
+  'admin-ml': ['admin.ml:'],
+  'admin-governance': ['admin.governance', 'admin.monitoring:'],
 };
+
+/**
+ * 사이드바 아이템별 권한 프리픽스 매핑.
+ * 이 맵에 존재하는 아이템은 개별적으로 권한 필터링됨.
+ * 존재하지 않으면 섹션 레벨 권한만 확인.
+ */
+const ADMIN_ITEM_PERMISSION_PREFIXES: Record<string, string[]> = {
+  // 사용자 & 조직
+  'admin-users': ['admin.user:'],
+  'admin-user-create': ['admin.user:'],
+  'admin-role-management': ['admin.role:', 'admin.supervision:', 'admin.permission:'],
+  // 에이전트플로우 리소스
+  'admin-agentflow-management': ['admin.workflow:'],
+  'admin-chat-monitoring': ['admin.workflow:monitor'],
+  'admin-user-token-dashboard': ['admin.user-token:'],
+  'admin-node-management': ['admin.node:'],
+  'admin-agentflow-store': ['admin.workflow:'],
+  'admin-prompt-store': ['admin.prompt:'],
+  // 환경 설정
+  'admin-system-settings': ['admin.system:read', 'admin.system:update'],
+  'admin-system-config': ['admin.system:config'],
+  // 시스템 상태
+  'admin-system-monitor': ['admin.system:monitor'],
+  'admin-system-health': ['admin.system:monitor'],
+  'admin-backend-logs': ['admin.log:'],
+  // 데이터 관리
+  'admin-database': ['admin.database:'],
+  // MCP 관리
+  'admin-mcp-market': ['admin.mcp:'],
+  'admin-mcp-station': ['admin.mcp:'],
+  // AI 거버넌스
+  'admin-gov-risk-management': ['admin.governance-risk:', 'admin.governance-review:'],
+  'admin-gov-monitoring': ['admin.monitoring:'],
+  'admin-gov-control-policy': ['admin.governance-pii:', 'admin.governance-forbidden:', 'admin.governance-risk-policy:'],
+  'admin-gov-audit-tracking': ['admin.governance:audit', 'admin.audit:'],
+};
+
+/**
+ * 유저가 해당 섹션에 접근할 권한이 있는지 확인.
+ * 유저 권한 중 해당 섹션의 프리픽스 목록과 하나라도 매칭되면 true.
+ */
+function hasAnySectionPermission(userPermissions: string[], sectionId: string): boolean {
+  // '*:*' 와일드카드 보유 시 전체 접근
+  if (userPermissions.includes('*:*')) return true;
+
+  const prefixes = ADMIN_SECTION_PERMISSION_PREFIXES[sectionId];
+  if (!prefixes) return true; // 매핑이 없으면 필터링 안 함
+
+  return userPermissions.some(perm =>
+    prefixes.some(prefix => perm.startsWith(prefix))
+  );
+}
+
+/**
+ * 개별 사이드바 아이템에 대한 권한 확인.
+ * ADMIN_ITEM_PERMISSION_PREFIXES에 매핑이 있으면 해당 프리픽스로 확인,
+ * 없으면 true (섹션 레벨 필터링에 위임).
+ */
+function hasItemPermission(userPermissions: string[], itemId: string): boolean {
+  if (userPermissions.includes('*:*')) return true;
+
+  const prefixes = ADMIN_ITEM_PERMISSION_PREFIXES[itemId];
+  if (!prefixes) return true; // 매핑이 없으면 필터링 안 함
+
+  return userPermissions.some(perm =>
+    prefixes.some(prefix => perm.startsWith(prefix))
+  );
+}
 
 // ─────────────────────────────────────────────────────────────
 // Admin Feature Initialization
@@ -79,17 +152,26 @@ export async function initializeAdminFeatures(): Promise<void> {
       import('@xgen/feature-admin-system-monitor'),
       import('@xgen/feature-admin-system-health'),
       import('@xgen/feature-admin-backend-logs'),
+      // 보안 & 감사 (admin-security)
+      import('@xgen/feature-admin-audit-logs'),
+      import('@xgen/feature-admin-error-logs'),
+      import('@xgen/feature-admin-security-settings'),
       // 데이터 관리 (admin-data)
       import('@xgen/feature-admin-database'),
-
+      import('@xgen/feature-admin-backup'),
+      import('@xgen/feature-admin-storage'),
       // MCP 관리 (admin-mcp)
       import('@xgen/feature-admin-mcp-market'),
       import('@xgen/feature-admin-mcp-station'),
-      // AI 거버넌스 (admin-governance) — xgen-frontend 원본 구조: 4개
+      // ML 모델 관리 (admin-ml)
+      import('@xgen/feature-admin-ml-model-control'),
+      // AI 거버넌스 (admin-governance)
       import('@xgen/feature-admin-gov-risk-management'),
       import('@xgen/feature-admin-gov-monitoring-orchestrator'),
       import('@xgen/feature-admin-gov-control-policy'),
       import('@xgen/feature-admin-gov-audit-tracking'),
+      import('@xgen/feature-admin-gov-agentflow-approval'),
+      import('@xgen/feature-admin-gov-operation-history'),
     ];
 
     const results = await Promise.allSettled(featureImports);
@@ -174,23 +256,26 @@ export function getAdminSidebarSections(userPermissions?: string[]): { id: strin
 
   // 빈 섹션 필터링 + ABAC 권한 필터링 후 반환
   return ADMIN_SECTION_ORDER
-    .filter(({ id }) => {
-      const items = sectionMap.get(id);
-      if (!items || items.length === 0) return false;
+    .map(({ id, titleKey }) => {
+      let items = sectionMap.get(id) || [];
 
-      // 권한 필터링: userPermissions가 제공되면 해당 섹션 권한 확인
+      // 아이템별 권한 필터링: userPermissions가 제공되면 개별 아이템도 필터링
       if (userPermissions) {
-        const requiredPerm = ADMIN_SECTION_PERMISSIONS[id];
-        if (requiredPerm && !hasPermission(userPermissions, requiredPerm)) {
+        items = items.filter(item => hasItemPermission(userPermissions, item.id));
+      }
+
+      return { id, titleKey, items };
+    })
+    .filter(({ id, items }) => {
+      if (items.length === 0) return false;
+
+      // 섹션 레벨 권한 필터링
+      if (userPermissions) {
+        if (!hasAnySectionPermission(userPermissions, id)) {
           return false;
         }
       }
 
       return true;
-    })
-    .map(({ id, titleKey }) => ({
-      id,
-      titleKey,
-      items: sectionMap.get(id) || [],
-    }));
+    });
 }

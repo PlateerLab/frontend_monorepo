@@ -5,6 +5,7 @@ import type { AdminFeatureModule, RouteComponentProps } from '@xgen/types';
 import { ContentArea, Button, SearchInput, Modal, StatCard, FilterTabs } from '@xgen/ui';
 import type { FilterTab } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
+import { useAuth } from '@xgen/auth-provider';
 import './locales';
 import {
   getPIIsList,
@@ -109,9 +110,31 @@ const genId = (): string => `id-${Date.now()}-${Math.random().toString(36).slice
 /* ------------------------------------------------------------------ */
 const AdminGovControlPolicyPage: React.FC<RouteComponentProps> = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+
+  // Permission prefix → tab mapping
+  const TAB_PERMISSION_PREFIXES: Record<PolicyTab, string> = {
+    pii: 'admin.governance-pii:',
+    forbidden_words: 'admin.governance-forbidden:',
+    risk_level: 'admin.governance-risk-policy:',
+  };
+
+  const hasTabPermission = useCallback((tab: PolicyTab): boolean => {
+    if (user?.is_superuser) return true;
+    const prefix = TAB_PERMISSION_PREFIXES[tab];
+    return user?.permissions?.some((p: string) => p.startsWith(prefix)) ?? false;
+  }, [user?.is_superuser, user?.permissions]);
 
   // Active tab
   const [activeTab, setActiveTab] = useState<PolicyTab>('pii');
+
+  // Reset active tab if user lacks permission for current tab
+  useEffect(() => {
+    if (!hasTabPermission(activeTab)) {
+      const firstAllowed = (['pii', 'forbidden_words', 'risk_level'] as PolicyTab[]).find(hasTabPermission);
+      if (firstAllowed) setActiveTab(firstAllowed);
+    }
+  }, [hasTabPermission, activeTab]);
 
   // Regex templates (Korean-specific)
   const REGEX_TEMPLATES: RegexTemplate[] = useMemo(() => [
@@ -1291,11 +1314,14 @@ const AdminGovControlPolicyPage: React.FC<RouteComponentProps> = () => {
   /* ================================================================ */
   /*  Main Render                                                      */
   /* ── Tab definitions ── */
-  const policyTabs: FilterTab[] = useMemo(() => [
-    { key: 'pii', label: t('admin.settings.guarder.piis.piiTab'), count: piisList.length, icon: <span>{'\uD83D\uDEE1'}</span> },
-    { key: 'forbidden_words', label: t('admin.settings.guarder.piis.forbiddenWordTab'), count: fwList.length, icon: <span>{'\uD83D\uDEAB'}</span> },
-    { key: 'risk_level', label: t('admin.settings.guarder.piis.riskLevelTab'), count: riskSummary.gradeCount, icon: <span>{'\u26A0'}</span> },
-  ], [t, piisList.length, fwList.length, riskSummary.gradeCount]);
+  const policyTabs: FilterTab[] = useMemo(() => {
+    const allTabs: (FilterTab & { tabKey: PolicyTab })[] = [
+      { key: 'pii', tabKey: 'pii', label: t('admin.settings.guarder.piis.piiTab'), count: piisList.length, icon: <span>{'\uD83D\uDEE1'}</span> },
+      { key: 'forbidden_words', tabKey: 'forbidden_words', label: t('admin.settings.guarder.piis.forbiddenWordTab'), count: fwList.length, icon: <span>{'\uD83D\uDEAB'}</span> },
+      { key: 'risk_level', tabKey: 'risk_level', label: t('admin.settings.guarder.piis.riskLevelTab'), count: riskSummary.gradeCount, icon: <span>{'\u26A0'}</span> },
+    ];
+    return allTabs.filter(tab => hasTabPermission(tab.tabKey));
+  }, [t, piisList.length, fwList.length, riskSummary.gradeCount, hasTabPermission]);
 
   /* ================================================================ */
   return (

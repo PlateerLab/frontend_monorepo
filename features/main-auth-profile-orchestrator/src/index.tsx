@@ -5,6 +5,7 @@ import type { RouteComponentProps, MainFeatureModule } from '@xgen/types';
 import { FeatureRegistry } from '@xgen/types';
 import { ContentArea, FilterTabs } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
+import { useAuth } from '@xgen/auth-provider';
 import './locales';
 
 interface AuthProfilePageProps extends RouteComponentProps {
@@ -13,8 +14,13 @@ interface AuthProfilePageProps extends RouteComponentProps {
 
 const AuthProfilePage: React.FC<AuthProfilePageProps> = ({ onNavigate }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
-  const plugins = useMemo(() => FeatureRegistry.getAuthProfileTabPlugins(), []);
+  const plugins = useMemo(() => {
+    const all = FeatureRegistry.getAuthProfileTabPlugins();
+    const perms = user?.is_superuser ? undefined : (user?.permissions ?? []);
+    return FeatureRegistry.filterMainTabPlugins(all, 'auth-profile', perms);
+  }, [user?.is_superuser, user?.permissions]);
   const [activeTab, setActiveTab] = useState(plugins[0]?.id ?? '');
   const [subToolbarContent, setSubToolbarContent] = useState<React.ReactNode>(null);
 

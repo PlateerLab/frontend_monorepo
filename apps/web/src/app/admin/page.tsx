@@ -55,7 +55,7 @@ function AdminPageContent() {
   const [CurrentComponent, setCurrentComponent] = useState<React.ComponentType<any> | null>(null);
   const [sections, setSections] = useState<{ id: string; titleKey: string; items: any[] }[]>([]);
 
-  // Initialize admin features on mount
+  // Initialize admin features on mount + re-compute when permissions load
   useEffect(() => {
     async function init() {
       await initializeAdminFeatures();
@@ -65,7 +65,7 @@ function AdminPageContent() {
       setInitialized(true);
     }
     init();
-  }, []);
+  }, [user?.permissions, user?.is_superuser]);
 
   // Handle route from URL
   useEffect(() => {

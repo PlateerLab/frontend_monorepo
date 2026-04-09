@@ -5,6 +5,7 @@ import type { RouteComponentProps, MainFeatureModule } from '@xgen/types';
 import { FeatureRegistry } from '@xgen/types';
 import { ContentArea, FilterTabs, UploadStatusProvider, UploadStatusPanel } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
+import { useAuth } from '@xgen/auth-provider';
 import './locales';
 
 // ─────────────────────────────────────────────────────────────
@@ -17,8 +18,13 @@ interface DocumentsPageProps extends RouteComponentProps {
 
 const DocumentsPage: React.FC<DocumentsPageProps> = ({ onNavigate }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
-  const plugins = useMemo(() => FeatureRegistry.getDocumentTabPlugins(), []);
+  const plugins = useMemo(() => {
+    const all = FeatureRegistry.getDocumentTabPlugins();
+    const perms = user?.is_superuser ? undefined : (user?.permissions ?? []);
+    return FeatureRegistry.filterMainTabPlugins(all, 'document', perms);
+  }, [user?.is_superuser, user?.permissions]);
   const [activeTab, setActiveTab] = useState(plugins[0]?.id ?? '');
   const [subToolbarContent, setSubToolbarContent] = useState<React.ReactNode>(null);
   const [toolbarExtraContent, setToolbarExtraContent] = useState<React.ReactNode>(null);

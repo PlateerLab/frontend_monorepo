@@ -13,6 +13,7 @@
     "@xgen/types": "workspace:*",
     "@xgen/ui": "workspace:*",
     "@xgen/i18n": "workspace:*",
+    "@xgen/auth-provider": "workspace:*",
     "@xgen/api-client": "workspace:*",
     "next": "^15.1.0",
     "react": "^19.0.0"

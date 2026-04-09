@@ -53,15 +53,24 @@ importers:
       '@xgen/feature-admin-agentflow-store':
         specifier: workspace:*
         version: link:../../features/admin-agentflow-store
+      '@xgen/feature-admin-audit-logs':
+        specifier: workspace:*
+        version: link:../../features/admin-audit-logs
       '@xgen/feature-admin-backend-logs':
         specifier: workspace:*
         version: link:../../features/admin-backend-logs
+      '@xgen/feature-admin-backup':
+        specifier: workspace:*
+        version: link:../../features/admin-backup
       '@xgen/feature-admin-chat-monitoring':
         specifier: workspace:*
         version: link:../../features/admin-chat-monitoring
       '@xgen/feature-admin-database':
         specifier: workspace:*
         version: link:../../features/admin-database
+      '@xgen/feature-admin-error-logs':
+        specifier: workspace:*
+        version: link:../../features/admin-error-logs
       '@xgen/feature-admin-gov-agentflow-approval':
         specifier: workspace:*
         version: link:../../features/admin-gov-agentflow-approval
@@ -95,6 +104,9 @@ importers:
       '@xgen/feature-admin-mcp-station':
         specifier: workspace:*
         version: link:../../features/admin-mcp-station
+      '@xgen/feature-admin-ml-model-control':
+        specifier: workspace:*
+        version: link:../../features/admin-ml-model-control
       '@xgen/feature-admin-node-management':
         specifier: workspace:*
         version: link:../../features/admin-node-management
@@ -104,6 +116,12 @@ importers:
       '@xgen/feature-admin-role-management':
         specifier: workspace:*
         version: link:../../features/admin-role-management
+      '@xgen/feature-admin-security-settings':
+        specifier: workspace:*
+        version: link:../../features/admin-security-settings
+      '@xgen/feature-admin-storage':
+        specifier: workspace:*
+        version: link:../../features/admin-storage
       '@xgen/feature-admin-system-config':
         specifier: workspace:*
         version: link:../../features/admin-system-config
@@ -1708,6 +1726,9 @@ importers:
 
   features/main-agentflow-management-orchestrator:
     dependencies:
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
@@ -1955,6 +1976,9 @@ importers:
 
   features/main-auth-profile-orchestrator:
     dependencies:
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
@@ -2206,6 +2230,9 @@ importers:
 
   features/main-document-management-orchestrator:
     dependencies:
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
@@ -2327,6 +2354,9 @@ importers:
 
   features/main-prompt-management-orchestrator:
     dependencies:
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
@@ -2423,6 +2453,9 @@ importers:
       '@xgen/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n

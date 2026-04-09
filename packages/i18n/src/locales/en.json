@@ -157,6 +157,13 @@
         "title": "Dashboard",
         "description": "Main Dashboard"
       }
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "mainDashboard": {
+        "title": "Dashboard",
+        "description": "Main Dashboard"
+      }
     }
   },
   "dashboard": {

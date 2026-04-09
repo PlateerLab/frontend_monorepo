@@ -5,6 +5,7 @@ import type { RouteComponentProps, MainFeatureModule } from '@xgen/types';
 import { FeatureRegistry } from '@xgen/types';
 import { ContentArea, FilterTabs } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
+import { useAuth } from '@xgen/auth-provider';
 import './locales';
 
 // ─────────────────────────────────────────────────────────────
@@ -17,8 +18,13 @@ interface PromptsPageProps extends RouteComponentProps {
 
 const PromptsPage: React.FC<PromptsPageProps> = ({ onNavigate }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
-  const plugins = useMemo(() => FeatureRegistry.getPromptTabPlugins(), []);
+  const plugins = useMemo(() => {
+    const all = FeatureRegistry.getPromptTabPlugins();
+    const perms = user?.is_superuser ? undefined : (user?.permissions ?? []);
+    return FeatureRegistry.filterMainTabPlugins(all, 'prompt', perms);
+  }, [user?.is_superuser, user?.permissions]);
   const [activeTab, setActiveTab] = useState(plugins[0]?.id ?? '');
   const [subToolbarContent, setSubToolbarContent] = useState<React.ReactNode>(null);
 

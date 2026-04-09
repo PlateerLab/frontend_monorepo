@@ -10,6 +10,7 @@ import {
 } from '@xgen/ui';
 import type { DataTableColumn } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
+import { useAuth } from '@xgen/auth-provider';
 import {
   getAllRoles, createRole, updateRole, deleteRole,
   getRolePermissions, updateRolePermissions,
@@ -568,8 +569,30 @@ type TabId = 'roles' | 'supervision' | 'verify';
 const AdminRoleManagementPage: React.FC<RouteComponentProps> = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Permission prefix → tab mapping
+  const TAB_PERMISSION_PREFIXES: Record<TabId, string> = {
+    roles: 'admin.role:',
+    supervision: 'admin.supervision:',
+    verify: 'admin.permission:',
+  };
+
+  const hasTabPermission = useCallback((tab: TabId): boolean => {
+    if (user?.is_superuser) return true;
+    const prefix = TAB_PERMISSION_PREFIXES[tab];
+    return user?.permissions?.some((p: string) => p.startsWith(prefix)) ?? false;
+  }, [user?.is_superuser, user?.permissions]);
 
   const [activeTab, setActiveTab] = useState<TabId>('roles');
+
+  // Reset active tab if user lacks permission for current tab
+  useEffect(() => {
+    if (!hasTabPermission(activeTab)) {
+      const firstAllowed = (['roles', 'supervision', 'verify'] as TabId[]).find(hasTabPermission);
+      if (firstAllowed) setActiveTab(firstAllowed);
+    }
+  }, [hasTabPermission, activeTab]);
 
   // ── Roles ──
   const [roles, setRoles] = useState<AdminRole[]>([]);
@@ -869,7 +892,7 @@ const AdminRoleManagementPage: React.FC<RouteComponentProps> = () => {
     { id: 'roles', label: t('admin.roleManagement.rolesTab', '역할 관리') },
     { id: 'supervision', label: t('admin.roleManagement.supervisionTab', '감독 관계') },
     { id: 'verify', label: t('admin.roleManagement.verifyTab', '권한 검증') },
-  ];
+  ].filter(tab => hasTabPermission(tab.id));
 
   return (
     <ContentArea

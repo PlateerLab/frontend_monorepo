@@ -59,12 +59,14 @@ function MainPageContent() {
   useEffect(() => {
     async function init() {
       await initializeFeatures();
-      const sidebarSections = featureRegistry.getSidebarSections();
+      // superuser는 모든 섹션 표시, 일반 사용자는 ABAC 권한 기반 필터링
+      const userPerms = user?.is_superuser ? undefined : (user?.permissions ?? []);
+      const sidebarSections = featureRegistry.getSidebarSections(userPerms);
       setSections(sidebarSections);
       setInitialized(true);
     }
     init();
-  }, []);
+  }, [user?.permissions, user?.is_superuser]);
 
   // Handle route from URL
   useEffect(() => {

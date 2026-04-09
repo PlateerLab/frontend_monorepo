@@ -152,12 +152,12 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
 export const mainDashboardFeature: MainFeatureModule = {
   id: 'main-dashboard',
   name: 'Main Dashboard',
-  sidebarSection: 'workspace',
+  sidebarSection: 'dashboard',
   sidebarItems: [
     {
       id: 'main-dashboard',
-      titleKey: 'sidebar.workspace.mainDashboard.title',
-      descriptionKey: 'sidebar.workspace.mainDashboard.description',
+      titleKey: 'sidebar.dashboard.mainDashboard.title',
+      descriptionKey: 'sidebar.dashboard.mainDashboard.description',
     },
   ],
   routes: {

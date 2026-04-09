@@ -243,8 +243,10 @@ export type AdminSidebarSectionId =
   | 'admin-agentflow'
   | 'admin-setting'
   | 'admin-system'
+  | 'admin-security'
   | 'admin-data'
   | 'admin-mcp'
+  | 'admin-ml'
   | 'admin-governance'
   | string;
 
@@ -1391,6 +1393,27 @@ class FeatureRegistryClass {
   private canvasPagePlugins: Map<string, CanvasPagePlugin> = new Map();
   private govMonitoringTabPlugins: Map<string, GovMonitoringTabPlugin> = new Map();
   private agentflowMgmtTabPlugins: Map<string, AgentflowMgmtTabPlugin> = new Map();
+  private mainTabPermMap: Record<string, Record<string, string[]>> = {};
+
+  // ── Main Tab Permission Filtering ──
+  setMainTabPermissionMap(map: Record<string, Record<string, string[]>>): void {
+    this.mainTabPermMap = map;
+  }
+
+  filterMainTabPlugins<T extends { id: string }>(
+    plugins: T[],
+    orchestratorType: string,
+    userPermissions?: string[],
+  ): T[] {
+    if (!userPermissions || userPermissions.includes('*:*')) return plugins;
+    const tabMap = this.mainTabPermMap[orchestratorType];
+    if (!tabMap) return plugins;
+    return plugins.filter(plugin => {
+      const prefixes = tabMap[plugin.id];
+      if (!prefixes) return true;
+      return userPermissions.some(perm => prefixes.some(pfx => perm.startsWith(pfx)));
+    });
+  }
 
   // ── FeatureModule (기존 호환) ──
   register(feature: FeatureModule): void {

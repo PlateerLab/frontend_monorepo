@@ -5,6 +5,7 @@ import type { RouteComponentProps, MainFeatureModule } from '@xgen/types';
 import { FeatureRegistry } from '@xgen/types';
 import { ContentArea, FilterTabs } from '@xgen/ui';
 import { useTranslation } from '@xgen/i18n';
+import { useAuth } from '@xgen/auth-provider';
 import './locales';
 
 // ─────────────────────────────────────────────────────────────
@@ -17,8 +18,13 @@ interface AgentflowsPageProps extends RouteComponentProps {
 
 const AgentflowsPage: React.FC<AgentflowsPageProps> = ({ onNavigate }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
-  const plugins = useMemo(() => FeatureRegistry.getAgentflowTabPlugins(), []);
+  const plugins = useMemo(() => {
+    const all = FeatureRegistry.getAgentflowTabPlugins();
+    const perms = user?.is_superuser ? undefined : (user?.permissions ?? []);
+    return FeatureRegistry.filterMainTabPlugins(all, 'agentflow', perms);
+  }, [user?.is_superuser, user?.permissions]);
   const [activeTab, setActiveTab] = useState(plugins[0]?.id ?? '');
   const [subToolbarContent, setSubToolbarContent] = useState<React.ReactNode>(null);
 
@@ -84,6 +90,7 @@ export const mainAgentflowsFeature: MainFeatureModule = {
   routes: {
     agentflows: AgentflowsPage,
   },
+  requiresAuth: true,
 };
 
 export default mainAgentflowsFeature;
