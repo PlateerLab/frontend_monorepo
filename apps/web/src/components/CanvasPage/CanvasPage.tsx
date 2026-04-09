@@ -43,6 +43,13 @@ import { TemplatePanel } from '@xgen/feature-canvas-sidebar-templates';
 import { AgentflowPanel } from '@xgen/feature-canvas-sidebar-agentflows';
 import { DeploymentModal } from '@xgen/feature-canvas-deploy';
 import { TutorialOverlay, TutorialPanel as TutorialPanelComponent } from '@xgen/feature-canvas-tutorial';
+import {
+    VirtualTutorialOverlay,
+    VirtualTutorialProvider,
+    ScenarioSelectModal,
+    VIRTUAL_TUTORIALS,
+    useVirtualTutorial,
+} from '@xgen/feature-canvas-tutorial';
 import type { TutorialData } from '@xgen/feature-canvas-tutorial';
 
 import styles from './CanvasPage.module.scss';
@@ -100,6 +107,34 @@ function validateAgentflowName(name: string): string {
     if (!name || typeof name !== 'string') return 'Agentflow';
     return name.trim().replace(/[<>:"/\\|?*]/g, '_') || 'Agentflow';
 }
+
+/** 가상 커서 튜토리얼 시나리오 선택 모달 (Provider 내부에서 사용) */
+const VirtualTutorialScenarioModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+    const { state, scenarios, start } = useVirtualTutorial();
+    return (
+        <ScenarioSelectModal
+            scenarios={scenarios}
+            completedScenarios={state.completedScenarios}
+            onSelect={(id: string) => { start(id); onClose(); }}
+            onClose={onClose}
+        />
+    );
+};
+
+/** 재생 버튼에서 직접 시나리오를 시작하는 헬퍼 */
+const VirtualTutorialStartHelper: React.FC<{
+    scenarioId: string | null;
+    onConsumed: () => void;
+}> = ({ scenarioId, onConsumed }) => {
+    const { start } = useVirtualTutorial();
+    useEffect(() => {
+        if (scenarioId) {
+            start(scenarioId);
+            onConsumed();
+        }
+    }, [scenarioId, start, onConsumed]);
+    return null;
+};
 
 // ── Component ──────────────────────────────────────────────────
 
@@ -179,6 +214,8 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
     const [tutorialData, setTutorialData] = useState<TutorialData | null>(null);
     const [tutorialStep, setTutorialStep] = useState(0);
     const [isTutorialAnimating, setIsTutorialAnimating] = useState(false);
+    const [showVirtualTutorialModal, setShowVirtualTutorialModal] = useState(false);
+    const [pendingVirtualScenarioId, setPendingVirtualScenarioId] = useState<string | null>(null);
 
     // ── Plugin context ──
     const pluginContext: CanvasPluginContext = useMemo(() => ({
@@ -1107,6 +1144,13 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
             <TutorialPanelComponent
                 onBack={onBack}
                 onSelectTutorial={handleStartTutorial}
+                onStartVirtualTutorial={(tutorialId: string) => {
+                    // tutorialId → virtual scenario ID 변환 후 직접 시작
+                    setShowVirtualTutorialModal(false);
+                    const scenarioId = `virtual-${tutorialId}`;
+                    // VirtualTutorialStartHelper로 위임
+                    setPendingVirtualScenarioId(scenarioId);
+                }}
             />
         );
         Wrapped.displayName = 'TutorialPanelWrapped';
@@ -1183,6 +1227,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
         (!currentCanvasState.nodes || currentCanvasState.nodes.length === 0);
 
     return (
+        <VirtualTutorialProvider scenarios={VIRTUAL_TUTORIALS}>
         <div className={styles.pageContainer}>
             {/* Header */}
             {HeaderComponent && (
@@ -1417,6 +1462,26 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                 />
             )}
 
+            {/* Virtual Cursor Tutorial */}
+            <VirtualTutorialOverlay
+                canvasRef={canvasRef}
+                onTutorialStart={() => setDirectPanel(null)}
+                onTutorialEnd={() => setDirectPanel('tutorial')}
+            />
+
+            {/* Virtual Tutorial Scenario Select Modal */}
+            {showVirtualTutorialModal && (
+                <VirtualTutorialScenarioModal
+                    onClose={() => setShowVirtualTutorialModal(false)}
+                />
+            )}
+
+            {/* 재생 버튼에서 직접 시작 */}
+            <VirtualTutorialStartHelper
+                scenarioId={pendingVirtualScenarioId}
+                onConsumed={() => setPendingVirtualScenarioId(null)}
+            />
+
             <input
                 ref={fileInputRef}
                 type="file"
@@ -1425,6 +1490,7 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ onNavigate, sidebarCollapsed })
                 onChange={handleFileChange}
             />
         </div>
+        </VirtualTutorialProvider>
     );
 };
 

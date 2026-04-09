@@ -81,6 +81,8 @@ export const NodePorts: React.FC<NodePortsProps> = ({
                                     ref={(el) => registerPortRef && registerPortRef(nodeId, portData.id, 'input', el)}
                                     className={portClasses}
                                     data-port-id={portData.id}
+                                    data-tutorial-port="input"
+                                    data-tutorial-node-id={nodeId}
                                     onMouseDown={isPreview ? undefined : (e) => {
                                         e.stopPropagation();
                                         onPortMouseDown({
@@ -154,6 +156,8 @@ export const NodePorts: React.FC<NodePortsProps> = ({
                                     ref={(el) => registerPortRef && registerPortRef(nodeId, portData.id, 'output', el)}
                                     className={portClasses}
                                     data-port-id={portData.id}
+                                    data-tutorial-port="output"
+                                    data-tutorial-node-id={nodeId}
                                     onMouseDown={isPreview ? undefined : (e) => {
                                         e.stopPropagation();
                                         onPortMouseDown({
