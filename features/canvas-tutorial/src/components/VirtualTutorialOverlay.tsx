@@ -19,6 +19,20 @@ import TutorialTopBar from './TutorialTopBar';
 /** 기본 자동 진행 딜레이 (명시적 autoAdvanceDelay가 없을 때) */
 const DEFAULT_AUTO_ADVANCE_MS = 1200;
 
+/** 노드 크기 추정 상수 */
+const NODE_WIDTH = 350;
+const BASE_NODE_HEIGHT = 140;
+const PORT_ROW_HEIGHT = 36;
+const PARAM_ROW_HEIGHT = 48;
+
+function estimateNodeHeight(data: Record<string, unknown> | undefined): number {
+    const inputs = Array.isArray(data?.inputs) ? (data.inputs as unknown[]).length : 0;
+    const outputs = Array.isArray(data?.outputs) ? (data.outputs as unknown[]).length : 0;
+    const params = Array.isArray(data?.parameters) ? (data.parameters as unknown[]).length : 0;
+    const portRows = Math.max(inputs, outputs);
+    return Math.max(200, BASE_NODE_HEIGHT + portRows * PORT_ROW_HEIGHT + params * PARAM_ROW_HEIGHT);
+}
+
 interface VirtualTutorialOverlayProps {
     canvasRef: React.RefObject<CanvasRefHandle | null>;
     onTutorialStart?: () => void;
@@ -77,10 +91,10 @@ const VirtualTutorialOverlay: React.FC<VirtualTutorialOverlayProps> = ({
         currentStep,
         currentScenario,
         next,
-        prev,
         skip,
         pause,
         resume,
+        goTo,
     } = useVirtualTutorial();
 
     // 시나리오 시작/종료 감지 → 콜백 호출
@@ -121,21 +135,12 @@ const VirtualTutorialOverlay: React.FC<VirtualTutorialOverlayProps> = ({
                 let fittedView = currentScenario.view;
 
                 if (addNodeSteps.length > 0) {
-                    const NODE_WIDTH = 350;
-                    const BASE_NODE_HEIGHT = 140;
-                    const PORT_ROW_HEIGHT = 36;
-                    const PARAM_ROW_HEIGHT = 48;
                     const PADDING = 200;
 
                     const nodeRects = addNodeSteps.map((s) => {
                         const pos = s.targetPosition!;
                         const data = s.nodeData as Record<string, unknown> | undefined;
-                        const inputs = Array.isArray(data?.inputs) ? (data.inputs as unknown[]).length : 0;
-                        const outputs = Array.isArray(data?.outputs) ? (data.outputs as unknown[]).length : 0;
-                        const params = Array.isArray(data?.parameters) ? (data.parameters as unknown[]).length : 0;
-                        const portRows = Math.max(inputs, outputs);
-                        const estimatedHeight = BASE_NODE_HEIGHT + portRows * PORT_ROW_HEIGHT + params * PARAM_ROW_HEIGHT;
-                        const h = Math.max(200, estimatedHeight);
+                        const h = estimateNodeHeight(data);
                         return { x: pos.x, y: pos.y, w: NODE_WIDTH, h };
                     });
 
@@ -286,6 +291,73 @@ const VirtualTutorialOverlay: React.FC<VirtualTutorialOverlayProps> = ({
 
     const targetRect = rawTargetRect ?? computedTargetRect ?? (state.isActive && currentStep ? fallbackRect : null);
 
+    // ── 현재 캔버스에 있는 노드/엣지의 실제 DOM 위치 수집 (스포트라이트용) ──
+    const [canvasHighlightRects, setCanvasHighlightRects] = useState<DOMRect[]>([]);
+    const [edgePolylines, setEdgePolylines] = useState<string[]>([]);
+
+    const collectHighlights = useCallback(() => {
+        const rects: DOMRect[] = [];
+        document.querySelectorAll('[data-node-id]').forEach((el) => {
+            rects.push(el.getBoundingClientRect());
+        });
+        setCanvasHighlightRects(rects);
+
+        const polylines: string[] = [];
+        document.querySelectorAll('[data-edge-id]').forEach((group) => {
+            const pathEl = group.querySelector('path:last-of-type') as SVGPathElement | null;
+            if (!pathEl) return;
+            const totalLength = pathEl.getTotalLength();
+            if (totalLength <= 0) return;
+            const ctm = pathEl.getScreenCTM();
+            if (!ctm) return;
+            const steps = Math.max(20, Math.ceil(totalLength / 10));
+            const points: string[] = [];
+            for (let i = 0; i <= steps; i++) {
+                const pt = pathEl.getPointAtLength((i / steps) * totalLength);
+                const screenX = ctm.a * pt.x + ctm.c * pt.y + ctm.e;
+                const screenY = ctm.b * pt.x + ctm.d * pt.y + ctm.f;
+                points.push(`${screenX},${screenY}`);
+            }
+            polylines.push(points.join(' '));
+        });
+        setEdgePolylines(polylines);
+    }, []);
+
+    // 스텝 전환 시 하이라이트 수집
+    useEffect(() => {
+        if (!state.isActive || !viewReady) {
+            setCanvasHighlightRects([]);
+            setEdgePolylines([]);
+            return;
+        }
+        const timer = setTimeout(collectHighlights, 100);
+        return () => clearTimeout(timer);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [state.isActive, state.currentStepIndex, viewReady, viewVersion, collectHighlights]);
+
+    // 사용자 확대/축소/패닝 시 하이라이트 실시간 동기화
+    useEffect(() => {
+        if (!state.isActive || !viewReady) return;
+
+        const container = document.querySelector('[class*="canvasContainer"]');
+        if (!container) return;
+
+        let rafId = 0;
+        const handleViewChange = () => {
+            cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(collectHighlights);
+        };
+
+        container.addEventListener('wheel', handleViewChange, { passive: true });
+        container.addEventListener('mousemove', handleViewChange, { passive: true });
+
+        return () => {
+            cancelAnimationFrame(rafId);
+            container.removeEventListener('wheel', handleViewChange);
+            container.removeEventListener('mousemove', handleViewChange);
+        };
+    }, [state.isActive, viewReady, collectHighlights]);
+
     // ── 자동 진행 ──
     const autoAdvanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -412,14 +484,13 @@ const VirtualTutorialOverlay: React.FC<VirtualTutorialOverlayProps> = ({
                 title={currentStep.stepTitle ?? currentScenario.titleKey}
                 message={currentStep.stepMessage}
                 isPaused={state.isPaused}
-                onPrev={prev}
-                onNext={next}
+                onGoTo={goTo}
                 onPause={pause}
                 onResume={resume}
                 onStop={skip}
             />
 
-            <SpotlightMask targetRect={targetRect} />
+            <SpotlightMask targetRect={null} highlightRects={canvasHighlightRects} edgePolylines={edgePolylines} />
 
             <VirtualCursor
                 x={cursorState.x}

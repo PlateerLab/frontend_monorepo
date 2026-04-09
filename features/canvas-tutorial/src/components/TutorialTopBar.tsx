@@ -12,10 +12,8 @@ interface TutorialTopBarProps {
     message?: string;
     /** 일시정지 여부 */
     isPaused?: boolean;
-    /** 이전 스텝 콜백 */
-    onPrev?: () => void;
-    /** 다음 스텝 콜백 */
-    onNext?: () => void;
+    /** 특정 단계로 이동 (0-based index) */
+    onGoTo?: (stepIndex: number) => void;
     /** 일시정지 콜백 */
     onPause?: () => void;
     /** 재개 콜백 */
@@ -35,8 +33,7 @@ const TutorialTopBar: React.FC<TutorialTopBarProps> = (props: TutorialTopBarProp
         title,
         message,
         isPaused = false,
-        onPrev,
-        onNext,
+        onGoTo,
         onPause,
         onResume,
         onStop,
@@ -61,45 +58,13 @@ const TutorialTopBar: React.FC<TutorialTopBarProps> = (props: TutorialTopBarProp
         return () => observer.disconnect();
     }, []);
 
-    const isFirst = currentStep <= 1;
-    const isLast = currentStep >= totalSteps;
-
     return (
         <div style={{ ...containerStyle, left: sidebarWidth }}>
-            {/* 좌측: 단계 뱃지 + < > 네비게이션 + 제목 */}
+            {/* 좌측: 단계 뱃지 + 제목 */}
             <div style={leftStyle}>
                 <span style={badgeStyle}>
                     {currentStep}/{totalSteps} 단계
                 </span>
-
-                {/* < > 네비게이션 */}
-                <div style={navStyle}>
-                    <button
-                        type="button"
-                        style={{
-                            ...navBtnStyle,
-                            ...(isFirst ? navBtnDisabledStyle : {}),
-                        }}
-                        onClick={onPrev}
-                        disabled={isFirst}
-                        title="이전 단계"
-                    >
-                        ‹
-                    </button>
-                    <button
-                        type="button"
-                        style={{
-                            ...navBtnStyle,
-                            ...(isLast ? navBtnDisabledStyle : {}),
-                        }}
-                        onClick={onNext}
-                        disabled={isLast}
-                        title="다음 단계"
-                    >
-                        ›
-                    </button>
-                </div>
-
                 <span style={titleStyle}>{title}</span>
             </div>
 
@@ -111,18 +76,29 @@ const TutorialTopBar: React.FC<TutorialTopBarProps> = (props: TutorialTopBarProp
             {/* 우측: 진행 점 + 일시정지 + 종료 */}
             <div style={rightStyle}>
                 <div style={dotsStyle}>
-                    {Array.from({ length: totalSteps }, (_, i) => (
-                        <span
-                            key={i}
-                            style={{
-                                width: 8,
-                                height: 8,
-                                borderRadius: '50%',
-                                background: i < currentStep ? '#4f46e5' : '#e5e7eb',
-                                transition: 'background 0.3s ease',
-                            }}
-                        />
-                    ))}
+                    {Array.from({ length: totalSteps }, (_, i) => {
+                        const stepNum = i + 1;
+                        const isCompleted = stepNum < currentStep;
+                        const isCurrent = stepNum === currentStep;
+                        return (
+                            <button
+                                key={i}
+                                type="button"
+                                onClick={() => onGoTo?.(i)}
+                                title={`${stepNum}단계로 이동`}
+                                style={{
+                                    width: isCurrent ? 20 : 10,
+                                    height: 10,
+                                    borderRadius: 5,
+                                    border: 'none',
+                                    padding: 0,
+                                    background: isCurrent ? '#4f46e5' : isCompleted ? '#818cf8' : '#e5e7eb',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease',
+                                }}
+                            />
+                        );
+                    })}
                 </div>
 
                 {/* 일시정지 / 재개 버튼 */}
@@ -205,34 +181,6 @@ const badgeStyle: React.CSSProperties = {
     whiteSpace: 'nowrap',
 };
 
-const navStyle: React.CSSProperties = {
-    display: 'flex',
-    gap: 2,
-    alignItems: 'center',
-};
-
-const navBtnStyle: React.CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 24,
-    height: 24,
-    padding: 0,
-    border: '1px solid #d1d5db',
-    borderRadius: 6,
-    background: '#fff',
-    color: '#374151',
-    fontSize: '1rem',
-    fontWeight: 600,
-    lineHeight: 1,
-    cursor: 'pointer',
-    transition: 'all 0.15s',
-};
-
-const navBtnDisabledStyle: React.CSSProperties = {
-    opacity: 0.35,
-    cursor: 'default',
-};
 
 const titleStyle: React.CSSProperties = {
     fontWeight: 600,
