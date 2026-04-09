@@ -110,11 +110,12 @@ frontend_monorepo/
 │   ├── main-teams/                ← ★ 메인 feature (사이드바 등록 + 3-column 레이아웃)
 │   │   └── src/
 │   │       ├── index.tsx          # MainFeatureModule export (사이드바 + 라우트)
-│   │       ├── TeamsPage.tsx      # 3-column 레이아웃 (방목록 + 채팅 + 패널)
+│   │       ├── TeamsPage.tsx      # 2-column 레이아웃 (좌측 사이드바 + 우측 채팅)
 │   │       ├── components/
-│   │       │   ├── RoomList/      # 채팅방 목록 (좌측)
-│   │       │   ├── ChatRoom/      # 채팅 영역 (중앙)
-│   │       │   ├── AgentPanel/    # 에이전트/멤버/로그 패널 (우측)
+│   │       │   ├── Sidebar/       # 좌측 패널 (채팅방 목록 + 워크플로우 목록)
+│   │       │   ├── TopBar/        # 상단 바 (채팅방명 + 검색 + 멤버 + 프로필)
+│   │       │   ├── ChatRoom/      # 채팅 영역 (우측)
+│   │       │   ├── MemberPanel/   # 멤버 패널 (상단 아이콘 클릭 시 표시)
 │   │       │   └── Router/        # 하이브리드 라우터 로직
 │   │       ├── hooks/
 │   │       │   ├── useTeamsWebSocket.ts
@@ -130,7 +131,7 @@ frontend_monorepo/
 ```
 
 **기존 패턴과의 통일성:**
-- `main-chat-current`가 자체 채팅 레이아웃을 가지듯, `main-teams`도 자체 3-column 레이아웃 관리
+- `main-chat-current`가 자체 채팅 레이아웃을 가지듯, `main-teams`도 자체 2-column 레이아웃 관리
 - `MainFeatureModule` 인터페이스를 따라 `sidebarSection`, `sidebarItems`, `routes` export
 - 별도 라우트(`/teams`) 없이 `/main?section=teams`로 접근
 
@@ -138,58 +139,122 @@ frontend_monorepo/
 
 ## 2. 화면 구성
 
-### 2.1 전체 레이아웃 (Teams 스타일 3-Column)
+### 2.1 전체 레이아웃 (Teams 스타일 2-Column)
+
+> 참고: Microsoft Teams UI를 최대한 따라감
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  XGEN-Teams                                        [👤 프로필]  │
-├──────────┬─────────────────────────────────┬────────────────────┤
-│          │                                 │                    │
-│  채팅방   │        채팅 영역                │   에이전트 패널    │
-│  목록     │                                 │                    │
-│          │  ┌─ 김철수 ──────────────────┐  │  ★ 초대된 에이전트  │
-│  ● 마케팅 │  │ 뉴스 분석하고 메일 보내줘   │  │  ┌──────────────┐ │
-│  ● 개발   │  └─────────────────────────────┘ │  │ 🤖 뉴스분석봇 │ │
-│  ○ 분석   │                                 │  │ 🤖 이메일봇   │ │
-│  + 새방   │  ┌─ 🤖 라우터 ────────────────┐ │  │ 🤖 요약봇     │ │
-│          │  │ 뉴스분석봇에게 전달합니다     │  │  │ + 에이전트    │ │
-│          │  └─────────────────────────────┘ │  │   추가         │ │
-│  ─────── │                                 │  └──────────────┘ │
-│  접속 중  │  ┌─ @뉴스분석봇 ────────────┐  │                    │
-│  👤 김철수│  │ TOP3 뉴스입니다:          │  │  ★ 접속 중인 멤버  │
-│  👤 박영희│  │ 1. AI 반도체...           │  │  ┌──────────────┐ │
-│          │  │ [결과 보기] [로그 보기]     │ │  │ 👤 김철수     │ │
-│          │  └─────────────────────────────┘ │  │ 👤 박영희     │ │
-│          │                                 │  └──────────────┘ │
-│          │  ┌─ 🤖 라우터 ────────────────┐ │                    │
-│          │  │ 이메일봇에게 전달합니다       │ │  ★ 실행 로그       │
-│          │  └─────────────────────────────┘ │  ┌──────────────┐ │
-│          │                                 │  │ 14:32 뉴스봇  │ │
-│          │  ┌─ @이메일봇 ────────────────┐ │  │  → 완료 (3.2s) │ │
-│          │  │ 전 직원에게 발송 완료했습니다 │ │  │ 14:35 메일봇  │ │
-│          │  │ [발송 결과] [로그 보기]     │  │  │  → 실행 중...  │ │
-│          │  └─────────────────────────────┘ │  └──────────────┘ │
-│          │                                 │                    │
-│          │  ┌──────────────────────────┐   │                    │
-│          │  │ 메시지를 입력하세요...     │   │                    │
-│          │  │              [@] [📎] [→] │   │                    │
-│          │  └──────────────────────────┘   │                    │
-├──────────┴─────────────────────────────────┴────────────────────┤
-│  XGEN Platform v2.0                                             │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│ [←][→]        🔍 검색 (Ctrl+E)                  [···] [👤] [👥20] │
+├────────────┬────────────────────────────────────────────────────────┤
+│            │  [동호회] 러닝메이트 ✏️   채팅  공유  [+]     [📞][🎥]│
+│  채팅      │────────────────────────────────────────────────────────│
+│  ┌───────┐ │                                                        │
+│  │읽지않음│ │  👤 김철수  오전 10:43                                  │
+│  │채널   │ │  ┌──────────────────────────────────────────────┐      │
+│  │채팅   │ │  │ 뉴스 분석하고 전직원한테 메일로 공지해줘        │      │
+│  └───────┘ │  └──────────────────────────────────────────────┘      │
+│            │                                                        │
+│  ▼ 즐겨찾기│  🤖 라우터  오전 10:43                                  │
+│  👤 나     │  ┌──────────────────────────────────────────────┐      │
+│            │  │ 📡 뉴스분석봇 → 이메일봇 순서로 실행합니다    │      │
+│  ▼ 채팅방  │  └──────────────────────────────────────────────┘      │
+│  🏢 마케팅 │                                                        │
+│  🏢 개발   │  🤖 @뉴스분석봇  오전 10:44                             │
+│  🏢 분석   │  ┌──────────────────────────────────────────────┐      │
+│            │  │ TOP3 뉴스입니다:                               │      │
+│  ▼ 워크플로│  │ 1. AI 반도체 시장 급성장...                    │      │
+│  🔧 뉴스봇 │  │ 2. 글로벌 공급망 재편...                       │      │
+│  🔧 번역봇 │  │ 3. 친환경 에너지 전환...                       │      │
+│  🔧 이메일 │  │                          [📋 결과] [📊 로그]  │      │
+│  🔧 요약봇 │  └──────────────────────────────────────────────┘      │
+│  🔧 분석봇 │                                                        │
+│            │  🤖 @이메일봇  오전 10:45                               │
+│            │  ┌──────────────────────────────────────────────┐      │
+│  + 방 만들기│  │ 전 직원(42명)에게 발송 완료했습니다.            │      │
+│            │  │                          [📋 결과] [📊 로그]  │      │
+│            │  └──────────────────────────────────────────────┘      │
+│            │                                                        │
+│            │  ┌──────────────────────────────────────────────┐      │
+│            │  │ 메시지를 입력하세요...        [✏️][😊][📎][+][→]│      │
+│            │  └──────────────────────────────────────────────┘      │
+└────────────┴────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 핵심 UI 요소
+### 2.2 상단 바 상세
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ [←][→]        🔍 검색 (Ctrl+E)                  [···] [👤] [👥20] │
+└─────────────────────────────────────────────────────────────────────┘
+  │                   │                               │    │    │
+  │                   │                               │    │    └─ 멤버 아이콘
+  │                   │                               │    │       클릭 시 멤버 패널 열림
+  │                   │                               │    │       (현재 방 참여자 목록 + 초대)
+  │                   │                               │    └─ 내 프로필
+  │                   │                               └─ 더보기 메뉴
+  │                   └─ 통합 검색 (멤버 검색 + 초대 / 방 검색 / 메시지 검색)
+  └─ 네비게이션 (뒤로/앞으로)
+```
+
+### 2.3 멤버 패널 (👥 클릭 시 오른쪽에서 슬라이드)
+
+```
+                                          ┌────────────────────┐
+                                          │  참여 멤버 (5)  [X]│
+                                          │──────────────────── │
+                                          │  🔍 멤버 검색...    │
+                                          │                    │
+                                          │  👤 김철수 (방장)   │
+                                          │     ● 온라인       │
+                                          │  👤 박영희         │
+                                          │     ● 온라인       │
+                                          │  👤 이민호         │
+                                          │     ○ 오프라인     │
+                                          │                    │
+                                          │  [+ 멤버 초대]     │
+                                          └────────────────────┘
+```
+
+### 2.4 좌측 사이드바 상세
+
+```
+┌────────────┐
+│  채팅       │ ← 상단 타이틀 + [...] [🔍] [✏️+] 버튼
+│ ┌─────────┐│
+│ │읽지않음  ││ ← 필터 탭 (읽지않음 / 채널 / 채팅)
+│ │채널  채팅││
+│ └─────────┘│
+│            │
+│ ▼ 즐겨찾기  │ ← 접히는 섹션 (Teams와 동일)
+│   👤 나    │
+│            │
+│ ▼ 채팅방    │ ← 접히는 섹션 — 생성한 Teams 방 목록
+│   🏢 마케팅│    각 방에 읽지않은 메시지 배지
+│   🏢 개발  │
+│   🏢 분석  │
+│            │
+│ ▼ 워크플로우│ ← 접히는 섹션 — 사용 가능한 에이전트(워크플로우) 목록
+│   🔧 뉴스봇│    방에 초대 가능한 워크플로우를 미리 보여줌
+│   🔧 번역봇│    클릭 시 해당 워크플로우 상세 정보 또는 1:1 실행
+│   🔧 이메일│
+│   🔧 요약봇│
+│            │
+│ [+ 방 만들기]│ ← 하단 고정 버튼
+└────────────┘
+```
+
+### 2.5 핵심 UI 요소
 
 | 요소 | 설명 |
 |------|------|
-| **채팅방 목록** | Teams 좌측 패널. 방 생성/삭제/검색. 읽지 않은 메시지 배지 |
-| **접속 멤버** | 좌측 하단. 현재 채팅방에 접속 중인 사용자 목록 (WebSocket 기반) |
-| **채팅 영역** | 메시지 버블. 사용자/에이전트별 아바타/색상 구분. 라우터 알림 메시지 |
-| **메시지 입력** | `@` 멘션 자동완성 (에이전트 + 사용자), 파일 첨부, 전송 |
-| **에이전트 패널** | 현재 방에 초대된 에이전트 목록. 추가/제거/상태 표시 |
-| **접속 멤버 패널** | 우측. 현재 방에 접속 중인 사용자 목록 |
-| **로그 뷰어** | 에이전트별 실행 로그. 토큰 수, 소요시간, 노드 진행상태 |
+| **상단 바** | 검색창 (중앙, Ctrl+E), 프로필, 멤버 아이콘 (👥 + 참여자 수) |
+| **좌측 사이드바** | 채팅방 목록 + 워크플로우 목록. 필터 탭, 즐겨찾기, 접히는 섹션 |
+| **채팅 영역** | 메시지 버블. 사용자/에이전트별 아바타 구분. 라우터 알림 메시지 |
+| **채팅 헤더** | 방 이름 + 채팅/공유 탭 + 화상/음성 버튼 (향후) |
+| **메시지 입력** | `@` 멘션 자동완성, 이모지, 파일 첨부, 전송 |
+| **멤버 패널** | 상단 👥 클릭 시 우측 슬라이드. 참여 멤버 목록 + 초대 기능 |
+| **로그 보기** | 에이전트 응답 메시지의 [📊 로그] 버튼 클릭 시 모달로 표시 |
 
 ---
 
@@ -678,8 +743,9 @@ class TeamsWebSocketHub:
 | 1-1 | Teams feature 모듈 생성 | `features/main-teams/` | `MainFeatureModule` export (사이드바 + 라우트) |
 | 1-2 | feature-registry 등록 | `apps/web/src/features/feature-registry.ts` | `import('@xgen/main-teams')` 한 줄 추가 |
 | 1-3 | Teams 타입 정의 | `packages/types/src/teams.ts` | Room, Message, Agent, Router, Member 타입 |
-| 1-4 | 3-Column 레이아웃 | `features/main-teams/src/TeamsPage.tsx` | 좌측 방목록 + 중앙 채팅 + 우측 패널 |
-| 1-5 | next.config 업데이트 | `apps/web/next.config.ts` | transpilePackages에 `@xgen/main-teams` 추가 |
+| 1-4 | 2-Column 레이아웃 | `features/main-teams/src/TeamsPage.tsx` | 좌측 사이드바 + 우측 채팅 영역 |
+| 1-5 | 상단 바 | `features/main-teams/src/components/TopBar/` | 검색창 + 프로필 + 멤버 아이콘 |
+| 1-6 | next.config 업데이트 | `apps/web/next.config.ts` | transpilePackages에 `@xgen/main-teams` 추가 |
 
 **백엔드:**
 
@@ -701,10 +767,10 @@ class TeamsWebSocketHub:
 
 | # | 작업 | 파일/위치 | 설명 |
 |---|------|----------|------|
-| 2-1 | 방 목록 컴포넌트 | `features/main-teams/src/components/RoomList/` | 방 리스트, 검색, 생성 버튼 |
-| 2-2 | 방 생성 모달 | `features/main-teams/src/components/RoomList/` | 이름, 설명 + 초기 에이전트/멤버 선택 |
+| 2-1 | 좌측 사이드바 | `features/main-teams/src/components/Sidebar/` | 채팅방 목록 + 워크플로우 목록 + 필터 탭 + 즐겨찾기 |
+| 2-2 | 방 생성 모달 | `features/main-teams/src/components/Sidebar/` | 이름, 설명 + 초기 에이전트/멤버 선택 |
 | 2-3 | API 클라이언트 | `packages/api-client/src/teams.ts` | 방 CRUD + 멤버/에이전트 API |
-| 2-4 | 방 상태 관리 | `features/main-teams/src/hooks/` | 선택된 방, 방 전환 로직 |
+| 2-4 | 방 상태 관리 | `features/main-teams/src/hooks/useRoomState.ts` | 선택된 방, 방 전환 로직 |
 
 **백엔드:**
 
@@ -727,11 +793,12 @@ class TeamsWebSocketHub:
 | # | 작업 | 파일/위치 | 설명 |
 |---|------|----------|------|
 | 3-1 | 채팅 메시지 UI | `features/main-teams/src/components/ChatRoom/` | 메시지 버블 (사용자/에이전트별 아바타) |
-| 3-2 | 메시지 입력 | `features/main-teams/src/components/ChatRoom/` | @멘션 자동완성, 파일 첨부 |
-| 3-3 | WebSocket 연결 | `features/main-teams/src/hooks/useTeamsWebSocket.ts` | 연결/재연결/이벤트 핸들링 |
-| 3-4 | 에이전트 실행 연동 | `features/main-teams/src/hooks/useAgentExecution.ts` | 실행 요청 → SSE→WebSocket 스트리밍 수신 |
-| 3-5 | 접속 멤버 표시 | `features/main-teams/src/components/AgentPanel/` | 온라인 멤버 목록 (WebSocket 기반) |
-| 3-6 | 라우터 알림 메시지 | `features/main-teams/src/components/ChatRoom/` | 시스템 메시지 표시 |
+| 3-2 | 채팅 헤더 | `features/main-teams/src/components/ChatRoom/ChatHeader.tsx` | 방 이름 + 채팅/공유 탭 |
+| 3-3 | 메시지 입력 | `features/main-teams/src/components/ChatRoom/` | @멘션 자동완성, 이모지, 파일 첨부 |
+| 3-4 | WebSocket 연결 | `features/main-teams/src/hooks/useTeamsWebSocket.ts` | 연결/재연결/이벤트 핸들링 |
+| 3-5 | 에이전트 실행 연동 | `features/main-teams/src/hooks/useAgentExecution.ts` | 실행 요청 → SSE→WebSocket 스트리밍 수신 |
+| 3-6 | 멤버 패널 | `features/main-teams/src/components/MemberPanel/` | 👥 클릭 → 우측 슬라이드 (멤버 목록 + 초대) |
+| 3-7 | 라우터 알림 메시지 | `features/main-teams/src/components/ChatRoom/` | 시스템 메시지 표시 |
 
 **백엔드:**
 
@@ -770,28 +837,27 @@ class TeamsWebSocketHub:
 
 ---
 
-### Phase 5: 에이전트 패널 + 로그 뷰어
+### Phase 5: 워크플로우 관리 + 로그 뷰어
 
-> 목표: 우측 패널에서 에이전트 관리 및 실행 로그 확인
+> 목표: 좌측 사이드바 워크플로우 목록 강화, 실행 로그 모달
 
 **프론트엔드:**
 
 | # | 작업 | 파일/위치 | 설명 |
 |---|------|----------|------|
-| 5-1 | 에이전트 목록 패널 | `features/main-teams/src/components/AgentPanel/` | 초대된 에이전트 카드 목록 |
-| 5-2 | 에이전트 추가 모달 | `features/main-teams/src/components/AgentPanel/` | 워크플로우 검색 + 초대 |
-| 5-3 | 에이전트 상태 표시 | `features/main-teams/src/components/AgentPanel/` | online/busy/error 뱃지 |
-| 5-4 | 로그 뷰어 | `features/main-teams/src/components/LogViewer/` | 실행 타임라인, 노드 상태 |
-| 5-5 | 로그 상세 모달 | `features/main-teams/src/components/LogViewer/` | 토큰 수, 소요시간, 원본 로그 |
+| 5-1 | 워크플로우 목록 | `features/main-teams/src/components/Sidebar/WorkflowList.tsx` | 좌측 사이드바에 워크플로우 목록 (상태 표시) |
+| 5-2 | 에이전트 초대 UX | `features/main-teams/src/components/Sidebar/` | 워크플로우를 방에 드래그 또는 우클릭 초대 |
+| 5-3 | 로그 모달 | `features/main-teams/src/components/LogViewer/LogDetailModal.tsx` | 메시지 [📊 로그] 버튼 → 모달 (타임라인, 노드 상태, 토큰) |
+| 5-4 | 결과 모달 | `features/main-teams/src/components/LogViewer/` | 메시지 [📋 결과] 버튼 → 상세 결과 모달 |
 
 **백엔드:**
 
 | # | 작업 | 설명 |
 |---|------|------|
-| 5-6 | 실행 로그 API | 로그 저장/조회 |
-| 5-7 | 에이전트 상태 추적 | 실행 중 상태를 WebSocket으로 브로드캐스트 |
+| 5-5 | 실행 로그 API | 로그 저장/조회 |
+| 5-6 | 에이전트 상태 추적 | 실행 중 상태를 WebSocket으로 브로드캐스트 |
 
-**결과물:** 에이전트 추가/제거, 실행 로그 실시간 확인
+**결과물:** 워크플로우 목록에서 에이전트 관리, 메시지 내 로그/결과 모달 확인
 
 ---
 
@@ -824,41 +890,46 @@ features/main-teams/
     │                                  # → sidebarSection: 'chat'
     │                                  # → sidebarItems: [{ id: 'teams', ... }]
     │                                  # → routes: { 'teams': TeamsPage }
-    ├── TeamsPage.tsx                  # 3-column 메인 레이아웃
+    ├── TeamsPage.tsx                  # 2-column 메인 레이아웃 (사이드바 + 채팅)
     ├── TeamsPage.module.scss
     │
     ├── components/
-    │   ├── RoomList/                  # 좌측 패널 — 채팅방 목록
-    │   │   ├── RoomList.tsx
-    │   │   ├── RoomCard.tsx
-    │   │   ├── CreateRoomModal.tsx
-    │   │   └── RoomSearch.tsx
+    │   ├── TopBar/                    # 상단 바
+    │   │   ├── TopBar.tsx             # 검색창 + 프로필 + 멤버 아이콘
+    │   │   └── GlobalSearch.tsx       # 통합 검색 (멤버/방/메시지)
     │   │
-    │   ├── ChatRoom/                  # 중앙 — 채팅 영역
-    │   │   ├── ChatRoom.tsx
-    │   │   ├── TeamsMessageList.tsx
-    │   │   ├── TeamsMessageItem.tsx
-    │   │   ├── TeamsMessageInput.tsx
-    │   │   ├── MentionAutocomplete.tsx
-    │   │   ├── RouterNotice.tsx
-    │   │   └── AgentSelectFallback.tsx
+    │   ├── Sidebar/                   # 좌측 패널
+    │   │   ├── TeamsSidebar.tsx       # 사이드바 메인
+    │   │   ├── RoomList.tsx           # 채팅방 목록 (접히는 섹션)
+    │   │   ├── RoomCard.tsx           # 개별 채팅방 카드
+    │   │   ├── WorkflowList.tsx       # 워크플로우(에이전트) 목록 (접히는 섹션)
+    │   │   ├── FilterTabs.tsx         # 읽지않음 / 채널 / 채팅 필터
+    │   │   ├── CreateRoomModal.tsx    # 방 생성 모달
+    │   │   └── FavoriteList.tsx       # 즐겨찾기 섹션
     │   │
-    │   ├── AgentPanel/                # 우측 패널 — 에이전트/멤버 관리
-    │   │   ├── AgentPanel.tsx
-    │   │   ├── AgentCard.tsx
-    │   │   ├── AddAgentModal.tsx
-    │   │   ├── MemberList.tsx
-    │   │   └── RouterSettings.tsx
+    │   ├── ChatRoom/                  # 우측 — 채팅 영역
+    │   │   ├── ChatRoom.tsx           # 채팅방 메인 (헤더 + 메시지 + 입력)
+    │   │   ├── ChatHeader.tsx         # 방 이름 + 채팅/공유 탭
+    │   │   ├── TeamsMessageList.tsx   # 메시지 목록 (스크롤)
+    │   │   ├── TeamsMessageItem.tsx   # 개별 메시지 버블 (사용자/에이전트/라우터)
+    │   │   ├── TeamsMessageInput.tsx  # 입력창 (@멘션, 이모지, 첨부, 전송)
+    │   │   ├── MentionAutocomplete.tsx # @멘션 드롭다운
+    │   │   ├── RouterNotice.tsx       # 라우터 알림 메시지
+    │   │   └── AgentSelectFallback.tsx # 라우팅 실패 시 수동 선택 버튼
     │   │
-    │   ├── LogViewer/                 # 우측 패널 — 실행 로그
-    │   │   ├── LogViewer.tsx
-    │   │   ├── ExecutionTimeline.tsx
-    │   │   ├── NodeStatusBar.tsx
-    │   │   └── LogDetailModal.tsx
+    │   ├── MemberPanel/               # 멤버 패널 (👥 클릭 시 우측 슬라이드)
+    │   │   ├── MemberPanel.tsx        # 참여 멤버 목록
+    │   │   ├── MemberCard.tsx         # 개별 멤버 (온라인 상태)
+    │   │   └── InviteMemberModal.tsx  # 멤버 초대 모달
+    │   │
+    │   ├── LogViewer/                 # 실행 로그 (메시지 내 [로그] 버튼 → 모달)
+    │   │   ├── LogDetailModal.tsx     # 로그 모달
+    │   │   ├── ExecutionTimeline.tsx  # 노드 실행 타임라인
+    │   │   └── NodeStatusBar.tsx      # 노드별 상태 바
     │   │
     │   └── Router/                    # 하이브리드 라우터 로직
-    │       ├── mentionParser.ts
-    │       └── routingClient.ts
+    │       ├── mentionParser.ts       # @멘션 파싱
+    │       └── routingClient.ts       # LLM 라우팅 API 호출
     │
     ├── hooks/
     │   ├── useTeamsWebSocket.ts       # WebSocket 연결/재연결/이벤트
@@ -876,6 +947,7 @@ features/main-teams/
 - `feature-registry.ts`에서 import 한 줄로 ON/OFF
 - 기존 feature들과 동일한 패턴 (`main-chat-current` 등과 같은 구조)
 - 내부적으로 `components/` 하위에 영역별 분리하여 관심사 구분
+- 로그 뷰어는 별도 패널 없이 메시지 내 버튼 → 모달로 표시
 
 ### 백엔드 xgen-teams/ (신규 서비스)
 
