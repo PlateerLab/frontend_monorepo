@@ -4,6 +4,10 @@ import React from 'react';
 
 interface SpotlightMaskProps {
     targetRect: DOMRect | null;
+    /** 추가로 밝게 표시할 사각 영역 (노드 등) */
+    highlightRects?: DOMRect[];
+    /** 밝게 표시할 엣지 polyline (화면 좌표 "x,y x,y ..." 문자열) */
+    edgePolylines?: string[];
     padding?: number;
     borderRadius?: number;
 }
@@ -14,15 +18,12 @@ interface SpotlightMaskProps {
  */
 const SpotlightMask: React.FC<SpotlightMaskProps> = ({
     targetRect,
+    highlightRects = [] as DOMRect[],
+    edgePolylines = [] as string[],
     padding = 8,
     borderRadius = 8,
-}) => {
-    if (!targetRect) return null;
-
-    const x = targetRect.left - padding;
-    const y = targetRect.top - padding;
-    const w = targetRect.width + padding * 2;
-    const h = targetRect.height + padding * 2;
+}: SpotlightMaskProps) => {
+    if (!targetRect && highlightRects.length === 0 && edgePolylines.length === 0) return null;
 
     return (
         <svg
@@ -39,16 +40,48 @@ const SpotlightMask: React.FC<SpotlightMaskProps> = ({
             <defs>
                 <mask id="spotlight-mask">
                     <rect x="0" y="0" width="100%" height="100%" fill="white" />
-                    <rect
-                        x={x}
-                        y={y}
-                        width={w}
-                        height={h}
-                        rx={borderRadius}
-                        ry={borderRadius}
-                        fill="black"
-                        style={{ transition: 'all 0.5s ease' }}
-                    />
+
+                    {/* 커서 타겟 영역 */}
+                    {targetRect && (
+                        <rect
+                            x={targetRect.left - padding}
+                            y={targetRect.top - padding}
+                            width={targetRect.width + padding * 2}
+                            height={targetRect.height + padding * 2}
+                            rx={borderRadius}
+                            ry={borderRadius}
+                            fill="black"
+                            style={{ transition: 'all 0.5s ease' }}
+                        />
+                    )}
+
+                    {/* 노드 등 사각 하이라이트 영역 */}
+                    {highlightRects.map((rect, i) => (
+                        <rect
+                            key={`r-${i}`}
+                            x={rect.left - padding}
+                            y={rect.top - padding}
+                            width={rect.width + padding * 2}
+                            height={rect.height + padding * 2}
+                            rx={borderRadius}
+                            ry={borderRadius}
+                            fill="black"
+                            style={{ transition: 'all 0.5s ease' }}
+                        />
+                    ))}
+
+                    {/* 엣지 선 하이라이트 */}
+                    {edgePolylines.map((points, i) => (
+                        <polyline
+                            key={`e-${i}`}
+                            points={points}
+                            fill="none"
+                            stroke="black"
+                            strokeWidth={6}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                    ))}
                 </mask>
             </defs>
             <rect

@@ -90,20 +90,36 @@ export function useNodes(): UseNodesReturn {
     const [isInitialized, setIsInitialized] = useState(false);
     const fetchedRef = useRef(false);
 
+    // 숨길 노드 ID 목록 (삭제 아닌 필터링)
+    const HIDDEN_NODE_IDS = [
+        'agents_lotte',  // 롯데 에이전트 (LotteGPT) — 현재 미사용
+        'agents/lotte',  // 동일 노드 (슬래시 형식 ID)
+    ];
+
+    const filterHiddenNodes = useCallback((categories: NodeCategory[]): NodeCategory[] => {
+        return categories.map((cat) => ({
+            ...cat,
+            functions: cat.functions?.map((func) => ({
+                ...func,
+                nodes: func.nodes?.filter((node) => !HIDDEN_NODE_IDS.includes(node.id)),
+            })).filter((func) => (func.nodes?.length ?? 0) > 0),
+        })).filter((cat) => (cat.functions?.length ?? 0) > 0);
+    }, []);
+
     const fetchNodes = useCallback(async () => {
         if (isLoading) return;
         setIsLoading(true);
         setError(null);
         try {
             const categories = await getNodes();
-            setNodes(categories);
+            setNodes(filterHiddenNodes(categories));
             setIsInitialized(true);
         } catch (e) {
             setError((e as Error).message || 'Failed to load nodes');
         } finally {
             setIsLoading(false);
         }
-    }, [isLoading]);
+    }, [isLoading, filterHiddenNodes]);
 
     useEffect(() => {
         if (!fetchedRef.current) {
@@ -121,13 +137,13 @@ export function useNodes(): UseNodesReturn {
         setError(null);
         try {
             const categories = await exportNodes();
-            setNodes(categories);
+            setNodes(filterHiddenNodes(categories));
         } catch (e) {
             setError((e as Error).message || 'Failed to refresh nodes');
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [filterHiddenNodes]);
 
     return { nodes, flatNodeSpecs, isLoading, error, isInitialized, refreshNodes };
 }
