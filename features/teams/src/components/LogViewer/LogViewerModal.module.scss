@@ -1,0 +1,245 @@
+$bg-overlay: rgba(0, 0, 0, 0.4);
+$bg-modal: #ffffff;
+$border-color: #e1e4e8;
+$text-primary: #1d1f23;
+$text-secondary: #7a7f89;
+$text-muted: #a0a4ab;
+$color-primary: #305eeb;
+$color-success: #2eb146;
+$color-warning: #f59f00;
+$color-error: #e03131;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $bg-overlay;
+  z-index: 1000;
+}
+
+.modal {
+  width: 640px;
+  max-width: 90vw;
+  max-height: 80vh;
+  background: $bg-modal;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid $border-color;
+
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: $text-primary;
+  }
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: $text-muted;
+  cursor: pointer;
+
+  &:hover {
+    background: #f0f2f5;
+    color: $text-primary;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+// ─── Summary ───
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.summaryItem {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.summaryLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: $text-muted;
+  margin: 0 0 4px;
+}
+
+.summaryValue {
+  font-size: 14px;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0;
+}
+
+// ─── Status Badge ───
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 4px;
+
+  &Running {
+    color: $color-warning;
+    background: rgba($color-warning, 0.1);
+  }
+
+  &Completed {
+    color: $color-success;
+    background: rgba($color-success, 0.1);
+  }
+
+  &Error {
+    color: $color-error;
+    background: rgba($color-error, 0.1);
+  }
+}
+
+.badgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+// ─── Timeline ───
+
+.timelineSection {
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 12px;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-left: 16px;
+  border-left: 2px solid $border-color;
+}
+
+.timelineItem {
+  position: relative;
+  padding: 8px 0 8px 16px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 12px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: $border-color;
+    border: 2px solid #fff;
+  }
+
+  &Completed::before {
+    background: $color-success;
+  }
+
+  &Running::before {
+    background: $color-warning;
+  }
+
+  &Error::before {
+    background: $color-error;
+  }
+}
+
+.timelineName {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0;
+}
+
+.timelineStatus {
+  font-size: 11px;
+  color: $text-muted;
+  margin: 2px 0 0;
+}
+
+// ─── Raw Logs ───
+
+.rawLogsSection {
+  margin-bottom: 20px;
+}
+
+.rawLogs {
+  padding: 12px;
+  background: #1e1e2e;
+  color: #cdd6f4;
+  border-radius: 8px;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  max-height: 200px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+// ─── Loading / Error ───
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: $text-muted;
+  font-size: 14px;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: $color-error;
+  font-size: 14px;
+}

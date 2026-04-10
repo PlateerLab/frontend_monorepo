@@ -85,6 +85,8 @@
     "@xgen/main-canvas-intro": "workspace:*",
     "@xgen/main-chat-current": "workspace:*",
     "@xgen/main-chat-new": "workspace:*",
+    "@xgen/main-teams": "workspace:*",
+    "@xgen/feature-teams": "workspace:*",
     "@xgen/main-document-management-collection": "workspace:*",
     "@xgen/main-document-management-database": "workspace:*",
     "@xgen/main-document-management-orchestrator": "workspace:*",

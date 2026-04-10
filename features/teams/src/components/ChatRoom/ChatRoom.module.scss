@@ -1,0 +1,453 @@
+$bg-chat: #ffffff;
+$bg-bubble-user: #305eeb;
+$bg-bubble-agent: #f0f2f5;
+$bg-bubble-system: transparent;
+$bg-input: #f8f9fa;
+$border-color: #e1e4e8;
+$text-primary: #1d1f23;
+$text-secondary: #7a7f89;
+$text-muted: #a0a4ab;
+$color-primary: #305eeb;
+$color-error: #e03131;
+
+// ─── Chat Room Container ───
+
+.chatRoom {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  background: $bg-chat;
+}
+
+.chatHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid $border-color;
+}
+
+.chatHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: $text-primary;
+  }
+}
+
+.chatHeaderAvatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.chatTabs {
+  display: flex;
+  gap: 4px;
+}
+
+.chatTab {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  background: #fff;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+
+  &Active {
+    background: $color-primary;
+    border-color: $color-primary;
+    color: #fff;
+  }
+}
+
+// ─── Message List ───
+
+.messageArea {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.messageGroup {
+  display: flex;
+  gap: 8px;
+  max-width: 75%;
+
+  &User {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+
+  &Agent, &System {
+    align-self: flex-start;
+  }
+}
+
+.messageAvatar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 2px;
+}
+
+.messageContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.messageSender {
+  font-size: 11px;
+  font-weight: 600;
+  color: $text-secondary;
+  margin-bottom: 2px;
+}
+
+.messageBubble {
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: pre-wrap;
+
+  &User {
+    background: $bg-bubble-user;
+    color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+
+  &Agent {
+    background: $bg-bubble-agent;
+    color: $text-primary;
+    border-bottom-left-radius: 4px;
+  }
+
+  &System {
+    background: transparent;
+    color: $text-muted;
+    font-size: 12px;
+    text-align: center;
+    padding: 8px;
+  }
+
+  &Error {
+    background: rgba($color-error, 0.08);
+    color: $color-error;
+    border: 1px solid rgba($color-error, 0.2);
+  }
+
+  &Streaming {
+    position: relative;
+
+    &::after {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 14px;
+      margin-left: 2px;
+      background: $color-primary;
+      border-radius: 1px;
+      animation: blink 0.8s infinite;
+      vertical-align: text-bottom;
+    }
+  }
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.messageTime {
+  font-size: 10px;
+  color: $text-muted;
+  margin-top: 2px;
+}
+
+.messageActions {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.messageActionBtn {
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  background: #fff;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+}
+
+// ─── Node Status ───
+
+.nodeStatuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.nodeStatus {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.04);
+  color: $text-secondary;
+
+  &Running {
+    color: #f59f00;
+  }
+
+  &Completed {
+    color: #2eb146;
+  }
+
+  &Error {
+    color: $color-error;
+  }
+}
+
+.nodeStatusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+// ─── Empty State ───
+
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: $text-muted;
+  padding: 40px;
+
+  svg {
+    width: 56px;
+    height: 56px;
+    opacity: 0.3;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: $text-secondary;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+  }
+}
+
+// ─── Chat Input ───
+
+.chatInput {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid $border-color;
+  background: #fff;
+}
+
+.inputWrapper {
+  flex: 1;
+  position: relative;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 40px;
+  max-height: 120px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.5;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  background: $bg-input;
+  color: $text-primary;
+  outline: none;
+  resize: none;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: $text-muted;
+  }
+
+  &:focus {
+    border-color: $color-primary;
+    background: #fff;
+    box-shadow: 0 0 0 2px rgba($color-primary, 0.08);
+  }
+}
+
+.sendBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: $color-primary;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+
+  &:hover {
+    background: darken($color-primary, 8%);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.stopBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: $color-error;
+  color: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover {
+    background: darken($color-error, 8%);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// ─── Mention Autocomplete ───
+
+.mentionList {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin-bottom: 4px;
+  background: #fff;
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.mentionItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: none;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.1s;
+
+  &:hover, &Active {
+    background: rgba($color-primary, 0.06);
+  }
+
+  &:first-child {
+    border-radius: 10px 10px 0 0;
+  }
+
+  &:last-child {
+    border-radius: 0 0 10px 10px;
+  }
+}
+
+.mentionDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mentionName {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.mentionDesc {
+  font-size: 11px;
+  color: $text-muted;
+  margin-left: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}

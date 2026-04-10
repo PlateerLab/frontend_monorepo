@@ -212,6 +212,9 @@ importers:
       '@xgen/feature-root-landing-hero':
         specifier: workspace:*
         version: link:../../features/root-landing-hero
+      '@xgen/feature-teams':
+        specifier: workspace:*
+        version: link:../../features/teams
       '@xgen/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
@@ -272,6 +275,9 @@ importers:
       '@xgen/main-prompt-management-storage':
         specifier: workspace:*
         version: link:../../features/main-prompt-management-storage
+      '@xgen/main-teams':
+        specifier: workspace:*
+        version: link:../../features/main-teams
       '@xgen/main-tool-management-library':
         specifier: workspace:*
         version: link:../../features/main-tool-management-library
@@ -2414,6 +2420,43 @@ importers:
         specifier: ^5
         version: 5.9.3
 
+  features/main-teams:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      next:
+        specifier: ^15.1.0
+        version: 15.5.14(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.99.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      sass:
+        specifier: ^1.89.2
+        version: 1.99.0
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
   features/main-tool-management-library:
     dependencies:
       '@xgen/api-client':
@@ -2735,6 +2778,43 @@ importers:
       '@types/react':
         specifier: ^19
         version: 19.2.14
+
+  features/teams:
+    dependencies:
+      '@xgen/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@xgen/auth-provider':
+        specifier: workspace:*
+        version: link:../../packages/auth-provider
+      '@xgen/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@xgen/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@xgen/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@xgen/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      next:
+        specifier: ^15.1.0
+        version: 15.5.14(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.99.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      sass:
+        specifier: ^1.89.2
+        version: 1.99.0
+      typescript:
+        specifier: ^5
+        version: 5.9.3
 
   packages/admin-setting-shared:
     dependencies:

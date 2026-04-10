@@ -314,6 +314,7 @@ export async function initializeFeatures(): Promise<void> {
     import('@xgen/main-chat-new'),
     import('@xgen/main-chat-current'),
     import('@xgen/feature-main-chat-history'),
+    // Teams는 독립 라우트(/teams)로 분리됨
 
     // Agentflow Section
     import('@xgen/main-canvas-intro'),
