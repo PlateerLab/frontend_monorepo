@@ -1,0 +1,133 @@
+$bg-topbar: #ffffff;
+$border-color: #e1e4e8;
+$text-primary: #1d1f23;
+$text-secondary: #7a7f89;
+$text-muted: #a0a4ab;
+$color-primary: #305eeb;
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: $bg-topbar;
+  border-bottom: 1px solid $border-color;
+  min-height: 48px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.navBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: $text-muted;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: #f0f2f5;
+    color: $text-primary;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.center {
+  flex: 1;
+  max-width: 320px;
+  margin: 0 16px;
+
+  input {
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 12px;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    background: #f8f9fa;
+    color: $text-primary;
+    outline: none;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: $text-muted;
+    }
+
+    &:focus {
+      border-color: $color-primary;
+      background: #fff;
+    }
+  }
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.membersBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  background: #fff;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.memberCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #f0f2f5;
+  font-size: 10px;
+  font-weight: 700;
+  color: $text-secondary;
+}
+
+.profileAvatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: $color-primary;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}

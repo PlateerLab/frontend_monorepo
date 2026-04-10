@@ -116,6 +116,10 @@
       },
       "current": {
         "title": "현재 채팅"
+      },
+      "teams": {
+        "title": "Teams",
+        "description": "AI 에이전트 협업 채팅"
       }
     },
     "agentflow": {

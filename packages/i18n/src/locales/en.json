@@ -116,6 +116,10 @@
       },
       "current": {
         "title": "Current Chat"
+      },
+      "teams": {
+        "title": "Teams",
+        "description": "AI Agent Collaborative Chat"
       }
     },
     "agentflow": {
