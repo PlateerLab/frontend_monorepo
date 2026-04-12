@@ -185,9 +185,9 @@ export const TeamsSidebar: React.FC<TeamsSidebarProps> = ({
           )
         ) : (
           filteredWorkflows.length > 0 ? (
-            filteredWorkflows.map((wf) => (
+            filteredWorkflows.map((wf, idx) => (
               <button
-                key={wf.id}
+                key={`${wf.id}__${idx}`}
                 className={styles.workflowCard}
                 onClick={() => handleAddWorkflowToRoom(wf)}
                 title={currentRoomId ? t('teams.workflow.addToRoom') : ''}

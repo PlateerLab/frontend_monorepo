@@ -1,7 +1,6 @@
 'use client';
 
 import React, { Suspense } from 'react';
-import { AuthGuard } from '@xgen/auth-provider';
 import { TeamsApp } from '@xgen/feature-teams';
 
 const LoadingSpinner: React.FC = () => (
@@ -22,10 +21,8 @@ const LoadingSpinner: React.FC = () => (
 
 export default function TeamsRoute() {
   return (
-    <AuthGuard>
-      <Suspense fallback={<LoadingSpinner />}>
-        <TeamsApp />
-      </Suspense>
-    </AuthGuard>
+    <Suspense fallback={<LoadingSpinner />}>
+      <TeamsApp />
+    </Suspense>
   );
 }

@@ -76,6 +76,9 @@ export function useTeamsChat(
 
       // 에이전트 placeholder 메시지 추가
       const agentMsgId = generateId();
+      // executionId가 백엔드에서 안 오면 메시지 ID 자체를 라이브 로그 키로 사용
+      // (teams-api.ts의 liveExecutionLogs Map에 SSE 동안 로그가 누적됨)
+      const liveExecId = executionId || agentMsgId;
       const agentMessage: TeamsMessage = {
         id: agentMsgId,
         roomId,
@@ -87,7 +90,7 @@ export function useTeamsChat(
         },
         content: '',
         type: 'agent',
-        metadata: executionId ? { executionId } : undefined,
+        metadata: { executionId: liveExecId },
         createdAt: new Date().toISOString(),
         status: 'streaming',
       };
@@ -101,8 +104,10 @@ export function useTeamsChat(
       try {
         await teamsApi.executeAgentStream({
           agentId: agent.id,
+          agentName: agent.name,
           message: userMessage,
           executionId,
+          liveExecutionId: liveExecId,
           signal: abortController.signal,
           onData: (content) => {
             setMessages((prev) =>
@@ -209,10 +214,20 @@ export function useTeamsChat(
         if (routing.targets.length > 0) {
           const execPromises = routing.targets.map((target) => {
             const agent = agents.find((a) => a.id === target.agentId);
-            if (!agent) return Promise.resolve();
+            if (!agent) {
+              console.warn(
+                '[teams] routed agent not found in current room:',
+                target.agentId,
+                'available:',
+                agents.map((a) => a.id)
+              );
+              return Promise.resolve();
+            }
             return executeAgent(agent, content, savedMessage.metadata?.executionId);
           });
           await Promise.all(execPromises);
+        } else {
+          console.warn('[teams] routing returned no targets for content:', content);
         }
       } catch (err: any) {
         setMessages((prev) =>
