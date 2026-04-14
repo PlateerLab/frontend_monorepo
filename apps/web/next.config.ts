@@ -54,6 +54,7 @@ const nextConfig: NextConfig = {
         '@xgen/canvas-types',
         '@xgen/canvas-layout',
         '@xgen/canvas-engine',
+        '@xgen/feature-teams',
         '@xgen/feature-canvas-core',
         '@xgen/feature-canvas-header',
         '@xgen/feature-canvas-sidebar-nodes',
