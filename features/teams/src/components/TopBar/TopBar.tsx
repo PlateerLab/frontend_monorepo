@@ -1,20 +1,59 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@xgen/i18n';
+import type { XgenUser, TeamsMember } from '../../types';
+import { useUserSearch } from '../../hooks/useUserSearch';
+import { UserSearchDropdown } from './UserSearchDropdown';
 import styles from './TopBar.module.scss';
 
 interface TopBarProps {
   username?: string;
+  currentUserId?: number;
   memberCount: number;
+  currentRoomId: string | null;
+  currentMembers: TeamsMember[];
   onToggleMembers: () => void;
+  onInviteUser: (roomId: string, user: XgenUser) => Promise<void> | void;
   onLogout?: () => void;
 }
 
-export const TopBar: React.FC<TopBarProps> = ({ username, memberCount, onToggleMembers, onLogout }) => {
+export const TopBar: React.FC<TopBarProps> = ({
+  username,
+  currentUserId,
+  memberCount,
+  currentRoomId,
+  currentMembers,
+  onToggleMembers,
+  onInviteUser,
+  onLogout,
+}) => {
   const { t } = useTranslation();
   const router = useRouter();
+  const [focused, setFocused] = useState(false);
+
+  const excludeIds = useMemo(() => {
+    const ids = currentMembers.map((m) => m.userId);
+    if (currentUserId) ids.push(currentUserId);
+    return ids;
+  }, [currentMembers, currentUserId]);
+
+  const { loading, results, query, setQuery } = useUserSearch(excludeIds);
+
+  const handleInvite = useCallback(
+    async (user: XgenUser) => {
+      if (!currentRoomId) return;
+      await onInviteUser(currentRoomId, user);
+      setQuery('');
+    },
+    [currentRoomId, onInviteUser, setQuery]
+  );
+
+  const handleClose = useCallback(() => {
+    setFocused(false);
+    setQuery('');
+  }, [setQuery]);
 
   return (
     <div className={styles.topBar}>
@@ -34,7 +73,28 @@ export const TopBar: React.FC<TopBarProps> = ({ username, memberCount, onToggleM
 
       {/* Center: Search */}
       <div className={styles.center}>
-        <input type="text" placeholder={t('teams.topBar.search')} />
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setTimeout(() => setFocused(false), 150)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') handleClose();
+          }}
+          placeholder={t('teams.topBar.search')}
+        />
+        {focused && query.trim() && (
+          <UserSearchDropdown
+            query={query}
+            loading={loading}
+            results={results}
+            currentRoomId={currentRoomId}
+            alreadyMemberIds={currentMembers.map((m) => m.userId)}
+            onInvite={handleInvite}
+            onClose={handleClose}
+          />
+        )}
       </div>
 
       {/* Right: Members + Profile */}

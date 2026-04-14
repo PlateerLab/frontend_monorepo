@@ -106,7 +106,8 @@ export function useTeamsChat(
           agentId: agent.id,
           agentName: agent.name,
           message: userMessage,
-          executionId,
+          roomId,
+          executionId: liveExecId,
           liveExecutionId: liveExecId,
           signal: abortController.signal,
           onData: (content) => {

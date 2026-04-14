@@ -18,6 +18,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({ agents, isExecuting, onSen
   const [showMentions, setShowMentions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState('');
   const [mentionIndex, setMentionIndex] = useState(0);
+  // 드롭다운으로 선택한 멘션 agent ID 추적 (이름에 공백/특수문자가 있어도 안전)
+  const [selectedMentionIds, setSelectedMentionIds] = useState<string[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // @mention 후보 필터링
@@ -76,6 +78,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({ agents, isExecuting, onSen
       const newText = beforeCursor.substring(0, mentionStart) + `@${agent.name} ` + afterCursor;
       setText(newText);
       setShowMentions(false);
+      setSelectedMentionIds((prev) =>
+        prev.includes(agent.id) ? prev : [...prev, agent.id]
+      );
 
       requestAnimationFrame(() => {
         const newPos = mentionStart + agent.name.length + 2;
@@ -90,21 +95,18 @@ export const ChatInput: React.FC<ChatInputProps> = ({ agents, isExecuting, onSen
   const handleSend = useCallback(() => {
     if (!text.trim() || isExecuting) return;
 
-    // @mention된 에이전트 ID 추출
-    const mentionedIds: string[] = [];
-    const mentionRegex = /@(\S+)/g;
-    let match;
-    while ((match = mentionRegex.exec(text)) !== null) {
-      const agent = agents.find(
-        (a) => a.name.toLowerCase() === match![1].toLowerCase()
-      );
-      if (agent) mentionedIds.push(agent.id);
-    }
+    // 드롭다운으로 선택된 멘션 ID 중 현재 본문에 이름이 남아있는 것만 유효
+    // (사용자가 backspace 등으로 멘션을 지웠을 수 있음)
+    const validIds = selectedMentionIds.filter((id) => {
+      const agent = agents.find((a) => a.id === id);
+      return agent ? text.includes(`@${agent.name}`) : false;
+    });
 
-    onSend(text.trim(), mentionedIds.length > 0 ? mentionedIds : undefined);
+    onSend(text.trim(), validIds.length > 0 ? validIds : undefined);
     setText('');
     setShowMentions(false);
-  }, [text, isExecuting, agents, onSend]);
+    setSelectedMentionIds([]);
+  }, [text, isExecuting, agents, onSend, selectedMentionIds]);
 
   // 키보드 핸들링
   const handleKeyDown = useCallback(

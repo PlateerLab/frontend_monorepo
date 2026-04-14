@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import type { TeamsRoom, TeamsAgent } from '../types';
+import type { TeamsRoom, TeamsAgent, TeamsMember, XgenUser } from '../types';
 import * as teamsApi from '../api/teams-api';
 
 // ─────────────────────────────────────────────────────────────
@@ -20,6 +20,8 @@ export interface UseRoomStateReturn {
   refreshRooms: () => Promise<void>;
   addAgentToRoom: (roomId: string, agent: TeamsAgent) => Promise<void>;
   removeAgentFromRoom: (roomId: string, agentId: string) => Promise<void>;
+  inviteMember: (roomId: string, user: XgenUser) => Promise<void>;
+  removeMember: (roomId: string, userId: number) => Promise<void>;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -94,9 +96,14 @@ export function useRoomState(): UseRoomStateReturn {
   }, []);
 
   const createRoom = useCallback(
-    async (name: string, description?: string) => {
+    async (name: string, description?: string, llmModel?: string) => {
       try {
-        const newRoom = await teamsApi.createRoom(name, description);
+        const newRoom = await teamsApi.createRoom(
+          name,
+          description,
+          'hybrid',
+          llmModel
+        );
         setRooms((prev) => [newRoom, ...prev]);
         setCurrentRoomId(newRoom.id);
       } catch (err: any) {
@@ -159,6 +166,53 @@ export function useRoomState(): UseRoomStateReturn {
     []
   );
 
+  const inviteMember = useCallback(
+    async (roomId: string, user: XgenUser) => {
+      try {
+        const room = rooms.find((r) => r.id === roomId);
+        if (room?.members.some((m) => m.userId === user.id)) return;
+
+        await teamsApi.addMember(roomId, user.id, user.username, 'member');
+
+        const newMember: TeamsMember = {
+          userId: user.id,
+          username: user.username,
+          role: 'member',
+          isOnline: true,
+          joinedAt: new Date().toISOString(),
+        };
+        setRooms((prev) =>
+          prev.map((r) =>
+            r.id === roomId
+              ? { ...r, members: [...r.members, newMember] }
+              : r
+          )
+        );
+      } catch (err: any) {
+        setError(err.message || 'Failed to invite member');
+      }
+    },
+    [rooms]
+  );
+
+  const removeMember = useCallback(
+    async (roomId: string, userId: number) => {
+      try {
+        await teamsApi.removeMember(roomId, userId);
+        setRooms((prev) =>
+          prev.map((r) =>
+            r.id === roomId
+              ? { ...r, members: r.members.filter((m) => m.userId !== userId) }
+              : r
+          )
+        );
+      } catch (err: any) {
+        setError(err.message || 'Failed to remove member');
+      }
+    },
+    []
+  );
+
   return {
     rooms,
     currentRoom,
@@ -171,5 +225,7 @@ export function useRoomState(): UseRoomStateReturn {
     refreshRooms,
     addAgentToRoom,
     removeAgentFromRoom,
+    inviteMember,
+    removeMember,
   };
 }

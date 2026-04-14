@@ -56,8 +56,16 @@ export const en = {
   },
 
   topBar: {
-    search: 'Search...',
+    search: 'Search users...',
     members: 'Members',
+  },
+
+  userSearch: {
+    loading: 'Loading users...',
+    noResults: 'No users found',
+    invite: 'Invite',
+    alreadyMember: 'Joined',
+    selectRoomFirst: 'Please select a room first',
   },
 
   memberPanel: {

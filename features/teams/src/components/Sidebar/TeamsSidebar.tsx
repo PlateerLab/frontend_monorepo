@@ -16,7 +16,7 @@ interface TeamsSidebarProps {
   currentRoomId: string | null;
   availableWorkflows: TeamsAgent[];
   onSelectRoom: (roomId: string) => void;
-  onCreateRoom: (name: string, description?: string) => Promise<void>;
+  onCreateRoom: (name: string, description?: string, llmModel?: string) => Promise<void>;
   onDeleteRoom: (roomId: string) => Promise<void>;
   onAddAgentToRoom: (roomId: string, agent: TeamsAgent) => Promise<void>;
 }

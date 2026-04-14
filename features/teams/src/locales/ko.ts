@@ -61,8 +61,17 @@ export const ko = {
 
   // Top Bar
   topBar: {
-    search: '검색...',
+    search: '사용자 검색...',
     members: '멤버',
+  },
+
+  // User Search Dropdown
+  userSearch: {
+    loading: '사용자 목록 불러오는 중...',
+    noResults: '검색 결과가 없습니다',
+    invite: '초대',
+    alreadyMember: '초대됨',
+    selectRoomFirst: '먼저 채팅방을 선택하세요',
   },
 
   // Member Panel

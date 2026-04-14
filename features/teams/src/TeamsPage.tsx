@@ -31,6 +31,7 @@ const TeamsPage: React.FC = () => {
     refreshRooms,
     addAgentToRoom,
     removeAgentFromRoom,
+    inviteMember,
   } = useRoomState();
 
   // ─── Chat State ───
@@ -107,8 +108,12 @@ const TeamsPage: React.FC = () => {
       {/* Top Bar */}
       <TopBar
         username={user?.username}
+        currentUserId={user?.user_id}
         memberCount={memberCount}
+        currentRoomId={currentRoom?.id ?? null}
+        currentMembers={currentRoom?.members ?? []}
         onToggleMembers={handleToggleMembers}
+        onInviteUser={inviteMember}
         onLogout={() => logout()}
       />
 

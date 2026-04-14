@@ -393,7 +393,34 @@ $color-primary-light: rgba(48, 94, 235, 0.08);
     color: $text-primary;
   }
 
-  input, textarea {
+  .labelWithHelp {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .helpIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid $text-muted;
+    color: $text-muted;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: help;
+    user-select: none;
+    transition: border-color 0.15s, color 0.15s;
+
+    &:hover {
+      border-color: $color-primary;
+      color: $color-primary;
+    }
+  }
+
+  input, textarea, select {
     padding: 10px 12px;
     font-size: 14px;
     border: 1px solid $border-color;
